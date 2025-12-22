@@ -5,7 +5,7 @@
 
 :root {
   /* Custom dark theme with lime green primary color */
-  --background: #282828;
+  --background: #0A0A0A;
   --foreground: #ffffff;
   --card: #454545;
   --card-foreground: #ffffff;
@@ -138,7 +138,7 @@
 
 
 .embla {
-  
+
   --slide-height: 19rem;
   --slide-spacing: 1rem;
   --slide-size: 100%;
