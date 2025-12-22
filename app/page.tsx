@@ -4,6 +4,7 @@ import EmblaCarousel from '@/components/embla-carousel/EmblaCarousel'
 import { Button } from '@/components/ui/button'
 import { EmblaOptionsType } from 'embla-carousel'
 import { Check } from 'lucide-react'
+import { LogosSlider } from '@/components/logoslider'
 export default function LandingPage() {
 
   const OPTIONS: EmblaOptionsType = { loop: true }
@@ -40,25 +41,38 @@ export default function LandingPage() {
         </div>
       </div>
 
-      <div className='h-180.5 w-full flex justify-center items-center'>
-        <div className='h-153 w-153'>
+      <div className='h-180.5 w-full flex items-center justify-center gap-16'>
+        <div className='h-133 w-153'>
           <img className='h-full w-full rounded-lg' src="./footballkick.jpg" alt="pic" />
         </div>
-        <div className='h-full w-147 flex flex-col   justify-center items-center gap-16 flex-1'>
+        <div className='h-full w-147 flex flex-col justify-center gap-4 flex-1'>
           <div className='w-123.75 h-80px'>
-            <h1 className='text-bold '>Our <span className='text-primary'>Facilities</span></h1>
-            <p>World-class training facilities designed for optimal player development</p>
+            <h1 className='font-bold text-[48px]'>Our <span className='text-primary'>Facilities</span></h1>
+            <p className='text-[#99A1AF] text-md'>World-class training facilities designed for optimal player development</p>
           </div>
-          <div className='h-66 w-147'>
-            <div className='flex gap-3'><Check className='color-primary'/><h1>Olympic-size indoor soccer field</h1></div>
-            <div className='flex gap-3'><Check className='color-primary'/><h1>Convenient Location</h1></div>
-            <div className='flex gap-3'><Check className='color-primary'/><h1>State-of-the-art lighting equipment</h1></div>
-            <div className='flex gap-3'><Check className='color-primary'/><h1>Modern locker rooms</h1></div>
-            <div className='flex gap-3'><Check className='color-primary'/><h1>Large Indoor Field Turf</h1></div>
-            <div className='flex gap-3'><Check className='color-primary'/><h1>Strength And Conditioning Room</h1></div>
-            <div className='flex gap-3'><Check className='color-primary'/><h1>Safe and secure facility</h1></div>
+          <div className='h-66 w-147 pl-4 pt-4 flex flex-col gap-2'>
+            <div className='flex gap-3'><Check className='text-primary'/><h1>Olympic-size indoor soccer field</h1></div>
+            <div className='flex gap-3'><Check className='text-primary'/><h1>Convenient Location</h1></div>
+            <div className='flex gap-3'><Check className='text-primary'/><h1>State-of-the-art lighting equipment</h1></div>
+            <div className='flex gap-3'><Check className='text-primary'/><h1>Modern locker rooms</h1></div>
+            <div className='flex gap-3'><Check className='text-primary'/><h1>Large Indoor Field Turf</h1></div>
+            <div className='flex gap-3'><Check className='text-primary'/><h1>Strength And Conditioning Room</h1></div>
+            <div className='flex gap-3'><Check className='text-primary'/><h1>Safe and secure facility</h1></div>
+          </div>
+
+          <div className='border-t  border-[#282828]  w-147 flex flex-col gap-1 pt-4'>
+            <p className='text-[#99A1AF]'>visit us at:</p>
+            <h1>Matuchen, NJ</h1>
           </div>
         </div>
+      </div>
+
+
+      <div className='h-66 w-full flex flex-col'>
+        <div className='flex justify-center'>
+          <h1>Our Trusted Partners</h1>
+        </div>
+        <LogosSlider/>
       </div>
 
     </div>
