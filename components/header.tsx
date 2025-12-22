@@ -2,7 +2,7 @@
 
 export default function Header(){
     return(
-    <div className="w-full h-auto flex justify-center pt-5 sticky top-0 left-0 z-50">
+    <div className="w-full h-auto flex justify-center pt-5 top-0 left-0 z-50 fixed">
 
         <div className="w-303 h-12.5 rounded-full flex justify-between items-center bg-[#FFFFFF3D] px-2">
             <div className="w-29.5 h-11 ">
