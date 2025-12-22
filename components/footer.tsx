@@ -3,7 +3,7 @@ import Link from "next/link";
 
 export default function Footer(){
     return(<div className="w-full h-81.5 border-t flex justify-center border-[#282828]">
-        <div className="w-295.5 h-57.25 gap-8">
+        <div className="w-295.5 h-57.25 gap-8 pt-12">
             <div className="flex gap-12">
                 <div className="flex flex-col h-36 w-[260.5px] gap-4 flex-wrap">
                     <div className="w-21.5 h-8"> <img className=" rounded-full" src="/logo.PNG" alt="" /></div>
