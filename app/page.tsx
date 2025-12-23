@@ -3,9 +3,10 @@
 import EmblaCarousel from "@/components/embla-carousel/EmblaCarousel";
 import { Button } from "@/components/ui/button";
 import { EmblaOptionsType } from "embla-carousel";
-import { Check, Users, User, Trophy, } from "lucide-react";
+import { Check, Users, User, Trophy, Calendar1, Clock, } from "lucide-react";
 import { LogosSlider } from "@/components/logoslider";
-import { Card, CardContent } from "@/components/ui/card";
+import { Calendar } from "@/components/ui/calendar";
+import { Card,CardHeader,CardContent,CardFooter } from "@/components/ui/card";
 export default function LandingPage() {
   const OPTIONS: EmblaOptionsType = { loop: true };
   const SLIDE_COUNT = 5;
@@ -281,7 +282,116 @@ export default function LandingPage() {
         </div>
       </div>
 
-      
+      {/* Book your training session */}
+
+  <div className="w-full min-h-screen flex flex-col items-center justify-center gap-16">
+
+    {/* Heading */}
+    <div className="max-w-4xl text-center space-y-2">
+      <h1 className="text-5xl font-bold">
+        Book Your <span className="text-primary">Training Session</span>
+      </h1>
+      <p className="text-muted">
+        Select your preferred date and time for group training sessions
+      </p>
+    </div>
+
+    {/* Content */}
+    <div className="flex w-full max-w-6xl gap-16 px-6">
+
+      {/* Calendar Card */}
+      <div className="flex flex-col flex-1 rounded-2xl bg-[#262626] p-6 px-10 gap-6">
+
+        {/* Card Header */}
+        <div className="flex items-center justify-center gap-3">
+          <Calendar1 className="text-primary" />
+          <h1 className="font-semibold text-xl">Select Date</h1>
+        </div>
+
+        {/* Calendar Container */}
+        <div className="flex h-110 w-full">
+          <Calendar
+           
+            className="rounded-[10px] bg-background p-10 w-full"
+          />
+        </div>
+        
+        <div className="w-full flex justify-center items-center"><button className="rounded-full px-5 py-1 bg-primary text-secondary font-bold w-full h-10">
+            BOOK SESSION
+          </button></div>
+          
+      </div>
+
+      {/* Right Card */}
+  <div className="flex flex-col flex-1 rounded-2xl bg-[#262626] p-6 gap-6">
+            <div className="flex items-center justify-center gap-3">
+              <Clock className="text-primary"/>
+              <h1 className="font-bold text-xl">Available Time Slot</h1>
+            </div>
+
+            <div className="h-110 w-full bg-background rounded-[10px] space-y-6 p-8">
+              <div className="w-full h-7 flex gap-1">
+                <Clock className="text-primary"/>
+                <h1 className="font-semibold">Select Session</h1>
+              </div>
+
+              <div className="h-81 w-100 space-y-4">
+
+
+                <div className="border border-[#282828] rounded-2xl w-full space-y-2 p-4 ">
+                    <div className="flex justify-between">
+                      <h1 className="font-semibold">Speed & Agility</h1>
+                      <h1 className="text-lg text-primary font-bold">$40</h1>
+                    </div>
+                    <p className="text-sm text-muted">4:00 PM - 5:00 PM • Monday - Friday</p>
+                </div>
+
+                <div className="border border-[#282828] rounded-2xl w-full space-y-2 p-4 ">
+                    <div className="flex justify-between">
+                      <h1 className="font-semibold">Technical Session</h1>
+                      <h1 className="text-lg text-primary font-bold">$40</h1>
+                    </div>
+                    <p className="text-sm text-muted">5:00 PM - 6:00 PM • Monday - Friday</p>
+                </div>
+
+                <div className="border border-[#282828] rounded-2xl w-full space-y-2 p-4 ">
+                    <div className="flex justify-between">
+                      <h1 className="font-semibold">Both Sessions (Combined)</h1>
+                      <h1 className="text-lg text-primary font-bold">$60</h1>
+                    </div>
+                    <p className="text-sm text-muted">4:00 PM - 6:00 PM • Monday - Friday</p>
+                    <p className="text-primary text-xs">⭐ Best Value - Save $20</p>
+                </div>
+
+
+              </div>
+            </div>
+            
+            <div className="w-full gap-2 flex flex-col">
+              <p>Available Slots</p>
+              <div className="w-full flex gap-4 h-18">
+                  <div className="bg-background w-56.5 h-full flex justify-center items-center gap-3 rounded-[10px]">
+                    <h1>9:00 AM</h1>
+                    <div className="p-2 h-10 bg-[#262626] flex justify-center items-center">
+                      <h1>2 slots available</h1>
+                    </div>
+                  </div>  
+                <div className="bg-background w-56.5 h-full flex justify-center items-center gap-3 rounded-[10px]">
+                    <h1>5:00 PM</h1>
+                    <div className="p-2 h-10 bg-[#262626] flex justify-center items-center">
+                      <h1>3 slots available</h1>
+                    </div>
+                  </div>
+              </div>
+
+            </div>
+
+
+  </div>
+
+    </div>
+  </div>
+  
 
       
     </div>
