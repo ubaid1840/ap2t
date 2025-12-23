@@ -6,7 +6,7 @@ const links = [
     { name: "HOME", href: "/" },
     { name: "ABOUT US", href: "/about" },
     { name: "IN-HOUSE PROGRAMS", href: "/inhouseprograms" },
-    { name: "CAPMS & CLINIS", href: "/camps&clinins" },
+    { name: "CAPMS & CLINICS", href: "/camps&clinics" },
     { name: "GALLERY", href: "/gallery" }
 ]
 
