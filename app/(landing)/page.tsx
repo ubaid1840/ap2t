@@ -1,15 +1,14 @@
 "use client";
 
 import EmblaCarousel from "@/components/embla-carousel/EmblaCarousel";
-import { Button } from "@/components/ui/button";
-import { EmblaOptionsType } from "embla-carousel";
-import { Check, Users, User, Trophy, Calendar1, Clock, } from "lucide-react";
-import { LogosSlider } from "@/components/logoslider";
-import { Calendar } from "@/components/ui/calendar";
-import { Card,CardHeader,CardContent,CardFooter } from "@/components/ui/card";
-import { ReviewSlider } from "@/components/reviewslider";
 import GradientIcon from "@/components/icon-container";
+import { LogosSlider } from "@/components/logoslider";
 import PricingSection from "@/components/priceing-section";
+import { ReviewSlider } from "@/components/reviewslider";
+import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
+import { EmblaOptionsType } from "embla-carousel";
+import { Calendar1, Check, Clock, Trophy, User, Users, } from "lucide-react";
 export default function LandingPage() {
   const OPTIONS: EmblaOptionsType = { loop: true };
   const SLIDE_COUNT = 5;
@@ -22,13 +21,13 @@ export default function LandingPage() {
       {/* hero section */}
       <EmblaCarousel slides={images} options={OPTIONS} />
       <div className="absolute top-66 left-15.5 w-148 h-80 flex flex-col">
-        <h1 className="font-Thunder text-[44px] tracking-[2px] font-bold italic">
+        <h1 className="text-6xl tracking-[2px] font-bold italic">
           Advanced Physical & Technical
         </h1>
         <h1 className="text-primary text-[44px] tracking-[2px] font-bold">
           TRAINING
         </h1>
-        <p>Professional Soccor Training Facility In Matuchen, NJ</p>
+        <p className="text-[#D1D5DC]">Professional Soccor Training Facility In Matuchen, NJ</p>
 
         <div className="rounded-lg flex bg-[#FFFFFF3D] p-6 mt-4">
           <div className="flex flex-col flex-1">
