@@ -3,6 +3,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import LoginForm from "@/components/loginForm"
+import SignUpForm from "@/components/signupform"
 
 export default function Page() {
   return (
@@ -26,6 +27,7 @@ export default function Page() {
 
         <div className="w-full flex justify-center">
         <TabsList className="border border-[#cbcbcb] bg-[#282828] w-50 py-2">
+
           <TabsTrigger value="login" className="flex-1">
             Log in
           </TabsTrigger>
@@ -42,15 +44,8 @@ export default function Page() {
 
   
         <TabsContent value="signup">
-          <div className="space-y-6">
-            <Input type="email" placeholder="Email" />
-            <Input type="password" placeholder="Password" />
-            <Input type="password" placeholder="Confirm Password" />
-
-            <Button className="w-full bg-primary text-secondary">
-              Sign up
-            </Button>
-          </div>
+            
+            <SignUpForm/>
         </TabsContent>
 
       </Tabs>
