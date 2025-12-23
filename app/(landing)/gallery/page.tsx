@@ -1,7 +1,6 @@
 "use client"
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { Gallery } from "react-grid-gallery";
 
 export default function Page() {
 
