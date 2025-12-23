@@ -1,4 +1,4 @@
-
+import Link from "next/link"
 
 export default function Header(){
     return(
@@ -9,16 +9,16 @@ export default function Header(){
                 <img src="/logo.PNG" alt="logo" className="h-full w-auto rounded-[22px]" />
             </div>
             <div className=" h-12.5 gap-8  flex items-center">
-                <h1>HOME</h1>
-                <h1>ABOUT US</h1>
-                <h1>IN-HOUSE PROGRAMS</h1>
-                <h1>CLAMPS & CLINICS</h1>
-                <h1>GALLERY</h1>
+                <Link href="/">HOME</Link> 
+                <Link href={"/about"}>ABOUT US</Link>
+                <Link href={"/inhouseprograms"}>IN-HOUSE PROGRAMS</Link>
+                <Link href={"/clamps&clinics"}>CLAMPS & CLINICS</Link>
+                <Link href={"/gallery"}>GALLERY</Link>
             </div>
 
             <div className='flex gap-2'>
-                <button className='rounded-full w-21.75 h-9 bg-[#CBFD0026] text-primary'>Store</button>
-                <button className='rounded-full w-31.25 h-9 bg-primary text-secondary font-semibold '>Contect</button>
+                <button className='rounded-full w-21.75 h-9 bg-[#CBFD0026] text-primary hover:bg-primary hover:text-secondary cursor-pointer'>Store</button>
+                <button className='rounded-full w-31.25 h-9 bg-primary text-secondary font-semibold cursor-pointer hover:bg-[#CBFD0026] hover:text-primary'>Contact</button>
             </div>
         </div>
     </div>)

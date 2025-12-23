@@ -14,7 +14,7 @@ const logos = [
 
 export function LogosSlider() {
   const [emblaRef] = useEmblaCarousel(
-    { loop: true, align: "start" },
+    { loop: true },
     [Autoplay({ delay: 2000, stopOnInteraction: false })]
   )
 
