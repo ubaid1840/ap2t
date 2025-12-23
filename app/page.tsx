@@ -7,6 +7,7 @@ import { Check, Users, User, Trophy, Calendar1, Clock, } from "lucide-react";
 import { LogosSlider } from "@/components/logoslider";
 import { Calendar } from "@/components/ui/calendar";
 import { Card,CardHeader,CardContent,CardFooter } from "@/components/ui/card";
+import { ReviewSlider } from "@/components/reviewslider";
 export default function LandingPage() {
   const OPTIONS: EmblaOptionsType = { loop: true };
   const SLIDE_COUNT = 5;
@@ -392,6 +393,42 @@ export default function LandingPage() {
     </div>
   </div>
   
+<div className="h-150 w-full p-15 space-y-8">
+
+    <div className="w-full h-24 space-y-1">
+      <h1 className="text-primary font-semibold text-5xl">Testimonial</h1>
+      <p className="text-muted">Hear from our members who have transformed their fitness, performance, and lifestyle with us!</p>
+
+    </div>
+    <ReviewSlider/>
+</div>
+
+
+
+{/* join now section */}
+
+      <div className="relative z-20 flex flex-col gap-6 sm:gap-8 items-center justify-center px-4 text-center">
+        <img src={"/logo.png"} className="w-40 sm:w-52 md:w-60" />
+        <p className="font-bold text-3xl sm:text-4xl md:text-6xl">
+          Join now and get 2 months free!
+        </p>
+        <div className="flex flex-col items-center justify-center px-2">
+          <p className="text-[#B3B3B3] mb-6 sm:mb-10 max-w-md sm:max-w-3xl text-center text-sm sm:text-base md:text-lg">
+            Contact Advanced Physical and Technical Training today at 732-575-9300 for more information about any of our classes, events, or clubs. Our friendly team will be happy to answer any questions you have.
+          </p>
+
+          <Button
+            style={{
+              background:
+                'radial-gradient(circle, rgba(255, 255, 255, 0.24) 0%, rgba(255, 255, 255, 0) 100%)',
+              borderColor: 'rgba(255, 255, 255, 0.2)',
+            }}
+            className="text-white w-36 sm:w-40 h-10"
+          >
+            Book Now
+          </Button>
+        </div>
+      </div>
 
       
     </div>
