@@ -2,7 +2,7 @@ import { Check } from "lucide-react"
 
 export default function PricingSection() {
   return (
-    <section className="w-full py-24 bg-gradient-to-b from-black to-[#0A0A0A] text-white">
+    <section className="w-full py-24 bg-linear-to-b from-black to-[#0A0A0A] text-white">
       <div className="max-w-7xl mx-auto px-6">
         {/* Header */}
         <div className="text-center mb-16">
