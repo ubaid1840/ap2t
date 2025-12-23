@@ -9,6 +9,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { Card,CardHeader,CardContent,CardFooter } from "@/components/ui/card";
 import { ReviewSlider } from "@/components/reviewslider";
 import GradientIcon from "@/components/icon-container";
+import PricingSection from "@/components/priceing-section";
 export default function LandingPage() {
   const OPTIONS: EmblaOptionsType = { loop: true };
   const SLIDE_COUNT = 5;
@@ -20,7 +21,7 @@ export default function LandingPage() {
     <div className="relative flex flex-col flex-1">
       {/* hero section */}
       <EmblaCarousel slides={images} options={OPTIONS} />
-      <div className="absolute top-66 left-15.5 w-148 h-108.5 flex flex-col">
+      <div className="absolute top-66 left-15.5 w-148 h-80 flex flex-col">
         <h1 className="font-Thunder text-[44px] tracking-[2px] font-bold italic">
           Advanced Physical & Technical
         </h1>
@@ -371,6 +372,7 @@ export default function LandingPage() {
     </div>
   </div>
   
+  {/* testimonial */}
 <div className="h-150 w-full p-15 space-y-8">
 
     <div className="w-full h-24 space-y-1">
@@ -381,7 +383,10 @@ export default function LandingPage() {
     <ReviewSlider/>
 </div>
 
+{/* path to you peak performance */}
 
+
+<PricingSection/>
 
 {/* join now section */}
 

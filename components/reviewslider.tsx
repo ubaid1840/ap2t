@@ -65,7 +65,7 @@ export function ReviewSlider() {
         {reviews.map((review, i) => (
           // 👇 THIS IS THE KEY FIX
           <div key={i} className="flex-[0_0_auto]">
-            <Card className="bg-[#141414] rounded-2xl w-[408px] h-80">
+            <Card className="bg-[#141414] rounded-[10px] w-102 h-80">
               <CardHeader>
                 <div className="flex gap-1">
                   {Array.from({ length: review.star }).map((_, i) => (
