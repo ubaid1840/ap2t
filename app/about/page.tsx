@@ -1,13 +1,10 @@
 "use client"
 
 
-import { Card, CardContent } from "@/components/ui/card"
 import {
     Carousel,
     CarouselContent,
-    CarouselItem,
-    CarouselNext,
-    CarouselPrevious,
+    CarouselItem
 } from "@/components/ui/carousel"
 
 
@@ -15,157 +12,155 @@ import {
 export default function Page() {
 
 
-    return (
-        <div className="flex flex-1 flex-col p-32 bg-[#090909]">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 w-full">
-                {/* Left – 2 Columns */}
-                <div className="lg:col-span-2">
-                    <p className="font-bold text-5xl md:text-6xl">
-                        <span className="italic">Where </span>
-                        <span className="text-primary">Performance</span>
-                    </p>
+   return (
+  <div className="py-16 sm:py-20 relative">
+    <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8">
+      {/* Hero Text Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 w-full my-5">
+        {/* Left – 2 Columns */}
+        <div className="lg:col-span-2">
+          <p className="font-bold text-3xl sm:text-4xl md:text-5xl lg:text-6xl">
+            <span className="italic">Where </span>
+            <span className="text-primary">Performance</span>
+          </p>
 
-                    <p className="font-bold text-5xl md:text-6xl mt-4">
-                        <span className="italic">Meets </span>
-                        <span className="text-primary">Community.</span>
-                    </p>
+          <p className="font-bold text-3xl sm:text-4xl md:text-5xl lg:text-6xl mt-4">
+            <span className="italic">Meets </span>
+            <span className="text-primary">Community.</span>
+          </p>
+        </div>
+
+        {/* Right – 1 Column */}
+        <p className="mt-4 lg:mt-0 max-w-lg text-muted-foreground text-sm sm:text-base md:text-lg">
+          AP2T builds personalized, sport-specific training programs backed by elite research—developing strength, speed, endurance, flexibility, power, and injury resilience to help athletes reach peak performance.
+        </p>
+      </div>
+
+      {/* Hero Image */}
+      <img src={"/work.png"} className="w-full rounded-lg mt-6 sm:mt-8" />
+
+      {/* Values Section */}
+      <section className="py-16 sm:py-20">
+        <div className="container mx-auto">
+          <p className="font-bold text-2xl sm:text-3xl mb-2">
+            <span>Our </span>
+            <span className="text-primary">Values</span>
+          </p>
+
+          <p className="text-[#B3B3B3] mb-10 max-w-2xl text-sm sm:text-base">
+            Shaping excellence through purpose, dedication, and professional growth.
+          </p>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
+            {values.map((item, i) => (
+              <div className="flex gap-4" key={i}>
+                <div className="w-1 bg-primary rounded-full" />
+                <div>
+                  <p className="text-primary font-semibold opacity-20 mb-2 text-2xl sm:text-3xl md:text-4xl">
+                    {item.title}
+                  </p>
+                  <p className="text-[#B3B3B3] text-sm sm:text-base leading-relaxed">
+                    {item.description}
+                  </p>
                 </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
 
-                {/* Right – 1 Column */}
-                <p className="mt-2 lg:mt-0 max-w-lg text-muted-foreground text-base md:text-lg">
-                    AP2T builds personalized, sport-specific training programs backed by elite
-                    research—developing strength, speed, endurance, flexibility, power, and
-                    injury resilience to help athletes reach peak performance.
-                </p>
+      {/* About Us Section */}
+      <section className="py-16 sm:py-20">
+        <div className="container mx-auto">
+          <p className="font-bold text-2xl sm:text-3xl mb-4">
+            <span className="text-primary">About </span>
+            <span className="text-primary">Us</span>
+          </p>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-12 items-start">
+            {/* Left Content */}
+            <div className="space-y-5 max-w-xl">
+              <span className="block text-white text-2xl sm:text-3xl md:text-4xl leading-tight">
+                We are athletes dedicated to{" "}
+                <span className="font-bold">pushing limits</span> and{" "}
+                <span className="font-bold">breaking records</span>
+              </span>
+
+              <p className="text-[#B3B3B3] text-sm sm:text-base md:text-lg leading-relaxed">
+                {` Here at AP2T, we recognize that a sound athletic performance training
+                program is nothing without a staff that best understands how to implement
+                it — which is why we feature an exceptional team to instruct and motivate
+                our athletes to unparalleled success. AP2T’s highly acclaimed coaching
+                staff features both current and former athletes who have earned
+                considerable accolades and truly understand what it takes to be the best.`}
+              </p>
             </div>
 
-
-            <img src={"/work.png"} className="w-full" />
-
-            <section className="py-20">
-                <div className="container mx-auto ">
-                    <p className="font-bold text-2xl mb-2">
-                        <span>Our </span>
-                        <span className="text-primary">Values</span>
-                    </p>
-
-                    <p className="text-[#B3B3B3] mb-10 max-w-2xl">
-                        Shaping excellence through purpose, dedication, and professional growth.
-                    </p>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-
-                        {values.map((item, i) => (
-                            <div className="flex gap-4" key={i}>
-                                <div className="w-1 bg-primary rounded-full" />
-
-                                <div>
-                                    <p className="text-primary font-semibold opacity-20 mb-2 text-4xl">
-                                        {item.title}
-                                    </p>
-                                    <p className="text-[#B3B3B3] leading-relaxed">
-                                        {item.description}
-                                    </p>
-                                </div>
-                            </div>
-                        ))}
-
-                    </div>
+            {/* Right Grid */}
+            <div className="grid grid-cols-2 sm:grid-cols-2 gap-4 sm:gap-6">
+              {about.map((item, i) => (
+                <div
+                  key={i}
+                  className="bg-[#191919] p-6 flex flex-col justify-center"
+                >
+                  <p className="text-white text-2xl sm:text-3xl md:text-4xl font-bold mb-1">
+                    {item.title}
+                  </p>
+                  <p className="text-[#A3A3A3] text-xs sm:text-sm md:text-base">
+                    {item.description}
+                  </p>
                 </div>
-
-            </section>
-
-            <section className="py-20">
-                <div className="container mx-auto">
-
-                    <p className="font-bold text-2xl mb-2">
-                        <span className="text-primary">About </span>
-                        <span className="text-primary">Us</span>
-                    </p>
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
-                        {/* Left Content */}
-                        <div className="space-y-5 max-w-xl">
-                            <span className="block text-white text-3xl md:text-4xl leading-tight">
-                                We are athletes dedicated to{" "}
-                                <span className="font-bold">pushing limits</span> and{" "}
-                                <span className="font-bold">breaking records</span>
-                            </span>
-
-
-                            <p className="text-[#B3B3B3] text-base md:text-lg leading-relaxed">
-                                {` Here at AP2T, we recognize that a sound athletic performance training
-                                program is nothing without a staff that best understands how to implement
-                                it — which is why we feature an exceptional team to instruct and motivate
-                                our athletes to unparalleled success. AP2T’s highly acclaimed coaching
-                                staff features both current and former athletes who have earned
-                                considerable accolades and truly understand what it takes to be the best.`}
-                            </p>
-                        </div>
-
-                        <div className="grid grid-cols-2 gap-6">
-                            {about.map((item, i) => (
-                                <div
-                                    key={i}
-                                    className="bg-[#191919] px-6 py-5 flex flex-col justify-center text-center"
-                                >
-                                    <p className="text-white text-3xl md:text-4xl font-bold mb-1">
-                                        {item.title}
-                                    </p>
-                                    <p className="text-[#A3A3A3] text-sm md:text-base">
-                                        {item.description}
-                                    </p>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-
-                </div>
-            </section>
-
-            <section className="pt-20 ">
-                <div className="container mx-auto">
-
-                    <p className="font-bold text-2xl mb-2">
-                        <span >Our Core </span>
-                        <span className="text-primary">Team</span>
-                    </p>
-
-                    <p className="text-[#A3A3A3]">Meet the dedicated professional who make Athletic exceptional</p>
-
-                    <Carousel className="w-full mt-4">
-                        <CarouselContent>
-                            {team.map((item, index) => (
-                                <CarouselItem
-                                    key={index}
-                                    className="basis-full sm:basis-1/2 lg:basis-1/3"
-                                >
-                                    <div className="bg-[#141414] flex flex-col h-[530px] rounded-t">
-                                        {/* Image */}
-                                        <div className="w-full overflow-hidden rounded-t">
-                                            <img
-                                                src={item.img}
-                                                alt={item.title}
-                                                className="w-full h-full object-cover"
-                                            />
-                                        </div>
-
-                                        {/* Name & Designation */}
-                                        <div className="flex flex-col p-4 mt-auto space-y-1">
-                                            <p className="text-white text-lg font-semibold">{item.title}</p>
-                                            <p className="text-[#A3A3A3] text-sm">{item.designation}</p>
-                                        </div>
-                                    </div>
-                                </CarouselItem>
-                            ))}
-                        </CarouselContent>
-                    </Carousel>
-
-
-                </div>
-            </section>
-
+              ))}
+            </div>
+          </div>
         </div>
-    )
+      </section>
+
+      {/* Core Team Section */}
+      <section className="pt-16 sm:pt-20">
+        <div className="container mx-auto">
+          <p className="font-bold text-2xl sm:text-3xl mb-2">
+            <span>Our Core </span>
+            <span className="text-primary">Team</span>
+          </p>
+
+          <p className="text-[#A3A3A3] text-sm sm:text-base mb-6 sm:mb-8">
+            Meet the dedicated professionals who make Athletic exceptional
+          </p>
+
+          <Carousel className="w-full mt-4">
+            <CarouselContent>
+              {team.map((item, index) => (
+                <CarouselItem
+                  key={index}
+                  className="basis-full sm:basis-1/2 lg:basis-1/3 px-2"
+                >
+                  <div className="bg-[#141414] flex flex-col h-[420px] sm:h-[480px] md:h-[530px] rounded-t-lg overflow-hidden">
+                    {/* Image */}
+                    <div className="w-full h-2/3 overflow-hidden rounded-t-lg">
+                      <img
+                        src={item.img}
+                        alt={item.title}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+
+                    {/* Name & Designation */}
+                    <div className="flex flex-col p-4 mt-auto space-y-1">
+                      <p className="text-white text-lg sm:text-xl font-semibold">{item.title}</p>
+                      <p className="text-[#A3A3A3] text-xs sm:text-sm">{item.designation}</p>
+                    </div>
+                  </div>
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+          </Carousel>
+        </div>
+      </section>
+    </div>
+  </div>
+);
+
 }
 
 const team = [
