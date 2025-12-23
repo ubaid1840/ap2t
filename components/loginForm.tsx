@@ -9,7 +9,7 @@ export default function LoginForm(){
         console.log("submitting")
     }
 return(
-    <form  className="space-y-5">
+    <form  className="space-y-5 mx-20">
         <div className="flex flex-col justify-center items-center gap-5">
         <Input className="rounded-[10px] h-12" type="email" placeholder="Email"/>
         <Input className="rounded-[10px] h-12" type="password" placeholder="Password"/>

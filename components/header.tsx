@@ -3,6 +3,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { Button } from "./ui/button";
 import { HiOutlineMenu, HiOutlineX } from "react-icons/hi";
+import { usePathname } from "next/navigation";
 
 const links = [
     { name: "HOME", href: "/" },
@@ -14,6 +15,7 @@ const links = [
 
 export default function Header() {
     const [drawerOpen, setDrawerOpen] = useState(false);
+    const pathname=usePathname()
 
     return (
 
@@ -34,8 +36,11 @@ export default function Header() {
         {/* Links */}
         <div className="flex gap-8 items-center text-[14px]">
           {links.map((item, i) => (
-            <Link key={i} href={item.href}>
+            <Link key={i} href={item.href}
+            className={pathname === item.href ? "text-primary font-bold" : "text-white"}
+            >
               {item.name}
+              
             </Link>
           ))}
         </div>
