@@ -8,6 +8,7 @@ import { LogosSlider } from "@/components/logoslider";
 import { Calendar } from "@/components/ui/calendar";
 import { Card,CardHeader,CardContent,CardFooter } from "@/components/ui/card";
 import { ReviewSlider } from "@/components/reviewslider";
+import GradientIcon from "@/components/icon-container";
 export default function LandingPage() {
   const OPTIONS: EmblaOptionsType = { loop: true };
   const SLIDE_COUNT = 5;
@@ -142,13 +143,9 @@ export default function LandingPage() {
                 flex flex-col items-center justify-between
                 p-6 text-center bg-[#131313]"
           >
-            <div
-              className="relative h-18.5 w-18.5 rounded-full
-                border border-[#CAFF33]
-                flex items-center justify-center overflow-hidden"
-            >
+            <GradientIcon>
               <Users className="text-[#CAFF33] size-8 relative z-10" />
-            </div>
+            </GradientIcon>
 
             <div className="space-y-1">
               <h1 className="text-lg font-semibold">Technical Training</h1>
@@ -170,13 +167,10 @@ export default function LandingPage() {
                 flex flex-col items-center justify-between
                 p-6 text-center bg-[#131313]"
           >
-            <div
-              className="relative h-18.5 w-18.5 rounded-full
-                border border-[#CAFF33]
-                flex items-center justify-center overflow-hidden"
-            >
-              <User className="text-[#CAFF33] size-8 relative z-10" />
-            </div>
+            
+              <GradientIcon><User className="text-[#CAFF33] size-8 relative z-10" /></GradientIcon>
+              
+            
 
             <div className="space-y-1">
               <h1 className="text-lg font-semibold">Physical Training</h1>
@@ -198,13 +192,7 @@ export default function LandingPage() {
                 flex flex-col items-center justify-between
                 p-6 text-center bg-[#131313]"
           >
-            <div
-              className="relative h-18.5 w-18.5 rounded-full
-                border border-[#CAFF33]
-                flex items-center justify-center overflow-hidden"
-            >
-              <Trophy className="text-[#CAFF33] size-8 relative z-10" />
-            </div>
+            <GradientIcon> <Trophy className="text-[#CAFF33] size-8 relative z-10" /></GradientIcon>
 
             <div className="space-y-1">
               <h1 className="text-lg font-semibold">2 Hour Training</h1>
@@ -229,13 +217,9 @@ export default function LandingPage() {
                 flex flex-col items-center justify-between
                 p-6 text-center bg-[#131313]"
           >
-            <div
-              className="relative h-18.5 w-18.5 rounded-full
-                border border-[#CAFF33]
-                flex items-center justify-center overflow-hidden"
-            >
-              <User className="text-[#CAFF33] size-8 relative z-10" />
-            </div>
+              <GradientIcon><User className="text-[#CAFF33] size-8 relative z-10" /></GradientIcon>
+              
+
 
             <div className="space-y-1">
               <h1 className="text-lg font-semibold">Semi-Private Session</h1>
@@ -257,13 +241,7 @@ export default function LandingPage() {
                 flex flex-col items-center justify-between
                 p-6 text-center bg-[#131313]"
           >
-            <div
-              className="relative h-18.5 w-18.5 rounded-full
-                border border-[#CAFF33]
-                flex items-center justify-center overflow-hidden"
-            >
-              <Trophy className="text-[#CAFF33] size-8 relative z-10" />
-            </div>
+            <GradientIcon><Trophy className="text-[#CAFF33] size-8 relative z-10" /></GradientIcon>
 
             <div className="space-y-1">
               <h1 className="text-lg font-semibold">Private Session</h1>
