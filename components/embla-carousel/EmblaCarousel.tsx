@@ -37,7 +37,7 @@ const EmblaCarousel: React.FC<PropType> = (props) => {
                 <div className="embla__container opacity-30">
                     {slides.map((item, index) => (
                         <div className="embla__slide" key={index}>
-                            <img src={item.img} alt='hero' className='w-full' />
+                            <img src={item.img} alt='hero' className='h-full w-full object-cover' />
                         </div>
 
                     ))}
