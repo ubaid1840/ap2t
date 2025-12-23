@@ -45,7 +45,9 @@ export default function Header() {
           <Button className="rounded-full bg-[#CBFD0026] text-primary hover:bg-primary hover:text-secondary w-20">
             Store
           </Button>
-          <Button className="w-30">Contact</Button>
+          <Link href={"/contact"}>
+          <Button className="w-30"  >Contact</Button>
+          </Link>
         </div>
       </div>
 
