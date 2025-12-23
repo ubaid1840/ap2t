@@ -7,7 +7,7 @@ import SignUpForm from "@/components/signupform"
 
 export default function Page() {
   return (
-    <div className="min-h-screen flex justify-center items-center ">
+    <div className="min-h-screen flex justify-center items-center bg-[#1C1C1C]">
       <Tabs defaultValue="login" className="w-[420px] space-y-8 ">
         
         {/* Header */}

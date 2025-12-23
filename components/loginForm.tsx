@@ -21,7 +21,7 @@ return(
             <Button className="bg-secondary text-white w-full">Sign up</Button>
         </div>
 
-             <div className="flex items-center gap-4">
+    <div className="flex items-center gap-4">
         <span className="h-px flex-1 bg-border" />
         <span className="text-xs text-muted-foreground uppercase">
           or continue with
