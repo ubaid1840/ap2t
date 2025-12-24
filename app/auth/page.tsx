@@ -10,11 +10,11 @@ export default function Page() {
   const [tab, setTab] = React.useState<"login" | "signup">("login");
 
   return (
-    <div className="min-h-screen flex justify-center items-center bg-[#1C1C1C] p-10">
+    <section className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 sm:py-2 ">
       <Tabs
         value={tab}
         onValueChange={(v) => setTab(v as "login" | "signup")}
-        className="w-[680px] space-y-8 overflow-hidden"
+        className="space-y-8 py-20"
       >
         {/* Header */}
         {tab === "login" && (
@@ -73,14 +73,14 @@ export default function Page() {
         </div>
 
         {/* Forms */}
-        <TabsContent value="login" className="w-full">
-          <LoginForm />
+        <TabsContent value="login" className="w-full max-w-3xl self-center">
+          <LoginForm onClickSignup={()=> setTab("signup")}/>
         </TabsContent>
 
-        <TabsContent value="signup" className="w-full">
-          <SignUpForm />
+        <TabsContent value="signup" className="w-full max-w-3xl self-center">
+          <SignUpForm onClickLogin={()=> setTab("login")}/>
         </TabsContent>
       </Tabs>
-    </div>
+    </section>
   );
 }
