@@ -4,6 +4,7 @@
 import { Calendar } from "@/components/ui/calendar";
 import { Calendar1, Clock } from "lucide-react";
 import { useState } from "react";
+import { Button } from "../ui/button";
 
 export default function Booking() {
 
@@ -39,11 +40,10 @@ export default function Booking() {
                             className="rounded-[0.75rem] border w-full"
                         />
 
-                        <div className="w-full flex justify-center items-center">
-                            <button className="rounded-full px-5 py-2 bg-primary text-secondary font-bold w-full sm:w-auto h-10">
-                                BOOK SESSION
-                            </button>
-                        </div>
+                        <Button >
+                            BOOK SESSION
+                        </Button>
+
                     </div>
 
                     {/* Time Slots */}
