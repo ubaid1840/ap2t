@@ -9,7 +9,7 @@ const links = [
     { name: "HOME", href: "/" },
     { name: "ABOUT US", href: "/about" },
     { name: "IN-HOUSE PROGRAMS", href: "/inhouseprograms" },
-    { name: "CAPMS & CLINICS", href: "/camps&clinics" },
+    { name: "CAMPS & CLINICS", href: "/camps&clinics" },
     { name: "GALLERY", href: "/gallery" }
 ];
 
