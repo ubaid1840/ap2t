@@ -293,24 +293,6 @@ export default function SignUpForm({onClickLogin} : {onClickLogin : ()=> void}) 
           })}
         </StepperPanel>
       </Stepper>
-
-    
-
-
-
-      <div className="flex items-center gap-4">
-        <span className="h-px flex-1 bg-border" />
-        <span className="text-xs text-muted-foreground uppercase">
-          or continue with
-        </span>
-        <span className="h-px flex-1 bg-border" />
-      </div>
-
-      <div className="flex justify-center items-center gap-10">
-        <button><GradientIcon><FaGoogle className="text-primary" size={18} /></GradientIcon></button>
-        <button><GradientIcon><FaFacebook className="text-primary" size={18} /></GradientIcon></button>
-        <button><GradientIcon><FaApple className="text-primary" size={18} /></GradientIcon></button>
-      </div>
     </div>
   );
 }

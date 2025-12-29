@@ -1,6 +1,4 @@
 import Link from "next/link";
-import { FaApple, FaFacebook, FaGoogle } from "react-icons/fa";
-import GradientIcon from "./icon-container";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 
@@ -21,18 +19,6 @@ export default function LoginForm({ onClickSignup }: { onClickSignup: () => void
                 <Button onClick={() => onClickSignup()} className="bg-secondary text-white w-full">Sign up</Button>
             </div>
 
-            <div className="flex items-center gap-4">
-                <span className="h-px flex-1 bg-border" />
-                <span className="text-xs text-muted-foreground uppercase">
-                    or continue with
-                </span>
-                <span className="h-px flex-1 bg-border" />
-            </div>
-            <div className="flex justify-center items-center gap-10">
-                <button><GradientIcon><FaGoogle className="text-primary" size={18} /></GradientIcon></button>
-                <button><GradientIcon><FaFacebook className="text-primary" size={18} /></GradientIcon></button>
-                <button><GradientIcon><FaApple className="text-primary" size={18} /></GradientIcon></button>
-            </div>
 
 
 
