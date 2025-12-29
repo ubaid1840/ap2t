@@ -36,7 +36,7 @@ export default function Page() {
       </div>
 
       {/* Hero Image */}
-      <img src={"/images/about/abouthero.jpg"} className="w-full rounded-lg mt-6 sm:mt-8" />
+      <img src={"/images/about/abouthero.JPG"} className="w-full rounded-lg mt-6 sm:mt-8" />
 
       {/* Values Section */}
       <section className="py-16 sm:py-20">

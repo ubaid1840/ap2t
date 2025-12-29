@@ -55,7 +55,7 @@ export default function Page() {
               </div>
 
               <img
-                src="/images/inhouse/hero.jpg"
+                src="/images/inhouse/hero.JPG"
                 alt=""
                 className="w-full object-contain rounded"
               />
@@ -160,7 +160,7 @@ export default function Page() {
   <div className="flex flex-1 justify-center">
     <img
       className="w-full max-w-md object-contain rounded-lg"
-      src="./images/inhouse/endpic.jpg"
+      src="./images/inhouse/endpic.JPG"
       alt="Key program features"
     />
   </div>

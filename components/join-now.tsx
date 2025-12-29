@@ -35,7 +35,7 @@ import { Button } from "./ui/button";
 
 
         <div className="relative z-20 flex flex-col gap-6 sm:gap-8 items-center justify-center px-4 text-center">
-          <img src={"/logo.png"} className="w-40 sm:w-52 md:w-60" />
+          <img src={"/logo.PNG"} className="w-40 sm:w-52 md:w-60" />
           <p className="font-bold text-3xl sm:text-4xl md:text-6xl">
             Join now and get 2 months free!
           </p>
