@@ -21,9 +21,9 @@ export default function LandingPage() {
 
     useEffect(() => {
         if (isMobile) {
-            setSlides([{ media: "/home/mobile.mp4" }])
+            setSlides([{ media: "/images/home/mobile.mp4" }])
         } else {
-            setSlides([{ media: "/home/desktop.mp4" }])
+            setSlides([{ media: "/images/home/desktop.mp4" }])
         }
     }, [isMobile])
 

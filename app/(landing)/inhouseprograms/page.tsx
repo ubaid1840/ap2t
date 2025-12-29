@@ -38,7 +38,7 @@ export default function Page() {
             </p>
           </div>
         </div>
-        <img src={"/inhouse/hero.jpg"} className="w-full rounded-lg mt-8" /> */}
+        <img src={"/images/inhouse/hero.jpg"} className="w-full rounded-lg mt-8" /> */}
         <section className="py-16 sm:py-20">
 
 
@@ -55,7 +55,7 @@ export default function Page() {
               </div>
 
               <img
-                src="/inhouse/hero.jpg"
+                src="/images/inhouse/hero.jpg"
                 alt=""
                 className="w-full object-contain rounded"
               />
@@ -160,7 +160,7 @@ export default function Page() {
   <div className="flex flex-1 justify-center">
     <img
       className="w-full max-w-md object-contain rounded-lg"
-      src="./inhouse/endpic.jpg"
+      src="./images/inhouse/endpic.jpg"
       alt="Key program features"
     />
   </div>
@@ -182,19 +182,19 @@ const events1 = [
     title: "Speed, Agility, and Quickness",
     description:
       "At AP2T, we recognize that today’s athletes are faster, quicker, and more agile than ever before. Since the difference between the best and the rest can often be fractions of seconds, we understand that developing game-changing speed and agility is one of the most important elements of our training regimen. Creating athletes who are strong and skillful is not enough to dominate the competition, which is why AP2T focuses heavily on executing sport-specific movements as explosively as possible. At AP2T, you will become a student of linear, lateral, and change-of-direction techniques. Through detailed instruction that explains the intricacies of elite-level running, AP2T athletes will improve acceleration, top speed, quickness, and enhance their resistance to injuries commonly associated with sport-related running.",
-    icon: <img src="/inhouse/running.png" className="w-8 h-8" />,
+    icon: <img src="/images/inhouse/running.png" className="w-8 h-8" />,
   },
   {
     title: "Strength Training",
     description:
       "AP2T prides itself on offering a strength and conditioning program that is second to none. We are committed to providing each student-athlete with the most appropriate exercise regimen to prepare them for their specific sport. Through the implementation of properly prescribed strength, power, plyometrics, speed, endurance, and flexibility exercises, we induce positive gains in holistic wellness, overall fitness, and resistance to injury as it relates to sport performance. AP2T creates individualized, sport-specific, multi-planar training regimens designed to produce morphological and neurological adaptations that yield physiological advantages for athletic performance. Our research-based programs form the foundation of AP2T’s Strength & Conditioning approach.",
-    icon: <img src="/inhouse/gym.png" className="w-8 h-8" />,
+    icon: <img src="/images/inhouse/gym.png" className="w-8 h-8" />,
   },
   {
     title: "Nutrition",
     description:
       "You are what you eat! In terms of athletic performance and general fitness, no truer words have been spoken. AP2T offers customized nutritional programs for every age and level of athleticism. Whether your goal is to build lean muscle or burn fat, AP2T’s professional staff will provide you with the nutritional foundation needed to help you achieve your goals.",
-    icon: <img src="/inhouse/diet.png" className="w-8 h-8 text-primary" />,
+    icon: <img src="/images/inhouse/diet.png" className="w-8 h-8 text-primary" />,
   },
   {
     title: "Sport-Specific Technical Training",
@@ -222,7 +222,7 @@ const events2 = [
     title: "Speed, Agility, and Quickness",
     description:
       "At AP2T, we recognize that today’s athletes are faster, quicker, and more agile than ever before. Since the difference between the best and the rest can often be fractions of seconds, we understand that developing game-changing speed and agility is one of the most important elements of our training regimen. Creating athletes who are strong and skillful is not enough to dominate the competition, which is why AP2T focuses heavily on executing sport-specific movements as explosively as possible. At AP2T, you will become a student of linear, lateral, and change-of-direction techniques. Through detailed instruction that explains the intricacies of elite-level running, AP2T athletes will improve acceleration, top speed, quickness, and enhance their resistance to injuries commonly associated with sport-related running.",
-    icon: <img src="/inhouse/running.png" className="w-8 h-8" />,
+    icon: <img src="/images/inhouse/running.png" className="w-8 h-8" />,
     area: "Main Training Area",
     players: "12 Players",
     time: "4:00 PM - 5:00 PM",
@@ -233,7 +233,7 @@ const events2 = [
     title: "Strength Training",
     description:
       "AP2T prides itself on offering a strength and conditioning program that is second to none. We are committed to providing each student-athlete with the most appropriate exercise regimen to prepare them for their specific sport. Through the implementation of properly prescribed strength, power, plyometrics, speed, endurance, and flexibility exercises, we induce positive gains in holistic wellness, overall fitness, and resistance to injury as it relates to sport performance. AP2T creates individualized, sport-specific, multi-planar training regimens designed to produce morphological and neurological adaptations that yield physiological advantages for athletic performance. Our research-based programs form the foundation of AP2T’s Strength & Conditioning approach.",
-    icon: <img src="/inhouse/gym.png" className="w-8 h-8" />,
+    icon: <img src="/images/inhouse/gym.png" className="w-8 h-8" />,
     area: "Main Training Area",
     players: "12 Players",
     time: "4:00 PM - 5:00 PM",
@@ -244,7 +244,7 @@ const events2 = [
     title: "Nutrition",
     description:
       "You are what you eat! In terms of athletic performance and general fitness, no truer words have been spoken. AP2T offers customized nutritional programs for every age and level of athleticism. Whether your goal is to build lean muscle or burn fat, AP2T’s professional staff will provide you with the nutritional foundation needed to help you achieve your goals.",
-    icon: <img src="/inhouse/diet.png" className="w-8 h-8 text-primary" />,
+    icon: <img src="/images/inhouse/diet.png" className="w-8 h-8 text-primary" />,
     area: "Main Training Area",
     players: "12 Players",
     time: "4:00 PM - 5:00 PM",

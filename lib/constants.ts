@@ -255,7 +255,7 @@ export const camps: Camp[] = [
 
 export const team = [
   {
-    img: "/about/Rj.jpg",
+    img: "/images/about/Rj.jpg",
     title: "RJ Allen",
     designation: "Director of Training",
     email: "rjallen@ap2t.net",
@@ -271,7 +271,7 @@ RJ utilizes his playing experience at the highest level to train and mentor his 
 RJ attended Monmouth University where he was named an NSCAA All-American.  He attended Saint Joseph High school in Metuchen where he was recently inducted to their hall of fame.  He currently holds his USSF National D license and has collegiate coaching experience with the College of Staten Island.`
   },
   {
-    img: "/about/Zach.jpg",
+    img: "/images/about/Zach.jpg",
     title: "Zach Rauch",
     designation: "Director of Strength & Conditioning",
     email: "zach@ap2t.net",
@@ -281,7 +281,7 @@ RJ attended Monmouth University where he was named an NSCAA All-American.  He at
 Education: Elon University-B.S. Exercise Science 2015`
   },
   {
-    img: "/about/Matt.jpg",
+    img: "/images/about/Matt.jpg",
     title: "Matt Nigro",
     designation: "Technical Director",
     email: "matt@ap2t.net",
@@ -308,7 +308,7 @@ IF Vestri, Phoenix Rising, New York Red Bulls II, Harrisburg City Islanders
 William Paterson University Men’s Soccer: 2010-2013: Named the 2013 ECAC Men's Soccer Metro Region First Team, All-NJAC First Team and NSCAA All-South Atlantic Region Third Team.`
   },
   {
-    img: "/about/Mike.jpg",
+    img: "/images/about/Mike.jpg",
     title: "Mike Olim",
     designation: "Founder / Director of Operations",
     email: "mike@ap2t.net",

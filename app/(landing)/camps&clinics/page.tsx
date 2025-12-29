@@ -19,7 +19,7 @@ export default function Page() {
             <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8">
 
 
-                <img src={"/camps/hero.jpg"} className="w-full rounded-lg mt-6 sm:mt-8" />
+                <img src={"/images/camps/hero.jpg"} className="w-full rounded-lg mt-6 sm:mt-8" />
 
                 <section className="pt-20 space-y-10">
 

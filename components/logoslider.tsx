@@ -2,14 +2,14 @@ import useEmblaCarousel from 'embla-carousel-react'
 import Autoplay from 'embla-carousel-autoplay'
 
 const logos = [
-"/partnerlogos/vsa.png",
-"/partnerlogos/edison.png",
-"/partnerlogos/pda.png",
-"/partnerlogos/metuchen.png",
-"/partnerlogos/perform.png",
-"/partnerlogos/runner1.png",
-"/partnerlogos/gitterman.png",
-"/partnerlogos/psa.png"
+"/images/partnerlogos/vsa.png",
+"/images/partnerlogos/edison.png",
+"/images/partnerlogos/pda.png",
+"/images/partnerlogos/metuchen.png",
+"/images/partnerlogos/perform.png",
+"/images/partnerlogos/runner1.png",
+"/images/partnerlogos/gitterman.png",
+"/images/partnerlogos/psa.png"
 ]
 
 export function LogosSlider() {
