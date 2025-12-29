@@ -3,17 +3,15 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Camp, camps, detailIcons } from "@/lib/constants";
 import { ArrowRight, Calendar, CircleAlert, CircleCheckBig, Clock, DollarSign, MapPin, Search, Users } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Camp, camps, detailIcons } from "../page";
 
 
 
 export default function Page() {
 
-    const [search, setSearch] = useState("")
-    const [filter, setFilter] = useState("All")
     const params = useParams()
     const [currentCamp, setCurrentCamp] = useState<Camp>()
 

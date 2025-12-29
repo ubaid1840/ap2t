@@ -1,6 +1,7 @@
 "use client"
 
 import CoreTeam from "@/components/home-page/core-team";
+import { about, values } from "@/lib/constants";
 
 
 
@@ -124,54 +125,5 @@ export default function Page() {
 
 }
 
-const team = [
-    {
-        img: "/about/Rj.jpg",
-        title: "RJ Allen",
-        designation: "Director of Training",
-    },
-    {
-        img: "/about/Zach.jpg",
-        title: "Zach Rauch",
-        designation: "Director of Strength & Conditioning",
-    },
-    {
-        img: "/about/Matt.jpg",
-        title: "Matt Nigro",
-        designation: "Technical Director",
-    },
-    {
-        img: "/about/Mike.jpg",
-        title: "Mike Olim",
-        designation: "Founder / Director of Operations",
-    },
-]
 
 
-const values = [
-    {
-        title: "Excellence",
-        description: "We pursue the highest standards in every training experience. We consistently refine our methods, inspire athletes to push their limits, and ensure every session delivers measurable progress."
-    },
-    {
-        title: "Team Development",
-        description: "We believe strong individuals build even stronger teams. Our programs focus on collaboration, leadership, and unity—helping players grow together on and off the field."
-    },
-    {
-        title: "Goal-Oriented",
-        description: "Every training sesison is desinged with clear outcomes in mind. We set actionable targets, track performance, and help athletes stay focused on achieving real, impactful results. "
-    },
-    {
-        title: "Professionalism",
-        description: "We uphold integrity, discipline, and the highest coaching standards. From communication to conduct, we create an environment that reflects respect, responsibility, and top-tier soccer training practices."
-    }
-
-]
-
-const about = [
-    { title: "25+", description: "Certified Expert Trainers" },
-    { title: "150+", description: "Classes" },
-    { title: "200+", description: "Members" },
-    { title: "10+", description: "Years" },
-
-]
