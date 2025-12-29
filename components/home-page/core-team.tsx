@@ -19,7 +19,7 @@ export default function CoreTeam() {
           <span>Our Core </span>
           <span className="text-primary">Team</span>
         </p>
-        <Link href={"/coreteam"}>
+        <Link href={"/about/coreteam"}>
           <Button >
             View All Coaches
           </Button>

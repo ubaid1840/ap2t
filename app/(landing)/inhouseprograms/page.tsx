@@ -6,13 +6,14 @@ import JoinNow from "@/components/join-now"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter } from "@/components/ui/card"
 import { Calendar, Clock, Pin, Trophy, Users, Volleyball } from "lucide-react"
+import Link from "next/link"
 
 export default function Page() {
 
   return (
     <div className="py-20 relative">
       <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 flex flex-col space-y-20">
-         {/* <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 w-full my-5">
+        {/* <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 w-full my-5">
           <div className="lg:col-span-2">
             <p className="font-bold text-4xl sm:text-5xl md:text-6xl">
               <span className="italic">Where </span>
@@ -101,12 +102,12 @@ export default function Page() {
                       <div className="flex gap-4 items-center w-full">
                         <Pin className="text-primary" size={16} />
                         <p>{item.area}</p>
-                        <Users className="text-primary" size={16}/>
+                        <Users className="text-primary" size={16} />
                         <p>{item.players}</p>
                       </div>
 
                       <div className="flex gap-4 items-center w-full">
-                        <Clock className="text-primary" size={16}/>
+                        <Clock className="text-primary" size={16} />
                         <p>{item.time}</p>
                         <Calendar className="text-primary" size={16} />
                         <p>{item.day}</p>
@@ -115,9 +116,11 @@ export default function Page() {
                   </CardContent>
                   <CardFooter className="h-20 flex justify-between items-center border-t border-[#282828]">
                     <h1 className="text-primary">${item.price}/hr</h1>
+                    <Link href={"/auth?p=signup"}>
                     <Button className="bg-primary text-secondary">
                       Book Now
                     </Button>
+                    </Link>
                   </CardFooter>
                 </Card>
               ))}
@@ -125,46 +128,46 @@ export default function Page() {
           </div>
 
           <Booking />
-<div className="bg-[#1E1E1E] flex flex-col lg:flex-row gap-10 p-5 sm:p-8 lg:p-10 lg:px-30">
-  {/* Text Section */}
-  <div className="flex flex-col flex-1 gap-10">
-    <div className="space-y-4">
-      <h1 className="text-xl sm:text-2xl font-bold">Key Benefits</h1>
-      <ul className="list-disc space-y-2 pl-5 marker:text-primary text-sm text-muted">
-        <li>Improve agility and overall speed</li>
-        <li>Enhance coordination and body control</li>
-        <li>Increase coordination and acceleration speed</li>
-        <li>Move confidently and accelerate faster in game situations</li>
-        <li>Build muscle memory for reactive movements</li>
-      </ul>
-    </div>
+          <div className="bg-[#1E1E1E] flex flex-col lg:flex-row gap-10 p-5 sm:p-8 lg:p-10 lg:px-30">
+            {/* Text Section */}
+            <div className="flex flex-col flex-1 gap-10">
+              <div className="space-y-4">
+                <h1 className="text-xl sm:text-2xl font-bold">Key Benefits</h1>
+                <ul className="list-disc space-y-2 pl-5 marker:text-primary text-sm text-muted">
+                  <li>Improve agility and overall speed</li>
+                  <li>Enhance coordination and body control</li>
+                  <li>Increase coordination and acceleration speed</li>
+                  <li>Move confidently and accelerate faster in game situations</li>
+                  <li>Build muscle memory for reactive movements</li>
+                </ul>
+              </div>
 
-    <div className="space-y-4">
-      <h1 className="text-xl sm:text-2xl font-bold">
-        Who This Program is Perfect For
-      </h1>
-      <ul className="list-disc space-y-2 pl-5 marker:text-primary text-sm text-muted">
-        <li>
-          Competitive athletes in sports like soccer, basketball, tennis, and football
-        </li>
-        <li>Youth athletes developing foundational athletic skills</li>
-        <li>Adults seeking improved coordination and balance</li>
-        <li>
-          Anyone looking to enhance sports-related quickness and agility
-        </li>
-      </ul>
-    </div>
-  </div>
+              <div className="space-y-4">
+                <h1 className="text-xl sm:text-2xl font-bold">
+                  Who This Program is Perfect For
+                </h1>
+                <ul className="list-disc space-y-2 pl-5 marker:text-primary text-sm text-muted">
+                  <li>
+                    Competitive athletes in sports like soccer, basketball, tennis, and football
+                  </li>
+                  <li>Youth athletes developing foundational athletic skills</li>
+                  <li>Adults seeking improved coordination and balance</li>
+                  <li>
+                    Anyone looking to enhance sports-related quickness and agility
+                  </li>
+                </ul>
+              </div>
+            </div>
 
-  {/* Image Section */}
-  <div className="flex flex-1 justify-center">
-    <img
-      className="w-full max-w-md object-contain rounded-lg"
-      src="./images/inhouse/endpic.JPG"
-      alt="Key program features"
-    />
-  </div>
-</div>
+            {/* Image Section */}
+            <div className="flex flex-1 justify-center">
+              <img
+                className="w-full max-w-md object-contain rounded-lg"
+                src="./images/inhouse/endpic.JPG"
+                alt="Key program features"
+              />
+            </div>
+          </div>
 
         </section>
       </div>

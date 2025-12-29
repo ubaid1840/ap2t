@@ -5,6 +5,8 @@ import LoginForm from "@/components/loginForm";
 import SignUpForm from "@/components/signupform";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
+import { ArrowLeft } from "lucide-react";
+import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import * as React from "react";
 import { useEffect } from "react";
@@ -38,16 +40,21 @@ export default function Page() {
 
   return (
     <section className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 sm:py-2">
+
       <Tabs
         value={tab}
         onValueChange={(v) => {
           routeTo(v)
         }}
-        className="space-y-8 py-20"
+        className="space-y-8 py-10"
       >
 
         {tab === "login" && (
           <div className="flex flex-col items-center gap-2">
+            <Link href={"/home"} className="self-start flex gap-4 text-muted items-center">
+              <ArrowLeft size={14} />
+              <p className="text-xs">Back to home</p>
+            </Link>
             <h1 className="font-bold text-5xl text-primary">Login</h1>
             <p className="text-sm text-muted-foreground text-center">
               Welcome back! Please log in to access your account.

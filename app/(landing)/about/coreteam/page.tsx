@@ -1,22 +1,28 @@
 "use client"
 
 import { useMobile } from "@/hooks/use-mobile"
+import { useSafeBack } from "@/hooks/use-safe-back"
 import { team } from "@/lib/constants"
 import { ArrowLeft, Mail } from "lucide-react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 
 export default function Page() {
 
 
-  const isMobile = useMobile()
+    const isMobile = useMobile()
+    const router = useRouter()
+     const safeBack = useSafeBack("/home")
+
+    
 
     return (
         <div className="pt-16 sm:pt-20 relative">
             <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8">
-                <Link href={"/about"} className="flex gap-4 text-muted items-center">
-                    <ArrowLeft size={16} />
-                    <p>Back to About</p>
-                </Link>
+                <div onClick={safeBack} className="flex gap-4 text-muted items-center cursor-pointer">
+                    <ArrowLeft size={14} />
+                    <p className="text-xs">Back</p>
+                </div>
             </div>
             <div className="h-60 flex items-center justify-center bg-gradient-to-b from-[#0A0A0A] to-[#1A1A1A] flex-col gap-4">
                 <p className=" text-5xl mb-2">
@@ -39,7 +45,7 @@ export default function Page() {
                                 key={index}
                                 className="grid grid-cols-1 md:grid-cols-2 gap-6"
                             >
-                    
+
                                 {isReversed ?
                                     <>
                                         <div
@@ -49,7 +55,7 @@ export default function Page() {
                                             <p className="text-primary font-medium">{member.designation}</p>
 
                                             <div className="flex items-center gap-2">
-                                                <Mail size={12} className="text-muted"/>
+                                                <Mail size={12} className="text-muted" />
                                                 <a
                                                     href={`mailto:${member.email}`}
                                                     className="text-sm text-muted hover:underline block"
