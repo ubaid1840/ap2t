@@ -13,12 +13,12 @@ import Testimonials from "@/components/home-page/testimonials.client";
 export default function LandingPage() {
 
     const OPTIONS: EmblaOptionsType = { loop: true };
-    const images = [{ img: "/hero.jpg" }, { img: "/hero2.jpg" }];
+    const slides = [{media:"./home/desktop.mp4"}];
 
     return (
         <div >
             <div className="absolute -z-1 h-screen overflow-hidden">
-                <EmblaCarousel slides={images} options={OPTIONS} />
+                <EmblaCarousel slides={slides} options={OPTIONS} />
             </div>
             <Hero />
             <Facilities />

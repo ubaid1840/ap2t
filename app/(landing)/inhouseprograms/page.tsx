@@ -12,7 +12,33 @@ export default function Page() {
   return (
     <div className="py-20 relative">
       <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 flex flex-col space-y-20">
-      
+         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 w-full my-5">
+          <div className="lg:col-span-2">
+            <p className="font-bold text-4xl sm:text-5xl md:text-6xl">
+              <span className="italic">Where </span>
+              <span className="text-primary">Performance</span>
+            </p>
+
+            <p className="font-bold text-4xl sm:text-5xl md:text-6xl mt-4">
+              <span className="italic">Meets </span>
+              <span className="text-primary">Community.</span>
+            </p>
+          </div>
+
+          
+          <div className="mt-4 lg:mt-0">
+            <p className="text-muted-foreground text-base sm:text-sm md:text-base max-w-lg">
+              Professional soccer training facility in Memphis, TN
+            </p>
+            <p className="text-muted-foreground text-base sm:text-sm md:text-base max-w-lg mt-2">
+              Programs designed for skill development
+            </p>
+            <p className="text-muted-foreground text-base sm:text-sm md:text-base max-w-lg mt-2">
+              Experienced coaches and friendly environment
+            </p>
+          </div>
+        </div>
+        <img src={"/inhouse/hero.jpg"} className="w-full rounded-lg mt-8" />
         <section className="py-16 sm:py-20">
 
 

@@ -10,7 +10,7 @@ export default function Facilities (){
                             <div className="w-full lg:w-1/2 h-64 sm:h-80 md:h-96">
                                 <img
                                     className="w-full h-full rounded-lg object-cover"
-                                    src="./footballkick.jpg"
+                                    src="./home/sidepic1.jpg"
                                     alt="pic"
                                 />
                             </div>
