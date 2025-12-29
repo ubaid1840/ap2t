@@ -1,7 +1,7 @@
 "use client"
 
-import { team } from "@/components/home-page/core-team"
 import { useMobile } from "@/hooks/use-mobile"
+import { team } from "@/lib/constants"
 import { ArrowLeft, Mail } from "lucide-react"
 import Link from "next/link"
 

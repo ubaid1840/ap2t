@@ -2,9 +2,8 @@
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Camp, camps, detailIcons } from "@/lib/constants";
-import { ArrowRight, Calendar, CircleAlert, CircleCheckBig, Clock, DollarSign, MapPin, Search, Users } from "lucide-react";
+import { CircleAlert, CircleCheckBig, DollarSign } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -30,7 +29,7 @@ export default function Page() {
             <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8">
 
 
-                <img src={"/work.png"} className="w-full rounded-lg mt-6 sm:mt-8" />
+                <img src={"/camps/hero.jpg"} className="w-full rounded-lg mt-6 sm:mt-8" />
 
                 <section className="pt-20 space-y-10">
 
@@ -257,15 +256,3 @@ export default function Page() {
 
     )
 }
-
-
-
-const images = [
-    { src: "/camps/camp (1).png", width: 320, height: 174 },
-    { src: "/camps/camp (2).png", width: 320, height: 212 },
-    { src: "/camps/camp (3).png", width: 320, height: 212 },
-    { src: "/camps/camp (4).png", width: 320, height: 180 },
-    { src: "/camps/camp (5).png", width: 320, height: 200 },
-    { src: "/camps/camp (6).png", width: 320, height: 190 },
-    { src: "/camps/camp (7).png", width: 320, height: 210 },
-];

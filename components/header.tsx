@@ -53,7 +53,7 @@ export default function Header() {
                 Store
               </Button>
               <Link href={"/contact"}>
-                <Button   >Contact</Button>
+                <Button >Contact</Button>
               </Link>
             </div>
           </div>
@@ -104,7 +104,9 @@ export default function Header() {
               <Button className="rounded-full bg-[#CBFD0026] text-primary hover:bg-primary hover:text-secondary">
                 Store
               </Button>
-              <Button>Contact</Button>
+              <Link onClick={()=> setDrawerOpen(false)} href={"/contact"} className="w-full">
+                <Button className="w-full">Contact</Button>
+              </Link>
             </div>
           </div>
         </div>

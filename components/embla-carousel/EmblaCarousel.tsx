@@ -33,11 +33,11 @@ const EmblaCarousel: React.FC<PropType> = (props) => {
 
     return (
         <section className="embla w-full">
-            <div className="embla__viewport" ref={emblaRef}>
-                <div className="embla__container opacity-30">
+            <div className="embla__viewport min-h-screen" ref={emblaRef}>
+                <div className="embla__container min-h-screen max-h-screen opacity-30">
                     {slides.map((item, index) => (
                         <div className="embla__slide" key={index}>
-                            <video className='h-full w-full object-cover' loop muted autoPlay>
+                            <video className='w-full h-full object-cover' loop muted autoPlay>
                             <source src={item.media} type="video/mp4" />
                             Your browser does not support the video tag.
                             </video>

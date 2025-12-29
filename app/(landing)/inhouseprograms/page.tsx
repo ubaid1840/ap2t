@@ -12,7 +12,7 @@ export default function Page() {
   return (
     <div className="py-20 relative">
       <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 flex flex-col space-y-20">
-         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 w-full my-5">
+         {/* <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 w-full my-5">
           <div className="lg:col-span-2">
             <p className="font-bold text-4xl sm:text-5xl md:text-6xl">
               <span className="italic">Where </span>
@@ -38,7 +38,7 @@ export default function Page() {
             </p>
           </div>
         </div>
-        <img src={"/inhouse/hero.jpg"} className="w-full rounded-lg mt-8" />
+        <img src={"/inhouse/hero.jpg"} className="w-full rounded-lg mt-8" /> */}
         <section className="py-16 sm:py-20">
 
 
@@ -55,7 +55,7 @@ export default function Page() {
               </div>
 
               <img
-                src="./work.png"
+                src="/inhouse/hero.jpg"
                 alt=""
                 className="w-full object-contain rounded"
               />
