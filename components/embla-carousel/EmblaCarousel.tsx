@@ -6,7 +6,7 @@ import useEmblaCarousel from 'embla-carousel-react'
 import Image from 'next/image'
 
 type PropType = {
-    slides: { img: string }[]
+    slides: { media: string }[]
     options?: EmblaOptionsType
 }
 
@@ -37,7 +37,10 @@ const EmblaCarousel: React.FC<PropType> = (props) => {
                 <div className="embla__container opacity-30">
                     {slides.map((item, index) => (
                         <div className="embla__slide" key={index}>
-                            <img src={item.img} alt='hero' className='h-full w-full object-cover' />
+                            <video className='h-full w-full object-cover' loop muted autoPlay>
+                            <source src={item.media} type="video/mp4" />
+                            Your browser does not support the video tag.
+                            </video>
                         </div>
 
                     ))}

@@ -18,7 +18,7 @@ export default function Page() {
             <div
                 className="relative h-[60vh] w-full flex items-center justify-center"
                 style={{
-                    backgroundImage: "url('/contact.jpg')",
+                    backgroundImage: "url('/contact/hero.jpg')",
                     backgroundSize: "cover",
                     backgroundPosition: "center",
                 }}
