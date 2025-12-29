@@ -160,7 +160,7 @@ export default function Page() {
   <div className="flex flex-1 justify-center">
     <img
       className="w-full max-w-md object-contain rounded-lg"
-      src="./keyfeature.jpg"
+      src="./inhouse/endpic.jpg"
       alt="Key program features"
     />
   </div>
