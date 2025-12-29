@@ -1,10 +1,9 @@
+import { Loader2 } from "lucide-react";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Inter } from "next/font/google";
-import "./globals.css";
-import Header from "@/components/header";
-import Footer from "@/components/footer";
+import NextTopLoader from 'nextjs-toploader';
 import { Suspense } from "react";
-import { Loader2 } from "lucide-react";
+import "./globals.css";
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-sans' });
 
@@ -33,7 +32,11 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <Suspense fallback={<div className="flex h-screen w-full items-center justify-center"><Loader2 className="animate-spin" /></div>}>
+        <Suspense fallback={
+          <div className="flex h-screen w-full items-center justify-center"><Loader2 className="animate-spin" /></div>}>
+         <NextTopLoader 
+         color="#d3fb20"
+         showSpinner={false}/>
           {children}
         </Suspense>
 

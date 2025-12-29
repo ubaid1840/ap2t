@@ -274,14 +274,21 @@
   animation: moveForward 10s linear infinite;
 }
 
-/* Animation */
-@keyframes moveForward {
-  from {
-    transform: translateZ(-4800px);
+@keyframes diagonalMove {
+  0% {
+    transform: translate(-50px, -50px) rotate(0deg);
+    opacity: 0;
   }
-  to {
-    transform: translateZ(0px);
+  50% {
+    transform: translate(10px, 10px) rotate(5deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(0, 0) rotate(0deg);
+    opacity: 1;
   }
 }
 
-
+.animate-diagonal {
+  animation: diagonalMove 2s ease-in-out infinite alternate;
+}
