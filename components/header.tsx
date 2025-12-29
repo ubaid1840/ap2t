@@ -6,7 +6,7 @@ import { HiOutlineMenu, HiOutlineX } from "react-icons/hi";
 import { usePathname } from "next/navigation";
 
 const links = [
-  { name: "HOME", href: "/" },
+  { name: "HOME", href: "/home" },
   { name: "ABOUT US", href: "/about" },
   { name: "IN-HOUSE PROGRAMS", href: "/inhouseprograms" },
   { name: "CAMPS & CLINICS", href: "/camps&clinics" },
@@ -39,7 +39,7 @@ export default function Header() {
             <div className="flex gap-8 items-center text-[14px]">
               {links.map((item, i) => (
                 <Link key={i} href={item.href}
-                  className={pathname === item.href ? "text-primary font-bold" : "text-white"}
+                  className={pathname.includes(item.href) ? "text-primary font-bold" : "text-white"}
                 >
                   {item.name}
 
