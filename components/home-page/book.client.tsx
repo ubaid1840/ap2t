@@ -24,29 +24,27 @@ export default function Booking() {
                 </div>
 
 
-                <div className="flex flex-col lg:flex-row w-full max-w-6xl gap-8 px-4 lg:px-6 mx-auto flex-wrap">
+                <div className="flex flex-col lg:flex-row w-full max-w-6xl gap-8 px-4 lg:px-6 mx-auto">
 
-                    {/* Date Selector */}
                     <div className="flex flex-col flex-1 rounded-2xl bg-[#262626] p-6 sm:px-10 gap-6">
                         <div className="flex items-center justify-center gap-3">
                             <Calendar1 className="text-primary" />
                             <h1 className="font-semibold text-lg sm:text-xl">Select Date</h1>
                         </div>
-
+                        <div className="w-full overflow-x-auto">
                         <Calendar
                             mode="single"
                             selected={date}
                             onSelect={setDate}
-                            className="rounded-[0.75rem] border w-full"
+                            className="rounded-[0.75rem] border"
                         />
-
+</div>
                         <Button >
                             BOOK SESSION
                         </Button>
 
                     </div>
 
-                    {/* Time Slots */}
                     <div className="flex flex-col flex-1 rounded-2xl bg-[#262626] p-6 sm:p-8 gap-6">
                         <div className="flex items-center justify-center gap-3">
                             <Clock className="text-primary" />

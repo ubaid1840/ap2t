@@ -126,47 +126,47 @@ export default function Page() {
           </div>
 
           <Booking />
+<div className="bg-[#1E1E1E] flex flex-col lg:flex-row gap-10 p-5 sm:p-8 lg:p-10 lg:px-30">
+  {/* Text Section */}
+  <div className="flex flex-col flex-1 gap-10">
+    <div className="space-y-4">
+      <h1 className="text-xl sm:text-2xl font-bold">Key Benefits</h1>
+      <ul className="list-disc space-y-2 pl-5 marker:text-primary text-sm text-muted">
+        <li>Improve agility and overall speed</li>
+        <li>Enhance coordination and body control</li>
+        <li>Increase coordination and acceleration speed</li>
+        <li>Move confidently and accelerate faster in game situations</li>
+        <li>Build muscle memory for reactive movements</li>
+      </ul>
+    </div>
 
-          <div className="flex items-center bg-[#1E1E1E] gap-16 p-10 lg:px-30">
-            <div className="gap-12 flex flex-col flex-1">
-              <div className="space-y-6">
-                <h1 className="text-2xl font-bold">Key Benefits</h1>
-                <ul className="list-disc space-y-3 pl-5 marker:text-primary text-sm text-muted ">
-                  <li>Improve agility and overall speed</li>
-                  <li>Enhance coordination and body control</li>
-                  <li>Increase coordination and acceleration speed</li>
-                  <li>
-                    Move confidently and accelerate faster in game situations
-                  </li>
-                  <li>Build muscle memory for reactive movements</li>
-                </ul>
-              </div>
+    <div className="space-y-4">
+      <h1 className="text-xl sm:text-2xl font-bold">
+        Who This Program is Perfect For
+      </h1>
+      <ul className="list-disc space-y-2 pl-5 marker:text-primary text-sm text-muted">
+        <li>
+          Competitive athletes in sports like soccer, basketball, tennis, and football
+        </li>
+        <li>Youth athletes developing foundational athletic skills</li>
+        <li>Adults seeking improved coordination and balance</li>
+        <li>
+          Anyone looking to enhance sports-related quickness and agility
+        </li>
+      </ul>
+    </div>
+  </div>
 
-              <div className="space-y-6">
-                <h1 className="text-2xl font-bold">
-                  Who This Program is Perfect For
-                </h1>
-                <ul
-                  className="list-disc space-y-3 pl-5 marker:text-primary text-sm text-muted "
-                >
-                  <li>
-                    Competitive athletes in sports like soccer, basketball,
-                    tennis, and football
-                  </li>
-                  <li>
-                    Youth athletes experiencing foundational athletic skills
-                  </li>
-                  <li>Adults seeking improved coordination and balance</li>
-                  <li>
-                    Anyone seeking to enhance sports-related quickness and agility
-                  </li>
-                </ul>
-              </div>
-            </div>
-            <div className="flex flex-1">
-              <img className=" object-contain" src="./keyfeature.jpg" alt="" />
-            </div>
-          </div>
+  {/* Image Section */}
+  <div className="flex flex-1 justify-center">
+    <img
+      className="w-full max-w-md object-contain rounded-lg"
+      src="./keyfeature.jpg"
+      alt="Key program features"
+    />
+  </div>
+</div>
+
         </section>
       </div>
 

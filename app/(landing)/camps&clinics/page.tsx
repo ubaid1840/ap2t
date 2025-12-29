@@ -31,7 +31,7 @@ export default function Page() {
                         </p>
                     </div>
 
-                    <div className="flex justify-between">
+                    <div className="flex justify-between flex-wrap gap-8">
 
                         <div className="flex items-center gap-2 rounded border border-gray-200 px-3 shadow-sm focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20">
                             <Search className="h-4 w-4 text-gray-400" />
