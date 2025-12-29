@@ -94,11 +94,11 @@ export default function Page() {
                     {/* RIGHT SIDE – MAP + INFO */}
                     <div className="space-y-6">
                         {/* Google Map */}
-                        <div className="overflow-hidden rounded-[8px] border border-neutral-800">
+                        <div className="overflow-hidden rounded-xl border border-neutral-800">
                             <iframe
                                 title="Google Map"
                                 src="https://www.google.com/maps?q=New%20York&t=&z=13&ie=UTF8&iwloc=&output=embed"
-                                className="w-full h-[280px]"
+                                className="w-full h-70"
                                 loading="lazy"
                             />
                         </div>
@@ -106,7 +106,7 @@ export default function Page() {
                         {/* Info Cards */}
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             {/* Call Us */}
-                            <div className="rounded-[8px] border border-neutral-800 bg-[#141414] p-5">
+                            <div className="rounded-xl border border-neutral-800 bg-[#141414] p-5">
                                 <GradientIcon className="mb-2">
                                     <Phone className="text-primary" />
                                 </GradientIcon>
@@ -115,7 +115,7 @@ export default function Page() {
                             </div>
 
                             {/* Visit Office */}
-                            <div className="rounded-[8px] border border-neutral-800 bg-[#141414] p-5">
+                            <div className="rounded-xl border border-neutral-800 bg-[#141414] p-5">
                                 <GradientIcon className="mb-2">
                                     <Pin className="text-primary" />
                                 </GradientIcon>
@@ -126,7 +126,7 @@ export default function Page() {
                             </div>
 
                             {/* Office Hours */}
-                            <div className="rounded-[8px] border border-neutral-800 bg-[#141414] p-5">
+                            <div className="rounded-xl border border-neutral-800 bg-[#141414] p-5">
                                 <GradientIcon className="mb-2">
                                     <Clock className="text-primary" />
                                 </GradientIcon>
@@ -140,7 +140,7 @@ export default function Page() {
                             </div>
 
                             {/* Email Us */}
-                            <div className="rounded-[8px] border border-neutral-800 bg-[#141414] p-5">
+                            <div className="rounded-xl border border-neutral-800 bg-[#141414] p-5">
                                 <GradientIcon className="mb-2">
                                     <Mail className="text-primary" />
                                 </GradientIcon>

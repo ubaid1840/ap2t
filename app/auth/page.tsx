@@ -67,7 +67,7 @@ export default function Page() {
 
         {/* Tabs */}
         <div className="flex justify-center">
-          <TabsList className="relative w-[200px] bg-[#282828] border border-[#404040] p-1 rounded-full">
+          <TabsList className="relative w-50 bg-[#282828] border border-[#404040] p-1 rounded-full">
             <div
               className={cn(
                 "absolute left-1 top-1 h-[calc(100%-8px)] w-[calc(50%-4px)] rounded-full bg-primary transition-transform duration-300 ease-out",
