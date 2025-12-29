@@ -103,16 +103,28 @@ export default function Page() {
 
 
 const images = [
-    { src: "/gallery/pic (1).jpg", width: 320, height: 174 },
-    { src: "/gallery/pic (2).jpg", width: 320, height: 212 },
-    { src: "/gallery/pic (3).jpg", width: 320, height: 212 },
-    { src: "/gallery/pic (4).jpg", width: 320, height: 180 },
-    { src: "/gallery/pic (5).jpg", width: 320, height: 200 },
-    { src: "/gallery/pic (6).jpg", width: 320, height: 190 },
-    { src: "/gallery/pic (7).jpg", width: 320, height: 210 },
-    { src: "/gallery/pic (8).jpg", width: 320, height: 175 },
-    { src: "/gallery/pic (9).jpg", width: 320, height: 220 },
-    { src: "/gallery/pic (10).jpg", width: 320, height: 185 },
-    { src: "/gallery/pic (11).jpg", width: 320, height: 195 },
-    { src: "/gallery/pic (12).jpg", width: 320, height: 200 },
+    { src: "/gallery/pic 1.jpg", width: 320, height: 174 },
+    { src: "/gallery/pic 2.jpg", width: 320, height: 212 },
+    { src: "/gallery/pic 3.jpg", width: 320, height: 212 },
+    { src: "/gallery/pic 4.jpg", width: 320, height: 180 },
+    { src: "/gallery/pic 5.jpg", width: 320, height: 200 },
+    { src: "/gallery/pic 6.jpg", width: 320, height: 190 },
+    { src: "/gallery/pic 7.jpg", width: 320, height: 210 },
+    { src: "/gallery/pic 8.jpg", width: 320, height: 175 },
+    { src: "/gallery/pic 9.jpg", width: 320, height: 220 },
+    { src: "/gallery/pic 10.jpg", width: 320, height: 185 },
+    { src: "/gallery/pic 11.jpg", width: 320, height: 195 },
+    { src: "/gallery/pic 12.jpg", width: 320, height: 200 },
+    { src: "/gallery/pic 13.jpg", width: 320, height: 200 },
+    { src: "/gallery/pic 14.jpg", width: 320, height: 175 },
+
+    { src: "/gallery/pic 15.jpg", width: 320, height: 200 },
+    { src: "/gallery/pic 16.jpg", width: 320, height: 190 },
+
+    { src: "/gallery/pic 17.jpg", width: 320, height: 200 },
+    { src: "/gallery/pic 18.jpg", width: 320, height: 175 },
+    { src: "/gallery/pic 19.jpg", width: 320, height: 174 },
+
+
+
 ];
