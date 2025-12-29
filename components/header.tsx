@@ -49,11 +49,11 @@ export default function Header() {
 
             {/* Buttons */}
             <div className="flex gap-2">
-              <Button className="rounded-full bg-[#CBFD0026] text-primary hover:bg-primary hover:text-secondary w-20">
+              <Button className="rounded-full bg-[#CBFD0026] text-primary hover:bg-primary hover:text-secondary">
                 Store
               </Button>
               <Link href={"/contact"}>
-                <Button className="w-30"  >Contact</Button>
+                <Button   >Contact</Button>
               </Link>
             </div>
           </div>

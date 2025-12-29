@@ -116,7 +116,7 @@ export default function Page() {
                   </CardContent>
                   <CardFooter className="h-20 flex justify-between items-center border-t border-[#282828]">
                     <h1 className="text-primary">${item.price}/hr</h1>
-                    <Button className="bg-primary text-secondary px-10">
+                    <Button className="bg-primary text-secondary">
                       Book Now
                     </Button>
                   </CardFooter>

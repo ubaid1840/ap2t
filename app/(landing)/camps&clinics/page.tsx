@@ -44,14 +44,14 @@ export default function Page() {
                             />
                         </div>
                         <div className="flex gap-4">
-                            <Button onClick={()=> setFilter("All")} className="rounded-[8px] w-15 cursor-pointer" variant={filter !== "All" ? "outline" : "default"}>
+                            <Button onClick={()=> setFilter("All")} className="rounded-[8px]  cursor-pointer" variant={filter !== "All" ? "outline" : "default"}>
                                 All
                             </Button>
 
-                            <Button onClick={()=> setFilter("CAMP")} className="rounded-[8px] w-20 cursor-pointer" variant={filter !== "CAMP" ? "outline" : "default"}>
+                            <Button onClick={()=> setFilter("CAMP")} className="rounded-[8px]  cursor-pointer" variant={filter !== "CAMP" ? "outline" : "default"}>
                                 Camps
                             </Button>
-                            <Button onClick={()=> setFilter("CLINIC")} className="rounded-[8px] w-20 cursor-pointer" variant={filter !== "CLINIC" ? "outline" : "default"}>
+                            <Button onClick={()=> setFilter("CLINIC")} className="rounded-[8px] cursor-pointer" variant={filter !== "CLINIC" ? "outline" : "default"}>
                                 Clinics
                             </Button>
                         </div>
@@ -134,26 +134,7 @@ export default function Page() {
 
 
 
-                    {/* <div className="columns-1 sm:columns-2 lg:columns-3 py-10 md:py-20 gap-4">
-                        {images.map((item, ind) => (
-                            <div
-                                key={ind}
-                                className="mb-4 break-inside-avoid relative group overflow-hidden rounded-[8px]"
-                            >
-                                <img
-                                    src={item.src}
-                                    className="w-full object-cover rounded-[8px] transition-transform duration-300 group-hover:scale-105"
-                                />
-
-                                <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 text-white font-semibold text-lg transition-opacity duration-300 rounded-[8px]">
-                                    <Button className="w-50 hover:bg-primary">
-                                        Register Now
-                                    </Button>
-                                </div>
-
-                            </div>
-                        ))}
-                    </div> */}
+                    
 
                 </section>
 

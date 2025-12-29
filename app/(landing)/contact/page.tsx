@@ -2,6 +2,7 @@
 
 import CoreTeam from "@/components/home-page/core-team"
 import GradientIcon from "@/components/icon-container"
+import { Button } from "@/components/ui/button"
 import { Clock, Mail, Phone, Pin } from "lucide-react"
 
 export default function Page() {
@@ -81,12 +82,12 @@ export default function Page() {
                                 className="w-full rounded bg-neutral-900 border border-neutral-800 px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-primary"
                             />
 
-                            <button
+                            <Button
                                 type="submit"
-                                className="w-full inline-flex items-center justify-center rounded-full bg-primary px-8 py-3 font-semibold text-black hover:opacity-90 transition"
+                                className="w-full"
                             >
                                 Send Message
-                            </button>
+                            </Button>
                         </form>
                     </div>
 
