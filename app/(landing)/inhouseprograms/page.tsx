@@ -39,7 +39,7 @@ export default function Page() {
             </p>
           </div>
         </div>
-        <img src={"/work.png"} className="w-full rounded-lg mt-8" />
+        <img src={"/inhouse/hero.jpg"} className="w-full rounded-lg mt-8" />
         <section className="py-16 sm:py-20">
           <div className="flex flex-col items-center w-full mx-auto">
             <p className="font-bold text-3xl sm:text-4xl mb-2 text-center">In-House Events</p>
