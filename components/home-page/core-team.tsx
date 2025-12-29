@@ -5,16 +5,25 @@ import {
   CarouselContent,
   CarouselItem
 } from "@/components/ui/carousel"
+import { Button } from "../ui/button"
+import Link from "next/link"
 
 export default function CoreTeam() {
 
   return (
    
       <div className="container mx-auto">
+        <div className="flex justify-between flex-wrap gap-4">
         <p className="font-bold text-2xl sm:text-3xl mb-2">
           <span>Our Core </span>
           <span className="text-primary">Team</span>
-        </p>
+        </p> 
+        <Link href={"/coreteam"}>
+        <Button >
+          View All Coaches
+        </Button>
+        </Link>
+        </div>
 
         <p className="text-[#A3A3A3] text-sm sm:text-base mb-6 sm:mb-8">
           Meet the dedicated professionals who make Athletic exceptional
