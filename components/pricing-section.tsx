@@ -1,5 +1,6 @@
 import { Check } from "lucide-react"
 import { Button } from "./ui/button"
+import { cn } from "@/lib/utils"
 
 export default function PricingSection() {
   return (
@@ -13,9 +14,13 @@ export default function PricingSection() {
       </div>
 
       {/* Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-end">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-center">
         {/* General Plan */}
-        <div className="rounded-2xl border border-white/10 bg-[#111] p-8">
+        <div className="rounded-2xl p-8" style={{
+          background: "linear-gradient(180deg, rgba(58,71,0,0.5) 5%, rgba(0,0,0,0) 100%), rgba(17,17,17,1)", border: "1px solid", borderColor: '#6D6D6D'
+        }}>
+       
+
           <h2 className="text-lg">General Plan</h2>
           <p className="text-xs text-muted mt-1">4 Weeks</p>
 
@@ -50,6 +55,7 @@ export default function PricingSection() {
 
         {/* Custom Plan */}
         <div className="rounded-2xl bg-primary text-black p-8">
+
           <span className="inline-block text-xs px-3 py-1 rounded-full bg-black text-primary mb-3">
             Most Popular
           </span>
@@ -87,7 +93,9 @@ export default function PricingSection() {
         </div>
 
         {/* Elite Plan */}
-        <div className="rounded-2xl border border-white/10 bg-[#111] p-8">
+        <div className="rounded-2xl p-8" style={{
+          background: "linear-gradient(180deg, rgba(58,71,0,0.5) 5%, rgba(0,0,0,0) 80%), rgba(17,17,17,1)", border: "1px solid", borderColor: '#6D6D6D'
+        }}>
           <h2 className="text-lg">Elite Plan</h2>
           <p className="text-xs text-muted mt-1">12 months</p>
 
@@ -115,7 +123,7 @@ export default function PricingSection() {
             ))}
           </ul>
 
-            <Button className="bg-black text-primary mt-8 w-full rounded-full border border-white/20 py-3 text-sm hover:text-black">
+          <Button className="bg-black text-primary mt-8 w-full rounded-full border border-white/20 py-3 text-sm hover:text-black">
             Choose Plan
           </Button>
         </div>
