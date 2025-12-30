@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Camp, camps, detailIcons } from "@/lib/constants";
 import { CircleAlert, CircleCheckBig, DollarSign } from "lucide-react";
+import Image from "next/image";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -27,20 +28,32 @@ export default function Page() {
     return (
         <div className="pt-16 sm:pt-20 relative">
             <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8">
+                <section className="space-y-5">
 
+                    <div className="relative flex flex-col items-center bg-[#090909] py-12 sm:py-16 rounded-lg overflow-hidden">
+                        <div className="relative space-y-8 w-full max-w-4xl">
+                            <div className="flex flex-col items-center gap-4 text-center">
+                                <h1 className="text-4xl sm:text-5xl font-bold">
+                                    Camps & Clinis
+                                </h1>
+                                <p className="text-sm text-muted max-w-xl">
+                                    Enhance your reflection time, coordination, and movement efficiency.
+                                </p>
+                            </div>
+                        </div>
 
-                <img src={"/images/camps/hero.JPG"} className="w-full rounded-lg mt-6 sm:mt-8" />
-
-                <section className="pt-20 space-y-10">
-
-                    <div className="flex flex-col items-center text-center px-4 sm:px-6 lg:px-0 mt-10">
-                        <p className="text-2xl sm:text-3xl md:text-4xl font-semibold mb-4">
-                            Camps & Clinics
-                        </p>
-                        <p className="text-[#B3B3B3] text-sm sm:text-base md:text-lg max-w-2xl">
-                            Enhance your reflection time, coordination, and movement efficiency.
-                        </p>
+                        <div className="relative aspect-[16/9] w-full mt-10">
+                            <Image
+                                src="/images/camps/hero.JPG"
+                                alt="About hero"
+                                fill
+                                className="rounded-lg object-cover"
+                                priority
+                            />
+                        </div>
                     </div>
+
+
                     {currentCamp &&
                         <div className="space-y-4">
                             <div className="flex items-center gap-4">
@@ -88,7 +101,7 @@ export default function Page() {
                                                     const Icon = detailIcons[index];
 
                                                     return (
-                                                        
+
                                                         <div
                                                             key={eachDetail}
                                                             className="flex items-center gap-2 text-xs text-muted-foreground"
@@ -100,15 +113,15 @@ export default function Page() {
                                                         </div>
                                                     );
                                                 })}
-                                                  <div
-                                                          
-                                                            className="flex items-center gap-2 text-xs text-muted-foreground"
-                                                        >
-                                                            
-                                                                <DollarSign className="h-4 w-4 text-primary shrink-0" />
-                                                            
-                                                            <span>${currentCamp.price}</span>
-                                                        </div>
+                                                <div
+
+                                                    className="flex items-center gap-2 text-xs text-muted-foreground"
+                                                >
+
+                                                    <DollarSign className="h-4 w-4 text-primary shrink-0" />
+
+                                                    <span>${currentCamp.price}</span>
+                                                </div>
 
                                             </div>
                                         </CardContent>

@@ -11,26 +11,22 @@ import JoinNow from "@/components/join-now";
 import PricingSection from "@/components/pricing-section";
 import { useMobile } from "@/hooks/use-mobile";
 import { EmblaOptionsType } from "embla-carousel";
-import { useEffect, useState } from "react";
+import { useCallback } from "react";
 export default function LandingPage() {
 
     const isMobile = useMobile()
     const OPTIONS: EmblaOptionsType = { loop: true };
 
-    const [slides, setSlides] = useState<{ media: string }[]>([])
-
-    useEffect(() => {
-        if (isMobile) {
-            setSlides([{ media: "/images/home/mobile.mp4" }])
-        } else {
-            setSlides([{ media: "/images/home/desktop.mp4" }])
-        }
+    const RenderVideo = useCallback(() => {
+        return (
+            <EmblaCarousel slides={isMobile ? [{ media: "/images/home/mobile.mp4" }] : [{ media: "/images/home/desktop.mp4" }]} options={OPTIONS} />
+        )
     }, [isMobile])
 
     return (
         <div >
             <div className="absolute -z-1 flex flex-1 h-screen w-full">
-                <EmblaCarousel slides={slides} options={OPTIONS} />
+                <RenderVideo />
             </div>
             <Hero />
             <Facilities />

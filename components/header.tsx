@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Button } from "./ui/button";
 import { HiOutlineMenu, HiOutlineX } from "react-icons/hi";
 import { usePathname } from "next/navigation";
+import Image from "next/image";
 
 const links = [
   { name: "HOME", href: "/home" },
@@ -28,10 +29,12 @@ export default function Header() {
           <div className="hidden md:flex justify-between items-center bg-[#FFFFFF3D] p-1 rounded-full">
             {/* Logo */}
             <Link href={"/"}>
-              <img
+              <Image
                 src="/logo.PNG"
                 alt="logo"
-                className="h-10 w-auto rounded-[22px]"
+                height={36}
+                width={120}
+                className="rounded-[22px]"
               />
             </Link>
 
@@ -60,11 +63,16 @@ export default function Header() {
 
           {/* Mobile Header */}
           <div className="md:hidden flex justify-between items-center bg-[#FFFFFF3D] p-2 rounded-full">
-            <img
-              src="/logo.PNG"
-              alt="logo"
-              className="h-9 w-auto rounded-[22px]"
-            />
+            <Link href={"/"}>
+              <Image
+                src="/logo.PNG"
+                alt="logo"
+                width={36}
+                height={36}
+                className="h-9 w-auto rounded-[22px]"
+                priority
+              />
+            </Link>
 
             <button onClick={() => setDrawerOpen(true)} className="mr-2">
               <HiOutlineMenu size={30} />
@@ -104,7 +112,7 @@ export default function Header() {
               <Button className="rounded-full bg-[#CBFD0026] text-primary hover:bg-primary hover:text-secondary">
                 Store
               </Button>
-              <Link onClick={()=> setDrawerOpen(false)} href={"/contact"} className="w-full">
+              <Link onClick={() => setDrawerOpen(false)} href={"/contact"} className="w-full">
                 <Button className="w-full">Contact</Button>
               </Link>
             </div>

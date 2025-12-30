@@ -8,13 +8,14 @@ import {
 import { Button } from "../ui/button"
 import Link from "next/link"
 import { team } from "@/lib/constants"
+import Image from "next/image"
 
 export default function CoreTeam() {
 
   return (
 
     <div className="container mx-auto">
-      <div className="flex justify-between flex-wrap gap-4">
+      <div className="flex justify-between flex-wrap gap-4 items-center mb-4 sm:mb-4">
         <p className="font-bold text-2xl sm:text-3xl mb-2">
           <span>Our Core </span>
           <span className="text-primary">Team</span>
@@ -39,11 +40,12 @@ export default function CoreTeam() {
             >
               <div className="bg-[#141414] flex flex-col h-[420px] sm:h-[480px] md:h-[530px] rounded-t-lg overflow-hidden">
                 {/* Image */}
-                <div className="w-full h-2/3 overflow-hidden rounded-t-lg">
-                  <img
+                <div className="relative w-full h-2/3 overflow-hidden rounded-t-lg">
+                  <Image
                     src={item.img}
                     alt={item.title}
-                    className="w-full h-full object-cover"
+                    fill
+                    className="object-cover"
                   />
                 </div>
 

@@ -6,138 +6,136 @@ import JoinNow from "@/components/join-now"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter } from "@/components/ui/card"
 import { Calendar, Clock, Pin, Trophy, Users, Volleyball } from "lucide-react"
+import Image from "next/image"
 import Link from "next/link"
 
 export default function Page() {
 
   return (
-    <div className="py-20 relative">
-      <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 flex flex-col space-y-20">
-        {/* <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 w-full my-5">
-          <div className="lg:col-span-2">
-            <p className="font-bold text-4xl sm:text-5xl md:text-6xl">
-              <span className="italic">Where </span>
-              <span className="text-primary">Performance</span>
-            </p>
+    <div className="relative py-16 sm:py-20">
+      <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 space-y-10">
 
-            <p className="font-bold text-4xl sm:text-5xl md:text-6xl mt-4">
-              <span className="italic">Meets </span>
-              <span className="text-primary">Community.</span>
-            </p>
-          </div>
+        {/* HERO / PROGRAM INTRO */}
+        <section className="space-y-12">
+          <div className="relative flex flex-col items-center bg-[#090909] py-12 sm:py-16 rounded-lg overflow-hidden">
+            <div className="absolute top-0 left-[30%] bg-primary h-60 w-50 rounded-full blur-[220px]" />
 
-          
-          <div className="mt-4 lg:mt-0">
-            <p className="text-muted-foreground text-base sm:text-sm md:text-base max-w-lg">
-              Professional soccer training facility in Memphis, TN
-            </p>
-            <p className="text-muted-foreground text-base sm:text-sm md:text-base max-w-lg mt-2">
-              Programs designed for skill development
-            </p>
-            <p className="text-muted-foreground text-base sm:text-sm md:text-base max-w-lg mt-2">
-              Experienced coaches and friendly environment
-            </p>
-          </div>
-        </div>
-        <img src={"/images/inhouse/hero.jpg"} className="w-full rounded-lg mt-8" /> */}
-        <section className="py-16 sm:py-20">
-
-
-          <div className="flex flex-col items-center bg-[#090909]">
-            <div className="absolute top-0 left-30% bg-primary h-60 w-50 rounded-full blur-[220px] z-0"></div>
-
-            <div className="space-y-8">
-              <div className="flex flex-col w-full items-center gap-4 Web/letter-spacing/0">
-                <h1 className="text-5xl font-bold">Programs at Our Facility</h1>
-                <p className="text-sm text-muted">
-                  Enhance your reaction time, coordination, and movement
-                  efficiency.
+            <div className="relative space-y-8 w-full max-w-4xl">
+              <div className="flex flex-col items-center gap-4 text-center">
+                <h1 className="text-4xl sm:text-5xl font-bold">
+                  Programs at Our Facility
+                </h1>
+                <p className="text-sm text-muted max-w-xl">
+                  Enhance your reaction time, coordination, and movement efficiency.
                 </p>
               </div>
 
-              <img
+
+
+
+            </div>
+
+            <div className="relative aspect-[16/9] w-full mt-10">
+              <Image
                 src="/images/inhouse/hero.JPG"
-                alt=""
-                className="w-full object-contain rounded"
+                alt="About hero"
+                fill
+                className="rounded-lg object-cover"
+                priority
               />
             </div>
           </div>
 
-          <div className="flex flex-col gap-6 my-20 max-w-4xl">
-            <h1 className="text-3xl">Class Overview</h1>
-            <p className="text-sm text-muted">
+          {/* CLASS OVERVIEW */}
+          <div className="max-w-4xl space-y-4">
+            <h1 className="text-2xl sm:text-3xl font-semibold">
+              Class Overview
+            </h1>
+            <p className="text-sm sm:text-base text-muted leading-relaxed">
               Our Agility & Quickness Drills class is built to improve your
               athleticism by improving reaction time, directional changes, and
               multi-directional speed. Through cutting drills, cone work, and
               explosive reaction exercises, you'll sharpen your footwork and
-              enhance your ability to change direction efficiently. All exercises
-              are sport-specific and scalable, meaning they can be customized to
-              your skill level and athletic goals. Whether you're an elite athlete
-              or someone just looking to move more confidently, this class will
-              challenge your mind-body connection and your coordination.
+              enhance your ability to change direction efficiently.
+            </p>
+          </div>
+        </section>
+
+        {/* IN-HOUSE EVENTS */}
+        <section className="space-y-12">
+          <div className="text-center space-y-3 max-w-2xl mx-auto">
+            <p className="font-bold text-3xl sm:text-4xl">
+              In-House Events
+            </p>
+            <p className="text-[#B3B3B3] text-sm sm:text-base">
+              Comprehensive training programs designed to develop exceptional soccer players
             </p>
           </div>
 
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            {events2.map((item, i) => (
+              <Card
+                key={i}
+                className="flex flex-col justify-between bg-[#131313] rounded-lg"
+              >
+                <CardContent className="p-6 space-y-6">
+                  <div className="flex flex-col items-center gap-4 text-center">
+                    <GradientIcon>{item.icon}</GradientIcon>
+                    <p className="font-semibold text-xl sm:text-2xl">
+                      {item.title}
+                    </p>
+                    <p className="text-[#B3B3B3] text-sm sm:text-base leading-relaxed">
+                      {item.description}
+                    </p>
+                  </div>
 
-
-          <div className="flex flex-col items-center w-full mx-auto">
-            <p className="font-bold text-3xl sm:text-4xl mb-2 text-center">In-House Events</p>
-            <p className="text-[#B3B3B3] mb-10 max-w-2xl text-center text-base sm:text-lg">
-              Comprehensive training programs designed to develop exceptional soccer players
-            </p>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 w-full">
-              {events2.map((item, i) => (
-                <Card
-                  className="flex gap-4 bg-[#131313] justify-between rounded-lg p-4"
-                  key={i}
-                >
-                  <CardContent>
-                    <div className="flex flex-col items-center gap-4">
-                      <GradientIcon>{item.icon}</GradientIcon>
-                      <p className="text-center font-semibold mb-2 text-xl sm:text-2xl">{item.title}</p>
-                      <p className="text-center text-[#B3B3B3] text-sm sm:text-base leading-relaxed">
-                        {item.description}
-                      </p>
-                      <div className="flex gap-4 items-center w-full">
-                        <Pin className="text-primary" size={16} />
-                        <p>{item.area}</p>
-                        <Users className="text-primary" size={16} />
-                        <p>{item.players}</p>
-                      </div>
-
-                      <div className="flex gap-4 items-center w-full">
-                        <Clock className="text-primary" size={16} />
-                        <p>{item.time}</p>
-                        <Calendar className="text-primary" size={16} />
-                        <p>{item.day}</p>
-                      </div>
+                  <div className="space-y-3 text-sm">
+                    <div className="flex gap-4 items-center">
+                      <Pin className="text-primary" size={16} />
+                      <p>{item.area}</p>
+                      <Users className="text-primary" size={16} />
+                      <p>{item.players}</p>
                     </div>
-                  </CardContent>
-                  <CardFooter className="h-20 flex justify-between items-center border-t border-[#282828]">
-                    <h1 className="text-primary">${item.price}/hr</h1>
-                    <Link href={"/auth?p=signup"}>
+
+                    <div className="flex gap-4 items-center">
+                      <Clock className="text-primary" size={16} />
+                      <p>{item.time}</p>
+                      <Calendar className="text-primary" size={16} />
+                      <p>{item.day}</p>
+                    </div>
+                  </div>
+                </CardContent>
+
+                <CardFooter className="flex items-center justify-between border-t border-[#282828] px-6 py-4">
+                  <h1 className="text-primary font-semibold">
+                    ${item.price}/hr
+                  </h1>
+                  <Link href="/auth?p=signup">
                     <Button className="bg-primary text-secondary">
                       Book Now
                     </Button>
-                    </Link>
-                  </CardFooter>
-                </Card>
-              ))}
-            </div>
+                  </Link>
+                </CardFooter>
+              </Card>
+            ))}
           </div>
+        </section>
 
-          <Booking />
-          <div className="bg-[#1E1E1E] flex flex-col lg:flex-row gap-10 p-5 sm:p-8 lg:p-10 lg:px-30">
-            {/* Text Section */}
-            <div className="flex flex-col flex-1 gap-10">
+        <Booking />
+
+        {/* BENEFITS SECTION */}
+        <section className="bg-[#1E1E1E] rounded-lg p-6 sm:p-8 lg:p-10 space-y-10">
+          <div className="flex flex-col lg:flex-row gap-10">
+            <div className="flex-1 space-y-10">
               <div className="space-y-4">
-                <h1 className="text-xl sm:text-2xl font-bold">Key Benefits</h1>
+                <h1 className="text-xl sm:text-2xl font-bold">
+                  Key Benefits
+                </h1>
                 <ul className="list-disc space-y-2 pl-5 marker:text-primary text-sm text-muted">
                   <li>Improve agility and overall speed</li>
                   <li>Enhance coordination and body control</li>
                   <li>Increase coordination and acceleration speed</li>
-                  <li>Move confidently and accelerate faster in game situations</li>
+                  <li>Move confidently in game situations</li>
                   <li>Build muscle memory for reactive movements</li>
                 </ul>
               </div>
@@ -147,35 +145,31 @@ export default function Page() {
                   Who This Program is Perfect For
                 </h1>
                 <ul className="list-disc space-y-2 pl-5 marker:text-primary text-sm text-muted">
-                  <li>
-                    Competitive athletes in sports like soccer, basketball, tennis, and football
-                  </li>
-                  <li>Youth athletes developing foundational athletic skills</li>
-                  <li>Adults seeking improved coordination and balance</li>
-                  <li>
-                    Anyone looking to enhance sports-related quickness and agility
-                  </li>
+                  <li>Competitive athletes across sports</li>
+                  <li>Youth athletes developing fundamentals</li>
+                  <li>Adults improving coordination & balance</li>
+                  <li>Athletes seeking speed & agility gains</li>
                 </ul>
               </div>
             </div>
 
-            {/* Image Section */}
-            <div className="flex flex-1 justify-center">
-              <img
-                className="w-full max-w-md object-contain rounded-lg"
-                src="./images/inhouse/endpic.JPG"
-                alt="Key program features"
+            <div className="relative w-full lg:w-1/2 h-64 sm:h-80 md:h-96">
+              <Image
+                src="/images/inhouse/endpic.JPG"
+                alt="pic"
+                fill
+                className="rounded-lg object-cover object-top"
+                priority
               />
             </div>
           </div>
-
         </section>
+
+        <JoinNow />
       </div>
-
-
-      <JoinNow />
     </div>
-  );
+  )
+
 
 }
 
