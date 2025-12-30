@@ -2,6 +2,7 @@ import { EmblaOptionsType } from 'embla-carousel'
 import useEmblaCarousel from 'embla-carousel-react'
 
 import { EmblaCarouselType } from 'embla-carousel'
+import { ChevronLeft, ChevronRight, Quote, Star } from 'lucide-react'
 import React, {
   ComponentPropsWithRef,
   ReactNode,
@@ -9,9 +10,8 @@ import React, {
   useEffect,
   useState
 } from 'react'
-import { Card, CardContent, CardFooter, CardHeader } from './ui/card'
-import { ChevronLeft, ChevronRight, CircleChevronLeft, CircleChevronRight, Quote, Star } from 'lucide-react'
 import { Avatar } from './ui/avatar'
+import { Card, CardContent, CardFooter, CardHeader } from './ui/card'
 
 export type Review = {
   star: number;
@@ -33,9 +33,6 @@ type PropType = {
 const TestimonialSlider: React.FC<PropType> = (props) => {
   const { slides, options, children } = props
   const [emblaRef, emblaApi] = useEmblaCarousel(options)
-
-  const { selectedIndex, scrollSnaps, onDotButtonClick } =
-    useDotButton(emblaApi)
 
   const {
     prevBtnDisabled,

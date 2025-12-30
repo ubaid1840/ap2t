@@ -48,13 +48,13 @@ export default function Page() {
         }}
         className="space-y-8 py-10"
       >
-
+        <Link href={"/home"} className="self-start flex gap-4 text-muted items-center">
+          <ArrowLeft size={14} />
+          <p className="text-xs">Back to home</p>
+        </Link>
         {tab === "login" && (
           <div className="flex flex-col items-center gap-2">
-            <Link href={"/home"} className="self-start flex gap-4 text-muted items-center">
-              <ArrowLeft size={14} />
-              <p className="text-xs">Back to home</p>
-            </Link>
+
             <h1 className="font-bold text-5xl text-primary">Login</h1>
             <p className="text-sm text-muted-foreground text-center">
               Welcome back! Please log in to access your account.

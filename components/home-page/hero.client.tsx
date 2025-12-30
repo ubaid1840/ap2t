@@ -1,5 +1,6 @@
 "use client"
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 
 export default function Hero(){
@@ -33,9 +34,11 @@ export default function Hero(){
                     </div>
 
                     <div className="flex flex-col sm:flex-row mt-4 gap-4 justify-center sm:justify-start">
+                        <Link href={"/auth"}>
                         <Button className="rounded-full px-5 py-2 bg-primary text-secondary font-bold w-full sm:w-auto">
                             GET STARTED
                         </Button>
+                        </Link>
                         <Button className="bg-transparent border-2 border-white rounded-full text-white w-full sm:w-auto hover:bg-white/10">
                             CALL US 732-XXX-XXXX
                         </Button>
