@@ -1,5 +1,6 @@
 "use client"
 
+import { CurvedImage } from "@/components/curved-image";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Camp, camps, detailIcons } from "@/lib/constants";
@@ -42,15 +43,14 @@ export default function Page() {
                             </div>
                         </div>
 
-                        <div className="relative aspect-[16/9] w-full mt-10">
-                            <Image
-                                src="/images/camps/hero.JPG"
-                                alt="About hero"
-                                fill
-                                className="rounded-lg object-cover"
-                                priority
-                            />
-                        </div>
+                        <CurvedImage
+                            src="/images/camps/hero.JPG"
+                            alt="About hero"
+                            curveDepth={30}
+                            className="shadow-2xl"
+                            imageClassName="object-top"
+                        />
+
                     </div>
 
 

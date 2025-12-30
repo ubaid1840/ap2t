@@ -1,5 +1,6 @@
 "use client"
 
+import { CurvedImage } from "@/components/curved-image"
 import Booking from "@/components/home-page/book.client"
 import GradientIcon from "@/components/icon-container"
 import JoinNow from "@/components/join-now"
@@ -35,15 +36,12 @@ export default function Page() {
 
             </div>
 
-            <div className="relative aspect-[16/9] w-full mt-10">
-              <Image
-                src="/images/inhouse/hero.JPG"
-                alt="About hero"
-                fill
-                className="rounded-lg object-cover"
-                priority
-              />
-            </div>
+            <CurvedImage
+              src="/images/inhouse/hero.JPG"
+              alt="In house"
+              curveDepth={30}
+              className="shadow-2xl"
+            />
           </div>
 
           {/* CLASS OVERVIEW */}

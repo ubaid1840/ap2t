@@ -27,10 +27,10 @@ export default function Footer() {
                     <div className="flex flex-col gap-4">
                         <h1 className="font-medium text-sm">Quick Links</h1>
                         <div className="flex flex-col gap-2 text-[#A3A3A3] text-xs">
-                            <Link href="#">About Us</Link>
-                            <Link href="#">Programs</Link>
-                            <Link href="#">Registration</Link>
-                            <Link href="#">Contact Us</Link>
+                            <Link href="/about">About Us</Link>
+                            <Link href="/inhouseprograms">Programs</Link>
+                            <Link href="/auth?p=signup">Registration</Link>
+                            <Link href="/contact">Contact Us</Link>
                         </div>
                     </div>
 

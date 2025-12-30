@@ -1,5 +1,6 @@
 "use client"
 
+import { CurvedImage } from "@/components/curved-image";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -33,15 +34,14 @@ export default function Page() {
                             </div>
                         </div>
 
-                        <div className="relative aspect-[16/9] w-full mt-10">
-                            <Image
-                                src="/images/camps/hero.JPG"
-                                alt="About hero"
-                                fill
-                                className="rounded-lg object-cover"
-                                priority
-                            />
-                        </div>
+                        <CurvedImage
+                            src="/images/camps/hero.JPG"
+                            alt="About hero"
+                            curveDepth={30}
+                            className="shadow-2xl"
+                              imageClassName="object-top"
+                        />
+
                     </div>
                     <div className="flex flex-wrap justify-between gap-6">
 
@@ -106,8 +106,8 @@ export default function Page() {
                                         <div className="flex items-center justify-between">
                                             <div
                                                 className={`text-xs font-semibold px-2.5 py-1 rounded-md ${item.badge === "CLINIC"
-                                                        ? "bg-blue-500/15 text-blue-400"
-                                                        : "bg-primary/15 text-primary"
+                                                    ? "bg-blue-500/15 text-blue-400"
+                                                    : "bg-primary/15 text-primary"
                                                     }`}
                                             >
                                                 {item.badge}

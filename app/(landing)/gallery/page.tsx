@@ -83,20 +83,33 @@ export default function Page() {
 
         {/* Content */}
         <div className="relative z-20 flex flex-col gap-6 sm:gap-8 items-center justify-center px-4 text-center">
-          <p className="font-bold text-3xl sm:text-4xl md:text-6xl">
+          <p className="font-bold text-3xl sm:t ext-4xl md:text-6xl">
             Visit Our Facility
           </p>
           <div className="flex flex-col items-center justify-center px-2">
-            <p className="text-[#B3B3B3] mb-2 sm:mb-2 max-w-md sm:max-w-3xl text-center text-sm sm:text-base md:text-lg">
+            <p className="text-[#B3B3B3] mb-2 sm:mb-2 max-w-md sm:max-w-3xl text-center text-sm">
               Interested in seeing our facility in person? Schedule a tour or come watch a training session.
             </p>
+            <p className="text-[#B3B3B3] mb-2 sm:mb-2 max-w-md sm:max-w-3xl text-center text-sm">
+              Address: <span className="text-white">302 High St, Metuchen, NJ 08840</span>
+            </p>
+
+            <p className="text-[#B3B3B3] mb-2 sm:mb-2 max-w-md sm:max-w-3xl text-center text-sm">
+              Phone: <span className="text-white">
+                <a className="cursor-pointer underline" href="tel:7325159300">
+                  732-515-9300
+                </a>
+
+              </span>
+            </p>
+
 
             <Button
               style={{
                 background: 'radial-gradient(circle, rgba(255, 255, 255, 0.24) 0%, rgba(255, 255, 255, 0) 100%)',
                 borderColor: 'rgba(255, 255, 255, 0.2)',
               }}
-              className="text-white w-36 sm:w-40 h-10"
+              className="text-white w-36 sm:w-40 h-10 mt-5"
             >
               Register Now
             </Button>
