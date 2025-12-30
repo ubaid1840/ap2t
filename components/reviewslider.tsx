@@ -66,8 +66,7 @@ const TestimonialSlider: React.FC<PropType> = (props) => {
 
         </div>
       </div>
-      <section className="embla"
-        style={{ '--slide-size': '33%' } as React.CSSProperties}>
+      <section className="embla responsive-slide">
         <div className="embla__viewport" ref={emblaRef}>
           <div className="embla__container">
             {slides.map((review, index) => (

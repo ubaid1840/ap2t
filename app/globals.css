@@ -292,3 +292,20 @@
 .animate-diagonal {
   animation: diagonalMove 2s ease-in-out infinite alternate;
 }
+
+
+.responsive-slide {
+  --slide-size: 100%;
+}
+
+@media (min-width: 640px) { /* md screens */
+  .responsive-slide {
+    --slide-size: 50%;
+  }
+}
+
+@media (min-width: 1024px) { /* lg screens */
+  .responsive-slide {
+    --slide-size: 33%;
+  }
+}
