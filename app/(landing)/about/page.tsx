@@ -2,17 +2,13 @@
 
 import { CurvedImage } from "@/components/curved-image";
 import CoreTeam from "@/components/home-page/core-team";
+import { useMobile } from "@/hooks/use-mobile";
 import { about, values } from "@/lib/constants";
-import Image from "next/image";
-
-
-
-
 
 
 export default function Page() {
 
-
+  const mobile = useMobile()
   return (
     <div className="relative py-16 sm:py-20">
       <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -39,12 +35,12 @@ export default function Page() {
             </p>
           </div>
 
-        
+
 
           <CurvedImage
             src="/images/about/abouthero.JPG?height=400&width=800"
             alt="About hero"
-            curveDepth={30}
+            curveDepth={mobile ? 10 : 20}
             className="shadow-2xl"
           />
 

@@ -10,6 +10,7 @@ interface CurvedImageProps {
 }
 
 export function CurvedImage({ src, alt, className, curveDepth = 40, borderRadius = 10, imageClassName }: CurvedImageProps) {
+  
   const cornerPercent = borderRadius / 1000
 
   return (

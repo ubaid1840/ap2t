@@ -6,11 +6,14 @@ import GradientIcon from "@/components/icon-container"
 import JoinNow from "@/components/join-now"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter } from "@/components/ui/card"
+import { useMobile } from "@/hooks/use-mobile"
 import { Calendar, Clock, Pin, Trophy, Users, Volleyball } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
 
 export default function Page() {
+
+  const mobile = useMobile()
 
   return (
     <div className="relative py-16 sm:py-20">
@@ -39,7 +42,7 @@ export default function Page() {
             <CurvedImage
               src="/images/inhouse/hero.JPG"
               alt="In house"
-              curveDepth={30}
+              curveDepth={mobile ? 10 : 20}
               className="shadow-2xl"
             />
           </div>

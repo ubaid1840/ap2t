@@ -4,9 +4,9 @@ import { CurvedImage } from "@/components/curved-image";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { useMobile } from "@/hooks/use-mobile";
 import { camps, detailIcons } from "@/lib/constants";
 import { ArrowRight, Search } from "lucide-react";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
@@ -14,6 +14,7 @@ export default function Page() {
 
     const [search, setSearch] = useState("")
     const [filter, setFilter] = useState("All")
+     const mobile = useMobile()
     const router = useRouter()
 
     return (
@@ -37,7 +38,7 @@ export default function Page() {
                         <CurvedImage
                             src="/images/camps/hero.JPG"
                             alt="About hero"
-                            curveDepth={30}
+                             curveDepth={mobile ? 10 : 20}
                             className="shadow-2xl"
                               imageClassName="object-top"
                         />

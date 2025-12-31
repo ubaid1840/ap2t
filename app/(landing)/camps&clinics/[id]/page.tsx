@@ -3,9 +3,9 @@
 import { CurvedImage } from "@/components/curved-image";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { useMobile } from "@/hooks/use-mobile";
 import { Camp, camps, detailIcons } from "@/lib/constants";
 import { CircleAlert, CircleCheckBig, DollarSign } from "lucide-react";
-import Image from "next/image";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -15,6 +15,7 @@ export default function Page() {
 
     const params = useParams()
     const [currentCamp, setCurrentCamp] = useState<Camp>()
+    const mobile = useMobile()
 
     useEffect(() => {
         if (params.id) {
@@ -46,7 +47,7 @@ export default function Page() {
                         <CurvedImage
                             src="/images/camps/hero.JPG"
                             alt="About hero"
-                            curveDepth={30}
+                            curveDepth={mobile ? 10 : 20}
                             className="shadow-2xl"
                             imageClassName="object-top"
                         />
