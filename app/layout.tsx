@@ -4,6 +4,7 @@ import { Geist, Geist_Mono, Inter } from "next/font/google";
 import NextTopLoader from 'nextjs-toploader';
 import { Suspense } from "react";
 import "./globals.css";
+import AnimatingLoader from "@/components/animating-loader";
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-sans' });
 
@@ -33,10 +34,10 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <Suspense fallback={
-          <div className="flex h-screen w-full items-center justify-center"><Loader2 className="animate-spin" /></div>}>
-         <NextTopLoader 
-         color="#d3fb20"
-         showSpinner={false}/>
+          <AnimatingLoader />}>
+          <NextTopLoader
+            color="#d3fb20"
+            showSpinner={false} />
           {children}
         </Suspense>
 
