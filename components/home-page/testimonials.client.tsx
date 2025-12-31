@@ -3,6 +3,7 @@
 "use client"
 
 import TestimonialSlider from "@/components/reviewslider"
+import { reviews } from "@/lib/constants"
 import { EmblaOptionsType } from "embla-carousel"
 import { User } from "lucide-react"
 
@@ -26,50 +27,3 @@ export default function Testimonials() {
 }
 
 
-const reviews = [
-    {
-        star: 5,
-        title: "A game-changer for my training!",
-        description:
-            "The personal trainers here are next level! I've seen massive improvements in my endurance and strength. Highly recommend!",
-        person: {
-            profile: <User />,
-            name: "Verity M.",
-            details: "Soccer Team Player",
-        },
-    },
-
-    {
-        star: 5,
-        title: "A game-changer for my training!",
-        description:
-            "The personal trainers here are next level! I've seen massive improvements in my endurance and strength. Highly recommend!",
-        person: {
-            profile: <User />,
-            name: "Verity M.",
-            details: "Soccer Team Player",
-        },
-    },
-    {
-        star: 5,
-        title: "A game-changer for my training!",
-        description:
-            "The personal trainers here are next level! I've seen massive improvements in my endurance and strength. Highly recommend!",
-        person: {
-            profile: <User />,
-            name: "Verity M.",
-            details: "Soccer Team Player",
-        },
-    },
-    {
-        star: 5,
-        title: "A game-changer for my training!",
-        description:
-            "The personal trainers here are next level! I've seen massive improvements in my endurance and strength. Highly recommend!",
-        person: {
-            profile: <User />,
-            name: "Verity M.",
-            details: "Soccer Team Player",
-        },
-    },
-];

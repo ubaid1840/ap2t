@@ -326,3 +326,49 @@ An accomplished youth soccer coach, Olim worked alongside Coach Jeff Josell for 
 ]
 
 
+export const reviews = [
+  {
+    star: 5,
+    title: "Incredible training environment!",
+    description:
+      "The coaching staff really understands player development. My speed, control, and confidence on the field have improved significantly.",
+    person: {
+      name: "Alex R.",
+      details: "Soccer Team Player",
+    },
+  },
+
+  {
+    star: 5,
+    title: "Professional and motivating coaches",
+    description:
+      "Every session is intense but rewarding. The trainers push you to be your best while keeping training fun and engaging.",
+    person: {
+      name: "Daniel S.",
+      details: "Soccer Team Player",
+    },
+  },
+
+  {
+    star: 5,
+    title: "Noticeable results in just weeks",
+    description:
+      "I’ve gained better stamina and sharper skills in a short time. The structured programs really make a difference.",
+    person: {
+      name: "Maria L.",
+      details: "Soccer Team Player",
+    },
+  },
+
+  {
+    star: 5,
+    title: "Top-tier soccer training facility",
+    description:
+      "From technical drills to fitness training, everything is well-planned. This place helped me take my game to the next level.",
+    person: {
+      name: "Chris T.",
+      details: "Soccer Team Player",
+    },
+  },
+];
+

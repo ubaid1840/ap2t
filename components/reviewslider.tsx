@@ -2,7 +2,7 @@ import { EmblaOptionsType } from 'embla-carousel'
 import useEmblaCarousel from 'embla-carousel-react'
 
 import { EmblaCarouselType } from 'embla-carousel'
-import { ChevronLeft, ChevronRight, Quote, Star } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Quote, Star, User } from 'lucide-react'
 import React, {
   ComponentPropsWithRef,
   ReactNode,
@@ -18,7 +18,6 @@ export type Review = {
   title: string;
   description: string;
   person: {
-    profile: ReactNode;
     name: string;
     details: string;
   };
@@ -89,7 +88,7 @@ const TestimonialSlider: React.FC<PropType> = (props) => {
                     <CardFooter>
                       <div className="w-full h-12 flex justify-between items-center">
                         <div className="flex items-center gap-3">
-                          <Avatar className="flex items-center justify-center">{review.person.profile}</Avatar>
+                          <Avatar className="flex items-center justify-center">{<User />}</Avatar>
 
                           <div>
                             <h1>{review.person.name}</h1>
