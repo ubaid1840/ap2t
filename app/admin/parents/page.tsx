@@ -1,9 +1,92 @@
+"use client"
+
+import PageTable from "@/components/app-table-without-pagination"
+import { PARENT_COLUMNS } from "@/components/parents/columns"
+import { PARENT_DATA, PARENT_TABLE_HEADER } from "@/components/parents/constatns"
+import Header from "@/components/parents/header"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Separator } from "@/components/ui/separator"
+import { Download, Filter, Plus, Search } from "lucide-react"
+import { useState } from "react"
 
 
-export default function Page(){
+export default function Page() {
+
+    const [filter, setFilter] = useState(true)
 
     return (
-        <>
-        </>
+        <div className="flex flex-col w-full py-4 gap-4">
+            <Header >
+                <div className="flex gap-4">
+                    <Button variant={"outline"}>
+                        <Download /> Export
+                    </Button>
+
+                    <Button >
+                        <Plus /> Add Parent
+                    </Button>
+                </div>
+            </Header>
+
+            <div className="flex flex-col gap-4 rounded-[14px] bg-#252525 border border-[#3A3A3A] p-4 bg-[#252525]">
+                <div className="flex gap-4">
+                    <div className="flex items-center gap-2 rounded-[12px] border border-[#3A3A3A] px-3 shadow-sm focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20 w-full bg-black">
+                        <Search className="h-4 w-4 text-gray-400" />
+                        <Input
+                            placeholder="Search by name, email, or phone..."
+                            className="w-full border-none bg-transparent p-0 text-sm placeholder:text-gray-400 focus-visible:ring-0 focus-visible:ring-offset-0 dark:bg-transparent"
+                        />
+                    </div>
+
+                    <Button onClick={() => setFilter(!filter)}>
+                        <Filter /> Filters
+                    </Button>
+                </div>
+
+                {filter &&
+                    <div className="flex flex-col w-full gap-4">
+
+                        <Separator />
+                        <div className="flex w-full gap-4">
+
+                            <div className="flex flex-1 flex-col gap-2">
+                                <Label className="text-muted-foreground">Payment Status</Label>
+                                <Input className="rounded-[8px] dark:bg-black" />
+                            </div>
+
+                            <div className="flex flex-1 flex-col gap-2">
+                                <Label className="text-muted-foreground">Zip Code</Label>
+                                <Input placeholder="Filter by zip code..." className="rounded-[8px] dark:bg-black" />
+                            </div>
+
+                        </div>
+                    </div>}
+
+
+            </div>
+
+            <PageTable
+                columns={PARENT_COLUMNS}
+                data={PARENT_DATA}
+                tableHeader={PARENT_TABLE_HEADER}
+                onRowClick={() => {
+
+                }}
+            />
+        </div>
     )
 }
+
+
+
+
+
+
+
+
+
+
+
+
