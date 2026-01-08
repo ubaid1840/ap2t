@@ -1,6 +1,6 @@
 import { Calendar, Clock, User } from "lucide-react"
-import { Card, CardContent, CardFooter, CardHeader } from "./ui/card"
-import { Button } from "./ui/button"
+import { Card, CardContent, CardFooter, CardHeader } from "../ui/card"
+import { Button } from "../ui/button"
 import {
   Table,
   TableBody,
@@ -8,14 +8,14 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "./ui/table"
-import { Badge } from "./ui/badge"
+} from "../ui/table"
+import { Badge } from "../ui/badge"
 export function UpcomingSessions() {
   return (
     <Card className="bg-[#252525] flex flex-col h-full p-0">
 
-      <CardHeader className="flex flex-row items-center justify-between py-5 px-8 ">
-        <div className="space-y-1">
+      <CardHeader className="flex flex-row items-center justify-between py-3 px-8 ">
+        <div className="flex flex-col justify-center gap-1">
           <h1 className="font-semibold text-3xl">Upcoming Sessions</h1>
           <p className="text-sm text-[#99A1AF]">
             Today's scheduled training sessions
@@ -32,8 +32,8 @@ export function UpcomingSessions() {
       <CardContent className="flex-1 px-0">
         <Table>
   
-          <TableHeader className="bg-[#1A1A1A] font-bold">
-            <TableRow>
+          <TableHeader className="bg-[#1A1A1A] text-2xl font-bold text-[#99A1AF]">
+            <TableRow className="h-22">
               <TableHead className="px-6">Player</TableHead>
               <TableHead className="px-6">Session Type</TableHead>
               <TableHead className="px-6">Coach</TableHead>
@@ -43,14 +43,14 @@ export function UpcomingSessions() {
             </TableRow>
           </TableHeader>
 
-          <TableBody>
+          <TableBody className="text-xl">
             {sessions.map((session, index) => (
               <TableRow
-  key={index}
-  className={`${
-    index % 2 === 0 ? "bg-[#252525]" : "bg-[#2A2A2A]"
-  } h-22`}
->
+              key={index}
+              className={`${
+                index % 2 === 0 ? "bg-[#252525]" : "bg-[#2A2A2A]"
+              } h-22`}
+            >
                 <TableCell className="px-6">
                   <div className="flex items-center gap-2">
                     {session.player.img}

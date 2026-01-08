@@ -4,7 +4,7 @@ import { Calendar, DollarSign, FileWarningIcon, User } from "lucide-react"
 
 export function DashboardOverview(){
     return(
-                    <div className="flex flex-col gap-3">
+            <div className="flex flex-col gap-3">
                 <div className="flex flex-col">
                     <h1 className="font-bold text-4xl ">Dashboard Overview</h1>
                     <p className="text-2xl text-[#99A1AF]">Welcome back! Here's what's happening today.</p>
