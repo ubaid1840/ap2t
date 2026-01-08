@@ -10,6 +10,8 @@ import {
   TableRow,
 } from "../ui/table"
 import { Badge } from "../ui/badge"
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar"
+import getInitials from "../parents/get-initials";
 export function UpcomingSessions() {
   return (
     <Card className="bg-[#252525] flex flex-col h-full p-0">
@@ -53,7 +55,12 @@ export function UpcomingSessions() {
             >
                 <TableCell className="px-6">
                   <div className="flex items-center gap-2">
-                    {session.player.img}
+                    <Avatar size="lg">
+                    <AvatarImage src="" />
+                    <AvatarFallback className="bg-primary text-black">
+                        {getInitials(session.player.name)}
+                    </AvatarFallback>
+                </Avatar>
                     {session.player.name}
                   </div>
                 </TableCell>
