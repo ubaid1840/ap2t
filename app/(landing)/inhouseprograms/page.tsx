@@ -6,14 +6,14 @@ import GradientIcon from "@/components/icon-container"
 import JoinNow from "@/components/join-now"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter } from "@/components/ui/card"
-import { useMobile } from "@/hooks/use-mobile"
+import { useIsMobile } from "@/hooks/use-mobile"
 import { Calendar, Clock, Pin, Trophy, Users, Volleyball } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
 
 export default function Page() {
 
-  const mobile = useMobile()
+  const mobile = useIsMobile()
 
   return (
     <div className="relative py-16 sm:py-20">

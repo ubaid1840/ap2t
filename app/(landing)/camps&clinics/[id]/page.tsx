@@ -3,7 +3,7 @@
 import { CurvedImage } from "@/components/curved-image";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { useMobile } from "@/hooks/use-mobile";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { Camp, camps, detailIcons } from "@/lib/constants";
 import { CircleAlert, CircleCheckBig, DollarSign } from "lucide-react";
 import { useParams } from "next/navigation";
@@ -15,7 +15,7 @@ export default function Page() {
 
     const params = useParams()
     const [currentCamp, setCurrentCamp] = useState<Camp>()
-    const mobile = useMobile()
+    const mobile = useIsMobile()
 
     useEffect(() => {
         if (params.id) {

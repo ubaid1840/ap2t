@@ -1,27 +1,19 @@
-import { useState, useEffect } from "react"
+import * as React from "react"
 
-/**
- * useMobile - returns true if the screen width is below the specified breakpoint
- * @param breakpoint number - optional, default is 768px (Tailwind md)
- */
-export const useMobile = (breakpoint: number = 768) => {
-  const [isMobile, setIsMobile] = useState(false)
+const MOBILE_BREAKPOINT = 768
 
-  useEffect(() => {
-    // Function to update isMobile based on current width
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < breakpoint)
+export function useIsMobile() {
+  const [isMobile, setIsMobile] = React.useState<boolean | undefined>(undefined)
+
+  React.useEffect(() => {
+    const mql = window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT - 1}px)`)
+    const onChange = () => {
+      setIsMobile(window.innerWidth < MOBILE_BREAKPOINT)
     }
+    mql.addEventListener("change", onChange)
+    setIsMobile(window.innerWidth < MOBILE_BREAKPOINT)
+    return () => mql.removeEventListener("change", onChange)
+  }, [])
 
-    // Initial check
-    checkMobile()
-
-    // Listen to resize events
-    window.addEventListener("resize", checkMobile)
-
-    // Cleanup
-    return () => window.removeEventListener("resize", checkMobile)
-  }, [breakpoint])
-
-  return isMobile
+  return !!isMobile
 }

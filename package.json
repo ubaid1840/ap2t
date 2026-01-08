@@ -16,6 +16,8 @@
     "embla-carousel": "8.6.0",
     "embla-carousel-autoplay": "8.6.0",
     "embla-carousel-react": "^8.6.0",
+    "holy-loader": "^2.3.14",
+    "kbar": "^0.1.0-beta.48",
     "lucide-react": "^0.562.0",
     "motion": "^12.23.26",
     "next": "16.1.0",

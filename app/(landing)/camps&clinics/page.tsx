@@ -4,7 +4,7 @@ import { CurvedImage } from "@/components/curved-image";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { useMobile } from "@/hooks/use-mobile";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { camps, detailIcons } from "@/lib/constants";
 import { ArrowRight, Search } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -14,7 +14,7 @@ export default function Page() {
 
     const [search, setSearch] = useState("")
     const [filter, setFilter] = useState("All")
-     const mobile = useMobile()
+     const mobile = useIsMobile()
     const router = useRouter()
 
     return (

@@ -2,13 +2,13 @@
 
 import { CurvedImage } from "@/components/curved-image";
 import CoreTeam from "@/components/home-page/core-team";
-import { useMobile } from "@/hooks/use-mobile";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { about, values } from "@/lib/constants";
 
 
 export default function Page() {
 
-  const mobile = useMobile()
+  const mobile = useIsMobile()
   return (
     <div className="relative py-16 sm:py-20">
       <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">

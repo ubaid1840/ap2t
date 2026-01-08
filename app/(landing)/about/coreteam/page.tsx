@@ -1,6 +1,6 @@
 "use client"
 
-import { useMobile } from "@/hooks/use-mobile"
+import { useIsMobile } from "@/hooks/use-mobile"
 import { useSafeBack } from "@/hooks/use-safe-back"
 import { team } from "@/lib/constants"
 import { ArrowLeft, Mail } from "lucide-react"
@@ -10,7 +10,7 @@ import { useRouter } from "next/navigation"
 export default function Page() {
 
 
-    const isMobile = useMobile()
+    const isMobile = useIsMobile()
     const router = useRouter()
      const safeBack = useSafeBack("/home")
 

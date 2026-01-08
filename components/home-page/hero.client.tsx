@@ -3,12 +3,12 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Pause, Play } from "lucide-react";
-import { useMobile } from "@/hooks/use-mobile";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 
 export default function Hero() {
 
-    const mobile = useMobile()
+    const mobile = useIsMobile()
 
     const videoRef = useRef<HTMLVideoElement | null>(null);
     const [isPlaying, setIsPlaying] = useState(false);
