@@ -1,6 +1,6 @@
 "use client"
 
-import { Bell } from "lucide-react"
+import { Bell, ChevronDown } from "lucide-react"
 import InputWithIcon from "./input-with-icon"
 import { Separator } from "./ui/separator"
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar"
@@ -23,7 +23,7 @@ export default function DashboardHeader() {
                 <InputWithIcon className="w-100" />
                 <div className="flex gap-4 items-center">
 
-                    <Bell />
+                    <NotificationBadge count={1} />
                     <Separator orientation="vertical" />
                     <div>
                         <p className="text-xs text-white text-right">Admin</p>
@@ -35,14 +35,9 @@ export default function DashboardHeader() {
                     </Avatar>
 
                     <DropdownMenu>
-                        <DropdownMenuTrigger>Open</DropdownMenuTrigger>
+                        <DropdownMenuTrigger><ChevronDown size={16} /></DropdownMenuTrigger>
                         <DropdownMenuContent>
-                            <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem>Profile</DropdownMenuItem>
-                            <DropdownMenuItem>Billing</DropdownMenuItem>
-                            <DropdownMenuItem>Team</DropdownMenuItem>
-                            <DropdownMenuItem>Subscription</DropdownMenuItem>
+                            <DropdownMenuItem>Logout</DropdownMenuItem>
                         </DropdownMenuContent>
                     </DropdownMenu>
 
@@ -54,3 +49,15 @@ export default function DashboardHeader() {
 
 
 }
+
+const NotificationBadge = ({ count }: { count?: number | null }) => {
+  return (
+    <div className="relative inline-block">
+      <Bell size={20} />
+
+      {count && count > 0 && (
+        <span className="absolute -top-1 -right-1 block w-2 h-2 bg-red-500 rounded-full" />
+      )}
+    </div>
+  );
+};
