@@ -47,7 +47,8 @@
 }
 
 :root {
-   --background: #0A0A0A;
+  --radius : .625rem;
+  --background: #0a0a0a;
   --foreground: #ffffff;
   --card: #454545;
   --card-foreground: #ffffff;
@@ -57,8 +58,8 @@
   --primary-foreground: #282828;
   --secondary: #454545;
   --secondary-foreground: #ffffff;
-  --muted: #A3A3A3;
-  --muted-foreground: #A3A3A3;
+  --muted: #a3a3a3;
+  --muted-foreground: #a3a3a3;
   --accent: #d3fb20;
   --accent-foreground: #282828;
   --destructive: oklch(0.577 0.245 27.325);
@@ -73,10 +74,10 @@
   --chart-5: #98c91e;
   --notification-primary: #cbfd0026;
   --sidebar: #252525;
-  --sidebar-foreground: #B0B0B0;
-  --sidebar-primary: #D3FB20;
+  --sidebar-foreground: #b0b0b0;
+  --sidebar-primary: #d3fb20;
   --sidebar-primary-foreground: #282828;
-  --sidebar-accent: #D3FB20;
+  --sidebar-accent: #d3fb20;
   --sidebar-accent-foreground: #282828;
   --sidebar-border: #e5e5e5;
   --sidebar-ring: #a1a1a1;
@@ -86,7 +87,7 @@
 }
 
 .dark {
-  --background: #0A0A0A;
+  --background: #0a0a0a;
   --foreground: #ffffff;
   --card: #454545;
   --card-foreground: #ffffff;
@@ -96,8 +97,8 @@
   --primary-foreground: #282828;
   --secondary: #454545;
   --secondary-foreground: #ffffff;
-  --muted: #A3A3A3;
-  --muted-foreground: #A3A3A3;
+  --muted: #a3a3a3;
+  --muted-foreground: #a3a3a3;
   --accent: #d3fb20;
   --accent-foreground: #282828;
   --destructive: oklch(0.577 0.245 27.325);
@@ -112,10 +113,10 @@
   --chart-5: #98c91e;
   --notification-primary: #cbfd0026;
   --sidebar: #252525;
-  --sidebar-foreground: #B0B0B0;
-  --sidebar-primary: #D3FB20;
+  --sidebar-foreground: #b0b0b0;
+  --sidebar-primary: #d3fb20;
   --sidebar-primary-foreground: #282828;
-  --sidebar-accent: #D3FB20;
+  --sidebar-accent: #d3fb20;
   --sidebar-accent-foreground: #282828;
   --sidebar-border: #e5e5e5;
   --sidebar-ring: #a1a1a1;
@@ -134,7 +135,6 @@
 }
 
 .embla {
-
   --slide-height: 19rem;
   --slide-spacing: 1rem;
   --slide-size: 100%;
@@ -212,7 +212,7 @@
   border-radius: 50%;
   display: flex;
   align-items: center;
-  content: '';
+  content: "";
 }
 
 .embla__dot--selected:after {
@@ -304,7 +304,6 @@
 }
 
 @media (min-width: 640px) {
-
   /* md screens */
   .responsive-slide {
     --slide-size: 50%;
@@ -312,7 +311,6 @@
 }
 
 @media (min-width: 1024px) {
-
   /* lg screens */
   .responsive-slide {
     --slide-size: 33%;
@@ -323,14 +321,14 @@
   width: 100%;
   height: 500px;
   position: relative;
-  background: url('/images/inhouse/hero.JPG') center/cover no-repeat;
+  background: url("/images/inhouse/hero.JPG") center/cover no-repeat;
   overflow: hidden;
   border-radius: 4px;
 }
 
 /* Top curve */
 .panoramic::before {
-  content: '';
+  content: "";
   position: absolute;
   top: -20px;
   /* curve height */
@@ -346,7 +344,7 @@
 
 /* Bottom curve */
 .panoramic::after {
-  content: '';
+  content: "";
   position: absolute;
   bottom: -20px;
   /* curve height */
