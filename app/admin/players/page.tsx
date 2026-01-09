@@ -2,14 +2,14 @@
 
 import PageTable from "@/components/app-table"
 import InputWithIcon from "@/components/input-with-icon"
-import { PARENT_COLUMNS } from "@/components/parents/columns"
-import { PARENT_DATA, PARENT_TABLE_HEADER } from "@/components/parents/constatns"
+import { PLAYERS_COLUMNS } from "@/components/players/columns"
+import { PLAYER_TABLE_HEADER, PLAYERS_DATA } from "@/components/players/constatns"
 import Header from "@/components/players/header"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
-import { Download, Filter, Plus, Search } from "lucide-react"
+import { Download, Filter, Plus } from "lucide-react"
 import { useState } from "react"
 
 
@@ -50,13 +50,18 @@ export default function Page() {
                         <div className="flex flex-col sm:flex-row w-full gap-4">
 
                             <div className="flex flex-1 flex-col gap-2">
-                                <Label className="text-muted-foreground">Payment Status</Label>
+                                <Label className="text-muted-foreground font-normal">Coach</Label>
                                 <Input className="rounded-[8px] dark:bg-black" />
                             </div>
 
                             <div className="flex flex-1 flex-col gap-2">
-                                <Label className="text-muted-foreground">Zip Code</Label>
-                                <Input placeholder="Filter by zip code..." className="rounded-[8px] dark:bg-black" />
+                                <Label className="text-muted-foreground font-normal">Session Type</Label>
+                                <Input  className="rounded-[8px] dark:bg-black" />
+                            </div>
+
+                             <div className="flex flex-1 flex-col gap-2">
+                                <Label className="text-muted-foreground font-normal">Attendance</Label>
+                                <Input  className="rounded-[8px] dark:bg-black" />
                             </div>
 
                         </div>
@@ -66,9 +71,9 @@ export default function Page() {
             </div>
 
             <PageTable
-                columns={PARENT_COLUMNS}
-                data={PARENT_DATA}
-                tableHeader={PARENT_TABLE_HEADER}
+                columns={PLAYERS_COLUMNS}
+                data={PLAYERS_DATA}
+                tableHeader={PLAYER_TABLE_HEADER}
                 onRowClick={() => {
 
                 }}
@@ -77,6 +82,8 @@ export default function Page() {
 
     )
 }
+
+
 
 
 
