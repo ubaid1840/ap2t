@@ -41,16 +41,16 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useIsMobile } from "@/hooks/use-mobile";
-import {Spinner} from "./ui/spinner";
+import { Spinner } from "./ui/spinner";
 
 const PageTable = ({
   columns,
   data,
   pageSizeOptions = [10, 20, 30, 40, 50],
   totalCustomerText,
-  onRowClick = (a : any, b : any)=> {},
+  onRowClick = (a: any, b: any) => { },
   loading = false,
-} : any) => {
+}: any) => {
   const [sorting, setSorting] = useState([]);
   const [columnFilters, setColumnFilters] = useState([]);
   const [columnVisibility, setColumnVisibility] = useState({});
@@ -65,7 +65,7 @@ const PageTable = ({
 
   const pageCount = Math.ceil(data.length / pageSize);
 
-  const handlePaginationChange = (updaterOrValue : any) => {
+  const handlePaginationChange = (updaterOrValue: any) => {
     const pagination =
       typeof updaterOrValue === "function"
         ? updaterOrValue(paginationState)
@@ -76,7 +76,7 @@ const PageTable = ({
   };
 
   const table = useReactTable({
-    data : data,
+    data: data,
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -95,8 +95,8 @@ const PageTable = ({
       pagination: paginationState,
     },
     onPaginationChange: handlePaginationChange,
-    defaultColumn : {
-      size : 200
+    defaultColumn: {
+      size: 200
     }
     // manualPagination: true,
     // manualFiltering: true
@@ -112,13 +112,13 @@ const PageTable = ({
 
   return (
     <div className="flex flex-1 flex-col space-y-4">
-      <div className={`relative flex flex-1 flex-col ${isMobile && "min-h-[500px]"} max-w-[calc(100vw-44px)]`}>
-        <div className="flex overflow-scroll rounded-md border md:overflow-auto">
-          <ScrollArea className="flex-1">
+      <div className={`relative flex flex-1 flex-col ${isMobile && "min-h-[500px] max-w-[calc(100vw-44px)]"} `}>
+        <div className="flex rounded-md border md:overflow-auto">
+          <ScrollArea className="overflow-x-auto">
             <Table className="relative">
-              <TableHeader>
+              <TableHeader className="hover:bg-inherit">
                 {table.getHeaderGroups().map((headerGroup) => (
-                  <TableRow key={headerGroup.id} className="bg-background">
+                  <TableRow key={headerGroup.id} className="bg-background hover:bg-inherit">
                     {headerGroup.headers.map((header) => (
                       <TableHead style={{ width: header.getSize() }} key={header.id}>
                         {header.isPlaceholder
@@ -131,18 +131,18 @@ const PageTable = ({
               </TableHeader>
               <TableBody className="bg-white dark:bg-[#252525]">
                 {table.getRowModel().rows?.length ? (
-                  table.getRowModel().rows.map((row : any) => (
+                  table.getRowModel().rows.map((row: any) => (
                     <TableRow
                       onClick={(e) => onRowClick?.(row.original, e)}
-                      className="even:bg-gray-100 dark:even:bg-[#2A2A2A] dark:text-white text-black cursor-pointer"
+                      className="even:bg-gray-100 dark:even:bg-[#2A2A2A] dark:text-white text-black hover:bg-inherit"
                       key={row.id}
                       data-state={row.getIsSelected() && "selected"}
                     >
-                      {row.getVisibleCells().map((cell : any) => (
+                      {row.getVisibleCells().map((cell: any) => (
                         <TableCell className="text-[13px]" key={cell.id}>
                           {flexRender(cell.column.columnDef.cell, {
                             ...cell.getContext(),
-                            stopRowClick: (e : any) => e.stopPropagation(),
+                            stopRowClick: (e: any) => e.stopPropagation(),
                           })}
                         </TableCell>
                       ))}
@@ -164,99 +164,99 @@ const PageTable = ({
               </TableBody>
             </Table>
 
-              <div className="flex flex-col items-center justify-end gap-2 space-x-2 py-4 sm:flex-row px-4">
-        <div className="flex w-full items-center justify-between">
-          <div className="flex-1 text-sm text-muted-foreground">
-            {data.length > 0 ? (
-              <>
-                Showing {startIndex} to {endIndex} of {data.length} entries
-              </>
-            ) : (
-              "No entries found"
-            )}
-          </div>
-          <div className="flex flex-col items-center gap-4 sm:flex-row sm:gap-6 lg:gap-8">
-            <div className="flex items-center space-x-2">
-              <p className="whitespace-nowrap text-sm font-medium">
-                Rows per page
-              </p>
-              <Select
-                value={`${paginationState.pageSize}`}
-                onValueChange={(value) => {
-                  table.setPageSize(Number(value));
-                }}
-              >
-                <SelectTrigger className="h-8 w-[70px]">
-                  <SelectValue placeholder={paginationState.pageSize} />
-                </SelectTrigger>
-                <SelectContent side="top">
-                  {pageSizeOptions.map((pageSize) => (
-                    <SelectItem key={pageSize} value={`${pageSize}`}>
-                      {pageSize}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+            <div className="flex flex-col items-center justify-end gap-2 space-x-2 py-4 sm:flex-row px-4">
+              <div className="flex w-full items-center justify-between">
+                <div className="flex-1 text-sm text-muted-foreground">
+                  {data.length > 0 ? (
+                    <>
+                      Showing {startIndex} to {endIndex} of {data.length} entries
+                    </>
+                  ) : (
+                    "No entries found"
+                  )}
+                </div>
+                <div className="flex flex-col items-center gap-4 sm:flex-row sm:gap-6 lg:gap-8">
+                  <div className="flex items-center space-x-2">
+                    <p className="whitespace-nowrap text-sm font-medium">
+                      Rows per page
+                    </p>
+                    <Select
+                      value={`${paginationState.pageSize}`}
+                      onValueChange={(value) => {
+                        table.setPageSize(Number(value));
+                      }}
+                    >
+                      <SelectTrigger className="h-8 w-[70px]">
+                        <SelectValue placeholder={paginationState.pageSize} />
+                      </SelectTrigger>
+                      <SelectContent side="top">
+                        {pageSizeOptions.map((pageSize) => (
+                          <SelectItem key={pageSize} value={`${pageSize}`}>
+                            {pageSize}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              </div>
+              <div className="flex w-full items-center justify-between gap-2 sm:justify-end">
+                <div className="flex sm:w-[250px] items-center justify-center text-sm font-medium">
+                  {data.length > 0 ? (
+                    <>
+                      {totalCustomerText && `${totalCustomerText} ${data.length}`} Page{" "}
+                      {paginationState.pageIndex + 1} of {pageCount}
+                    </>
+                  ) : (
+                    "No pages"
+                  )}
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Button
+                    aria-label="Go to first page"
+                    variant="outline"
+                    className="hidden h-8 w-8 p-0 lg:flex"
+                    onClick={() => table.setPageIndex(0)}
+                    disabled={!table.getCanPreviousPage()}
+                  >
+                    <DoubleArrowLeftIcon className="h-4 w-4" aria-hidden="true" />
+                  </Button>
+                  <Button
+                    aria-label="Go to previous page"
+                    variant="outline"
+                    className="p-0 w-8"
+                    onClick={() => table.previousPage()}
+                    disabled={!table.getCanPreviousPage()}
+                  >
+                    <ChevronLeftIcon className="h-4 w-4" aria-hidden="true" />
+                  </Button>
+                  <Button
+                    aria-label="Go to next page"
+                    variant="outline"
+                    className="p-0 w-8"
+                    onClick={() => table.nextPage()}
+                    disabled={!table.getCanNextPage()}
+                  >
+                    <ChevronRightIcon className="h-4 w-4" aria-hidden="true" />
+                  </Button>
+                  <Button
+                    aria-label="Go to last page"
+                    variant="outline"
+                    className="hidden h-8 w-8 p-0 lg:flex"
+                    onClick={() => table.setPageIndex(table.getPageCount() - 1)}
+                    disabled={!table.getCanNextPage()}
+                  >
+                    <DoubleArrowRightIcon className="h-4 w-4" aria-hidden="true" />
+                  </Button>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
-        <div className="flex w-full items-center justify-between gap-2 sm:justify-end">
-          <div className="flex sm:w-[250px] items-center justify-center text-sm font-medium">
-            {data.length > 0 ? (
-              <>
-                {totalCustomerText && `${totalCustomerText} ${data.length}`} Page{" "}
-                {paginationState.pageIndex + 1} of {pageCount}
-              </>
-            ) : (
-              "No pages"
-            )}
-          </div>
-          <div className="flex items-center space-x-2">
-            <Button
-              aria-label="Go to first page"
-              variant="outline"
-              className="hidden h-8 w-8 p-0 lg:flex"
-              onClick={() => table.setPageIndex(0)}
-              disabled={!table.getCanPreviousPage()}
-            >
-              <DoubleArrowLeftIcon className="h-4 w-4" aria-hidden="true" />
-            </Button>
-            <Button
-              aria-label="Go to previous page"
-              variant="outline"
-              className="p-0 w-8"
-              onClick={() => table.previousPage()}
-              disabled={!table.getCanPreviousPage()}
-            >
-              <ChevronLeftIcon className="h-4 w-4" aria-hidden="true" />
-            </Button>
-            <Button
-              aria-label="Go to next page"
-              variant="outline"
-              className="p-0 w-8"
-              onClick={() => table.nextPage()}
-              disabled={!table.getCanNextPage()}
-            >
-              <ChevronRightIcon className="h-4 w-4" aria-hidden="true" />
-            </Button>
-            <Button
-              aria-label="Go to last page"
-              variant="outline"
-              className="hidden h-8 w-8 p-0 lg:flex"
-              onClick={() => table.setPageIndex(table.getPageCount() - 1)}
-              disabled={!table.getCanNextPage()}
-            >
-              <DoubleArrowRightIcon className="h-4 w-4" aria-hidden="true" />
-            </Button>
-          </div>
-        </div>
-      </div>
             <ScrollBar orientation="horizontal" />
           </ScrollArea>
         </div>
       </div>
 
-    
+
     </div>
   );
 };

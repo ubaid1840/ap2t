@@ -12,15 +12,17 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { useIsMobile } from "@/hooks/use-mobile"
 
 
 export default function DashboardHeader() {
+    const isMobile = useIsMobile()
 
     return (
-        <div className="flex flex-1 w-full h-full items-center px-4">
+        <div className="flex flex-1 w-full h-full py-4 px-4">
             <div className="w-full flex justify-between flex-wrap">
 
-                <InputWithIcon className="w-100" />
+                <InputWithIcon className={isMobile ? "hidden" : "w-100"} />
                 <div className="flex gap-4 items-center">
 
                     <NotificationBadge count={1} />

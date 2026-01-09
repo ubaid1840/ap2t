@@ -37,6 +37,21 @@
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
+  
+  --color-success-bg : var(--success-bg);
+  --color-success-text : var(--success-text) ;
+  --color-danger-bg: var(--danger-bg);
+--color-danger-text: var(--danger-text);
+--color-warning-bg: var(--warning-bg);
+--color-warning-text: var(--warning-text);
+--color-info-bg: var(--info-bg);
+--color-info-text: var(--info-text);
+--color-active-bg: var(--active-bg);
+--color-active-text: var(--active-text);
+--color-other-bg: var(--other-bg);
+--color-other-text: var(--other-text);
+--color-ghost-bg: var(--ghost-bg);
+--color-ghost-text: var(--ghost-text);
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -123,6 +138,21 @@
   --detail-medium-contrast: rgb(25, 25, 25);
   --text-high-contrast-rgb-value: 230, 230, 230;
   --text-body: rgb(222, 222, 222);
+  --success-bg : #D3FB2033;
+  --success-text : #D3FB20;
+  --danger-bg : #DC262652;
+  --danger-text : #EF4444;
+  --warning-bg : #EA580C52;
+  --warning-text : #F97316;
+  --info-bg : #2B7FFF33;
+  --info-text : #51A2FF;
+  --active-bg : #00C95033;
+  --active-text:#05DF72;
+  --other-bg : #AD46FF33;
+  --other-text : #C27AFF; 
+  --ghost-bg : #6A728233;
+  --ghost-text : #99A1AF;
+
 }
 
 @layer base {

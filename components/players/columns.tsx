@@ -27,6 +27,7 @@ export const PLAYERS_COLUMNS: ColumnDef<PlayersData>[] = [
         header: ({ column }) => (
             <Button
                 variant="ghost"
+                className="dark:hover:bg-transparent dark:hover:text-white/50"
                 onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
             >
                 Player Name
@@ -55,6 +56,7 @@ export const PLAYERS_COLUMNS: ColumnDef<PlayersData>[] = [
         header: ({ column }) => (
             <Button
                 variant="ghost"
+                className="dark:hover:bg-transparent dark:hover:text-white/50"
                 onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
             >
                 Age
@@ -72,6 +74,7 @@ export const PLAYERS_COLUMNS: ColumnDef<PlayersData>[] = [
         header: ({ column }) => (
             <Button
                 variant="ghost"
+                className="dark:hover:bg-transparent dark:hover:text-white/50"
                 onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
             >
                 Position
@@ -89,6 +92,7 @@ export const PLAYERS_COLUMNS: ColumnDef<PlayersData>[] = [
         header: ({ column }) => (
             <Button
                 variant="ghost"
+                className="dark:hover:bg-transparent dark:hover:text-white/50"
                 onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
             >
                 Parent Name
@@ -106,6 +110,7 @@ export const PLAYERS_COLUMNS: ColumnDef<PlayersData>[] = [
         header: ({ column }) => (
             <Button
                 variant="ghost"
+                className="dark:hover:bg-transparent dark:hover:text-white/50"
                 onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
             >
                 Last Session
@@ -124,6 +129,7 @@ export const PLAYERS_COLUMNS: ColumnDef<PlayersData>[] = [
         header: ({ column }) => (
             <Button
                 variant="ghost"
+                className="dark:hover:bg-transparent dark:hover:text-white/50"
                 onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
             >
                 Attendance

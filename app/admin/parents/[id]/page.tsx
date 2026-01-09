@@ -19,7 +19,7 @@ import { IoCalendarClear } from "react-icons/io5"
 export default function Page() {
     const { id } = useParams()
     const [data, setData] = useState<ParentData | undefined>()
-    const [tab, setTab] = useState("history");
+    const [tab, setTab] = useState("linked");
 
     useEffect(() => {
         if (id) {
@@ -62,26 +62,26 @@ export default function Page() {
                     <div className="mt-4 flex w-full justify-evenly flex-wrap gap-4">
                         <HeaderCard title={String(data?.children)} description="Linked Children"
                             icon={
-                                <div className="rounded-[8px] flex w-10 h-10 items-center justify-center bg-primary/50">
-                                    <Users className="text-primary" size={20} />
+                                <div className="rounded-[8px] flex w-10 h-10 items-center justify-center bg-success-bg">
+                                    <Users className="text-success-text" size={20} />
                                 </div>} />
 
                         <HeaderCard title={`$${String(data?.total_spent)}`} description="Total Spent"
                             icon={
-                                <div className="rounded-[8px] flex w-10 h-10 items-center justify-center bg-[#2B7FFF33]">
-                                    <DollarSign className="text-[#51A2FF]" size={20} />
+                                <div className="rounded-[8px] flex w-10 h-10 items-center justify-center bg-info-bg">
+                                    <DollarSign className="text-info-text" size={20} />
                                 </div>} />
 
                         <HeaderCard title={"**** 4242"} description="Exp:12/2026"
                             icon={
-                                <div className="rounded-[8px] flex w-10 h-10 items-center justify-center bg-[#00C95033]">
-                                    <CreditCard className="text-[#05DF72]" size={20} />
+                                <div className="rounded-[8px] flex w-10 h-10 items-center justify-center bg-active-bg">
+                                    <CreditCard className="text-active-text" size={20} />
                                 </div>} />
 
                         <HeaderCard title={"4"} description="Upcoming Session"
                             icon={
-                                <div className="rounded-[8px] flex w-10 h-10 items-center justify-center bg-[#AD46FF33]">
-                                    <Calendar className="text-[#C27AFF]" size={20} />
+                                <div className="rounded-[8px] flex w-10 h-10 items-center justify-center bg-other-bg">
+                                    <Calendar className="text-other-text" size={20} />
                                 </div>} />
                     </div>
                 </CardContent>
@@ -233,12 +233,11 @@ const CardStatusHistory = ({ text = "" }: { text: string }) => {
 
 
 
-    const txtColor = text === "Completed" ? "#05DF72" : text === "Upcoming" ? "#51A2FF" : text === "Cancelled" ? "#99A1AF" : "#FF6467"
-    const bgColor = text === "Completed" ? "#00C95033" : text === "Upcoming" ? "#2B7FFF33" : text === "Cancelled" ? "#6A728233" : "#FB2C3633"
-
+    const colors = text === "Completed" ? "bg-success-bg text-success-text" : text === "Upcoming" ? "bg-info-bg text-info-text" : text === "Cancelled" ? "bg-ghost-bg text-ghost-text" : "bg-danger-bg text-danger-text"
+   
     return (
-        <div className="w-25 py-1 justify-center rounded-full flex items-center gap-2" style={{ backgroundColor: bgColor }}>
-            <div style={{ color: txtColor }} className="text-xs">{text}</div>
+        <div className={`w-25 py-1 justify-center rounded-full flex items-center gap-2 ${colors}`} >
+            <div  className="text-xs">{text}</div>
         </div>
     )
 }

@@ -28,6 +28,7 @@ export const PARENT_COLUMNS: ColumnDef<ParentData>[] = [
         header: ({ column }) => (
             <Button
                 variant="ghost"
+                className="dark:hover:bg-transparent dark:hover:text-white/50"
                 onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
             >
                 Parent Name
@@ -57,6 +58,7 @@ export const PARENT_COLUMNS: ColumnDef<ParentData>[] = [
         header: ({ column }) => (
             <Button
                 variant="ghost"
+                className="dark:hover:bg-transparent dark:hover:text-white/50"
                 onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
             >
                 Contact Info
@@ -79,6 +81,7 @@ export const PARENT_COLUMNS: ColumnDef<ParentData>[] = [
         header: ({ column }) => (
             <Button
                 variant="ghost"
+                className="dark:hover:bg-transparent dark:hover:text-white/50"
                 onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
             >
                 Location
@@ -96,6 +99,7 @@ export const PARENT_COLUMNS: ColumnDef<ParentData>[] = [
         header: ({ column }) => (
             <Button
                 variant="ghost"
+                className="dark:hover:bg-transparent dark:hover:text-white/50"
                 onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
             >
                 Children
@@ -113,6 +117,7 @@ export const PARENT_COLUMNS: ColumnDef<ParentData>[] = [
         header: ({ column }) => (
             <Button
                 variant="ghost"
+                className="dark:hover:bg-transparent dark:hover:text-white/50"
                 onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
             >
                 Card Status
@@ -128,6 +133,7 @@ export const PARENT_COLUMNS: ColumnDef<ParentData>[] = [
         header: ({ column }) => (
             <Button
                 variant="ghost"
+                className="dark:hover:bg-transparent dark:hover:text-white/50"
                 onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
             >
                 Total Spent

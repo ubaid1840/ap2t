@@ -6,33 +6,29 @@ interface CardStatusProps {
 
 const CardStatus = ({ value }: CardStatusProps) => {
   // Determine colors based on value type
-  let bgColor = "#FB2C3633";
-  let txtColor = "#FF6467";
+  let colors = ""
   let Icon = Info; // Default icon
 
   
     // Number logic
     if (value > 90) {
-      bgColor = "#16A34A52";
-      txtColor = "#22C55E";
+      colors = "bg-success-bg text-success-text"
       Icon = TrendingUp
     } else if (value >= 80 && value <= 90) {
-      bgColor = "#EA580C52";
-      txtColor = "#F97316";
+      colors = "bg-warning-bg text-warning-text"
     } else {
-      bgColor = "#DC262652";
-      txtColor = "#EF4444";
+      colors = "bg-danger-bg text-danger-text"
       Icon = TrendingDown
     }
   
 
   return (
     <div
-      className="w-25 py-1 justify-center rounded-full flex items-center gap-2"
-      style={{ backgroundColor: bgColor }}
+      className={`w-25 py-1 justify-center rounded-full flex items-center gap-2 ${colors}`}
+    
     >
-      <Icon size={14} className="text-current" style={{ color: txtColor }} />
-      <div style={{ color: txtColor }} className="text-xs">
+      <Icon size={14} className="text-current"  />
+      <div  className="text-xs">
         {value}
       </div>
     </div>
