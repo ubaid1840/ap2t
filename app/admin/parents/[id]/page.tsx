@@ -31,7 +31,7 @@ export default function Page() {
 
 
     return (
-      <div className="flex flex-col w-full gap-6">
+        <div className="flex flex-col w-full gap-6">
             <BackButton title="Back To Parents" route="/admin/parents" />
 
             <Card className="w-full rounded-[12px] bg-[#252525]">
@@ -101,12 +101,6 @@ export default function Page() {
                             <TabsTrigger
                                 key={t}
                                 value={t}
-                                className={cn(
-                                    "flex-1 relative z-10 text-lg px-4 rounded-md ",
-                                    tab === t
-                                        ? "bg-blue-500 text-black dark:text-black" // active tab style
-                                        : "bg-transparent text-muted-foreground" // inactive tab style
-                                )}
                             >
                                 {t === "linked" && <div className="flex gap-2 items-center text-sm py-2"><Users /> Linked Children</div>}
                                 {t === "history" && <div className="flex gap-2 items-center text-sm py-2"><Calendar /> Booking History</div>}
@@ -199,7 +193,7 @@ export default function Page() {
                                     <div className="space-y-1">
                                         <div className="flex items-center gap-2">
                                             <span className="text-[#F3F4F6]">{item.title}</span>
-                                            <CardStatusHistory text={item.status}/>
+                                            <CardStatusHistory text={item.status} />
                                         </div>
                                         <div className="text-muted-foreground text-xs flex items-center gap-2">
                                             <Calendar size={14} /> {item.date} <Clock size={14} /> {item.time}
@@ -213,7 +207,7 @@ export default function Page() {
                                 {/* Bottom row: coach and child */}
                                 <div className="grid grid-cols-2 text-[#F3F4F6] text-xs max-w-md">
                                     <span>Coach: {item.coach}</span>
-                                    <span className="inline-flex"><Dot size={16}/> Child: {item.child}</span>
+                                    <span className="inline-flex"><Dot size={16} /> Child: {item.child}</span>
                                 </div>
                             </div>
 
@@ -237,7 +231,7 @@ export default function Page() {
 const CardStatusHistory = ({ text = "" }: { text: string }) => {
 
 
-   
+
 
     const txtColor = text === "Completed" ? "#05DF72" : text === "Upcoming" ? "#51A2FF" : text === "Cancelled" ? "#99A1AF" : "#FF6467"
     const bgColor = text === "Completed" ? "#00C95033" : text === "Upcoming" ? "#2B7FFF33" : text === "Cancelled" ? "#6A728233" : "#FB2C3633"

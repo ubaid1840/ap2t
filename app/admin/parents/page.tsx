@@ -1,6 +1,7 @@
 "use client"
 
 import PageTable from "@/components/app-table"
+import InputWithIcon from "@/components/input-with-icon"
 import { PARENT_COLUMNS } from "@/components/parents/columns"
 import { PARENT_DATA, PARENT_TABLE_HEADER } from "@/components/parents/constatns"
 import Header from "@/components/parents/header"
@@ -33,13 +34,9 @@ export default function Page() {
 
             <div className="flex flex-col gap-4 rounded-[14px] bg-#252525 border border-[#3A3A3A] p-4 bg-[#252525]">
                 <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
-                    <div className="flex items-center gap-2 rounded-[12px] border border-[#3A3A3A] px-3 shadow-sm w-full bg-black">
-                        <Search className="h-4 w-4 text-gray-400" />
-                        <Input
-                            placeholder="Search by name, email, or phone..."
-                            className="w-full border-none bg-transparent p-0 text-sm placeholder:text-gray-400 focus-visible:ring-0 focus-visible:ring-offset-0 dark:bg-transparent"
-                        />
-                    </div>
+                   <div className="w-full">
+                    <InputWithIcon  placeholder="Search by name, email, or phone..."/>
+                   </div>
 
                     <Button onClick={() => setFilter(!filter)}>
                         <Filter /> Filters
