@@ -1,0 +1,30 @@
+"use client";
+
+import Booking from "@/components/landing/home-page/book.client";
+import Facilities from "@/components/landing/home-page/facilities.client";
+import Hero from "@/components/landing/home-page/hero.client";
+import Partners from "@/components/landing/home-page/partner.client";
+import Programs from "@/components/landing/home-page/programs.client";
+import Testimonials from "@/components/landing/home-page/testimonials.client";
+import JoinNow from "@/components/landing/join-now";
+import PricingSection from "@/components/landing/pricing-section";
+export default function LandingPage() {
+
+    return (
+        <div >
+          
+            <Hero />
+            <Facilities />
+            <Partners />
+            <Programs />
+            <Booking />
+            <Testimonials />
+            <section className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 pt-10 sm:pt-20">
+                <PricingSection />
+            </section>
+            <JoinNow />
+
+        </div>
+    );
+}
+
