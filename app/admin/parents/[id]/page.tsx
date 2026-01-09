@@ -31,7 +31,7 @@ export default function Page() {
 
 
     return (
-        <div className="flex flex-col w-full py-4 gap-4">
+      <div className="flex flex-col w-full gap-6">
             <BackButton title="Back To Parents" route="/admin/parents" />
 
             <Card className="w-full rounded-[12px] bg-[#252525]">
@@ -102,9 +102,9 @@ export default function Page() {
                                 key={t}
                                 value={t}
                                 className={cn(
-                                    "flex-1 relative z-10 text-lg px-4 rounded-[8px] transition-colors duration-300",
+                                    "flex-1 relative z-10 text-lg px-4 rounded-md ",
                                     tab === t
-                                        ? "bg-primary text-black dark:text-black" // active tab style
+                                        ? "bg-blue-500 text-black dark:text-black" // active tab style
                                         : "bg-transparent text-muted-foreground" // inactive tab style
                                 )}
                             >

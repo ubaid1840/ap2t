@@ -47,38 +47,42 @@
 }
 
 :root {
-  --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
+   --background: #0A0A0A;
+  --foreground: #ffffff;
+  --card: #454545;
+  --card-foreground: #ffffff;
+  --popover: #454545;
+  --popover-foreground: #ffffff;
+  --primary: #d3fb20;
+  --primary-foreground: #282828;
+  --secondary: #454545;
+  --secondary-foreground: #ffffff;
+  --muted: #A3A3A3;
+  --muted-foreground: #A3A3A3;
+  --accent: #d3fb20;
+  --accent-foreground: #282828;
   --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  --destructive-foreground: oklch(0.985 0 0);
+  --border: #3a3a3a;
+  --input: #3a3a3a;
+  --ring: #d3fb20;
+  --chart-1: #d3fb20;
+  --chart-2: #454545;
+  --chart-3: #5a5a5a;
+  --chart-4: #cbfd00;
+  --chart-5: #98c91e;
+  --notification-primary: #cbfd0026;
+  --sidebar: #252525;
+  --sidebar-foreground: #B0B0B0;
+  --sidebar-primary: #D3FB20;
+  --sidebar-primary-foreground: #282828;
+  --sidebar-accent: #D3FB20;
+  --sidebar-accent-foreground: #282828;
+  --sidebar-border: #e5e5e5;
+  --sidebar-ring: #a1a1a1;
+  --detail-medium-contrast: rgb(25, 25, 25);
+  --text-high-contrast-rgb-value: 230, 230, 230;
+  --text-body: rgb(222, 222, 222);
 }
 
 .dark {
