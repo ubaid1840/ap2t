@@ -4,7 +4,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "../ui/tabs";
 
 export function DailyCheckins() {
   return (
-    <Card className="flex-3 bg-[#282828]">
+    <Card className="flex-3 bg-[#282828] border border-[#3A3A3A]">
       <Tabs defaultValue="today">
         <CardHeader className="flex justify-between">
           <div className="space-y-1">
@@ -36,21 +36,21 @@ export function DailyCheckins() {
         <TabsContent value="today">
           <CardContent>
             {/* Bar chart for Today */}
-            <p>Today's check-in chart goes here</p>
+            <p className="text-xl">Today's check-in chart goes here</p>
           </CardContent>
         </TabsContent>
 
         <TabsContent value="weekly">
           <CardContent>
             {/* Bar chart for Weekly */}
-            <p>Weekly check-in chart goes here</p>
+            <p className="text-xl">Weekly check-in chart goes here</p>
           </CardContent>
         </TabsContent>
 
         <TabsContent value="monthly">
           <CardContent>
             {/* Bar chart for Monthly */}
-            <p>Monthly check-in chart goes here</p>
+            <p className="text-xl">Monthly check-in chart goes here</p>
           </CardContent>
         </TabsContent>
       </Tabs>

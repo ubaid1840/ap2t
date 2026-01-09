@@ -1,24 +1,31 @@
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent } from "@/components/ui/card"
-import { Calendar, DollarSign, FileWarningIcon, User } from "lucide-react"
+import { Calendar, DollarSign, FileWarningIcon, Plus, User } from "lucide-react"
+import { Button } from "../ui/button"
 
-export function DashboardOverview(){
+export function CoachOverview(){
     return(
             <div className="flex flex-col gap-3">
+                <div className="flex justify-between">
                 <div className="flex flex-col">
-                    <h1 className="font-bold text-4xl ">Dashboard Overview</h1>
-                    <p className="text-2xl text-[#99A1AF]">Welcome back! Here's what's happening today.</p>
+                    <h1 className="font-bold text-4xl ">Coaches Management</h1>
+                    <p className="text-2xl text-[#99A1AF]">Manage coach schedules, availability, and performance.</p>
+                </div>
+                        <Button >
+                               <Plus /> Add New Coaches
+                        </Button>
                 </div>
                 <div className="flex gap-4">
                     <Card className="bg-[#252525] h-43 flex-1 border border-[#3A3A3A]">
                         <CardContent >
-                            <div className="flex justify-between flex-col gap-4">
-                                <div className="flex justify-between h-full">
-                                    <div className="bg-[#CBFD0026] rounded-2xl p-3 text-primary"><User/></div>
-                                    <Badge className="bg-[#16A34A52] text-[#22C55E]">+12</Badge>
-                                </div>
-                                <div className="flex flex-col p-">
+                            <div className="flex gap-4">
+                                <div className="flex h-full">
+                                    <div className="bg-[#CBFD0026] rounded-2xl p-3 text-primary"><User/>
+                                    </div>
                                     <p className="text-[#B0B0B0]">Today's Check-ins</p>
+                                    </div>
+
+                                <div className="flex flex-col">
                                     <h1 className="font-semibold text-3xl">147</h1>
                                 </div>
                             </div>

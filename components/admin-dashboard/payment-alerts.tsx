@@ -7,7 +7,7 @@ import { ScrollArea } from "../ui/scroll-area";
 
 export function PaymentAlerts(){
     return(
-       <Card className="bg-[#252525] flex-1">
+       <Card className="bg-[#252525] flex-1 border border-[#3A3A3A]">
   <CardHeader className="flex justify-between">
     <div className="space-y-1">
       <h1 className="text-xl">Payment Alerts</h1>

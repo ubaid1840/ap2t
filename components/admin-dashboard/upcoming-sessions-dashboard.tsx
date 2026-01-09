@@ -12,9 +12,10 @@ import {
 import { Badge } from "../ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar"
 import getInitials from "../parents/get-initials";
+import { cn } from "@/lib/utils"
 export function UpcomingSessions() {
   return (
-    <Card className="bg-[#252525] flex flex-col h-full p-0">
+    <Card className="bg-[#252525] flex flex-col h-full p-0 border border-[#3A3A3A]">
 
       <CardHeader className="flex flex-row items-center justify-between py-3 px-8 ">
         <div className="flex flex-col justify-center gap-1">
@@ -77,10 +78,12 @@ export function UpcomingSessions() {
 
                 <TableCell className="px-6">
                   <Badge
-                    className={
+                    className={cn(
                       session.status === "Pending"
                         ? "bg-[#F0B10033] text-[#FDC700]"
                         : "bg-[#00C95033] text-[#05DF72]"
+                      ,
+                    "px-4 py-3")
                     }
                   >
                     {session.status}
@@ -153,7 +156,7 @@ const sessions=[
         sessiontype:"Basketball Training",
         coach:"Coach Martinez",
         time:"2:00 PM - 3:30 PM",
-        status:"Confirmed"
+        status:"Pending"
     },
     {
         player:{
@@ -173,6 +176,6 @@ const sessions=[
         sessiontype:"Basketball Training",
         coach:"Coach Martinez",
         time:"2:00 PM - 3:30 PM",
-        status:"Confirmed"
+        status:"Pending"
     },
 ]
