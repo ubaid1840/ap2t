@@ -23,7 +23,7 @@ import { ScrollArea, ScrollBar } from "./ui/scroll-area";
 
 export const company = {
   name: "AP2T",
-  logo: "/logo.png",
+  logo: "/images/logo.png",
 };
 
 export default function AppSidebar() {
