@@ -240,7 +240,7 @@ const CardStatusHistory = ({ text = "" }: { text: string }) => {
             <div  className="text-xs">{text}</div>
         </div>
     )
-}
+} 
 
 
 const HeaderCard = ({ title = "", description = "", icon = null }: { title: string, description: string, icon: ReactNode }) => {

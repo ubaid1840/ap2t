@@ -51,8 +51,8 @@ const PageTable = ({
   onRowClick = (a: any, b: any) => { },
   loading = false,
 }: any) => {
-  const [sorting, setSorting] = useState([]);
-  const [columnFilters, setColumnFilters] = useState([]);
+  // const [sorting, setSorting] = useState([]);
+  // const [columnFilters, setColumnFilters] = useState([]);
   const [columnVisibility, setColumnVisibility] = useState({});
   const [rowSelection, setRowSelection] = useState({});
   const [currentPage, setCurrentPage] = useState(1);
@@ -78,8 +78,8 @@ const PageTable = ({
   const table = useReactTable({
     data: data,
     columns,
-    onSortingChange: setSorting,
-    onColumnFiltersChange: setColumnFilters,
+    // onSortingChange: setSorting,
+    // onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
@@ -88,8 +88,8 @@ const PageTable = ({
     onRowSelectionChange: setRowSelection,
     pageCount: pageCount,
     state: {
-      sorting,
-      columnFilters,
+      // sorting,
+      // columnFilters,
       columnVisibility,
       rowSelection,
       pagination: paginationState,
@@ -190,7 +190,7 @@ const PageTable = ({
                         <SelectValue placeholder={paginationState.pageSize} />
                       </SelectTrigger>
                       <SelectContent side="top">
-                        {pageSizeOptions.map((pageSize) => (
+                        {pageSizeOptions.map((pageSize : number) => (
                           <SelectItem key={pageSize} value={`${pageSize}`}>
                             {pageSize}
                           </SelectItem>

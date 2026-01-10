@@ -13,14 +13,16 @@ import { Badge } from "../ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar"
 import getInitials from "../parents/get-initials";
 import { cn } from "@/lib/utils"
+import Link from "next/link"
+import { ScrollArea } from "../ui/scroll-area"
 export function UpcomingSessions() {
   return (
     <Card className="bg-[#252525] flex flex-col h-full p-0 border border-[#3A3A3A]">
 
-      <CardHeader className="flex flex-row items-center justify-between py-3 px-8 ">
-        <div className="flex flex-col justify-center gap-1">
-          <h1 className="font-semibold text-3xl">Upcoming Sessions</h1>
-          <p className="text-sm text-[#99A1AF]">
+      <CardHeader className="flex flex-row items-center justify-between p-6 pb-0">
+        <div className="flex flex-col justify-center  gap-1">
+          <h1 className="font-medium text-lg">Upcoming Sessions</h1>
+          <p className="text-sm text-muted-foreground">
             Today's scheduled training sessions
           </p>
         </div>
@@ -33,43 +35,42 @@ export function UpcomingSessions() {
 
 
       <CardContent className="flex-1 px-0">
-        <Table>
-  
-          <TableHeader className="bg-[#1A1A1A] text-2xl font-bold text-[#99A1AF]">
-            <TableRow className="h-22">
-              <TableHead className="px-6">Player</TableHead>
-              <TableHead className="px-6">Session Type</TableHead>
-              <TableHead className="px-6">Coach</TableHead>
-              <TableHead className="px-6">Time</TableHead>
-              <TableHead className="px-6">Status</TableHead>
-              <TableHead className="px-6">Action</TableHead>
+        <Table >
+
+          <TableHeader className="bg-[#1A1A1A]  font-bold  tracking-wider">
+            <TableRow className="hover:bg-inherit">
+              <TableHead className="px-6 text-[#99A1AF] text-[12px]">PLAYER</TableHead>
+              <TableHead className="px-6 text-[#99A1AF] text-[12px]" >SESSIONG TYPE</TableHead>
+              <TableHead className="px-6 text-[#99A1AF] text-[12px]">COACH</TableHead>
+              <TableHead className="px-6 text-[#99A1AF] text-[12px]">TIME</TableHead>
+              <TableHead className="px-6 text-[#99A1AF] text-[12px]">STATUS</TableHead>
+              <TableHead className="px-6 text-[#99A1AF] text-[12px]">ACTION</TableHead>
             </TableRow>
           </TableHeader>
 
-          <TableBody className="text-xl">
+          <TableBody >
             {sessions.map((session, index) => (
               <TableRow
-              key={index}
-              className={`${
-                index % 2 === 0 ? "bg-[#252525]" : "bg-[#2A2A2A]"
-              } h-22`}
-            >
-                <TableCell className="px-6">
-                  <div className="flex items-center gap-2">
+                key={index}
+                className={`${index % 2 === 0 ? "bg-[#252525]" : "bg-[#2A2A2A]"
+                  } text-xs hover:bg-inherit dark:hover:bg-inherit`}
+              >
+                <TableCell className="px-6 py-4">
+                  <div className="flex items-center gap-2 text-[#D1D5DC]">
                     <Avatar >
-                    <AvatarImage src="" />
-                    <AvatarFallback className="bg-primary text-black">
+                      <AvatarImage src="" />
+                      <AvatarFallback className="bg-primary text-black">
                         {getInitials(session.player.name)}
-                    </AvatarFallback>
-                </Avatar>
+                      </AvatarFallback>
+                    </Avatar>
                     {session.player.name}
                   </div>
                 </TableCell>
 
-                <TableCell className="px-6">{session.sessiontype}</TableCell>
-                <TableCell className="px-6">{session.coach}</TableCell>
+                <TableCell className="px-6 text-[#D1D5DC]">{session.sessiontype}</TableCell>
+                <TableCell className="px-6 text-[#D1D5DC]">{session.coach}</TableCell>
 
-                <TableCell className="px-6">
+                <TableCell className="px-6 text-[#D1D5DC]">
                   <div className="flex items-center gap-2">
                     <Clock className="h-4 w-4" />
                     {session.time}
@@ -77,23 +78,26 @@ export function UpcomingSessions() {
                 </TableCell>
 
                 <TableCell className="px-6">
-                  <Badge
-                    className={cn(
-                      session.status === "Pending"
-                        ? "bg-[#F0B10033] text-[#FDC700]"
-                        : "bg-[#00C95033] text-[#05DF72]"
-                      ,
-                    "px-4 py-3")
-                    }
-                  >
-                    {session.status}
-                  </Badge>
+                  <div>
+                    <Badge
+                      className={cn(
+                        session.status === "Pending"
+                          ? "bg-warning-bg text-warning-text"
+                          : "bg-active-bg text-active-text"
+                        ,
+                        "font-normal px-3 text-xs")
+                      }
+                    >
+                      {session.status}
+                    </Badge>
+                  </div>
                 </TableCell>
 
                 <TableCell className="px-6">
-                  <Button variant="ghost" className="text-primary p-0">
-                    view details
-                  </Button>
+                  <Link href={"#"} className="text-primary hover:underline">
+                    View Details
+                  </Link>
+
                 </TableCell>
               </TableRow>
             ))}
@@ -108,7 +112,7 @@ export function UpcomingSessions() {
         </h1>
 
         <Button className="bg-[#252525] border border-[#3A3A3A] text-[#D1D5DC]">
-          view all sessions
+          View All Sessions
         </Button>
       </CardFooter>
     </Card>
@@ -117,65 +121,65 @@ export function UpcomingSessions() {
 
 
 
-const sessions=[
-    {
-        player:{
-            img:<User/>,
-            name:"Emma Johnson"
-        },
-        sessiontype:"Basketball Training",
-        coach:"Coach Martinez",
-        time:"2:00 PM - 3:30 PM",
-        status:"Confirmed"
+const sessions = [
+  {
+    player: {
+      img: <User />,
+      name: "Emma Johnson"
     },
-    {
-        player:{
-            img:<User/>,
-            name:"Emma Johnson"
-        },
-        sessiontype:"Basketball Training",
-        coach:"Coach Martinez",
-        time:"2:00 PM - 3:30 PM",
-        status:"Confirmed"
+    sessiontype: "Basketball Training",
+    coach: "Coach Martinez",
+    time: "2:00 PM - 3:30 PM",
+    status: "Confirmed"
+  },
+  {
+    player: {
+      img: <User />,
+      name: "Emma Johnson"
     },
-    {
-        player:{
-            img:<User/>,
-            name:"Emma Johnson"
-        },
-        sessiontype:"Basketball Training",
-        coach:"Coach Martinez",
-        time:"2:00 PM - 3:30 PM",
-        status:"Confirmed"
+    sessiontype: "Basketball Training",
+    coach: "Coach Martinez",
+    time: "2:00 PM - 3:30 PM",
+    status: "Confirmed"
+  },
+  {
+    player: {
+      img: <User />,
+      name: "Emma Johnson"
     },
-    {
-        player:{
-            img:<User/>,
-            name:"Emma Johnson"
-        },
-        sessiontype:"Basketball Training",
-        coach:"Coach Martinez",
-        time:"2:00 PM - 3:30 PM",
-        status:"Pending"
+    sessiontype: "Basketball Training",
+    coach: "Coach Martinez",
+    time: "2:00 PM - 3:30 PM",
+    status: "Confirmed"
+  },
+  {
+    player: {
+      img: <User />,
+      name: "Emma Johnson"
     },
-    {
-        player:{
-            img:<User/>,
-            name:"Emma Johnson"
-        },
-        sessiontype:"Basketball Training",
-        coach:"Coach Martinez",
-        time:"2:00 PM - 3:30 PM",
-        status:"Confirmed"
+    sessiontype: "Basketball Training",
+    coach: "Coach Martinez",
+    time: "2:00 PM - 3:30 PM",
+    status: "Pending"
+  },
+  {
+    player: {
+      img: <User />,
+      name: "Emma Johnson"
     },
-    {
-        player:{
-            img:<User/>,
-            name:"Emma Johnson"
-        },
-        sessiontype:"Basketball Training",
-        coach:"Coach Martinez",
-        time:"2:00 PM - 3:30 PM",
-        status:"Pending"
+    sessiontype: "Basketball Training",
+    coach: "Coach Martinez",
+    time: "2:00 PM - 3:30 PM",
+    status: "Confirmed"
+  },
+  {
+    player: {
+      img: <User />,
+      name: "Emma Johnson"
     },
+    sessiontype: "Basketball Training",
+    coach: "Coach Martinez",
+    time: "2:00 PM - 3:30 PM",
+    status: "Pending"
+  },
 ]

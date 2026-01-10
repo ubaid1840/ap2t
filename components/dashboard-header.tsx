@@ -1,18 +1,16 @@
 "use client"
 
-import { Bell, ChevronDown } from "lucide-react"
-import InputWithIcon from "./input-with-icon"
-import { Separator } from "./ui/separator"
-import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar"
 import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
+    DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu"
 import { useIsMobile } from "@/hooks/use-mobile"
+import { Bell, ChevronDown } from "lucide-react"
+import InputWithIcon from "./input-with-icon"
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar"
+import { Separator } from "./ui/separator"
 
 
 export default function DashboardHeader() {
@@ -22,7 +20,7 @@ export default function DashboardHeader() {
         <div className="flex flex-1 w-full h-full py-4 px-4">
             <div className="w-full flex justify-between flex-wrap">
 
-                <InputWithIcon className={isMobile ? "hidden" : "w-100"} />
+                <InputWithIcon className={isMobile ? "hidden" : "w-100"} placeholder="Search player, coaches, sessions..."/>
                 <div className="flex gap-4 items-center">
 
                     <NotificationBadge count={1} />

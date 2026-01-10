@@ -1,66 +1,74 @@
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent } from "@/components/ui/card"
-import { Calendar, DollarSign, FileWarningIcon, User } from "lucide-react"
+import { Calendar, DollarSign, FileWarningIcon, Info, User } from "lucide-react"
+
+const localData = [{
+    Icon: <User />,
+    title: "Today's Check-ins",
+    description: "147",
+    value: '+12',
+    type: "success",
+    going : "active"
+},
+{
+    Icon: <DollarSign />,
+    title: "Today's Revenue",
+    description: "$3,487",
+    value: '+8%',
+    type: "active",
+    going : "active"
+},
+{
+    Icon: <Info />,
+    title: "Pending Payments",
+    description: "23",
+    value: '-5%',
+    type: "warning",
+    going : "danger"
+},
+{
+    Icon: <Calendar />,
+    title: "Upcoming Sessions",
+    description: "89",
+    value: '+3%',
+    type: "other",
+    going : "active"
+}
+]
 
 export function DashboardOverview() {
     return (
         <div className="flex flex-col gap-3">
-            <div className="flex flex-col">
-                <h1 className="font-bold text-4xl ">Dashboard Overview</h1>
-                <p className="text-2xl text-[#99A1AF]">Welcome back! Here's what's happening today.</p>
+            <div >
+                <p className="text-xl">Dashboard Overview</p>
+                <span className="text-[16px] text-muted-foreground flex items-center">
+                    <span>Welcome back! Here's what's happening today.</span>
+
+                </span>
             </div>
+
+
+
+
             <div className="flex justify-between gap-4 flex-wrap">
-                <Card className="bg-[#252525] h-43 flex-1 border border-[#3A3A3A]">
-                    <CardContent className="space-y-4">
-                        <div className="flex justify-between">
-                            <div className="bg-[#CBFD0026] rounded-xl p-3 text-primary"><User /></div>
-                            <div>
-                                <Badge className="bg-[#16A34A52] text-[#22C55E] text-md px-3">+12</Badge>
+                {localData.map((item, index) => (
+                    <Card key={index} className="rounded-[10px] bg-[#252525] border-[#3A3A3A] flex-1">
+                        <CardContent className="space-y-4">
+                            <div className="flex justify-between">
+                                <div className={`rounded-[8px] flex w-10 h-10 items-center justify-center bg-${item.type}-bg text-${item.type}-text`}>{item.Icon}</div>
+                                <div>
+                                    <Badge className={`bg-${item.going}-bg text-${item.going}-text text-xs px-3`}>{item.value}</Badge>
+                                </div>
                             </div>
-                        </div>
-                         <div className="flex flex-col gap-1">
-                            <p className="text-[#B0B0B0]">Today's Check-ins</p>
-                            <h1 className="font-semibold text-2xl">147</h1>
-                        </div>
-                    </CardContent>
-                </Card>
-                <Card className="bg-[#252525] h-43 flex-1 border border-[#3A3A3A]">
-                    <CardContent className="space-y-4">
-                        <div className="flex justify-between">
-                            <div className="bg-[#CBFD0026] rounded-xl p-3 text-[#22C55E]"><DollarSign /></div>
-                            <div>  <Badge className="bg-[#16A34A52] text-[#22C55E] text-md px-3">+8</Badge>
+                            <div className="flex flex-col gap-1">
+                                <p className="text-[#B0B0B0]">{item.title}</p>
+                                <h1 className="font-semibold text-2xl">{item.description}</h1>
                             </div>
-                        </div>
-                        <div className="flex flex-col gap-1">
-                            <p className="text-[#B0B0B0]">Today's Revenues</p>
-                            <h1 className="font-semibold text-2xl">$3,842</h1>
-                        </div>
-                    </CardContent>
-                </Card>
-                <Card className="bg-[#252525] h-43 flex-1 border border-[#3A3A3A]">
-                    <CardContent className="space-y-4">
-                        <div className="flex justify-between ">
-                            <div className="rounded-xl p-3 bg-[#EA580C52] text-[#F97316]"><FileWarningIcon /></div>
-                            <div>      <Badge className="bg-[#DC262652] text-[#EF4444] text-md px-3">-5%</Badge></div>
-                        </div>
-                         <div className="flex flex-col gap-1">
-                            <p className="text-[#B0B0B0]">Pending Payments</p>
-                            <h1 className="font-semibold text-2xl">23</h1>
-                        </div>
-                    </CardContent>
-                </Card>
-                <Card className="bg-[#252525] h-43 flex-1 border border-[#3A3A3A]">
-                    <CardContent className="space-y-4">
-                        <div className="flex justify-between">
-                            <div className="bg-[#AD46FF33] rounded-xl p-3 text-[#C27AFF]"><Calendar /></div>
-                            <div>  <Badge className="bg-[#16A34A52] text-[#22C55E] text-md px-3">+3</Badge></div>
-                        </div>
-                        <div className="flex flex-col gap-1">
-                            <p className="text-[#B0B0B0]">Upcoming Sessions</p>
-                            <h1 className="font-semibold text-2xl">89</h1>
-                        </div>
-                    </CardContent>
-                </Card>
+                        </CardContent>
+                    </Card>
+                ))}
+
+               
             </div>
         </div>
     )
