@@ -30,7 +30,7 @@ export default function Header() {
             {/* Logo */}
             <Link href={"/"}>
               <Image
-                src="/logo.PNG"
+                src="/logo.png"
                 alt="logo"
                 height={30}
                 width={110}
@@ -65,7 +65,7 @@ export default function Header() {
           <div className="md:hidden flex justify-between items-center bg-[#FFFFFF3D] p-2 rounded-full">
             <Link href={"/"}>
               <Image
-                src="/logo.PNG"
+                src="/logo.png"
                 alt="logo"
                 width={36}
                 height={36}
