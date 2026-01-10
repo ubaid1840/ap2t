@@ -76,7 +76,7 @@ export default function Hero() {
                         Professional Soccer Training Facility In Matuchen, NJ
                     </p>
 
-                    <div className="rounded flex flex-col sm:flex-row bg-[#FFFFFF3D] p-4 sm:p-6 mt-4 gap-4 sm:gap-0 justify-between text-center backdrop-blur-sm">
+                    <div className="rounded-lg flex flex-col sm:flex-row bg-[#FFFFFF3D] p-4 sm:p-6 mt-4 gap-4 sm:gap-0 justify-between text-center">
                         <div className="flex-1">
                             <h1 className="text-2xl sm:text-3xl font-bold">5000+</h1>
                             <h4 className="text-sm sm:text-base">Members</h4>
@@ -93,12 +93,12 @@ export default function Hero() {
 
                     <div className="flex flex-col sm:flex-row mt-4 gap-4 justify-center sm:justify-start">
                         <Link href="/auth">
-                            <Button className="rounded-full px-5 py-2 bg-primary text-secondary font-bold w-full sm:w-auto">
+                            <Button size={"lg"} className="rounded-full bg-primary text-secondary font-bold w-full sm:w-auto">
                                 GET STARTED
                             </Button>
                         </Link>
 
-                        <Button className="bg-transparent border-2 border-white rounded-full text-white w-full sm:w-auto hover:bg-white/10">
+                        <Button size={"lg"} className="bg-transparent border-2 border-white rounded-full text-white w-full sm:w-auto hover:bg-white/10">
                             CALL US 732-XXX-XXXX
                         </Button>
                     </div>

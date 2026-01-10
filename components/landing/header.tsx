@@ -32,8 +32,8 @@ export default function Header() {
               <Image
                 src="/logo.PNG"
                 alt="logo"
-                height={36}
-                width={120}
+                height={30}
+                width={110}
                 className="rounded-[22px]"
               />
             </Link>
@@ -42,7 +42,7 @@ export default function Header() {
             <div className="flex gap-8 items-center text-[14px]">
               {links.map((item, i) => (
                 <Link key={i} href={item.href}
-                  className={pathname.includes(item.href) ? "text-primary font-bold" : "text-white"}
+                  className={`text-[14px] font-medium leading-relaxed tracking-wide ${pathname.includes(item.href) ? " text-primary" : "text-white"}`}
                 >
                   {item.name}
 
@@ -52,11 +52,11 @@ export default function Header() {
 
             {/* Buttons */}
             <div className="flex gap-2">
-              <Button className="rounded-full bg-[#CBFD0026] text-primary hover:bg-primary hover:text-secondary">
+              <Button className="rounded-full bg-[#CBFD0026] text-primary hover:bg-primary hover:text-secondary w-20">
                 Store
               </Button>
-              <Link href={"/contact"}>
-                <Button className="rounded-full">Contact</Button>
+              <Link href={"/contact"} className="w-25">
+                <Button className="rounded-full w-full">Contact</Button>
               </Link>
             </div>
           </div>
