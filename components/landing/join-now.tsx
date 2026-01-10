@@ -51,7 +51,7 @@ export default function JoinNow() {
                   'radial-gradient(circle, rgba(255, 255, 255, 0.24) 0%, rgba(255, 255, 255, 0) 100%)',
                 borderColor: 'rgba(255, 255, 255, 0.2)',
               }}
-              className="text-white w-36 sm:w-40 h-10 hover:opacity-70"
+              className="text-white w-36 sm:w-40 h-10 hover:opacity-70 border rounded-full"
             >
               Book Now
             </Button>

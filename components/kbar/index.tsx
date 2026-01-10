@@ -40,7 +40,7 @@ export default function KBar({ children } : {children : ReactNode}) {
                 subtitle: `Go to ${navItem.title}`,
                 perform: () => navigateTo(navItem.url),
               }
-            : null;
+            : [];
 
         return baseAction
       }),

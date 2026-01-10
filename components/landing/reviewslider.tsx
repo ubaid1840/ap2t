@@ -91,7 +91,7 @@ const TestimonialSlider: React.FC<PropType> = (props) => {
                           <Avatar className="flex items-center justify-center">{<User />}</Avatar>
 
                           <div>
-                            <h1>{review.person.name}</h1>
+                            <h1 className='text-xl'>{review.person.name}</h1>
                             <p className="text-sm text-[#A3A3A3]">
                               {review.person.details}
                             </p>

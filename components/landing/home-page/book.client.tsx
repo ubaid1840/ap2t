@@ -32,11 +32,11 @@ export default function Booking() {
                             <h1 className="font-semibold text-lg sm:text-xl">Select Date</h1>
                         </div>
                         <div className="w-full overflow-x-auto">
-                            <Calendar
+                            <Calendar 
                                 mode="single"
                                 selected={date}
                                 onSelect={setDate}
-                                className="rounded-[0.75rem] border"
+                                className="rounded-[0.75rem] border w-full"
                             />
                         </div>
                         <Button >
