@@ -3,7 +3,7 @@
 import PageTable from "@/components/app-table"
 import InputWithIcon from "@/components/input-with-icon"
 import { PLAYERS_COLUMNS } from "@/components/players/columns"
-import { PLAYER_TABLE_HEADER, PLAYERS_DATA } from "@/components/players/constatns"
+import { PLAYERS_DATA } from "@/components/players/constatns"
 import Header from "@/components/players/header"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -73,10 +73,6 @@ export default function Page() {
             <PageTable
                 columns={PLAYERS_COLUMNS}
                 data={PLAYERS_DATA}
-                tableHeader={PLAYER_TABLE_HEADER}
-                onRowClick={() => {
-
-                }}
             />
         </div>
 

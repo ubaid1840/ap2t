@@ -1,15 +1,17 @@
 "use client"
 import BackButton from "@/components/back-button"
-import CardStatus from "@/components/parents/card-status"
+import CardStatus from "@/components/card-status"
 import { ParentData } from "@/components/parents/columns"
-import { PARENT_DATA } from "@/components/parents/constatns"
+import { PARENT_DATA, PAYMENT_HISTORY } from "@/components/parents/constatns"
+import { EditParents } from "@/components/parents/edit-parents"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { Separator } from "@/components/ui/separator"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { cn } from "@/lib/utils"
-import { Calendar, Clock, CreditCard, DollarSign, Dot, Mail, Phone, Send, SquarePen, Users, UserX } from "lucide-react"
+import { useIsMobile } from "@/hooks/use-mobile"
+import { Calendar, CircleCheckBig, Clock, CreditCard, DollarSign, Dot, Download, Mail, Phone, Send, Users, UserX } from "lucide-react"
 import { useParams } from "next/navigation"
 import { ReactNode, useEffect, useState } from "react"
 import { IoIosPin } from "react-icons/io"
@@ -20,11 +22,11 @@ export default function Page() {
     const { id } = useParams()
     const [data, setData] = useState<ParentData | undefined>()
     const [tab, setTab] = useState("linked");
+    const isMobile = useIsMobile()
 
     useEffect(() => {
         if (id) {
             const currentParentData = PARENT_DATA.find((item) => item.id === Number(id))
-            console.log(currentParentData)
             setData(currentParentData)
         }
     }, [id])
@@ -36,9 +38,9 @@ export default function Page() {
 
             <Card className="w-full rounded-[12px] bg-[#252525]">
                 <CardContent>
-                    <div className="w-full flex justify-between">
+                    <div className="w-full flex justify-between flex-wrap gap-4">
                         <div className="flex flex-col gap-2">
-                            <span className="flex gap-2 text-xl items-center">{data?.name} <span><CardStatus text={data?.card_status || ""} /></span></span>
+                            <span className="flex gap-2 text-xl items-center">{data?.name} <span><CardStatus value={data?.card_status || ""} type="active" icon={<CircleCheckBig size={14}/>}/></span></span>
                             <div className="text-[#D1D5DC] text-xs flex flex-col gap-2">
                                 <span className="inline-flex gap-2 "><Mail size={14} /> {data?.email}</span>
                                 <span className="inline-flex gap-2"><Phone size={14} /> {data?.number}</span>
@@ -47,9 +49,7 @@ export default function Page() {
                             </div>
                         </div>
                         <div className="flex gap-4 flex-wrap">
-                            <Button variant={"outline"} className="bg-black dark:bg-black">
-                                <SquarePen />   Edit Details
-                            </Button>
+                            <EditParents />
                             <Button >
                                 <Send />  Send Reminder
                             </Button>
@@ -59,7 +59,7 @@ export default function Page() {
                         </div>
 
                     </div>
-                    <div className="mt-4 flex w-full justify-evenly flex-wrap gap-4">
+                    <div className="mt-4 flex w-full justify-between flex-wrap gap-4">
                         <HeaderCard title={String(data?.children)} description="Linked Children"
                             icon={
                                 <div className="rounded-[8px] flex w-10 h-10 items-center justify-center bg-success-bg">
@@ -95,24 +95,26 @@ export default function Page() {
                     }}
 
                 >
-
-                    <TabsList className="bg-transparent relative flex gap-2 ">
-                        {["linked", "history", "payment"].map((t) => (
-                            <TabsTrigger
-                                key={t}
-                                value={t}
-                            >
-                                {t === "linked" && <div className="flex gap-2 items-center text-sm py-2"><Users /> Linked Children</div>}
-                                {t === "history" && <div className="flex gap-2 items-center text-sm py-2"><Calendar /> Booking History</div>}
-                                {t === "payment" && <div className="flex gap-2 items-center text-sm py-2"><CreditCard /> Payment History</div>}
-                            </TabsTrigger>
-                        ))}
-                    </TabsList>
-
+                    <ScrollArea className={`overflow-x-auto ${isMobile && "max-w-[calc(100vw-64px)]"}`}>
+                        <TabsList className="bg-transparent relative flex gap-2">
+                            {["linked", "history", "payment"].map((t) => (
+                                <TabsTrigger
+                                    key={t}
+                                    value={t}
+                                    className="h-9 px-4 text-[12px] leading-tight tracking-tight"
+                                >
+                                    {t === "linked" && <div className="flex gap-2 items-center py-2"><Users /> Linked Children</div>}
+                                    {t === "history" && <div className="flex gap-2 items-center py-2"><Calendar /> Booking History</div>}
+                                    {t === "payment" && <div className="flex gap-2 items-center py-2"><CreditCard /> Payment History</div>}
+                                </TabsTrigger>
+                            ))}
+                        </TabsList>
+                        <ScrollBar orientation="horizontal" />
+                    </ScrollArea>
                     <Separator />
 
                     <TabsContent value="linked" >
-                        <div className="flex w-full justify-between gap-4 p-2">
+                        <div className="flex w-full justify-between gap-4 p-2 flex-wrap">
                             <Card className="rounded-[10px] bg-[#1A1A1A] border-[#3A3A3A] flex flex-1">
                                 <CardContent className="space-y-4">
                                     <div className="flex gap-4 items-center">
@@ -188,7 +190,7 @@ export default function Page() {
                     <TabsContent value="history" className="space-y-4 p-2">
                         {BOOKING_DATA.map((item) => (
                             <div key={item.id} className="bg-[#1A1A1A] w-full rounded-[8px] p-4 space-y-4">
-                                {/* Top row: title/status and amount */}
+
                                 <div className="flex w-full justify-between items-start">
                                     <div className="space-y-1">
                                         <div className="flex items-center gap-2">
@@ -204,7 +206,7 @@ export default function Page() {
 
                                 <Separator className="my-2" />
 
-                                {/* Bottom row: coach and child */}
+
                                 <div className="grid grid-cols-2 text-[#F3F4F6] text-xs max-w-md">
                                     <span>Coach: {item.coach}</span>
                                     <span className="inline-flex"><Dot size={16} /> Child: {item.child}</span>
@@ -217,8 +219,48 @@ export default function Page() {
                         </div>
                     </TabsContent>
 
-                    <TabsContent value="payment">
-                        <div>Payment</div>
+                    <TabsContent value="payment" className="space-y-4 p-2">
+                        <div className="flex gap-4 flex-wrap justify-between items-center">
+                            <div>
+                                <p className="text-xs text-muted-foreground">Total Revenue from Parent</p>
+                                <p className="text-lg">$2,450</p>
+                            </div>
+                            <Button variant={"outline"} className="bg-black">
+                                <Download /> Export
+                            </Button>
+                        </div>
+
+                        {PAYMENT_HISTORY.map((item, i) => (
+                            <Card key={item.id} className="bg-black">
+                                <CardContent className="space-y-2">
+                                    <div className="flex justify-between gap-2 flex-wrap">
+                                        <div className="flex gap-4 items-center text-sm">
+                                            <p>{item.session}</p>
+                                            <CardStatus value={item.status} type={item.status === "Completed" ? "active" : item.status === "Refunded" ? "other" : "danger"} />
+
+
+                                        </div>
+                                        <p className={`text-md ${item.status === "Refunded" && "text-danger-text"}`}>{item.status === "Refunded" ? `-$${item.price}` : `$${item.price}`}</p>
+                                    </div>
+
+                                    <div className="flex gap-2 items-center text-xs text-muted-foreground flex-wrap">
+                                        <div className="flex gap-2">
+                                            <Calendar size={14} />
+                                            <p>{item.date}</p>
+                                        </div>
+                                        <div className="flex gap-2">
+                                            <CreditCard size={14} />
+                                            <p>{item.card}</p>
+                                        </div>
+                                        <div className="flex gap-2">
+                                            <p>Receipt: </p>
+                                            <p>{item.receipt}</p>
+                                        </div>
+                                    </div>
+                                  
+                                </CardContent>
+                            </Card>
+                        ))}
                     </TabsContent>
 
 
@@ -234,13 +276,13 @@ const CardStatusHistory = ({ text = "" }: { text: string }) => {
 
 
     const colors = text === "Completed" ? "bg-success-bg text-success-text" : text === "Upcoming" ? "bg-info-bg text-info-text" : text === "Cancelled" ? "bg-ghost-bg text-ghost-text" : "bg-danger-bg text-danger-text"
-   
+
     return (
         <div className={`w-25 py-1 justify-center rounded-full flex items-center gap-2 ${colors}`} >
-            <div  className="text-xs">{text}</div>
+            <div className="text-xs">{text}</div>
         </div>
     )
-} 
+}
 
 
 const HeaderCard = ({ title = "", description = "", icon = null }: { title: string, description: string, icon: ReactNode }) => {

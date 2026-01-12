@@ -1,6 +1,6 @@
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent } from "@/components/ui/card"
-import { Calendar, DollarSign, FileWarningIcon, Info, User } from "lucide-react"
+import { Calendar, DollarSign, Info, User } from "lucide-react"
 
 const localData = [{
     Icon: <User />,
@@ -8,7 +8,7 @@ const localData = [{
     description: "147",
     value: '+12',
     type: "success",
-    going : "active"
+    going: "active"
 },
 {
     Icon: <DollarSign />,
@@ -16,7 +16,7 @@ const localData = [{
     description: "$3,487",
     value: '+8%',
     type: "active",
-    going : "active"
+    going: "active"
 },
 {
     Icon: <Info />,
@@ -24,7 +24,7 @@ const localData = [{
     description: "23",
     value: '-5%',
     type: "warning",
-    going : "danger"
+    going: "danger"
 },
 {
     Icon: <Calendar />,
@@ -32,7 +32,7 @@ const localData = [{
     description: "89",
     value: '+3%',
     type: "other",
-    going : "active"
+    going: "active"
 }
 ]
 
@@ -46,9 +46,6 @@ export function DashboardOverview() {
 
                 </span>
             </div>
-
-
-
 
             <div className="flex justify-between gap-4 flex-wrap">
                 {localData.map((item, index) => (
@@ -68,7 +65,7 @@ export function DashboardOverview() {
                     </Card>
                 ))}
 
-               
+
             </div>
         </div>
     )

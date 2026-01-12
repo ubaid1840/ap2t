@@ -1,24 +1,27 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { ColumnDef } from "@tanstack/react-table";
-import { ArrowUpDown, Eye, Mail, Phone, Users } from "lucide-react";
+import { ArrowUpDown, Eye, Info, Mail, Phone, TrendingDown, TrendingUp, Users } from "lucide-react";
 import Link from "next/link";
 import { IoIosPin } from "react-icons/io";
-import CardStatus from "./card-status";
 import getInitials from "../parents/get-initials";
+import CardStatus from "../card-status";
+import { DashIcon } from "@radix-ui/react-icons";
 
 
-type PlayerPosition = "Forward" | "Defender" | "GoalKeeper";
 
 export type PlayersData = {
-  name: string;
-  coach_name: string;
-  age: number;
-  position: PlayerPosition;
-  parent: string;
-  last_session: string;
-  last_session_date: string; // ISO format "YYYY-MM-DD"
-  attendance: number; // e.g., 94, 89, 100
+    name: string;
+    coach_name: string;
+    age: number;
+    position: string;
+    parent: string;
+    last_session: string;
+    last_session_date: string; // ISO format "YYYY-MM-DD"
+    attendance: number; // e.g., 94, 89, 100
+    id : number;
+    joining_date ?: string
+
 };
 
 export const PLAYERS_COLUMNS: ColumnDef<PlayersData>[] = [
@@ -27,10 +30,10 @@ export const PLAYERS_COLUMNS: ColumnDef<PlayersData>[] = [
         header: ({ column }) => (
             <Button
                 variant="ghost"
-                className="dark:hover:bg-transparent dark:hover:text-white/50"
+                className="text-[#99A1AF] text-[12px] tracking-wider dark:hover:bg-transparent dark:hover:text-white/50"
                 onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
             >
-                Player Name
+                PLAYER NAME
                 <ArrowUpDown />
             </Button>
         ),
@@ -56,10 +59,10 @@ export const PLAYERS_COLUMNS: ColumnDef<PlayersData>[] = [
         header: ({ column }) => (
             <Button
                 variant="ghost"
-                className="dark:hover:bg-transparent dark:hover:text-white/50"
+                className="text-[#99A1AF] text-[12px] tracking-wider dark:hover:bg-transparent dark:hover:text-white/50"
                 onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
             >
-                Age
+                AGE
                 <ArrowUpDown />
             </Button>
         ),
@@ -74,16 +77,16 @@ export const PLAYERS_COLUMNS: ColumnDef<PlayersData>[] = [
         header: ({ column }) => (
             <Button
                 variant="ghost"
-                className="dark:hover:bg-transparent dark:hover:text-white/50"
+                className="text-[#99A1AF] text-[12px] tracking-wider dark:hover:bg-transparent dark:hover:text-white/50"
                 onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
             >
-                Position
+                POSITION
                 <ArrowUpDown />
             </Button>
         ),
         cell: ({ row }) => (
             <div className="text-[#D1D5DC] flex items-center gap-2">
-                 {row.getValue("position")}
+                {row.getValue("position")}
             </div>
         ),
     },
@@ -92,16 +95,16 @@ export const PLAYERS_COLUMNS: ColumnDef<PlayersData>[] = [
         header: ({ column }) => (
             <Button
                 variant="ghost"
-                className="dark:hover:bg-transparent dark:hover:text-white/50"
+                className="text-[#99A1AF] text-[12px] tracking-wider dark:hover:bg-transparent dark:hover:text-white/50"
                 onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
             >
-                Parent Name
+                PARENT NAME
                 <ArrowUpDown />
             </Button>
         ),
         cell: ({ row }) => (
             <div className="text-[#D1D5DC] flex items-center gap-2">
-                 {row.getValue("parent")}
+                {row.getValue("parent")}
             </div>
         ),
     },
@@ -110,18 +113,18 @@ export const PLAYERS_COLUMNS: ColumnDef<PlayersData>[] = [
         header: ({ column }) => (
             <Button
                 variant="ghost"
-                className="dark:hover:bg-transparent dark:hover:text-white/50"
+                className="text-[#99A1AF] text-[12px] tracking-wider dark:hover:bg-transparent dark:hover:text-white/50"
                 onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
             >
-                Last Session
+                LAST SESSIONS
                 <ArrowUpDown />
             </Button>
         ),
         cell: ({ row }) => (
-           <div className="space-y-1 text-[#D1D5DC]">
-            <div>{row.getValue("last_session_date")}</div>
-            <div>{row.original.last_session}</div>
-           </div>
+            <div className="space-y-1 text-[#D1D5DC]">
+                <div>{row.getValue("last_session_date")}</div>
+                <div>{row.original.last_session}</div>
+            </div>
         ),
     },
     {
@@ -129,29 +132,46 @@ export const PLAYERS_COLUMNS: ColumnDef<PlayersData>[] = [
         header: ({ column }) => (
             <Button
                 variant="ghost"
-                className="dark:hover:bg-transparent dark:hover:text-white/50"
+                className="text-[#99A1AF] text-[12px] tracking-wider dark:hover:bg-transparent dark:hover:text-white/50"
                 onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
             >
-                Attendance
+                ATTENDANCE
                 <ArrowUpDown />
             </Button>
         ),
-        cell: ({ row }) => (
-            <CardStatus value={row.getValue("attendance")}/>
-        ),
+        cell: ({ row }) => {
+            let type = ""
+            const Up = () => <TrendingUp size={14} />
+            const Down = () => <TrendingDown size={14} />
+            const In = () => <DashIcon />
+
+            if (row.original.attendance > 90) {
+                type = "success"
+            } else if (row.original.attendance >= 80 && row.original.attendance <= 90) {
+                type = "warning"
+            } else {
+                type = "danger"
+            }
+            return (
+                <div className="w-20">
+                <CardStatus value={row.getValue("attendance")} type={type} icon={row.original.attendance
+                    > 90 ? <Up /> : row.original.attendance >= 80 && row.original.attendance <= 90 ? <In /> : <Down />} />
+                    </div>
+            )
+        },
     },
     {
         id: "actions",
-        header: "Action",
+        header: () => <div className="text-[#99A1AF] text-[12px] tracking-wider dark:hover:bg-transparent dark:hover:text-white/50">ACTIONS</div>,
         cell: ({ row }) => (
-            <Link href={`/admin/players/${row.original.name}`}>
-            <Button
-                onClick={(e) => {
-                    e.stopPropagation();
-                }}
-            >
-                <Eye /> View
-            </Button>
+            <Link href={`/admin/players/${row.original.id}`}>
+                <Button
+                    onClick={(e) => {
+                        e.stopPropagation();
+                    }}
+                >
+                    <Eye /> View
+                </Button>
             </Link>
         ),
     },

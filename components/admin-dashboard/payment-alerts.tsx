@@ -32,7 +32,7 @@ export function PaymentAlerts() {
                       <p className="text-xs text-muted-foreground">{alert.smallname}</p>
                     </div>
                     <div>
-                      <Badge className={`${index % 2 === 0 ? "bg-warning-bg text-warning-text" : "bg-danger-bg text-danger-text"}`}>
+                      <Badge className={`${index % 2 === 0 ? "bg-alternative-bg text-alternative-text" : "bg-danger-bg text-danger-text"}`}>
                         ${alert.amount}
                       </Badge>
                     </div>

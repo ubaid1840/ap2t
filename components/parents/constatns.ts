@@ -158,32 +158,96 @@ export const PARENT_DATA = [
 ];
 
 
+export const PAYMENT_HISTORY = [
+  {
+    id: 1,
+    session: "Basketball Training",
+    date: "2026-01-05",
+    status: "Completed",
+    price: 25,
+    card: "**** 4242",
+    receipt: "RCPT-1001",
+  },
+  {
+    id: 2,
+    session: "Goalkeeper Drills",
+    date: "2026-01-06",
+    status: "Completed",
+    price: 0,
+    card: "**** 1111",
+    receipt: "RCPT-1002",
+  },
+  {
+    id: 3,
+    session: "Defensive Skills",
+    date: "2026-01-08",
+    status: "Refunded",
+    price: 20,
+    card: "**** 4242",
+    receipt: "RCPT-1003",
+  },
+  {
+    id: 4,
+    session: "Strength & Conditioning",
+    date: "2026-01-10",
+    status: "Completed",
+    price: 18,
+    card: "**** 3333",
+    receipt: "RCPT-1004",
+  },
+  {
+    id: 5,
+    session: "Shooting Practice",
+    date: "2026-01-12",
+    status: "Completed",
+    price: 22,
+    card: "**** 4242",
+    receipt: "RCPT-1005",
+  },
+  {
+    id: 6,
+    session: "Team Strategy Session",
+    date: "2026-01-14",
+    status: "Refunded",
+    price: 30,
+    card: "**** 5555",
+    receipt: "RCPT-1006",
+  },
+  {
+    id: 7,
+    session: "Dribbling & Finishing",
+    date: "2026-01-15",
+    status: "Completed",
+    price: 26,
+    card: "**** 4242",
+    receipt: "RCPT-1007",
+  },
+  {
+    id: 8,
+    session: "Tactical Training",
+    date: "2026-01-16",
+    status: "Completed",
+    price: 24,
+    card: "**** 1111",
+    receipt: "RCPT-1008",
+  },
+  {
+    id: 9,
+    session: "Reaction Speed Training",
+    date: "2026-01-17",
+    status: "Refunded",
+    price: 20,
+    card: "**** 3333",
+    receipt: "RCPT-1009",
+  },
+  {
+    id: 10,
+    session: "Marking & Positioning",
+    date: "2026-01-18",
+    status: "Completed",
+    price: 21,
+    card: "**** 4242",
+    receipt: "RCPT-1010",
+  },
+]
 
-
-export const PARENT_TABLE_HEADER = [
-    {
-        value: "name",
-        label: "Parent Name",
-    },
-    {
-        value: "email",
-        label: "Contact Information",
-    },
-    {
-        value: "location",
-        label: "Location",
-    },
-    {
-        value: "children",
-        label: "Children",
-    },
-    {
-        value: "card_status",
-        label: "Card Status",
-    },
-    {
-        value: "total_spent",
-        label: "Total Spent",
-    },
-
-];
