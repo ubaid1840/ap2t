@@ -1,11 +1,14 @@
+import CardStatus from "@/components/card-status";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
+    ArrowUpIcon,
   Calendar,
   DollarSign,
   Dot,
+  Link,
   Plus,
   Recycle,
   Tag,
@@ -105,15 +108,66 @@ export default function Page() {
         </div>
       </div>
 
-      <div className="grid grid-cols-3">
+      <div className="grid grid-cols-3 gap-4">
         {
             Promotions.map((promotion)=>{
                 return(
-                     <Card>
+                     <Card className="p-0 bg-[#1A1A1A]">
             <div className="h-48 relative">
                 <img src={promotion.image} alt="" />
-                <Badge className="bg-active-text text-white absolute top-2 left-2">{promotion.status}</Badge>
-                
+                <Badge className="bg-[#00C950] text-white absolute top-2 left-2 px-4">{promotion.status}</Badge>
+                <Badge className="bg-primary text-black absolute top-2 right-2 px-4">{promotion.liveOn}</Badge>
+            </div>
+            <div className="space-y-4 p-4">
+                    <h1 className="text-[#F3F4F6]">{promotion.title}</h1>
+                    <p className="text-sm text-[#99A1AF]">{promotion.description}</p>
+                    <div className="flex gap-2 items-center">
+                        <DollarSign className="text-primary"/>
+                        <h1>{promotion.price}</h1>
+                        <h1 className="text-[#6A7282]" >{promotion.oldPrice}</h1>
+                        <CardStatus value={`Save ${promotion.save}`} type="active"/>
+
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                        <div className="rounded-2xl border border-border space-y-2 p-4 bg-[#1A1A1A]">
+                            <div className="flex gap-2"> 
+                                <Calendar/> 
+                                <p className="text-sm text-[#99A1AF]">Start Date</p>
+                            </div>
+                                <h1 className="text-[#E5E7EB]">{promotion.startDate}</h1>
+                        </div>
+
+                        <div className="rounded-2xl border border-border space-y-2 p-4 bg-[#1A1A1A]">
+                            <div className="flex gap-2"> 
+                                <Calendar/> 
+                                <p className="text-sm text-[#99A1AF]">End Date</p>
+                            </div>
+                                <h1 className="text-[#E5E7EB]">{promotion.endDate}</h1>
+                        </div>
+
+                        <div className="rounded-2xl border border-border space-y-2 p-4 bg-[#1A1A1A]">
+                            <div className="flex gap-2"> 
+                                <Users/> 
+                                <p className="text-sm text-[#99A1AF]">Sign-ups</p>
+                            </div>
+                                <h1 className="text-[#E5E7EB]">{promotion.signUps}</h1>
+                        </div>
+
+                        <div className="rounded-2xl border border-border space-y-2 p-4 bg-[#1A1A1A]">
+                            <div className="flex gap-2"> 
+                                <ArrowUpIcon/> 
+                                <p className="text-sm text-[#99A1AF]">Revenue</p>
+                            </div>
+                                <h1 className="text-[#E5E7EB]">{promotion.revenue}</h1>
+                        </div>
+                    </div>
+                    <div className="bg-info-bg text-info-text flex justify-between rounded-2xl">
+                        <div className="flex gap-2">
+                            <Link/> <h1>Square Checkout</h1>
+                        </div>
+                    </div>
+
             </div>
 
         </Card>)
