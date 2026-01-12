@@ -1,33 +1,36 @@
 "use client";
+import CardStatus from "@/components/card-status";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import { Separator } from "@/components/ui/separator";
+import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ReactNode, useState } from "react";
-import { FaBell, FaCreditCard, FaLock, FaUser } from "react-icons/fa";
-import { FaFloppyDisk } from "react-icons/fa6";
-import { RiShieldKeyholeLine } from "react-icons/ri";
-import InputWithIcon from "@/components/input-with-icon";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { GearIcon } from "@radix-ui/react-icons";
 import {
   Bell,
   Calendar,
   Check,
   CreditCard,
   DollarSign,
-  Dot,
-  FileWarning,
   FileWarningIcon,
+  Info,
   MessageCircle,
   MessageSquare,
+  Phone,
   Shield,
   Trash,
   User,
-  Users,
+  Users
 } from "lucide-react";
-import { Switch } from "@/components/ui/switch";
-import { Badge } from "@/components/ui/badge";
-import { GearIcon } from "@radix-ui/react-icons";
+import { ReactNode, useState } from "react";
+import { FaBell, FaCreditCard, FaLock, FaUser } from "react-icons/fa";
+import { FaFloppyDisk } from "react-icons/fa6";
+import { GoDotFill } from "react-icons/go";
+import { RiShieldKeyholeLine } from "react-icons/ri";
 export default function Page() {
   const [profileInfo, setProfileInfo] = useState({
     adminUser: "",
@@ -47,25 +50,27 @@ export default function Page() {
     autoSyncCatalog: false,
   });
 
-  const [securityInfo,setSecurityInfo]=useState({
-    twoFactorAuth:false,
-    loginAlert:false,
-    oldPass:"",
-    newPass:"",
-    confirmNewPass:""
+  const [securityInfo, setSecurityInfo] = useState({
+    twoFactorAuth: false,
+    loginAlert: false,
+    oldPass: "",
+    newPass: "",
+    confirmNewPass: ""
   })
 
-  const [notificationInfo,setNoficationInfo]=useState({
-    newBooking:false,
-    paymentReceived:false,
-    sessionCencellation:false,
-    promotionPerchase:false,
-    emailNotification:false,
-    smsNotification:false,
-    pushNotification:false
+  const [notificationInfo, setNoficationInfo] = useState({
+    newBooking: false,
+    paymentReceived: false,
+    sessionCencellation: false,
+    promotionPerchase: false,
+    emailNotification: false,
+    smsNotification: false,
+    pushNotification: false
   })
+
+  const isMobile = useIsMobile()
   return (
-    <div className="flex flex-col w-full gap-6">
+    <div className="flex flex-col w-full gap-4">
       <Header>
         <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
           <Button className="rounded-full">
@@ -74,211 +79,224 @@ export default function Page() {
         </div>
       </Header>
       <Card className="bg-[#282828] p-0 overflow-hidden">
-        <Tabs defaultValue="Profile info">
-          <TabsList className="bg-[#282828] p-0">
-            <TabsTrigger
-              value="Profile info"
-              className="dark:data-[state=active]:bg-[#CBFD0026] dark:data-[state=active]:text-primary dark:data-[state=active]:border-b-primary rounded-none rounded-tl-xl"
-            >
-              <div className="py-4 px-2 gap-2 flex items-center ">
-                <FaUser />
-                <h1 className="text-sm">Profile Info</h1>
-              </div>
-            </TabsTrigger>
-            <TabsTrigger
-              value="Notification Preference"
-              className="dark:data-[state=active]:bg-[#CBFD0026] dark:data-[state=active]:text-primary dark:data-[state=active]:border-b-primary rounded-none"
-            >
-              <div className="py-4 px-2 gap-2 flex items-center data-[state=active]:bg-[#CBFD0026] data-[state=active]:text-primary data-[state=active]:border-primary">
-                <FaBell />
-                <h1 className="text-sm">Notification Preference</h1>
-              </div>
-            </TabsTrigger>
-            <TabsTrigger
-              value="Role Permission"
-              className="dark:data-[state=active]:bg-[#CBFD0026] dark:data-[state=active]:text-primary dark:data-[state=active]:border-b-primary rounded-none"
-            >
-              <div className="py-4 px-2 gap-2 flex items-center data-[state=active]:bg-[#CBFD0026] data-[state=active]:text-primary data-[state=active]:border-primary">
-                <RiShieldKeyholeLine />
-                <h1 className="text-sm">Role Permission</h1>
-              </div>
-            </TabsTrigger>
-            <TabsTrigger
-              value="Square Integration"
-              className="dark:data-[state=active]:bg-[#CBFD0026] dark:data-[state=active]:text-primary dark:data-[state=active]:border-b-primary rounded-none"
-            >
-              <div className="py-4 px-2 gap-2 flex items-center data-[state=active]:bg-[#CBFD0026] data-[state=active]:text-primary data-[state=active]:border-primary">
-                <FaCreditCard />
-                <h1 className="text-sm">Square Integration</h1>
-              </div>
-            </TabsTrigger>
-            <TabsTrigger
-              value="Security"
-              className="dark:data-[state=active]:bg-[#CBFD0026] dark:data-[state=active]:text-primary dark:data-[state=active]:border-b-primary rounded-none"
-            >
-              <div className="py-4 px-2 gap-2 flex items-center data-[state=active]:bg-[#CBFD0026] data-[state=active]:text-primary data-[state=active]:border-primary">
-                <FaLock />
-                <h1 className="text-sm">Security</h1>
-              </div>
-            </TabsTrigger>
-          </TabsList>
+        <Tabs defaultValue="Profile info" className="gap-0">
+          <ScrollArea className={`overflow-x-auto ${isMobile && "max-w-[calc(100vw-64px)]"}`}>
+            <TabsList className="bg-transparent relative flex p-0 ">
+              <TabsTrigger
+                value="Profile info"
+                className="dark:data-[state=active]:bg-[#CBFD0026] dark:data-[state=active]:text-primary dark:data-[state=active]:border-b-primary rounded-none rounded-tl-xl h-9 px-4 text-[12px] leading-tight tracking-tight"
+              >
+                <div className="flex gap-2 items-center py-2">
+                  <FaUser />
+                  Profile Info
+                </div>
+              </TabsTrigger>
+              <TabsTrigger
+                value="Notification Preference"
+                className="dark:data-[state=active]:bg-[#CBFD0026] dark:data-[state=active]:text-primary dark:data-[state=active]:border-b-primary rounded-none h-9 px-4 text-[12px] leading-tight tracking-tight"
+              >
+                <div className="flex gap-2 items-center py-2">
+                  <FaBell />
+                  Notification Preference
+                </div>
+              </TabsTrigger>
+              <TabsTrigger
+                value="Role Permission"
+                className="dark:data-[state=active]:bg-[#CBFD0026] dark:data-[state=active]:text-primary dark:data-[state=active]:border-b-primary rounded-none h-9 px-4 text-[12px] leading-tight tracking-tight"
+              >
+                <div className="flex gap-2 items-center py-2">
+                  <RiShieldKeyholeLine />
+                  Role Permission
+                </div>
+              </TabsTrigger>
+              <TabsTrigger
+                value="Square Integration"
+                className="dark:data-[state=active]:bg-[#CBFD0026] dark:data-[state=active]:text-primary dark:data-[state=active]:border-b-primary rounded-none h-9 px-4 text-[12px] leading-tight tracking-tight"
+              >
+                <div className="flex gap-2 items-center py-2">
+                  <FaCreditCard />
+                  Square Integration
+                </div>
+              </TabsTrigger>
+              <TabsTrigger
+                value="Security"
+                className="dark:data-[state=active]:bg-[#CBFD0026] dark:data-[state=active]:text-primary dark:data-[state=active]:border-b-primary rounded-none h-9 px-4 text-[12px] leading-tight tracking-tight"
+              >
+                <div className="flex gap-2 items-center py-2">
+                  <FaLock />
+                  Security
+                </div>
+              </TabsTrigger>
+            </TabsList>
+            <ScrollBar orientation="horizontal" />
+          </ScrollArea>
+          <Separator />
           <CardContent className="p-4">
             <TabsContent value="Profile info" className="space-y-4">
-              <div className="flex flex-col gap-4">
+
+              <div className="space-y-1">
+                <h1 className="text-[18px] font normal">Profile Information</h1>
+                <p className="text-xs text-muted-foreground">
+                  Manage your personal details and keep your contact
+                </p>
+              </div>
+
+              <div className="flex items-center gap-8">
+                <div className="relative w-24 h-24">
+                  <img
+                    className="w-full h-full rounded-full object-cover"
+                    src="/settings/profilepic.png"
+                    alt=""
+                  />
+
+                  <div className="absolute bottom-0 right-0 bg-primary p-2 rounded-full">
+                    <User size={14} className="text-black text-sm" />
+                  </div>
+                </div>
                 <div className="space-y-1">
-                  <h1 className="text-xl font-semibold">Profile Information</h1>
-                  <p className="text-md text-[#B0B0B0]">
-                    Manage your personal details and keep your contact
-                  </p>
-                </div>
-
-                <div className="flex gap-8">
-                  <div className="relative w-24 h-24">
-                    <img
-                      className="w-full h-full rounded-full object-cover"
-                      src="/settings/profilepic.png"
-                      alt=""
-                    />
-
-                    <div className="absolute bottom-0 right-0 bg-primary p-2 rounded-full">
-                      <FaUser className="text-black text-sm" />
-                    </div>
-                  </div>
-                  <div className="space-y-4">
-                    <h1 className="text-xl font-semibold">Admin User</h1>
-                    <p className="text-md text-[#B0B0B0]">Super Admin</p>
-                    <div className="flex gap-2">
-                      <Button variant={"link"} className="p-0">
-                        Delete
-                      </Button>
-                      <Button variant={"link"} className="p-0">
-                        Update
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 gap-6">
-                  <div className="space-y-1">
-                    <Label>Full Name</Label>
-                    <div
-                      className={`flex items-center gap-2 h-16 rounded-[12px] border border-[#3A3A3A] px-3 shadow-sm  bg-[#18181B]`}
-                    >
-                      <User className="h-5 w-5 text-gray-400" />
-                      <Input
-                        value={profileInfo.adminUser}
-                        onChange={(e) =>
-                          setProfileInfo((prev) => ({
-                            ...prev,
-                            adminUser: e.target.value,
-                          }))
-                        }
-                        placeholder="Admin User"
-                        className={`border-none bg-transparent p-0 text-xl placeholder:text-gray-400 focus-visible:ring-0 focus-visible:ring-offset-0 dark:bg-transparent `}
-                      />
-                    </div>
-                  </div>
-                  <div className="space-y-1">
-                    <Label>E-mail</Label>
-
-                    <div
-                      className={`flex items-center gap-2 h-16 rounded-[12px] border border-[#3A3A3A] px-3 shadow-sm  bg-[#18181B]`}
-                    >
-                      <MessageSquare className="h-5 w-5 text-gray-400" />
-                      <Input
-                        value={profileInfo.email}
-                        onChange={(e) =>
-                          setProfileInfo((prev) => ({
-                            ...prev,
-                            email: e.target.value,
-                          }))
-                        }
-                        placeholder="admin@ap2t.com"
-                        className={`border-none bg-transparent p-0 text-xl placeholder:text-gray-400 focus-visible:ring-0 focus-visible:ring-offset-0 dark:bg-transparent `}
-                      />
-                    </div>
-                  </div>
-
-                  <div className="space-y-1">
-                    <Label>Phone No.</Label>
-                    <div
-                      className={`flex items-center gap-2 h-16 rounded-[12px] border border-[#3A3A3A] px-3 shadow-sm  bg-[#18181B]`}
-                    >
-                      <User className="h-5 w-5 text-gray-400" />
-                      <Input
-                        value={profileInfo.phoneNo}
-                        onChange={(e) =>
-                          setProfileInfo((prev) => ({
-                            ...prev,
-                            phoneNo: e.target.value,
-                          }))
-                        }
-                        placeholder="+91 3948392"
-                        className={`border-none bg-transparent p-0 text-xl placeholder:text-gray-400 focus-visible:ring-0 focus-visible:ring-offset-0 dark:bg-transparent `}
-                      />
-                    </div>
-                  </div>
-                  <div className="space-y-1">
-                    <Label>Role</Label>
-                    <div
-                      className={`flex items-center gap-2 h-16 rounded-[12px] border border-[#3A3A3A] px-3 shadow-sm  bg-[#18181B]`}
-                    >
-                      <User className="h-5 w-5 text-gray-400" />
-                      <Input
-                        value={profileInfo.role}
-                        onChange={(e) =>
-                          setProfileInfo((prev) => ({
-                            ...prev,
-                            role: e.target.value,
-                          }))
-                        }
-                        placeholder="Super Admin"
-                        className={`border-none bg-transparent p-0 text-xl placeholder:text-gray-400 focus-visible:ring-0 focus-visible:ring-offset-0 dark:bg-transparent `}
-                      />
-                    </div>
-                  </div>
-                  <div className="space-y-1">
-                    <Label>Password</Label>
-                    <div
-                      className={`flex items-center gap-2 h-16 rounded-[12px] border border-[#3A3A3A] px-3 shadow-sm  bg-[#18181B]`}
-                    >
-                      <User className="h-5 w-5 text-gray-400" />
-                      <Input
-                        value={profileInfo.password}
-                        onChange={(e) =>
-                          setProfileInfo((prev) => ({
-                            ...prev,
-                            password: e.target.value,
-                          }))
-                        }
-                        placeholder="********"
-                        className={`border-none bg-transparent p-0 text-xl placeholder:text-gray-400 focus-visible:ring-0 focus-visible:ring-offset-0 dark:bg-transparent `}
-                      />
-                    </div>
-                  </div>
-                  <div className="space-y-1">
-                    <Label>Phone No.</Label>
-                    <div
-                      className={`flex items-center gap-2 h-16 rounded-[12px] border border-[#3A3A3A] px-3 shadow-sm  bg-[#18181B]`}
-                    >
-                      <User className="h-5 w-5 text-gray-400" />
-                      <Input
-                        value={profileInfo.blanck}
-                        onChange={(e) =>
-                          setProfileInfo((prev) => ({
-                            ...prev,
-                            blanck: e.target.value,
-                          }))
-                        }
-                        placeholder="+91 03490334"
-                        className={`border-none bg-transparent p-0 text-xl placeholder:text-gray-400 focus-visible:ring-0 focus-visible:ring-offset-0 dark:bg-transparent `}
-                      />
-                    </div>
+                  <h1 className="text-md font-semibold">Admin User</h1>
+                  <p className="text-sm text-muted-foreground">Super Admin</p>
+                  <div className="flex gap-2">
+                    <Button variant={"link"} className="p-0 font-normal">
+                      Delete
+                    </Button>
+                    <Button variant={"link"} className="p-0 font-normal">
+                      Update
+                    </Button>
                   </div>
                 </div>
               </div>
+              <div className="grid grid-cols-2 gap-6">
+                <div className="space-y-1">
+                  <Label className="text-xs font-normal tracking-wide text-[#D1D1D1]">Full Name</Label>
+                  <div
+                    className={`flex items-center gap-2 py-2 rounded-[12px] border border-[#3A3A3A] px-3 shadow-sm  bg-[#18181B]`}
+                  >
+                    <FaUser className="h-4 w-4 text-gray-400" />
+                    <Input
+                      value={profileInfo.adminUser}
+                      onChange={(e) =>
+                        setProfileInfo((prev) => ({
+                          ...prev,
+                          adminUser: e.target.value,
+                        }))
+                      }
+                      placeholder="Admin User"
+                      className={`border-none bg-transparent p-0 text-xl placeholder:text-gray-400 focus-visible:ring-0 focus-visible:ring-offset-0 dark:bg-transparent `}
+                    />
+                  </div>
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-xs font-normal tracking-wide text-[#D1D1D1]">E-mail</Label>
+
+                  <div
+                    className={`flex items-center gap-2 py-2 rounded-[12px] border border-[#3A3A3A] px-3 shadow-sm  bg-[#18181B]`}
+                  >
+                    <MessageSquare className="h-5 w-5 text-gray-400" />
+                    <Input
+                      value={profileInfo.email}
+                      onChange={(e) =>
+                        setProfileInfo((prev) => ({
+                          ...prev,
+                          email: e.target.value,
+                        }))
+                      }
+                      placeholder="admin@ap2t.com"
+                      className={`border-none bg-transparent p-0 text-xl placeholder:text-gray-400 focus-visible:ring-0 focus-visible:ring-offset-0 dark:bg-transparent `}
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-1">
+                  <Label className="text-xs font-normal tracking-wide text-[#D1D1D1]">Phone No.</Label>
+                  <div
+                    className={`flex items-center gap-2 py-2 rounded-[12px] border border-[#3A3A3A] px-3 shadow-sm  bg-[#18181B]`}
+                  >
+                    <Phone className="h-5 w-5 text-gray-400" />
+                    <Input
+                      value={profileInfo.phoneNo}
+                      onChange={(e) =>
+                        setProfileInfo((prev) => ({
+                          ...prev,
+                          phoneNo: e.target.value,
+                        }))
+                      }
+                      placeholder="+91 3948392"
+                      className={`border-none bg-transparent p-0 text-xl placeholder:text-gray-400 focus-visible:ring-0 focus-visible:ring-offset-0 dark:bg-transparent `}
+                    />
+                  </div>
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-xs font-normal tracking-wide text-[#D1D1D1]">Role</Label>
+                  <div
+                    className={`flex items-center gap-2 py-2 rounded-[12px] border border-[#3A3A3A] px-3 shadow-sm  bg-[#18181B]`}
+                  >
+                    <User className="h-5 w-5 text-gray-400" />
+                    <Input
+                      value={profileInfo.role}
+                      onChange={(e) =>
+                        setProfileInfo((prev) => ({
+                          ...prev,
+                          role: e.target.value,
+                        }))
+                      }
+                      placeholder="Super Admin"
+                      className={`border-none bg-transparent p-0 text-xl placeholder:text-gray-400 focus-visible:ring-0 focus-visible:ring-offset-0 dark:bg-transparent `}
+                    />
+                  </div>
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-xs font-normal tracking-wide text-[#D1D1D1]">Password</Label>
+                  <div
+                    className={`flex items-center gap-2 py-2 rounded-[12px] border border-[#3A3A3A] px-3 shadow-sm  bg-[#18181B]`}
+                  >
+                    <User className="h-5 w-5 text-gray-400" />
+                    <Input
+                      value={profileInfo.password}
+                      onChange={(e) =>
+                        setProfileInfo((prev) => ({
+                          ...prev,
+                          password: e.target.value,
+                        }))
+                      }
+                      placeholder="********"
+                      className={`border-none bg-transparent p-0 text-xl placeholder:text-gray-400 focus-visible:ring-0 focus-visible:ring-offset-0 dark:bg-transparent `}
+                    />
+                  </div>
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-xs font-normal tracking-wide text-[#D1D1D1]">Phone No.</Label>
+                  <div
+                    className={`flex items-center gap-2 py-2 rounded-[12px] border border-[#3A3A3A] px-3 shadow-sm  bg-[#18181B]`}
+                  >
+                    <User className="h-5 w-5 text-gray-400" />
+                    <Input
+                      value={profileInfo.blanck}
+                      onChange={(e) =>
+                        setProfileInfo((prev) => ({
+                          ...prev,
+                          blanck: e.target.value,
+                        }))
+                      }
+                      placeholder="+91 03490334"
+                      className={`border-none bg-transparent p-0 text-xl placeholder:text-gray-400 focus-visible:ring-0 focus-visible:ring-offset-0 dark:bg-transparent `}
+                    />
+                  </div>
+                </div>
+              </div>
+
             </TabsContent>
             <TabsContent value="Notification Preference" className="space-y-4">
               {/* header */}
+
+              <div className="space-y-1">
+                <h1 className="text-[18px] font normal">Notification Preferences</h1>
+                <p className="text-xs text-muted-foreground">
+                  Configure how and when you receive notifications.
+                </p>
+              </div>
+
+
               <div className="space-y-2">
                 <h1 className="text-xl font-bold text-[#F3F4F6]">
                   Notification Preferences
@@ -305,7 +323,7 @@ export default function Page() {
                       </div>
                     </div>
 
-                    <Switch className="scale-150 mr-2" checked={notificationInfo.newBooking} onCheckedChange={(val)=> setNoficationInfo((prevState)=>({...prevState, newBooking:val}))}/>
+                    <Switch className="scale-150 mr-2" checked={notificationInfo.newBooking} onCheckedChange={(val) => setNoficationInfo((prevState) => ({ ...prevState, newBooking: val }))} />
                   </div>
 
                   <div className="flex justify-between items-center p-4 bg-[#1A1A1A] border border-border rounded-[10px]">
@@ -321,7 +339,7 @@ export default function Page() {
                       </div>
                     </div>
 
-                    <Switch className="scale-150 mr-2" checked={notificationInfo.paymentReceived} onCheckedChange={(val)=> setNoficationInfo((prevState)=>({...prevState, paymentReceived:val}))}/>
+                    <Switch className="scale-150 mr-2" checked={notificationInfo.paymentReceived} onCheckedChange={(val) => setNoficationInfo((prevState) => ({ ...prevState, paymentReceived: val }))} />
                   </div>
 
                   <div className="flex justify-between items-center p-4 bg-[#1A1A1A] border border-border rounded-[10px]">
@@ -337,7 +355,7 @@ export default function Page() {
                       </div>
                     </div>
 
-                    <Switch className="scale-150 mr-2" checked={notificationInfo.sessionCencellation} onCheckedChange={(val)=> setNoficationInfo((prevState)=>({...prevState, sessionCencellation:val}))}/>
+                    <Switch className="scale-150 mr-2" checked={notificationInfo.sessionCencellation} onCheckedChange={(val) => setNoficationInfo((prevState) => ({ ...prevState, sessionCencellation: val }))} />
                   </div>
                   <div className="flex justify-between items-center p-4 bg-[#1A1A1A] border border-border rounded-[10px]">
                     <div className="flex items-center max-w-2xl gap-4">
@@ -352,7 +370,7 @@ export default function Page() {
                       </div>
                     </div>
 
-                    <Switch className="scale-150 mr-2" checked={notificationInfo.promotionPerchase} onCheckedChange={(val)=> setNoficationInfo((prevState)=>({...prevState, promotionPerchase:val}))}/>
+                    <Switch className="scale-150 mr-2" checked={notificationInfo.promotionPerchase} onCheckedChange={(val) => setNoficationInfo((prevState) => ({ ...prevState, promotionPerchase: val }))} />
                   </div>
                 </div>
               </div>
@@ -375,7 +393,7 @@ export default function Page() {
                       </div>
                     </div>
 
-                    <Switch className="scale-150 mr-2" checked={notificationInfo.emailNotification} onCheckedChange={(val)=> setNoficationInfo((prevState)=>({...prevState, emailNotification:val}))}/>
+                    <Switch className="scale-150 mr-2" checked={notificationInfo.emailNotification} onCheckedChange={(val) => setNoficationInfo((prevState) => ({ ...prevState, emailNotification: val }))} />
                   </div>
 
                   <div className="flex justify-between items-center p-4 bg-[#1A1A1A] border border-border rounded-[10px]">
@@ -391,7 +409,7 @@ export default function Page() {
                       </div>
                     </div>
 
-                    <Switch className="scale-150 mr-2" checked={notificationInfo.smsNotification} onCheckedChange={(val)=> setNoficationInfo((prevState)=>({...prevState, smsNotification:val}))}/>
+                    <Switch className="scale-150 mr-2" checked={notificationInfo.smsNotification} onCheckedChange={(val) => setNoficationInfo((prevState) => ({ ...prevState, smsNotification: val }))} />
                   </div>
 
                   <div className="flex justify-between items-center p-4 bg-[#1A1A1A] border border-border rounded-[10px]">
@@ -407,106 +425,91 @@ export default function Page() {
                       </div>
                     </div>
 
-                    <Switch className="scale-150 mr-2" checked={notificationInfo.pushNotification} onCheckedChange={(val)=> setNoficationInfo((prevState)=>({...prevState, pushNotification:val}))}/>
+                    <Switch className="scale-150 mr-2" checked={notificationInfo.pushNotification} onCheckedChange={(val) => setNoficationInfo((prevState) => ({ ...prevState, pushNotification: val }))} />
                   </div>
                 </div>
               </div>
             </TabsContent>
             <TabsContent value="Role Permission" className="space-y-4">
-              {/* header */}
-              <div className="space-y-2">
-                <h1 className="text-xl font-semibold text-[#F3F4F6]">
-                  Role Permissions
-                </h1>
-                <p className="text-sm text-[#99A1AF]">
-                  View permissions associated with your role.
+             
+              <div className="space-y-1">
+                <h1 className="text-[18px] font normal">Role Permissions</h1>
+                <p className="text-xs text-muted-foreground">
+                 View permissions associated with your role.
                 </p>
               </div>
-              {/* caution */}
-              <div className="rounded-xl border border-[#2B7FFF33] bg-[#2B7FFF1A] flex items-center p-4 gap-4">
-                <FileWarning className="w-5 h-5 text-[#51A2FF]" />
-                <div className="space-y-1">
-                  <h1 className="text-[#51A2FF] text-lg text-semibold">
-                    Current Role: Super Admin
-                  </h1>
-                  <p className="text-sm text-[#99A1AF]">
-                    These permissions apply to your account. Contact a
-                  </p>
-                </div>
-              </div>
-              {/* feilds */}
+
+              
+
+              <Card className="bg-info-bg/40 p-3 border-info-text/30">
+                <CardContent className="p-0">
+                  <div className="flex gap-4 items-start">
+                    <Info size={14} className="text-info-text" />
+                    <div className="font-normal space-y-1">
+                      <Label className="text-info-text text-[14px] leading-none">Current Role: Super Admin</Label>
+                      <p className="text-muted-foreground text-xs">These permissions apply to your account</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+
               <div className="grid grid-cols-2 gap-4">
                 <div className="flex justify-between bg-[#1A1A1A] border border-[#3A3A3A] rounded-[10px] p-4">
                   <div className="flex items-center gap-2">
-                    <Users className="text-gray-400 h-5 w-5" />
-                    <h1 className="text-[#E5E7EB]">Manage Users</h1>
+                    <Users className="text-gray-400" size={16}/>
+                    <h1 className="text-[#E5E7EB] text-sm">Manage Users</h1>
                   </div>
-                  <Badge className="bg-active-bg text-active-text px-5 py-1 text-sm">
-                    Enabled
-                  </Badge>
+                  <CardStatus value={"Enabled"} type="active" />
                 </div>
                 <div className="flex justify-between bg-[#1A1A1A] border border-[#3A3A3A] rounded-[10px] p-4">
                   <div className="flex items-center gap-2">
-                    <User className="text-gray-400 h-5 w-5" />
-                    <h1 className="text-[#E5E7EB]">Manage Players</h1>
+                    <User className="text-gray-400 " size={16}/>
+                    <h1 className="text-[#E5E7EB] text-sm">Manage Players</h1>
                   </div>
-                  <Badge className="bg-active-bg text-active-text px-5 py-1 text-sm">
-                    Enabled
-                  </Badge>
+                  <CardStatus value={"Enabled"} type="active" />
                 </div>
                 <div className="flex justify-between bg-[#1A1A1A] border border-[#3A3A3A] rounded-[10px] p-4">
                   <div className="flex items-center gap-2">
-                    <Shield className="text-gray-400 h-5 w-5" />
-                    <h1 className="text-[#E5E7EB]">Manage Coaches </h1>
+                    <Shield className="text-gray-400 " size={16}/>
+                    <h1 className="text-[#E5E7EB] text-sm">Manage Coaches </h1>
                   </div>
-                  <Badge className="bg-active-bg text-active-text px-5 py-1 text-sm">
-                    Enabled
-                  </Badge>
+                  <CardStatus value={"Enabled"} type="active" />
                 </div>
                 <div className="flex justify-between bg-[#1A1A1A] border border-[#3A3A3A] rounded-[10px] p-4">
                   <div className="flex items-center gap-2">
-                    <Calendar className="text-gray-400 h-5 w-5" />
-                    <h1 className="text-[#E5E7EB]">Manage Sessions</h1>
+                    <Calendar className="text-gray-400 " size={16} />
+                    <h1 className="text-[#E5E7EB] text-sm">Manage Sessions</h1>
                   </div>
-                  <Badge className="bg-active-bg text-active-text px-5 py-1 text-sm">
-                    Enabled
-                  </Badge>
+                  <CardStatus value={"Enabled"} type="active" />
                 </div>
                 <div className="flex justify-between bg-[#1A1A1A] border border-[#3A3A3A] rounded-[10px] p-4">
                   <div className="flex items-center gap-2">
-                    <CreditCard className="text-gray-400 h-5 w-5" />
-                    <h1 className="text-[#E5E7EB]">Manage Payments</h1>
+                    <CreditCard className="text-gray-400" size={16} />
+                    <h1 className="text-[#E5E7EB] text-sm">Manage Payments</h1>
                   </div>
-                  <Badge className="bg-active-bg text-active-text px-5 py-1 text-sm">
-                    Enabled
-                  </Badge>
+                  <CardStatus value={"Enabled"} type="active" />
                 </div>
                 <div className="flex justify-between bg-[#1A1A1A] border border-[#3A3A3A] rounded-[10px] p-4">
                   <div className="flex items-center gap-2">
-                    <DollarSign className="text-gray-400 h-5 w-5" />
-                    <h1 className="text-[#E5E7EB]">Manage Promotions</h1>
+                    <DollarSign className="text-gray-400 " size={16} />
+                    <h1 className="text-[#E5E7EB] text-sm">Manage Promotions</h1>
                   </div>
-                  <Badge className="bg-active-bg text-active-text px-5 py-1 text-sm">
-                    Enabled
-                  </Badge>
+                  <CardStatus value={"Enabled"} type="active" />
                 </div>
                 <div className="flex justify-between bg-[#1A1A1A] border border-[#3A3A3A] rounded-[10px] p-4">
                   <div className="flex items-center gap-2">
-                    <GearIcon className="text-gray-400 h-5 w-5" />
-                    <h1 className="text-[#E5E7EB]">System Settings</h1>
+                    <GearIcon className="text-gray-400 h-4 w-4" />
+                    <h1 className="text-[#E5E7EB] text-sm">System Settings</h1>
                   </div>
-                  <Badge className="bg-active-bg text-active-text px-5 py-1 text-sm">
-                    Enabled
-                  </Badge>
+                  <CardStatus value={"Enabled"} type="active" />
                 </div>
                 <div className="flex justify-between bg-[#1A1A1A] border border-[#3A3A3A] rounded-[10px] p-4">
                   <div className="flex items-center gap-2">
-                    <GearIcon className="text-gray-400 h-5 w-5" />
-                    <h1 className="text-[#E5E7EB]">View Reports</h1>
+                    <GearIcon className="text-gray-400 h-4 w-4" />
+                    <h1 className="text-[#E5E7EB] text-sm">View Reports</h1>
                   </div>
-                  <Badge className="bg-active-bg text-active-text px-5 py-1 text-sm">
-                    Enabled
-                  </Badge>
+                  <CardStatus value={"Enabled"} type="active" />
                 </div>
               </div>
             </TabsContent>
@@ -521,9 +524,10 @@ export default function Page() {
                     Manage your Square payment integration settings.
                   </p>
                 </div>
-                <Badge className="bg-active-bg text-active-text px-5 py-1 text-sm h-8 gap-2">
-                  <Dot scale={"150"} /> Connected
-                </Badge>
+                <div>
+                  <CardStatus value={"Connected"} type="active" icon={<GoDotFill />} className="gap-0" />
+                </div>
+
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1">
@@ -614,7 +618,7 @@ export default function Page() {
                     </div>
                   </div>
 
-                  <Switch className="scale-150 mr-2" checked={squareIntigration.testModes} onCheckedChange={(val)=> setSquareIntigration((prevState)=>({...prevState, testModes:val}))} />
+                  <Switch className="scale-150 mr-2" checked={squareIntigration.testModes} onCheckedChange={(val) => setSquareIntigration((prevState) => ({ ...prevState, testModes: val }))} />
                 </div>
 
                 <div className="flex justify-between items-center p-4 bg-[#1A1A1A] border border-border rounded-[10px]">
@@ -630,7 +634,7 @@ export default function Page() {
                     </div>
                   </div>
 
-                  <Switch className="scale-150 mr-2" checked={squareIntigration.autoSyncCatalog} onCheckedChange={(val)=> setSquareIntigration((prevState)=>({...prevState, autoSyncCatalog:val}))}/>
+                  <Switch className="scale-150 mr-2" checked={squareIntigration.autoSyncCatalog} onCheckedChange={(val) => setSquareIntigration((prevState) => ({ ...prevState, autoSyncCatalog: val }))} />
                 </div>
               </div>
               <div className="space-x-4 mt-8">
@@ -662,7 +666,7 @@ export default function Page() {
                     </div>
                   </div>
 
-                  <Switch className="scale-150 mr-2" checked={securityInfo.twoFactorAuth} onCheckedChange={(val)=> setSecurityInfo((prevState)=>({...prevState, twoFactorAuth:val}))}/>
+                  <Switch className="scale-150 mr-2" checked={securityInfo.twoFactorAuth} onCheckedChange={(val) => setSecurityInfo((prevState) => ({ ...prevState, twoFactorAuth: val }))} />
                 </div>
                 <div className="flex justify-between items-center p-4 bg-[#1A1A1A] border border-border rounded-[10px]">
                   <div className="flex items-center max-w-2xl gap-4">
@@ -674,7 +678,7 @@ export default function Page() {
                     </div>
                   </div>
 
-                  <Switch className="scale-150 mr-2" checked={securityInfo.loginAlert} onCheckedChange={(val)=> setSecurityInfo((prevState)=>({...prevState, loginAlert:val}))}/>
+                  <Switch className="scale-150 mr-2" checked={securityInfo.loginAlert} onCheckedChange={(val) => setSecurityInfo((prevState) => ({ ...prevState, loginAlert: val }))} />
                 </div>
               </div>
 
@@ -682,64 +686,64 @@ export default function Page() {
                 <h1 className="text-xl text-[#E5E7EB]">Password Management</h1>
                 <div className="grid grid-cols-2">
                   <div className="space-y-1">
-                  <Label className="text-[#D1D1D1]">Old Password</Label>
+                    <Label className="text-[#D1D1D1]">Old Password</Label>
 
-                  <div
-                    className={`flex items-center gap-2 h-16 rounded-[12px] border border-[#3A3A3A] px-3 shadow-sm  bg-[#18181B]`}
-                  >
-                    <Input
-                      value={securityInfo.oldPass}
-                      onChange={(e) =>
-                        setSecurityInfo((prev) => ({
-                          ...prev,
-                          oldPass: e.target.value,
-                        }))
-                      }
-                      placeholder="*********"
-                      className={`border-none bg-transparent p-0 text-xl placeholder:text-gray-400 focus-visible:ring-0 focus-visible:ring-offset-0 dark:bg-transparent `}
-                    />
+                    <div
+                      className={`flex items-center gap-2 h-16 rounded-[12px] border border-[#3A3A3A] px-3 shadow-sm  bg-[#18181B]`}
+                    >
+                      <Input
+                        value={securityInfo.oldPass}
+                        onChange={(e) =>
+                          setSecurityInfo((prev) => ({
+                            ...prev,
+                            oldPass: e.target.value,
+                          }))
+                        }
+                        placeholder="*********"
+                        className={`border-none bg-transparent p-0 text-xl placeholder:text-gray-400 focus-visible:ring-0 focus-visible:ring-offset-0 dark:bg-transparent `}
+                      />
+                    </div>
                   </div>
-                </div>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1">
-                  <Label className="text-[#D1D1D1]">New Password</Label>
+                    <Label className="text-[#D1D1D1]">New Password</Label>
 
-                  <div
-                    className={`flex items-center gap-2 h-16 rounded-[12px] border border-[#3A3A3A] px-3 shadow-sm  bg-[#18181B]`}
-                  >
-                    <Input
-                      value={securityInfo.newPass}
-                      onChange={(e) =>
-                        setSecurityInfo((prev) => ({
-                          ...prev,
-                          newPass: e.target.value,
-                        }))
-                      }
-                      placeholder="*********"
-                      className={`border-none bg-transparent p-0 text-xl placeholder:text-gray-400 focus-visible:ring-0 focus-visible:ring-offset-0 dark:bg-transparent `}
-                    />
+                    <div
+                      className={`flex items-center gap-2 h-16 rounded-[12px] border border-[#3A3A3A] px-3 shadow-sm  bg-[#18181B]`}
+                    >
+                      <Input
+                        value={securityInfo.newPass}
+                        onChange={(e) =>
+                          setSecurityInfo((prev) => ({
+                            ...prev,
+                            newPass: e.target.value,
+                          }))
+                        }
+                        placeholder="*********"
+                        className={`border-none bg-transparent p-0 text-xl placeholder:text-gray-400 focus-visible:ring-0 focus-visible:ring-offset-0 dark:bg-transparent `}
+                      />
+                    </div>
                   </div>
-                </div>
-                <div className="space-y-1">
-                  <Label className="text-[#D1D1D1]">Confirm New Password</Label>
+                  <div className="space-y-1">
+                    <Label className="text-[#D1D1D1]">Confirm New Password</Label>
 
-                  <div
-                    className={`flex items-center gap-2 h-16 rounded-[12px] border border-[#3A3A3A] px-3 shadow-sm  bg-[#18181B]`}
-                  >
-                    <Input
-                      value={securityInfo.confirmNewPass}
-                      onChange={(e) =>
-                        setSecurityInfo((prev) => ({
-                          ...prev,
-                          confirmNewPass: e.target.value,
-                        }))
-                      }
-                      placeholder="*********"
-                      className={`border-none bg-transparent p-0 text-xl placeholder:text-gray-400 focus-visible:ring-0 focus-visible:ring-offset-0 dark:bg-transparent `}
-                    />
+                    <div
+                      className={`flex items-center gap-2 h-16 rounded-[12px] border border-[#3A3A3A] px-3 shadow-sm  bg-[#18181B]`}
+                    >
+                      <Input
+                        value={securityInfo.confirmNewPass}
+                        onChange={(e) =>
+                          setSecurityInfo((prev) => ({
+                            ...prev,
+                            confirmNewPass: e.target.value,
+                          }))
+                        }
+                        placeholder="*********"
+                        className={`border-none bg-transparent p-0 text-xl placeholder:text-gray-400 focus-visible:ring-0 focus-visible:ring-offset-0 dark:bg-transparent `}
+                      />
+                    </div>
                   </div>
-                </div>
                 </div>
               </div>
             </TabsContent>
@@ -753,7 +757,7 @@ export default function Page() {
 const Header = ({ children }: { children: ReactNode }) => {
   return (
     <div className="flex w-full gap-4 justify-between flex-wrap items-center">
-      <div className="space-y-2">
+      <div className="space-y-1">
         <p className="text-xl">Settings</p>
         <span className="text-xs text-muted-foreground flex items-center">
           <span>Manage your account, preferences and integration</span>

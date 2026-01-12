@@ -27,7 +27,7 @@ const CardStatus = ({ value, type = "success", icon = null, className="" }: Card
             className={`px-2 py-1 justify-center rounded-full flex items-center gap-2 ${typeClasses[type]} ${className}`}
         >
             {icon && icon}
-            <p className="text-xs leading-none">
+            <p className="text-xs leading-none tracking-normal">
                 {value}
             </p>
         </div>

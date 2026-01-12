@@ -158,7 +158,7 @@ export default function Page() {
                         setTab(v);
                     }}
 
-                >
+                > 
                     <ScrollArea className={`overflow-x-auto ${isMobile && "max-w-[calc(100vw-64px)]"}`}>
                         <TabsList className="bg-transparent relative flex gap-2">
 
