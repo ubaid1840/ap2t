@@ -111,7 +111,9 @@ export const DASHBOARD_SESSIONS_COLUMNS: ColumnDef<SessionData>[] = [
             </Button>
         ),
         cell: ({ row }) => (
+            <div className="w-20">
           <CardStatus value={row.getValue("status")} type={row.original.status === "Confirmed" ? "active" : "alternative"}/>
+          </div>
         ),
     },
     {

@@ -50,6 +50,7 @@ const PageTable = ({
   totalCustomerText,
   onRowClick = (a: any, b: any) => { },
   loading = false,
+  headerClassName = ""
 }: any) => {
   // const [sorting, setSorting] = useState([]);
   // const [columnFilters, setColumnFilters] = useState([]);
@@ -112,10 +113,10 @@ const PageTable = ({
 
   return (
     <div className="flex flex-1 flex-col space-y-4">
-      <div className={`relative flex flex-1 flex-col ${isMobile && "min-h-[500px] max-w-[calc(100vw-44px)]"} `}>
-        <div className="flex rounded-md border md:overflow-auto">
-          <ScrollArea className="overflow-x-auto">
-            <Table className="relative">
+      <div className={`relative flex flex-1 flex-col ${isMobile && "max-w-[calc(100vw-44px)]"} `}>
+        <div className={`flex rounded-md border md:overflow-auto ${headerClassName}`}>
+          <ScrollArea className="overflow-x-auto flex flex-1">
+            <Table className="relative w-full">
               <TableHeader className="hover:bg-inherit">
                 {table.getHeaderGroups().map((headerGroup) => (
                   <TableRow key={headerGroup.id} className="bg-background hover:bg-inherit">
