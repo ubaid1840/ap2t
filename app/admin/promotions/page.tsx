@@ -2,6 +2,7 @@ import CardStatus from "@/components/card-status";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
     ArrowUpIcon,
@@ -9,9 +10,11 @@ import {
   DollarSign,
   Dot,
   Link,
+  NotebookPen,
   Plus,
   Recycle,
   Tag,
+  Trash,
   Users,
 } from "lucide-react";
 
@@ -162,10 +165,28 @@ export default function Page() {
                                 <h1 className="text-[#E5E7EB]">{promotion.revenue}</h1>
                         </div>
                     </div>
-                    <div className="bg-info-bg text-info-text flex justify-between rounded-2xl">
+                    <div className="bg-info-bg text-info-text flex justify-between rounded-2xl p-4">
                         <div className="flex gap-2">
                             <Link/> <h1>Square Checkout</h1>
                         </div>
+                        <div>
+                            <Button variant={"link"}>View link</Button>
+                        </div>
+                    </div>
+
+                    <div className="bg-[#D3FB2033] text-primary flex justify-between rounded-2xl p-4">
+                        <div className="flex gap-2">
+                            <Link/> <h1>Visible on Storefront</h1>
+                        </div>
+                        <div>
+                            <Button variant={"link"}>Users can sign up</Button>
+                        </div>
+                    </div>
+                    <Separator/>
+                    <div className="flex gap-2">
+                        <Button variant={"outline"} className="gap-2 flex-3"><Users/> Users can sign up</Button>
+                        <Button variant={"outline"} className="flex-1"><NotebookPen/></Button>
+                        <Button className="bg-[#FF690033] border border-[#FF69004D]"><Trash/></Button>
                     </div>
 
             </div>
@@ -183,7 +204,7 @@ const Promotions=[
     {
         status:"Active",
         liveOn:"Live on Storefront",
-        image:"",
+        image:"/public/promotionCardHero.png",
         title:"5-Pack Basketball Training",
         description:"Get 5 basketball training sessions at a discounted",
         price:"$200",
