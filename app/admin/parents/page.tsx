@@ -3,13 +3,13 @@
 import PageTable from "@/components/app-table"
 import InputWithIcon from "@/components/input-with-icon"
 import { PARENT_COLUMNS } from "@/components/parents/columns"
-import { PARENT_DATA, PARENT_TABLE_HEADER } from "@/components/parents/constatns"
+import { PARENT_DATA } from "@/components/parents/constatns"
 import Header from "@/components/parents/header"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
-import { Download, Filter, Plus, Search } from "lucide-react"
+import { Download, Filter, Plus } from "lucide-react"
 import { useState } from "react"
 
 
@@ -68,7 +68,6 @@ export default function Page() {
             <PageTable
                 columns={PARENT_COLUMNS}
                 data={PARENT_DATA}
-                tableHeader={PARENT_TABLE_HEADER}
                 onRowClick={() => {
 
                 }}

@@ -1,21 +1,10 @@
-import { Calendar, Clock, User } from "lucide-react"
-import { Card, CardContent, CardFooter, CardHeader } from "../ui/card"
+import { Calendar } from "lucide-react"
+import PageTable from "../app-table"
 import { Button } from "../ui/button"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "../ui/table"
-import { Badge } from "../ui/badge"
-import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar"
-import getInitials from "../parents/get-initials";
-import { cn } from "@/lib/utils"
-import Link from "next/link"
-import { ScrollArea } from "../ui/scroll-area"
-export function UpcomingSessions() {
+import { Card, CardFooter, CardHeader } from "../ui/card"
+import { DASHBOARD_SESSIONS_COLUMNS } from "./columns"
+import { DASHBOARD_SESSIONS, DASHBOARD_TABLE_HEADER } from "./constants"
+export function  UpcomingSessions() {
   return (
     <Card className="bg-[#252525] flex flex-col h-full p-0 border border-[#3A3A3A]">
 
@@ -34,7 +23,7 @@ export function UpcomingSessions() {
       </CardHeader>
 
 
-      <CardContent className="flex-1 px-0">
+      {/* <CardContent className="flex-1 px-0">
         <Table >
 
           <TableHeader className="bg-[#1A1A1A]  font-bold  tracking-wider">
@@ -103,7 +92,15 @@ export function UpcomingSessions() {
             ))}
           </TableBody>
         </Table>
-      </CardContent>
+      </CardContent> */}
+
+       <PageTable
+                columns={DASHBOARD_SESSIONS_COLUMNS}
+                data={DASHBOARD_SESSIONS}
+                onRowClick={() => {
+
+                }}
+            />
 
 
       <CardFooter className="flex items-center justify-between bg-[#1A1A1A] px-6 py-4">
@@ -121,65 +118,3 @@ export function UpcomingSessions() {
 
 
 
-const sessions = [
-  {
-    player: {
-      img: <User />,
-      name: "Emma Johnson"
-    },
-    sessiontype: "Basketball Training",
-    coach: "Coach Martinez",
-    time: "2:00 PM - 3:30 PM",
-    status: "Confirmed"
-  },
-  {
-    player: {
-      img: <User />,
-      name: "Emma Johnson"
-    },
-    sessiontype: "Basketball Training",
-    coach: "Coach Martinez",
-    time: "2:00 PM - 3:30 PM",
-    status: "Confirmed"
-  },
-  {
-    player: {
-      img: <User />,
-      name: "Emma Johnson"
-    },
-    sessiontype: "Basketball Training",
-    coach: "Coach Martinez",
-    time: "2:00 PM - 3:30 PM",
-    status: "Confirmed"
-  },
-  {
-    player: {
-      img: <User />,
-      name: "Emma Johnson"
-    },
-    sessiontype: "Basketball Training",
-    coach: "Coach Martinez",
-    time: "2:00 PM - 3:30 PM",
-    status: "Pending"
-  },
-  {
-    player: {
-      img: <User />,
-      name: "Emma Johnson"
-    },
-    sessiontype: "Basketball Training",
-    coach: "Coach Martinez",
-    time: "2:00 PM - 3:30 PM",
-    status: "Confirmed"
-  },
-  {
-    player: {
-      img: <User />,
-      name: "Emma Johnson"
-    },
-    sessiontype: "Basketball Training",
-    coach: "Coach Martinez",
-    time: "2:00 PM - 3:30 PM",
-    status: "Pending"
-  },
-]

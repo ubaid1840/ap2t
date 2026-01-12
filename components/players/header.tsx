@@ -8,7 +8,7 @@ const Header = ({ children }: { children: ReactNode }) => {
                 <p className="text-xl">Players Management</p>
                 <span className="text-xs text-muted-foreground flex items-center">
                     <span>8 of 8 players{' '}</span>
-                    <span className="text-[#FDC700] inline-flex"> <Dot size={16} /> 1 with low attendance</span>
+                    <span className="text-[#FF6467] inline-flex"> <Dot size={16} /> 1 with low attendance</span>
                 </span>
             </div>
 

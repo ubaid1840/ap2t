@@ -11,6 +11,7 @@ import { Bell, ChevronDown } from "lucide-react"
 import InputWithIcon from "./input-with-icon"
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar"
 import { Separator } from "./ui/separator"
+import { SidebarTrigger } from "./ui/sidebar"
 
 
 export default function DashboardHeader() {
@@ -18,9 +19,11 @@ export default function DashboardHeader() {
 
     return (
         <div className="flex flex-1 w-full h-full py-4 px-4">
-            <div className="w-full flex justify-between flex-wrap">
-
+            <div className="w-full flex justify-between flex-wrap items-center">
+                <div className="flex gap-4 items-center">
+            <SidebarTrigger />
                 <InputWithIcon className={isMobile ? "hidden" : "w-100"} placeholder="Search player, coaches, sessions..."/>
+                </div>
                 <div className="flex gap-4 items-center">
 
                     <NotificationBadge count={1} />

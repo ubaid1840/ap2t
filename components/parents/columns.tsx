@@ -1,15 +1,15 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { ColumnDef } from "@tanstack/react-table";
-import { ArrowUpDown, Eye, Mail, Phone, Users } from "lucide-react";
+import { ArrowUpDown, CircleCheckBig, CircleX, Eye, Info, Mail, Phone, Users } from "lucide-react";
 import Link from "next/link";
 import { IoIosPin } from "react-icons/io";
-import CardStatus from "./card-status";
 import getInitials from "./get-initials";
+import CardStatus from "../card-status";
 
 
 export interface ParentData {
-    id : number
+    id: number
     name: string;
     joining_date: string;
     email: string;
@@ -28,10 +28,11 @@ export const PARENT_COLUMNS: ColumnDef<ParentData>[] = [
         header: ({ column }) => (
             <Button
                 variant="ghost"
-                className="dark:hover:bg-transparent dark:hover:text-white/50"
+                className="text-[#99A1AF] text-[12px] tracking-wider dark:hover:bg-transparent dark:hover:text-white/50"
+
                 onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
             >
-                Parent Name
+                PARENT NAME
                 <ArrowUpDown />
             </Button>
         ),
@@ -58,10 +59,11 @@ export const PARENT_COLUMNS: ColumnDef<ParentData>[] = [
         header: ({ column }) => (
             <Button
                 variant="ghost"
-                className="dark:hover:bg-transparent dark:hover:text-white/50"
+                className="text-[#99A1AF] text-[12px] tracking-wider dark:hover:bg-transparent dark:hover:text-white/50"
+
                 onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
             >
-                Contact Info
+                CONTACT INFO
                 <ArrowUpDown />
             </Button>
         ),
@@ -81,10 +83,11 @@ export const PARENT_COLUMNS: ColumnDef<ParentData>[] = [
         header: ({ column }) => (
             <Button
                 variant="ghost"
-                className="dark:hover:bg-transparent dark:hover:text-white/50"
+                className="text-[#99A1AF] text-[12px] tracking-wider dark:hover:bg-transparent dark:hover:text-white/50"
+
                 onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
             >
-                Location
+                LOCATION
                 <ArrowUpDown />
             </Button>
         ),
@@ -99,10 +102,11 @@ export const PARENT_COLUMNS: ColumnDef<ParentData>[] = [
         header: ({ column }) => (
             <Button
                 variant="ghost"
-                className="dark:hover:bg-transparent dark:hover:text-white/50"
+                className="text-[#99A1AF] text-[12px] tracking-wider dark:hover:bg-transparent dark:hover:text-white/50"
+
                 onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
             >
-                Children
+                CHILDREN
                 <ArrowUpDown />
             </Button>
         ),
@@ -117,26 +121,36 @@ export const PARENT_COLUMNS: ColumnDef<ParentData>[] = [
         header: ({ column }) => (
             <Button
                 variant="ghost"
-                className="dark:hover:bg-transparent dark:hover:text-white/50"
+                className="text-[#99A1AF] text-[12px] tracking-wider dark:hover:bg-transparent dark:hover:text-white/50"
+
                 onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
             >
-                Card Status
+                CARD STATUS
                 <ArrowUpDown />
             </Button>
         ),
-        cell: ({ row }) => (
-            <CardStatus text={row.original.card_status} />
-        ),
+        cell: ({ row }) => {
+            const Valid = () => <CircleCheckBig size={14} />
+            const Expired = () => <Info size={14} />
+            const NoCard = () => <CircleX size={14} />
+            const Error = () => <Info size={14} />
+            return (
+                 <div className="w-30">
+                <CardStatus value={row.original.card_status} type={row.original.card_status === "Active" ? "success" : row.original.card_status === "Expired" ? "warning" : row.original.card_status === "No Card" ? "ghost" : "danger"} icon={row.original.card_status === "Active" ? <Valid /> : row.original.card_status === "Expired" ? <Expired /> : row.original.card_status === "No Card" ? <NoCard /> : <Error />} />
+                </div>
+            )
+        },
     },
     {
         accessorKey: "total_spent",
         header: ({ column }) => (
             <Button
                 variant="ghost"
-                className="dark:hover:bg-transparent dark:hover:text-white/50"
+                className="text-[#99A1AF] text-[12px] tracking-wider dark:hover:bg-transparent dark:hover:text-white/50"
+
                 onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
             >
-                Total Spent
+                TOTAL SPENT
                 <ArrowUpDown />
             </Button>
         ),
@@ -154,16 +168,17 @@ export const PARENT_COLUMNS: ColumnDef<ParentData>[] = [
     },
     {
         id: "actions",
-        header: "Action",
+        header: () => <div className="text-[#99A1AF] text-[12px] tracking-wider dark:hover:bg-transparent dark:hover:text-white/50"
+        >ACTIONS</div>,
         cell: ({ row }) => (
             <Link href={`/admin/parents/${row.original.id}`}>
-            <Button
-                onClick={(e) => {
-                    e.stopPropagation();
-                }}
-            >
-                <Eye /> View
-            </Button>
+                <Button
+                    onClick={(e) => {
+                        e.stopPropagation();
+                    }}
+                >
+                    <Eye /> View
+                </Button>
             </Link>
         ),
     },

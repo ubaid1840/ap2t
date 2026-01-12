@@ -1,4 +1,4 @@
-import { CircleCheckBig, CircleX, Info, TrendingDown, TrendingUp } from "lucide-react"
+import { Info, TrendingDown, TrendingUp } from "lucide-react";
 
 interface CardStatusProps {
   value: number;

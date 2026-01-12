@@ -14,11 +14,11 @@ const AppCalendar = ({ date, onChange, required = false } : {date : Date | undef
         <Button
           variant={"outline"}
           className={cn(
-            "w-full pl-3 text-left font-normal rounded",
+            "w-full h-9 rounded-md dark:bg-[#1A1A1A]",
             !date && "text-muted-foreground"
           )}
         >
-          {date ? format(date, "PPP") : <span>Pick a date</span>}
+          {date ? format(date, "PPP") : <p className="text-[14px] font-normal">Pick a date</p>}
           <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
         </Button>
       </PopoverTrigger>
