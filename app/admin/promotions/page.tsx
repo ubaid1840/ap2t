@@ -415,10 +415,10 @@ export default function Page() {
           <p>Filter by status:</p>
 
           <div className="flex gap-4">
-            <Button className=" text-sm">All</Button>
-            <Button className=" text-sm">Active</Button>
-            <Button className=" text-sm">Upcoming</Button>
-            <Button className=" text-sm">Archived</Button>
+            <Button className={`text-sm ${filter==="All"?"":"bg-[#1A1A1A] text-[#99A1AF]"}`} onClick={()=>setFilter("All")}>All</Button>
+            <Button className={`text-sm ${filter==="Active"?"":"bg-[#1A1A1A] text-[#99A1AF]"}`} onClick={()=>setFilter("Active")}>Active</Button>
+            <Button className={`text-sm ${filter==="Upcoming"?"":"bg-[#1A1A1A] text-[#99A1AF]"}`} onClick={()=>setFilter("Upcoming")}>Upcoming</Button>
+            <Button className={`text-sm ${filter==="Archive"?"":"bg-[#1A1A1A] text-[#99A1AF]"}`} onClick={()=>setFilter("Archive")}>Archive</Button>
           </div>
         </div>
 
