@@ -1,6 +1,6 @@
 "use client"
 import BackButton from "@/components/back-button"
-import { BarChart } from "@/components/bar-chart"
+import { BarChart } from "@/components/charts/bar-chart"
 import CardStatus from "@/components/card-status"
 import { AddCoachNotes } from "@/components/players/add-coach-notes"
 import { PlayersData } from "@/components/players/columns"
@@ -229,7 +229,7 @@ export default function Page() {
                         <p>Last 12 weeks</p>
                         <p className="text-muted-foreground text-xs">Track attendance patterns over time</p>
 
-                        <BarChart chartData={CHECKINS_12WEEKS_DATA} />
+                        <BarChart chartData={CHECKINS_12WEEKS_DATA} yaxis={"checkins"} xaxis={"time"}/>
                     </TabsContent>
 
                     <TabsContent value="Payment Status" className="space-y-4 p-2">
@@ -327,7 +327,7 @@ export default function Page() {
 const HeaderCard = ({ title = "", description = "", icon = null }: { title: string, description: string, icon: ReactNode }) => {
 
     return (
-        <Card className="rounded-[10px] bg-[#1A1A1A] border-[#3A3A3A] w-[204px] p-0 py-2 px-4">
+        <Card className="rounded-[10px] bg-[#1A1A1A] border-[#3A3A3A] sm:w-[204px] w-fit p-0 py-2 px-4">
             <CardContent className="p-0">
                 <div className="flex gap-2 items-center">
                     {icon}

@@ -135,7 +135,7 @@ export const PARENT_COLUMNS: ColumnDef<ParentData>[] = [
             const NoCard = () => <CircleX size={14} />
             const Error = () => <Info size={14} />
             return (
-                 <div className="w-30">
+                 <div className="w-25">
                 <CardStatus value={row.original.card_status} type={row.original.card_status === "Active" ? "success" : row.original.card_status === "Expired" ? "warning" : row.original.card_status === "No Card" ? "ghost" : "danger"} icon={row.original.card_status === "Active" ? <Valid /> : row.original.card_status === "Expired" ? <Expired /> : row.original.card_status === "No Card" ? <NoCard /> : <Error />} />
                 </div>
             )
