@@ -12,13 +12,14 @@ import InputWithIcon from "./input-with-icon"
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar"
 import { Separator } from "./ui/separator"
 import { SidebarTrigger } from "./ui/sidebar"
+import NotificationSheet from "./notification-sheet"
 
 
 export default function DashboardHeader() {
     const isMobile = useIsMobile()
 
     return (
-        <div className="flex flex-1 w-full h-full py-4 px-4">
+        <div className="flex flex-1 w-full h-full py-3 px-4">
             <div className="w-full flex justify-between flex-wrap items-center">
                 <div className="flex gap-4 items-center">
             <SidebarTrigger />
@@ -26,7 +27,7 @@ export default function DashboardHeader() {
                 </div>
                 <div className="flex gap-4 items-center">
 
-                    <NotificationBadge count={1} />
+                    <NotificationSheet />
                     <Separator orientation="vertical" />
                     <div>
                         <p className="text-xs text-white text-right">Admin</p>
@@ -53,14 +54,4 @@ export default function DashboardHeader() {
 
 }
 
-const NotificationBadge = ({ count }: { count?: number | null }) => {
-  return (
-    <div className="relative inline-block">
-      <Bell size={20} />
 
-      {count && count > 0 && (
-        <span className="absolute -top-1 -right-1 block w-2 h-2 bg-red-500 rounded-full" />
-      )}
-    </div>
-  );
-};

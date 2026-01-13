@@ -7,7 +7,8 @@ import { EditParents } from "@/components/parents/edit-parents"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
+import { ScrollArea } from "@/components/ui/scroll-area"
+import { Scrollbar } from "@radix-ui/react-scroll-area"
 import { Separator } from "@/components/ui/separator"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useIsMobile } from "@/hooks/use-mobile"
@@ -40,7 +41,8 @@ export default function Page() {
                 <CardContent>
                     <div className="w-full flex justify-between flex-wrap gap-4">
                         <div className="flex flex-col gap-2">
-                            <span className="flex gap-2 text-xl items-center">{data?.name} <span><CardStatus value={data?.card_status || ""} type="active" icon={<CircleCheckBig size={14}/>}/></span></span>
+                            <span className="flex gap-2 text-xl items-center">{data?.name} <span>
+                                <CardStatus value={data?.card_status || ""} type="active" icon={<CircleCheckBig size={14}/>}/></span></span>
                             <div className="text-[#D1D5DC] text-xs flex flex-col gap-2">
                                 <span className="inline-flex gap-2 "><Mail size={14} /> {data?.email}</span>
                                 <span className="inline-flex gap-2"><Phone size={14} /> {data?.number}</span>
@@ -95,7 +97,7 @@ export default function Page() {
                     }}
 
                 >
-                    <ScrollArea className={`overflow-x-auto ${isMobile && "max-w-[calc(100vw-64px)]"}`}>
+                   <ScrollArea className={`overflow-x-auto ${isMobile && "max-w-[calc(100vw-64px)]"}`}>
                         <TabsList className="bg-transparent relative flex gap-2">
                             {["linked", "history", "payment"].map((t) => (
                                 <TabsTrigger
@@ -109,7 +111,7 @@ export default function Page() {
                                 </TabsTrigger>
                             ))}
                         </TabsList>
-                        <ScrollBar orientation="horizontal" />
+                        <Scrollbar orientation="horizontal" />
                     </ScrollArea>
                     <Separator />
 
@@ -288,7 +290,7 @@ const CardStatusHistory = ({ text = "" }: { text: string }) => {
 const HeaderCard = ({ title = "", description = "", icon = null }: { title: string, description: string, icon: ReactNode }) => {
 
     return (
-        <Card className="rounded-[10px] bg-[#1A1A1A] border-[#3A3A3A] w-[250px]">
+        <Card className="rounded-[10px] bg-[#1A1A1A] border-[#3A3A3A] sm:w-[250px] w-full">
             <CardContent>
                 <div className="flex gap-4 items-center">
                     {icon}

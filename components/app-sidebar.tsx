@@ -37,8 +37,8 @@ export default function AppSidebar() {
   return (
     <Sidebar collapsible="icon">
       <SidebarHeader className="border-b">
-        <div className="flex w-full align-center justify-center py-2">
-          <div className="w-35 h-[37px]  rounded-full bg-black overflow-hidden">
+        <div className="flex w-full align-center justify-center py-1">
+          <div className="w-35 h-9.25  rounded-full bg-black overflow-hidden">
             <img
               src={company.logo}
               alt="AP2T LOGO"
@@ -88,10 +88,10 @@ export default function AppSidebar() {
       <SidebarFooter className="border-t py-5">
         <SidebarMenu>
           <SidebarMenuItem>
-            <div className="flex flex-col gap-1 w-full bg-primary rounded-[8px] p-4">
+            <div className="flex flex-col gap-1 w-full bg-primary rounded-xl p-4">
               <p className="text-xs text-[#282828]">Need Help?</p>
               <p className="text-md text-[#282828]">Contact Support</p>
-              <Button className="bg-black text-primary rounded-[8px]">
+              <Button className="bg-black text-primary rounded-xl">
                 Get Support
               </Button>
             </div>

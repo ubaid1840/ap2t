@@ -121,7 +121,7 @@
 .dark {
   --background: #0a0a0a;
   --foreground: #ffffff;
-  --card: #454545;
+  --card: #252525;
   --card-foreground: #ffffff;
   --popover: #454545;
   --popover-foreground: #ffffff;
@@ -139,10 +139,10 @@
   --input: #3a3a3a;
   --ring: #d3fb20;
   --chart-1: #d3fb20;
-  --chart-2: #454545;
-  --chart-3: #5a5a5a;
-  --chart-4: #cbfd00;
-  --chart-5: #98c91e;
+  --chart-2: #2f6b1f;
+  --chart-3: #4f9a2a;
+  --chart-4: #b6f200;
+  --chart-5: #7fbf1a;
   --notification-primary: #cbfd0026;
   --sidebar: #252525;
   --sidebar-foreground: #b0b0b0;

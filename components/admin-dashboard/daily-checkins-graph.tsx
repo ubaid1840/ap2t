@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader } from "../ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
-import { BarChart } from "@/components/bar-chart";
+import { BarChart } from "@/components/charts/bar-chart";
 import { CHECKINS_CHART_DATA } from "./constants";
 
 export function DailyCheckins() {
@@ -31,21 +31,21 @@ export function DailyCheckins() {
         <TabsContent value="Today">
           <CardContent>
             {/* Bar chart for Today */}
-            <BarChart chartData={CHECKINS_CHART_DATA.today} />
+            <BarChart chartData={CHECKINS_CHART_DATA.today} xaxis="time" yaxis="checkins" />
           </CardContent>
         </TabsContent>
 
         <TabsContent value="Weekly">
           <CardContent>
             {/* Bar chart for Weekly */}
-            <BarChart chartData={CHECKINS_CHART_DATA.week} />
+            <BarChart chartData={CHECKINS_CHART_DATA.week} xaxis="time" yaxis="checkins"/>
           </CardContent>
         </TabsContent>
 
         <TabsContent value="Monthly">
           <CardContent>
             {/* Bar chart for Monthly */}
-            <BarChart chartData={CHECKINS_CHART_DATA.month} />
+            <BarChart chartData={CHECKINS_CHART_DATA.month} xaxis="time" yaxis="checkins"/>
           </CardContent>
         </TabsContent>
       </Tabs>

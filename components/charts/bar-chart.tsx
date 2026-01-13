@@ -26,7 +26,7 @@ const chartConfig = {
   },
 } satisfies ChartConfig
 
-export function BarChart({chartData = []} : {chartData : any[]}) {
+export function BarChart({chartData = [], xaxis, yaxis} : {chartData : any[], xaxis : string, yaxis : string}) {
   return (
    
         <ChartContainer config={chartConfig} className="mt-4">
@@ -34,7 +34,7 @@ export function BarChart({chartData = []} : {chartData : any[]}) {
             <CartesianGrid vertical={false} />
 
             <XAxis
-              dataKey="time"
+              dataKey={xaxis}
               tickLine={false}
               axisLine={false}
               tickMargin={10}
@@ -55,7 +55,7 @@ export function BarChart({chartData = []} : {chartData : any[]}) {
             />
 
             <Bar
-              dataKey="checkins"
+              dataKey={yaxis}
               fill="var(--color-checkins)"
               radius={8}
             />
