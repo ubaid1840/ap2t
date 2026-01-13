@@ -439,8 +439,6 @@ export default function Page() {
                 </p>
               </div>
 
-              
-
               <Card className="bg-info-bg/40 p-3 border-info-text/30">
                 <CardContent className="p-0">
                   <div className="flex gap-4 items-start">
