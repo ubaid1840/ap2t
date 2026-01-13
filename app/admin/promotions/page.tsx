@@ -19,7 +19,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { DialogTrigger } from "@radix-ui/react-dialog";
 import {
   Archive,
-  ArrowUpIcon,
   Calendar,
   DollarSign,
   Dot,
@@ -31,11 +30,12 @@ import {
   Recycle,
   ShoppingBag,
   Tag,
-  Trash,
+  TrendingUp,
   Users,
 } from "lucide-react";
 import { useState } from "react";
 import { GoDotFill } from "react-icons/go";
+
 
 const localData = [
   {
@@ -97,7 +97,8 @@ export default function Page() {
     displayOnWebsite: false,
   });
 
-  const createPromotion = () => {
+  const createPromotion = (e:React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
     console.log(addPromotion);
   };
 
@@ -170,8 +171,9 @@ export default function Page() {
                   Auto-syncs with Square and appears on online store
                 </p>
               </DialogHeader>
-              <ScrollArea className="flex-1 max-h-[70dvh] py-1">
-                <form onSubmit={createPromotion} className="space-y-4 px-4">
+              <form onSubmit={createPromotion} className="">
+                <ScrollArea className="h-[70dvh] py-1 space-y-4 px-2">
+                  <div className="space-y-2 px-2">
                   <div className="flex gap-2 text-md ">
                     <Tag className="text-primary" />
                     <h1 className="text-[#F3F4F6]">Promotion Details</h1>
@@ -181,12 +183,12 @@ export default function Page() {
                       Promotion Title *
                     </Label>
                     <Input
-                    name="promotionTitle"
+                      name="promotionTitle"
                       placeholder="e.g., 5-Pack Basketball Training"
                       className="!bg-[#1A1A1A] !border-[#3A3A3A] !text-[#E5E7EB] !p-5"
                       required
                       value={addPromotion.promotionTitle}
-                       onChange={handleChange}
+                      onChange={handleChange}
                     />
                   </div>
 
@@ -195,12 +197,12 @@ export default function Page() {
                       Description *
                     </Label>
                     <Textarea
-                    name="description"
+                      name="description"
                       placeholder="Describe the promotion offer and what's included..."
                       className="!bg-[#1A1A1A] !border-[#3A3A3A] !text-[#E5E7EB] !p-5"
                       required
                       value={addPromotion.description}
-                       onChange={handleChange}
+                      onChange={handleChange}
                     />
                   </div>
 
@@ -214,12 +216,12 @@ export default function Page() {
                       Image URL *
                     </Label>
                     <Input
-                    name="imageUrl"
+                      name="imageUrl"
                       placeholder="https://example.com/image.jpg"
                       className="!bg-[#1A1A1A] !border-[#3A3A3A] !text-[#E5E7EB] !p-5"
                       required
                       value={addPromotion.imageUrl}
-                       onChange={handleChange}
+                      onChange={handleChange}
                     />
                     <p className="text-[#6A7282] text-sm">
                       Enter the URL of your promotional flyer image. Rec
@@ -237,12 +239,12 @@ export default function Page() {
                         Promotion Price *
                       </Label>
                       <Input
-                      name="promotionPrice"
+                        name="promotionPrice"
                         placeholder="200.00"
                         className="!bg-[#1A1A1A] !border-[#3A3A3A] !text-[#E5E7EB] !p-5"
                         required
                         value={addPromotion.promotionPrice}
-                         onChange={handleChange}
+                        onChange={handleChange}
                       />
                     </div>
                     <div className="space-y-2">
@@ -250,12 +252,12 @@ export default function Page() {
                         Original Price (Optional)
                       </Label>
                       <Input
-                      name="orignalPrice"
+                        name="orignalPrice"
                         placeholder="250.00"
                         className="!bg-[#1A1A1A] !border-[#3A3A3A] !text-[#E5E7EB] !p-5"
                         required
                         value={addPromotion.originalPrice}
-                         onChange={handleChange}
+                        onChange={handleChange}
                       />
                     </div>
                   </div>
@@ -271,21 +273,20 @@ export default function Page() {
                         Start Date *
                       </Label>
                       <Input
-                      name="startDate"
+                        name="startDate"
                         placeholder=""
                         className="!bg-[#1A1A1A] !border-[#3A3A3A] !text-[#E5E7EB] !p-5"
                         required
                         value={addPromotion.startDate}
-                         onChange={handleChange}
+                        onChange={handleChange}
                       />
                     </div>
                     <div className="space-y-2">
-                      
                       <Label className="text-sm text-[#99A1AF]">
                         End Date *
                       </Label>
                       <Input
-                      name="endDate"
+                        name="endDate"
                         placeholder=""
                         className="!bg-[#1A1A1A] !border-[#3A3A3A] !text-[#E5E7EB] !p-5"
                         required
@@ -313,7 +314,7 @@ export default function Page() {
                       Square Checkout URL *
                     </Label>
                     <Input
-                    name="sqrCheckOutUrl"
+                      name="sqrCheckOutUrl"
                       placeholder="https://square.link/u/promotion-name"
                       className="!bg-[#1A1A1A] !border-[#3A3A3A] !text-[#E5E7EB] !p-5"
                       required
@@ -333,7 +334,7 @@ export default function Page() {
 
                   <div className="flex items-center gap-4 px-8 bg-[#1A1A1A] border border-[#3A3A3A] rounded-[10px] p-2">
                     <Checkbox
-                    name="showOnStoreFront"
+                      name="showOnStoreFront"
                       checked={addPromotion.showOnStoreFront}
                       onCheckedChange={handleCheckboxChange}
                     />
@@ -358,28 +359,29 @@ export default function Page() {
                       checkout)
                     </p>
                   </div>
-                </form>
-              </ScrollArea>
-              <div className="p-2 space-y-1">
-                <div className="flex gap-4 border-t border-[#3A3A3A] ">
-                  <DialogClose className="flex-1">
-                    <Button className="bg-[#1A1A1A] border border-[#3A3A3A] w-full text-[#D1D5DC] text-md font-semibold py-5">
-                      Cencel
-                    </Button>
-                  </DialogClose>
-                  <Button
-                    type="submit"
-                    
-                    className="flex-1 text-md font-semibold py-5"
-                  >
-                    Create Promotion & Sync to Square
-                  </Button>
+                  </div>
+                </ScrollArea>
+                <div className="p-2 space-y-1">
+                  <div className="flex gap-4 border-t border-[#3A3A3A] ">
+                    <DialogClose className="flex-1">
+                      <Button className="bg-[#1A1A1A] border border-[#3A3A3A] w-full text-[#D1D5DC] text-md font-semibold py-5">
+                        Cancel
+                      </Button>
+                    </DialogClose>
+                     <Button
+                  type="submit"
+                  className="flex-1 text-md font-semibold py-5"
+                >
+                  Create Promotion & Sync to Square
+                </Button>
+                  </div>
+                  <p className="text-sm text-[#6A7282] text-center">
+                    Promotion will automatically sync with Square and appear on
+                    storefront
+                  </p>
                 </div>
-                <p className="text-sm text-[#6A7282] text-center">
-                  Promotion will automatically sync with Square and appear on
-                  storefront
-                </p>
-              </div>
+               
+              </form>
             </DialogContent>
           </Dialog>
         </div>
@@ -481,7 +483,7 @@ export default function Page() {
 
                   <div className="rounded-2xl border border-border space-y-2 p-4 bg-[#1A1A1A]">
                     <div className="flex gap-2">
-                      <ArrowUpIcon />
+                      <TrendingUp />
                       <p className="text-sm text-[#99A1AF]">Revenue</p>
                     </div>
                     <h1 className="text-[#E5E7EB]">{promotion.revenue}</h1>
@@ -526,10 +528,9 @@ export default function Page() {
                           Update promotion details
                         </p>
                       </DialogHeader>
-                      <ScrollArea className="flex-1 max-h-[70dvh] py-1">
-                        <form
-                          onSubmit={changePromotion}
-                          className="space-y-4 px-4"
+                      <form onSubmit={changePromotion} className="">
+                      <ScrollArea className="h-[70dvh] py-1">
+                        <div className="space-y-4 px-4"
                         >
                           <div className="flex gap-2 text-md ">
                             <Tag className="text-primary" />
@@ -542,7 +543,7 @@ export default function Page() {
                               Promotion Title *
                             </Label>
                             <Input
-                            name="promotionTitle"
+                              name="promotionTitle"
                               placeholder="e.g., 5-Pack Basketball Training"
                               className="!bg-[#1A1A1A] !border-[#3A3A3A] !text-[#E5E7EB] !p-5"
                               required
@@ -556,7 +557,7 @@ export default function Page() {
                               Description *
                             </Label>
                             <Textarea
-                            name="description"
+                              name="description"
                               placeholder="Describe the promotion offer and what's included..."
                               className="!bg-[#1A1A1A] !border-[#3A3A3A] !text-[#E5E7EB] !p-5"
                               required
@@ -577,7 +578,7 @@ export default function Page() {
                               Image URL *
                             </Label>
                             <Input
-                            name="imageUrl"
+                              name="imageUrl"
                               placeholder="https://example.com/image.jpg"
                               className="!bg-[#1A1A1A] !border-[#3A3A3A] !text-[#E5E7EB] !p-5"
                               required
@@ -607,7 +608,7 @@ export default function Page() {
                                 Promotion Price *
                               </Label>
                               <Input
-                              name="promotionPrice"
+                                name="promotionPrice"
                                 placeholder="200.00"
                                 className="!bg-[#1A1A1A] !border-[#3A3A3A] !text-[#E5E7EB] !p-5"
                                 required
@@ -620,7 +621,7 @@ export default function Page() {
                                 Original Price (Optional)
                               </Label>
                               <Input
-                              name="orignalPrice"
+                                name="orignalPrice"
                                 placeholder="250.00"
                                 className="!bg-[#1A1A1A] !border-[#3A3A3A] !text-[#E5E7EB] !p-5"
                                 required
@@ -643,7 +644,7 @@ export default function Page() {
                                 Start Date *
                               </Label>
                               <Input
-                              name="startDate"
+                                name="startDate"
                                 placeholder=""
                                 className="!bg-[#1A1A1A] !border-[#3A3A3A] !text-[#E5E7EB] !p-5"
                                 required
@@ -656,7 +657,7 @@ export default function Page() {
                                 End Date *
                               </Label>
                               <Input
-                              name="endDate"
+                                name="endDate"
                                 placeholder=""
                                 className="!bg-[#1A1A1A] !border-[#3A3A3A] !text-[#E5E7EB] !p-5"
                                 required
@@ -676,7 +677,7 @@ export default function Page() {
                               Square Checkout URL *
                             </Label>
                             <Input
-                            name="sqrCheckOutUrl"
+                              name="sqrCheckOutUrl"
                               placeholder="https://square.link/u/promotion-name"
                               className="!bg-[#1A1A1A] !border-[#3A3A3A] !text-[#E5E7EB] !p-5"
                               required
@@ -692,7 +693,7 @@ export default function Page() {
 
                           <div className="flex items-center gap-4 px-8 bg-[#1A1A1A] border border-[#3A3A3A] rounded-[10px] p-2">
                             <Checkbox
-                            name="displayOnWebsite"
+                              name="displayOnWebsite"
                               checked={editPromotion.displayOnWebsite}
                               onCheckedChange={handleEditCheckboxChange}
                             />
@@ -706,7 +707,7 @@ export default function Page() {
                               </p>
                             </div>
                           </div>
-                        </form>
+                        </div>
                       </ScrollArea>
                       <div className="p-2 space-y-1">
                         <div className="flex gap-4 border-t border-[#3A3A3A] ">
@@ -715,14 +716,13 @@ export default function Page() {
                               Cencel
                             </Button>
                           </DialogClose>
-                          <Button
-                            onClick={changePromotion}
-                            className="flex-1 text-md font-semibold py-5"
+                          <Button className="flex-1 text-md font-semibold py-5"
                           >
                             Create Promotion & Sync to Square
                           </Button>
                         </div>
                       </div>
+                      </form>
                     </DialogContent>
                   </Dialog>
 
