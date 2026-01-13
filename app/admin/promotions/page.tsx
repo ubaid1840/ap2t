@@ -1,16 +1,27 @@
+import CardStatus from "@/components/card-status";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogHeader } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { DialogTrigger } from "@radix-ui/react-dialog";
 import {
+  ArrowUpIcon,
   Calendar,
   DollarSign,
   Dot,
+  Link,
+  NotebookPen,
   Plus,
   Recycle,
   Tag,
+  Trash,
   Users,
 } from "lucide-react";
+import { GoDotFill } from "react-icons/go";
 
 const localData = [
   {
@@ -54,13 +65,35 @@ export default function Page() {
           </p>
         </div>
 
-        <div className="flex gap-4">
-          <Button variant={"outline"} className="gap-2">
+        <div className="flex items-center gap-4">
+          <Button variant={"outline"} className="gap-2 text-sm">
             <Recycle /> Sync with Square
           </Button>
-          <Button className="gap-2">
+          <Dialog>
+            <DialogTrigger>
+          <Button className="gap-2 text-sm">
             <Plus /> Add New Promotion
           </Button>
+          </DialogTrigger>
+
+          <DialogContent className="bg-[#252525] border border-[#3A3A3A] p-0 w-4xl">
+            <DialogHeader className="border-b border-[#3A3A3A] p-4">
+              <h1 className="text-[#F3F4F6] font-semibold text-lg">Add New Promotion</h1>
+              <p className="text-[#99A1AF]">Auto-syncs with Square and appears on online store</p>
+            </DialogHeader>
+              <div className="space-y-4 p-4">
+                <div className="flex gap-2 text-md ">
+                  <Tag className="text-primary"/>
+                  <h1 className="text-[#F3F4F6]">Promotion Details</h1>
+                </div>
+                <div className="space-y-1">
+                  <Label>Promotion Title *</Label>
+                  <Input placeholder="e.g., 5-Pack Basketball Training"  className="!bg-[#1A1A1A] !border-[#3A3A3A] !text-[#E5E7EB]"/>
+                </div>
+              
+              </div>
+          </DialogContent>
+          </Dialog>
         </div>
       </div>
 
@@ -92,66 +125,146 @@ export default function Page() {
           <p>Filter by status:</p>
 
           <div className="flex gap-4">
-            <Button>All</Button>
-            <Button>Active</Button>
-            <Button>Upcoming</Button>
-            <Button>Archived</Button>
+            <Button className=" text-sm">All</Button>
+            <Button className=" text-sm" >Active</Button>
+            <Button className=" text-sm">Upcoming</Button>
+            <Button className=" text-sm">Archived</Button>
           </div>
         </div>
 
-        <div className="rounded-[10px] bg-info-bg p-2 flex gap-2">
-          <Dot className="text-active-text" />
+        <div className="rounded-[10px] bg-info-bg p-2 flex items-center gap-2">
+          <GoDotFill className="text-active-text" />
           <h1 className="text-info-text">Live Sync with Square</h1>
         </div>
       </div>
 
-      <div className="grid grid-cols-3">
-        {
-            Promotions.map((promotion)=>{
-                return(
-                     <Card>
-            <div className="h-48 relative">
+      <div className="grid grid-cols-3 gap-4">
+        {Promotions.map((promotion,i) => {
+          return (
+            <Card className="p-0 bg-[#252525]" key={i}>
+              <div className="h-48 relative bg-[#1A1A1A]">
                 <img src={promotion.image} alt="" />
-                <Badge className="bg-active-text text-white absolute top-2 left-2">{promotion.status}</Badge>
-                
-            </div>
+                <Badge className="bg-[#00C950] text-white absolute top-2 left-2 px-4">
+                  {promotion.status}
+                </Badge>
+                <Badge className="bg-primary text-black absolute top-2 right-2 px-4">
+                  {promotion.liveOn}
+                </Badge>
+              </div>
+              <div className="space-y-4 p-4">
+                <h1 className="text-[#F3F4F6] font-semibold">
+                  {promotion.title}
+                </h1>
+                <p className="text-sm text-[#99A1AF]">
+                  {promotion.description}
+                </p>
+                <div className="flex gap-2 items-center">
+                  <DollarSign className="text-primary" />
+                  <h1>{promotion.price}</h1>
+                  <h1 className="text-[#6A7282]">{promotion.oldPrice}</h1>
+                  <CardStatus value={`Save ${promotion.save}`} type="active" />
+                </div>
 
-        </Card>)
-            })
-        }
-       
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="rounded-2xl border border-border space-y-2 p-4 bg-[#1A1A1A]">
+                    <div className="flex gap-2">
+                      <Calendar />
+                      <p className="text-sm text-[#99A1AF]">Start Date</p>
+                    </div>
+                    <h1 className="text-[#E5E7EB]">{promotion.startDate}</h1>
+                  </div>
+
+                  <div className="rounded-2xl border border-border space-y-2 p-4 bg-[#1A1A1A]">
+                    <div className="flex gap-2">
+                      <Calendar />
+                      <p className="text-sm text-[#99A1AF]">End Date</p>
+                    </div>
+                    <h1 className="text-[#E5E7EB]">{promotion.endDate}</h1>
+                  </div>
+
+                  <div className="rounded-2xl border border-border space-y-2 p-4 bg-[#1A1A1A]">
+                    <div className="flex gap-2">
+                      <Users />
+                      <p className="text-sm text-[#99A1AF]">Sign-ups</p>
+                    </div>
+                    <h1 className="text-[#E5E7EB]">{promotion.signUps}</h1>
+                  </div>
+
+                  <div className="rounded-2xl border border-border space-y-2 p-4 bg-[#1A1A1A]">
+                    <div className="flex gap-2">
+                      <ArrowUpIcon />
+                      <p className="text-sm text-[#99A1AF]">Revenue</p>
+                    </div>
+                    <h1 className="text-[#E5E7EB]">{promotion.revenue}</h1>
+                  </div>
+                </div>
+                <div className="bg-info-bg text-info-text flex justify-between rounded-2xl p-4">
+                  <div className="flex gap-2">
+                    <Link /> <h1>Square Checkout</h1>
+                  </div>
+                  <div>
+                    <Button variant={"link"}>View link</Button>
+                  </div>
+                </div>
+
+                <div className="bg-[#D3FB2033] text-primary flex justify-between rounded-2xl p-4">
+                  <div className="flex gap-2">
+                    <Link /> <h1>Visible on Storefront</h1>
+                  </div>
+                  <div>
+                    <Button variant={"link"}>Users can sign up</Button>
+                  </div>
+                </div>
+                <Separator />
+                <div className="flex gap-2">
+                  <Button className="bg-[#1A1A1A] border border-[#3A3A3A]  gap-2 rounded-[10px] text-[#D1D5DC] text-md py-6 px-6 flex-3">
+                    <Users /> Users can sign up
+                  </Button>
+
+                  <Button className="rounded-[10px] bg-[#1A1A1A] border border-[#3A3A3A] text-[#D1D5DC] py-6 px-6 text-md">
+                    <NotebookPen />
+                  </Button>
+
+                  <Button className="bg-[#FF690033] border border-[#FF69004D] rounded-[10px] py-6 px-6 text-md text-[#FF8904]">
+                    <Trash />
+                  </Button>
+                </div>
+              </div>
+            </Card>
+          );
+        })}
       </div>
     </div>
   );
 }
 
-const Promotions=[
-    {
-        status:"Active",
-        liveOn:"Live on Storefront",
-        image:"",
-        title:"5-Pack Basketball Training",
-        description:"Get 5 basketball training sessions at a discounted",
-        price:"$200",
-        oldPrice:"$250",
-        save:"$50",
-        startDate:"12/1/2025",
-        endDate:"12/31/2025",
-        signUps:"24",
-        revenue:"$4,800",
-    },
-        {
-        status:"Active",
-        liveOn:"Live on Storefront",
-        image:"",
-        title:"5-Pack Basketball Training",
-        description:"Get 5 basketball training sessions at a discounted",
-        price:"$200",
-        oldPrice:"$250",
-        save:"$50",
-        startDate:"12/1/2025",
-        endDate:"12/31/2025",
-        signUps:"24",
-        revenue:"$4,800",
-    }
-]
+const Promotions = [
+  {
+    status: "Active",
+    liveOn: "Live on Storefront",
+    image: "/public/promotionCardHero.png",
+    title: "5-Pack Basketball Training",
+    description: "Get 5 basketball training sessions at a discounted",
+    price: "$200",
+    oldPrice: "$250",
+    save: "$50",
+    startDate: "12/1/2025",
+    endDate: "12/31/2025",
+    signUps: "24",
+    revenue: "$4,800",
+  },
+  {
+    status: "Active",
+    liveOn: "Live on Storefront",
+    image: "",
+    title: "5-Pack Basketball Training",
+    description: "Get 5 basketball training sessions at a discounted",
+    price: "$200",
+    oldPrice: "$250",
+    save: "$50",
+    startDate: "12/1/2025",
+    endDate: "12/31/2025",
+    signUps: "24",
+    revenue: "$4,800",
+  },
+];
