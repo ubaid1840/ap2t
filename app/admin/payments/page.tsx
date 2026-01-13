@@ -159,7 +159,7 @@ export default function Page() {
         </div>
       </div>
 
-      {/* tables */}
+      {/* table */}
     </div>
   );
 }
