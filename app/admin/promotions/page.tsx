@@ -361,8 +361,8 @@ export default function Page() {
                   </div>
                   </div>
                 </ScrollArea>
-                <div className="p-2 space-y-1">
-                  <div className="flex gap-4 border-t border-[#3A3A3A] ">
+                <div className="p-2 space-y-1 border-t border-[#3A3A3A]">
+                  <div className="flex gap-4">
                     <DialogClose className="flex-1">
                       <Button className="bg-[#1A1A1A] border border-[#3A3A3A] w-full text-[#D1D5DC] text-md font-semibold py-5">
                         Cancel
@@ -709,8 +709,8 @@ export default function Page() {
                           </div>
                         </div>
                       </ScrollArea>
-                      <div className="p-2 space-y-1">
-                        <div className="flex gap-4 border-t border-[#3A3A3A] ">
+                      <div className="p-2 space-y-1 border-t border-[#3A3A3A]">
+                        <div className="flex gap-4">
                           <DialogClose className="flex-1">
                             <Button className="bg-[#1A1A1A] border border-[#3A3A3A] w-full text-[#D1D5DC] text-md font-semibold py-5">
                               Cencel

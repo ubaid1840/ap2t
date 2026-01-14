@@ -5,6 +5,8 @@ import { ArrowUpDown, Check, CheckCircle, Eye, X } from "lucide-react";
 import Link from "next/link";
 import getInitials from "../parents/get-initials";
 import CardStatus from "../card-status";
+import { Dialog, DialogContent, DialogTrigger } from "../ui/dialog";
+import { ViewDialog } from "./view-dialog";
 
 
 export type PaymentData = {
@@ -171,10 +173,14 @@ export const PAYMENT_COLUMNS: ColumnDef<PaymentData>[] = [
 
     return (
       <div className="flex gap-2">
-        <Button size="icon" variant="ghost">
-          <Eye className="h-4 w-4" />
-        </Button>
-
+        <Dialog>
+        <DialogTrigger asChild>
+            <Button size="icon" variant="ghost">
+              <Eye className="h-4 w-4" />
+            </Button>
+          </DialogTrigger>
+        <ViewDialog data={row.original}/>
+        </Dialog>
         {status === "Pending" && (
           <>
             <Button size="icon" variant="ghost">
