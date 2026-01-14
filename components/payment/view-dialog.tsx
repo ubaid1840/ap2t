@@ -139,9 +139,7 @@ export function ViewDialog({ data }: ViewDialogProps) {
               </div>
               <div className="bg-[#1A1A1A] border border-border rounded-[10px] flex p-4 gap-2">
                 <GoDotFill className="text-active-text" />
-                <h1 className="text-[#D1D5DC]">
-                  PCI DSS compliant via Square
-                </h1>
+                <h1 className="text-[#D1D5DC]">PCI DSS compliant via Square</h1>
               </div>
               <div className="bg-[#1A1A1A] border border-border rounded-[10px] flex p-4 gap-2">
                 <GoDotFill className="text-active-text" />
@@ -154,14 +152,12 @@ export function ViewDialog({ data }: ViewDialogProps) {
         </div>
       </ScrollArea>
       <div className="p-4 border-t border-[#3A3A3A]">
-                  <div className="flex justify-end gap-4  ">
-                    <DialogClose>
-                      <Button className="text-md font-semibold py-5">
-                        Cancel
-                      </Button>
-                    </DialogClose>
-                  </div>
-                </div>
+        <div className="flex justify-end gap-4  ">
+          <DialogClose>
+            <Button className="text-md font-semibold py-5">Cancel</Button>
+          </DialogClose>
+        </div>
+      </div>
     </DialogContent>
   );
 }

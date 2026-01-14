@@ -7,6 +7,7 @@ import getInitials from "../parents/get-initials";
 import CardStatus from "../card-status";
 import { Dialog, DialogContent, DialogTrigger } from "../ui/dialog";
 import { ViewDialog } from "./view-dialog";
+import { CompedDialog } from "./comped-dialog";
 
 
 export type PaymentData = {
@@ -183,9 +184,14 @@ export const PAYMENT_COLUMNS: ColumnDef<PaymentData>[] = [
         </Dialog>
         {status === "Pending" && (
           <>
+            <Dialog>
+            <DialogTrigger asChild>
             <Button size="icon" variant="ghost">
-              <Check className="h-4 w-4" />
+              <CheckCircle className="h-4 w-4" />
             </Button>
+          </DialogTrigger>
+        <CompedDialog data={row.original}/>
+        </Dialog>
             <Button size="icon" variant="ghost">
               <X className="h-4 w-4" />
             </Button>
