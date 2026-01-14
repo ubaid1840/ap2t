@@ -1,5 +1,8 @@
 "use client";
+import PageTable from "@/components/app-table";
 import InputWithIcon from "@/components/input-with-icon";
+import { PAYMENT_COLUMNS } from "@/components/payment/payment-columns";
+import { PAYMENT_DATA } from "@/components/payment/payment-data";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -45,11 +48,19 @@ const localData = [
   },
 ];
 
+
+
 export default function Page() {
   const [filter, setFilter] = useState<
     "All" | "Completed" | "Pending" | "Failed" | "Comped" | "Voided"
   >("All");
-  const isMobile = useIsMobile();
+
+  const filteredData=PAYMENT_DATA.filter((data)=> {
+    if (filter==="All"){
+      return data
+    }
+    return data.status===filter})
+
   return (
     <div className="flex flex-col gap-4 w-full">
       <div className="flex justify-between">
@@ -159,7 +170,14 @@ export default function Page() {
         </div>
       </div>
 
-      {/* table */}
+      <PageTable
+          headerClassName={"rounded-4xl"}
+          columns={PAYMENT_COLUMNS}
+          data={filteredData}
+          onRowClick={() => {
+
+          }}
+        />
     </div>
   );
 }
