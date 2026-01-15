@@ -3,6 +3,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { ArrowUp, Bell, Calendar, CheckCircle, Circle, Eye, Plus, User } from "lucide-react";
+import Link from "next/link";
 
 const localData = [
   {
@@ -169,8 +170,9 @@ export default function Page() {
                         <h1 className="text-[#F3F4F6]">{coach.avgRating}</h1>
                     </div>
                 </div>
-
-                    <Button className="flex gap-2 w-full text-lg font-semibold items-center py-4"><Eye className="h-4 w-4"/> View Schedule & Manage</Button>
+                    <Link href={`/admin/coaches/${coach.id}`}>
+                      <Button className="flex gap-2 w-full text-lg font-semibold items-center py-4"><Eye className="h-4 w-4"/> View Schedule & Manage</Button>
+                    </Link>
               </CardContent>
             </Card>
           );
@@ -180,8 +182,9 @@ export default function Page() {
   );
 }
 
-const coachinfo = [
-  {
+export const coachinfo = [
+  { 
+    id:1,
     name: "Coach Martinez",
     email: "martinez@ap2t.com",
     phoneNo: "(555) 123-4567",
@@ -195,6 +198,7 @@ const coachinfo = [
     avgRating: "4.8",
   },
   {
+    id:2,
     name: "Coach Martinez",
     email: "martinez@ap2t.com",
     phoneNo: "(555) 123-4567",
@@ -208,6 +212,7 @@ const coachinfo = [
     avgRating: "4.8",
   },
   {
+    id:3,
     name: "Coach Martinez",
     email: "martinez@ap2t.com",
     phoneNo: "(555) 123-4567",
@@ -221,6 +226,7 @@ const coachinfo = [
     avgRating: "4.8",
   },
   {
+    id:4,
     name: "Coach Martinez",
     email: "martinez@ap2t.com",
     phoneNo: "(555) 123-4567",
@@ -234,6 +240,7 @@ const coachinfo = [
     avgRating: "4.8",
   },
   {
+    id:5,
     name: "Coach Martinez",
     email: "martinez@ap2t.com",
     phoneNo: "(555) 123-4567",
