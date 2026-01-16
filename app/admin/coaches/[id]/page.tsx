@@ -2,13 +2,19 @@
 import { useParams } from "next/navigation";
 import { coachinfo, coachinfoType } from "../page";
 import BackButton from "@/components/back-button";
-import { useEffect, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import {
+  Award,
   Bell,
   Calendar,
   CheckCircle,
+  CircleCheckBig,
+  CircleCheckBigIcon,
   Clock,
   DollarSign,
+  Edit,
+  Info,
+  Mail,
   Medal,
   MessageSquare,
   NotebookPen,
@@ -16,18 +22,20 @@ import {
   Percent,
   Phone,
   Recycle,
+  RefreshCcw,
+  TrendingUp,
   User,
   Users,
 } from "lucide-react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { CartesianGrid, Line, LineChart, XAxis, YAxis } from "recharts";
 import {
   Dialog,
   DialogClose,
   DialogContent,
   DialogHeader,
+  DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -42,75 +50,29 @@ import {
   type ChartConfig,
 } from "@/components/ui/chart";
 import { GoDotFill } from "react-icons/go";
+import CardStatus from "@/components/card-status";
+import { IoCalendarClear } from "react-icons/io5";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { Scrollbar } from "@radix-ui/react-scroll-area";
+import { Separator } from "@/components/ui/separator";
+import { Badge } from "@/components/ui/badge";
+import LineChart from "@/components/charts/line-chart-dots";
+import { COACH_ALL_SESSIONS, COACH_REVENUE_TRED, COACH_WEEKLY_EVENTS } from "@/components/coach-dashboard/constants";
+import { WeeklySchedule } from "@/components/coach-dashboard/weekly-schedule";
 
-const allSessions = [
-  {
-    name: "Advanced Skills Training",
-    status: "Completed",
-    amount: "$85",
-    date: "2025-12-18",
-    time: "10:00 AM - 11:30 AM",
-    player: "Emma Johnson",
-  },
-  {
-    name: "Advanced Skills Training",
-    status: "Completed",
-    amount: "$85",
-    date: "2025-12-18",
-    time: "10:00 AM - 11:30 AM",
-    player: "Emma Johnson",
-  },
-  {
-    name: "Advanced Skills Training",
-    status: "Completed",
-    amount: "$85",
-    date: "2025-12-18",
-    time: "10:00 AM - 11:30 AM",
-    player: "Emma Johnson",
-  },
-  {
-    name: "Advanced Skills Training",
-    status: "Completed",
-    amount: "$85",
-    date: "2025-12-18",
-    time: "10:00 AM - 11:30 AM",
-    player: "Emma Johnson",
-  },
-  {
-    name: "Advanced Skills Training",
-    status: "Completed",
-    amount: "$85",
-    date: "2025-12-18",
-    time: "10:00 AM - 11:30 AM",
-    player: "Emma Johnson",
-  },
-];
 
-const revenueTrendData = [
-  { month: "Aug", revenue: 120 },
-  { month: "Sep", revenue: 145 },
-  { month: "Oct", revenue: 132 },
-  { month: "Nov", revenue: 168 },
-  { month: "Dec", revenue: 190 },
-  { month: "Jan", revenue: 215 },
-];
 
 export default function Page() {
   const { id } = useParams();
   const [data, setData] = useState<coachinfoType>();
-  const [filter, setFilter] = useState<"Daily" | "Weekly" | "Monthly">("Daily");
-  const [editCoach, setEditCoach] = useState({
-    fullname: "",
-    email: "",
-    phone: "",
-    yearexp: "",
-    bio: "",
-    preferedSchedule: "",
-  });
+  const [tab, setTab] = useState("Details");
+
+  const isMobile = useIsMobile()
+
 
   const chartConfig = {
-    desktop: {
-      label: "Revenue",
+    value: {
+      label: "Sessions",
       color: "var(--primary)",
     },
   } satisfies ChartConfig;
@@ -131,21 +93,21 @@ export default function Page() {
       going: "active",
     },
     {
-      Icon: <CheckCircle />,
+      Icon: <Clock />,
       title: "Completed",
       description: data?.completed,
       type: "active",
       going: "active",
     },
     {
-      Icon: <Clock />,
+      Icon: <CircleCheckBigIcon />,
       title: "Upcoming",
       description: data?.upComing,
       type: "info",
       going: "info",
     },
     {
-      Icon: <Medal />,
+      Icon: <Award />,
       title: "Avg Rating",
       description: data?.avgRating,
       type: "other",
@@ -160,472 +122,477 @@ export default function Page() {
     },
   ];
 
-  const changeCoach = () => {
-    console.log(editCoach);
-  };
+  const coachStatus = data?.status ? data?.status.charAt(0).toUpperCase() + data?.status.slice(1) : ""
   return (
-    <div className="flex flex-col gap-4 w-full">
-      <div className="flex justify-between">
-        <BackButton title="Back to coaches" route="/admin/coaches" />
-      </div>
-      <div className="bg-[#252525] border border-border p-6 rounded-[10px] space-y-4">
-        <div className="flex justify-between">
-          <div className="space-y-1">
-            <div className=" flex item gap-4">
-              <h1 className="text-xl text-[#F3F4F6] font-semibold">
-                {data?.name}
-              </h1>
-              <div className="px-2 py-0 rounded-2xl bg-[#00C95033] border border-[#00C9504D] flex items-center gap-1 text-active-text">
-                <CheckCircle className="h-4 w-4" />
-                <h1>{data?.status}</h1>
+    <div className="flex flex-col w-full gap-6">
+      <BackButton title="Back to coaches" route="/admin/coaches" />
+
+      <Card className="w-full rounded-[12px] bg-[#252525]">
+        <CardContent className="space-y-4">
+
+          <div className="w-full flex justify-between flex-wrap gap-4">
+            <div className="flex flex-col gap-2">
+              <span className="flex gap-2 text-xl items-center">{data?.name} <span>
+                <CardStatus value={coachStatus} type="active" icon={<CircleCheckBig size={14} />} /></span></span>
+              <div className="text-[#D1D5DC] text-xs flex flex-col gap-2">
+                <span className="inline-flex gap-2 "><Mail size={14} /> {data?.email}</span>
+                <span className="inline-flex gap-2"><Phone size={14} /> {data?.phoneNo}</span>
+                <span className="inline-flex gap-2"><IoCalendarClear size={14} />  Joined 2023-01-15 • 10 years experience</span>
               </div>
             </div>
-            <div className="flex gap-2 text-ghost-text">
-              <MessageSquare className="h-4 w-4" />
-              <p className="text-sm ">{data?.email}</p>
+            <div className="flex gap-4 flex-wrap">
+              <EditProfile />
             </div>
-            <div className="flex gap-2 text-ghost-text">
-              <Phone className="h-4 w-4" />
-              <p className="text-sm ">{data?.phoneNo}</p>
-            </div>
-            <div className="flex gap-2 text-ghost-text">
-              <Calendar className="h-4 w-4" />
-              <p className="text-sm ">
-                Joined 2023-01-15 • 10 years experience
-              </p>
-            </div>
+
           </div>
 
-          <Dialog>
-            <DialogTrigger>
-              <Button
-                variant={"outline"}
-                className="flex gap-1 rounded-[10px] !bg-[#1A1A1A] "
-              >
-                {" "}
-                <NotebookPen /> Edit Profile
-              </Button>
-            </DialogTrigger>
-
-            <DialogContent className="bg-[#252525] border border-[#3A3A3A] sm:max-w-4xl p-0">
-              <DialogHeader className="border-b border-[#3A3A3A] p-4">
-                <h1 className="text-[#F3F4F6] font-semibold text-lg">
-                  Edit Coach Profile
-                </h1>
-              </DialogHeader>
-              <form onSubmit={changeCoach} className="">
-                <ScrollArea className=" py-1 space-y-4 px-2">
-                  <div className="space-y-2 px-2">
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label className="text-sm text-[#99A1AF]">
-                          Full Name
-                        </Label>
-                        <Input
-                          name="fullName"
-                          placeholder="Coach Martinez"
-                          className="!bg-[#1A1A1A] !border-[#3A3A3A] !text-[#E5E7EB] !p-5"
-                          required
-                          value={editCoach.fullname}
-                          onChange={(e) =>
-                            setEditCoach((prev) => ({
-                              ...prev,
-                              fullname: e.target.value,
-                            }))
-                          }
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label className="text-sm text-[#99A1AF]">Email</Label>
-                        <Input
-                          name="email"
-                          placeholder="martinez@ap2t.com"
-                          className="!bg-[#1A1A1A] !border-[#3A3A3A] !text-[#E5E7EB] !p-5"
-                          required
-                          value={editCoach.email}
-                          onChange={(e) =>
-                            setEditCoach((prev) => ({
-                              ...prev,
-                              email: e.target.value,
-                            }))
-                          }
-                        />
-                      </div>
-
-                      <div className="space-y-2">
-                        <Label className="text-sm text-[#99A1AF]">Phone</Label>
-                        <Input
-                          name="phone"
-                          placeholder="(555) 123-4567"
-                          className="!bg-[#1A1A1A] !border-[#3A3A3A] !text-[#E5E7EB] !p-5"
-                          required
-                          value={editCoach.phone}
-                          onChange={(e) =>
-                            setEditCoach((prev) => ({
-                              ...prev,
-                              phone: e.target.value,
-                            }))
-                          }
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label className="text-sm text-[#99A1AF]">
-                          Years of Experience
-                        </Label>
-                        <Input
-                          name="yearsofexp"
-                          placeholder="10"
-                          className="!bg-[#1A1A1A] !border-[#3A3A3A] !text-[#E5E7EB] !p-5"
-                          required
-                          value={editCoach.yearexp}
-                          onChange={(e) =>
-                            setEditCoach((prev) => ({
-                              ...prev,
-                              yearexp: e.target.value,
-                            }))
-                          }
-                        />
-                      </div>
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label className="text-sm text-[#99A1AF]">
-                        Biography
-                      </Label>
-                      <Textarea className="!bg-[#1A1A1A] border border-border rounded-[10px] min-h-28" />
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label className="text-sm text-[#99A1AF]">
-                        Preferred Schedule
-                      </Label>
-                      <Input
-                        name="preferedscedule"
-                        placeholder="Coach Martinez"
-                        className="!bg-[#1A1A1A] !border-[#3A3A3A] !text-[#E5E7EB] !p-5"
-                        required
-                        value={editCoach.preferedSchedule}
-                        onChange={(e) =>
-                          setEditCoach((prev) => ({
-                            ...prev,
-                            preferedSchedule: e.target.value,
-                          }))
-                        }
-                      />
-                    </div>
-                  </div>
-                </ScrollArea>
-                <div className="p-2 space-y-1 border-t border-[#3A3A3A]">
-                  <div className="flex gap-4">
-                    <DialogClose className="flex-1">
-                      <Button className="bg-[#1A1A1A] border border-[#3A3A3A] w-full text-[#D1D5DC] text-md font-semibold py-5">
-                        Cancel
-                      </Button>
-                    </DialogClose>
-                    <Button
-                      type="submit"
-                      className="flex-1 text-md font-semibold py-5"
-                    >
-                      Save Changes
-                    </Button>
-                  </div>
-                  <p className="text-sm text-[#6A7282] text-center">
-                    Promotion will automatically sync with Square and appear on
-                    storefront
-                  </p>
-                </div>
-              </form>
-            </DialogContent>
-          </Dialog>
-        </div>
-
-        <div className="flex justify-between gap-4 flex-wrap">
-          {localData.map((item, index) => (
-            <Card
-              key={index}
-              className="rounded-[10px] bg-[#1A1A1A] border-[#3A3A3A] flex-1"
-            >
-              <CardContent className="space-y-4">
-                <div className="flex gap-4 items-center">
-                  <div
-                    className={`rounded-[8px] flex w-10 h-10 items-center justify-center bg-${item.type}-bg text-${item.type}-text`}
-                  >
+          <div className="flex justify-between gap-4 flex-wrap">
+            {localData.map((item, index) => (
+              <HeaderCard key={index} title={item.description as string} description={item.title}
+                icon={
+                  <div className={`rounded-[8px] flex w-10 h-10 items-center justify-center bg-${item.type}-bg text-${item.type}-text border-${item.type}-text/32`}>
                     {item.Icon}
+                  </div>} />
+            ))}
+          </div>
+
+        </CardContent>
+      </Card>
+
+      <div className="w-full rounded-[12px] bg-[#252525] py-2">
+        <Tabs
+          value={tab}
+          onValueChange={(v) => {
+            setTab(v);
+          }}
+
+        >
+          <ScrollArea className={`overflow-x-auto ${isMobile && "max-w-[calc(100vw-64px)]"}`}>
+            <TabsList className="bg-transparent relative flex gap-2 px-2">
+              {["Details", "Availability", "Sessions", "Revenue"
+              ].map((t) => (
+                <TabsTrigger
+                  key={t}
+                  value={t}
+                  className="h-9 px-4 text-[12px] leading-tight tracking-tight"
+                >
+                  {t === "Details" && <div className="flex gap-2 items-center py-2"><User /> Details</div>}
+                  {t === "Availability" && <div className="flex gap-2 items-center py-2"><Calendar /> Availability</div>}
+                  {t === "Sessions" && <div className="flex gap-2 items-center py-2"><Clock /> Sessions</div>}
+                  {t === "Revenue" && <div className="flex gap-2 items-center py-2"><DollarSign /> Revenue</div>}
+                </TabsTrigger>
+              ))}
+            </TabsList>
+            <Scrollbar orientation="horizontal" />
+          </ScrollArea>
+          <Separator />
+
+          <TabsContent value="Details" className="space-y-4 p-4">
+
+            <h1 className="text-lg text-[#F3F4F6]">Biography</h1>
+            <p className="text-sm text-muted-foreground">
+              Experienced sports coach with over 10 years of Training
+              Athletes at all levels. Speacialize in Advance skill
+              development and proformance optimizations
+            </p>
+
+
+            <h1 className="text-lg text-[#F3F4F6]">Specialties</h1>
+            <div className="flex gap-1">
+              {data?.specialities.map((s) => {
+                return (
+                  <div key={s} className="py-2 px-3 rounded-lg bg-[#1A1A1A] border border-border text-xs leading-none text-[#D1D5DC]">{s}</div>
+                );
+              })}
+            </div>
+
+
+            <h1 className="text-lg text-[#F3F4F6]">Certifications</h1>
+            <div className="space-y-2">
+              <div className="bg-[#1A1A1A] border border-border rounded-[10px] px-4 py-3 flex items-center gap-2">
+                <Award className="text-primary" size={16} />
+                <h1 className="text-[#E5E7EB] text-sm">USSF A License</h1>
+              </div>
+              <div className="bg-[#1A1A1A] border border-border rounded-[10px] px-4 py-3 flex items-center gap-2">
+                <Award className="text-primary" size={16} />
+                <h1 className="text-[#E5E7EB] text-sm">USSF A License</h1>
+              </div>
+              <div className="bg-[#1A1A1A] border border-border rounded-[10px] px-4 py-3 flex items-center gap-2">
+                <Award className="text-primary" size={16} />
+                <h1 className="text-[#E5E7EB] text-sm">USSF A License</h1>
+              </div>
+            </div>
+
+
+            <h1 className="text-lg text-[#F3F4F6]">
+              Scheduling Preferences
+            </h1>
+            <div className="bg-[#1A1A1A] border border-border text-ghost-text rounded-[10px] px-4 py-3 flex items-center gap-2">
+              <Clock size={16} />
+              <h1 className="text-[#E5E7EB]">
+                Weekday afternoons, Weekend mornings
+              </h1>
+            </div>
+
+          </TabsContent>
+
+          <TabsContent value="Availability" className="space-y-4 p-4">
+            <div className="bg-[#1A1A1A] border border-border rounded-[10px] px-4 py-2 flex justify-between">
+              <div className="flex gap-2 items-center text-sm">
+                <GoDotFill className="text-active-text" />
+                <h1 className="text-[#D1D5DC]">Synced with booking system</h1>
+                <p className="text-ghost-text">Last sync: 5:03:15 PM</p>
+              </div>
+              <Button className="flex gap-2"><RefreshCcw /> Sync Now </Button>
+            </div>
+
+            <WeeklySchedule events={COACH_WEEKLY_EVENTS} />
+
+
+            <Card className="bg-info-bg p-3 border-info-text/30">
+              <CardContent className="p-0">
+                <div className="flex gap-4 items-start">
+                  <Info size={14} className="text-info-text" />
+                  <div className="font-normal space-y-1">
+                    <Label className="text-info-text text-[14px] leading-none">Availability Management</Label>
+                    <p className="text-[#D1D5DC] text-xs">Click on available slots to block them. Click on block slots to make them available again. Booked slots cannot be modified here</p>
                   </div>
-                  <p className="text-[#B0B0B0]">{item.title}</p>
-                </div>
-                <div className="flex flex-col gap-1">
-                  <h1 className="font-semibold text-2xl">{item.description}</h1>
                 </div>
               </CardContent>
             </Card>
-          ))}
-        </div>
-      </div>
 
-      <Tabs defaultValue="Details">
-        <Card className="p-0">
-          <CardHeader className="border-b border-border flex py-4 ">
-            <TabsList className="bg-[#252525]">
-              <TabsTrigger
-                value="Details"
-                className="flex gap-1 items-cemter py-4 px-6"
-              >
-                <User /> Details
-              </TabsTrigger>
-              <TabsTrigger
-                value="Availability"
-                className="flex gap-1 items-cemter py-4 px-6"
-              >
-                <Calendar /> Availability
-              </TabsTrigger>
-              <TabsTrigger
-                value="Sessions"
-                className="flex gap-1 items-cemter py-4 px-6"
-              >
-                <Clock /> Sessions
-              </TabsTrigger>
-              <TabsTrigger
-                value="Revenue"
-                className="flex gap-1 items-cemter py-4 px-6"
-              >
-                <DollarSign /> Revenue
-              </TabsTrigger>
-            </TabsList>
-          </CardHeader>
-          <CardContent>
-            <TabsContent value="Details" className="space-y-4 py-4">
-              <div className="space-y-2">
-                <h1 className="text-lg text-[#F3F4F6]">Biography</h1>
-                <p className="text-sm text-ghost-text">
-                  Experienced sports coach with over 10 years of Training
-                  Athletes at all levels. Speacialize in Advance skill
-                  development and proformance optimizations
-                </p>
-              </div>
-              <div className="space-y-1">
-                <h1 className="text-sm text-[#99A1AF]">Specialties</h1>
-                <div className="flex gap-1">
-                  {data?.specialities.map((s) => {
-                    return (
-                      <div className="py-1 px-3 rounded-2xl bg-[#1A1A1A] border border-border text-sm text-[#D1D5DC]">
-                        {s}
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-              <div className="space-y-2">
-                <h1 className="text-lg text-[#F3F4F6]">Certifications</h1>
-                <div className="space-y-2">
-                  <div className="bg-[#1A1A1A] border border-border rounded-[10px] p-4 flex items-center gap-2">
-                    <Medal className="h-4 w-4 text-primary" />
-                    <h1 className="text-[#E5E7EB]">USSF A License</h1>
-                  </div>
-                  <div className="bg-[#1A1A1A] border border-border rounded-[10px] p-4 flex items-center gap-2">
-                    <Medal className="h-4 w-4 text-primary" />
-                    <h1 className="text-[#E5E7EB]">USSF A License</h1>
-                  </div>
-                  <div className="bg-[#1A1A1A] border border-border rounded-[10px] p-4 flex items-center gap-2">
-                    <Medal className="h-4 w-4 text-primary" />
-                    <h1 className="text-[#E5E7EB]">USSF A License</h1>
-                  </div>
-                </div>
-              </div>
-              <div className="space-y-2">
-                <h1 className="text-lg text-[#F3F4F6]">
-                  Scheduling Preferences
-                </h1>
-                <div className="bg-[#1A1A1A] border border-border text-ghost-text rounded-[10px] p-4 flex items-center gap-2">
-                  <Clock className="h-4 w-4" />
-                  <h1 className="text-[#E5E7EB]">
-                    Weekday afternoons, Weekend mornings
-                  </h1>
-                </div>
-              </div>
-            </TabsContent>
+          </TabsContent>
 
-            <TabsContent value="Availability" className="space-y-4 py-4">
-              <div className="bg-[#1A1A1A] border border-border rounded-[10px] p-4 flex justify-between">
-                <div className="flex gap-2 items-center">
-                  <GoDotFill className="text-active-text" />
-                  <h1 className="text-[#D1D5DC]">Synced with booking system</h1>
-                  <p className="text-ghost-text">Last sync: 5:03:15 PM</p>
-                </div>
-                  <Button className="flex gap-2"><Recycle/> Sync Now </Button>
-              </div>
-
-              
-
-              <div className="bg-[#2B7FFF1A] border-[#2B7FFF4D] flex gap-2 p-4 rounded-[10px] ">
-                  <OctagonAlert className="h-4 w-4 text-info-text"/>
-                  <div className="space-y-2">
-                    <h1 className="text-info-text">Availability Management</h1>
-                    <p className="text-sm text-ghost-text">Click on available slots to block them. Click on block slots to make them available again. Booked slots cannot be modified here</p>
-                  </div>
-              </div>
-            </TabsContent>
-
-            <TabsContent value="Sessions" className="space-y-4 py-4">
-              <h1 className="">All Sessions</h1>
-              <div className="space-y-4">
-                {allSessions.map((session) => {
-                  return (
-                    <div className="bg-[#1A1A1A] border border-border rounded-[10px] p-8 space-y-4">
+          <TabsContent value="Sessions" className="space-y-2 p-4">
+            <h1 className="text-lg text-[#F3F4F6]">All Sessions</h1>
+            <div className="space-y-4 pt-2">
+              {COACH_ALL_SESSIONS.map((session, i) => {
+                return (
+                  <Card key={i} className="p-0 overflow-hidden">
+                    <CardContent className="bg-[#1A1A1A] p-4 space-y-2">
                       <div className="flex justify-between">
                         <div className="flex gap-2">
-                          <h1 className="text-lg text-[#F3F4F6]">
+                          <h1 className="text-md text-[#F3F4F6]">
                             {session.name}
                           </h1>
-                          <div className="bg-[#2B7FFF33] border-info-text text-info-text text-xs rounded-2xl py-1 px-2">
-                            {session.status}
+                          <div>
+                            <Badge className={session.status === "Completed" ? "leading-none py-1 bg-active-bg border-active-text/32 text-active-text" : "bg-info-bg border-info-text/32 text-info-text leading-none py-1"}>
+                              {session.status}
+                            </Badge>
                           </div>
+
                         </div>
                         <h1>{session.amount}</h1>
                       </div>
-                      <div className="flex gap-4">
-                        <div className="flex gap-2 text-sm text-ghost-text items-center">
-                          <Calendar className="h-4 w-4" /> <p>{session.date}</p>
+                      <div className="flex gap-4 text-xs text-muted-foreground">
+                        <div className="flex gap-2  items-center">
+                          <Calendar size={12} /> <p>{session.date}</p>
                         </div>
-                        <div className="flex gap-2 text-sm text-ghost-text items-center">
-                          <Clock className="h-4 w-4" /> <p>{session.time}</p>
+                        <div className="flex gap-2  items-center">
+                          <Clock size={12} /> <p>{session.time}</p>
                         </div>
-                        <div className="flex gap-2 text-sm text-ghost-text items-center">
-                          <Users className="h-4 w-4" /> <p>{session.player}</p>
+                        <div className="flex gap-2 items-center">
+                          <Users size={12} /> <p>{session.player}</p>
                         </div>
                       </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </TabsContent>
+                    </CardContent>
+                  </Card>
 
-            <TabsContent value="Revenue" className="space-y-4 py-4">
-              <div className="flex gap-4 w-full">
-                <div className="space-y-4 p-8 flex-1 bg-[#1A1A1A] rounded-[10px] border border-border">
-                  <div className="flex gap-2">
-                    <DollarSign className="h-4 w-4 text-primary" />
-                    <p className="text-sm text-ghost-text">Total Revenue</p>
-                  </div>
-                  <h1 className="text-xl">$12,350</h1>
-                  <p className="text-sm text-ghost-text">All time earnings</p>
-                </div>
-                <div className="space-y-4 p-8 flex-1 bg-[#1A1A1A] rounded-[10px] border border-border">
-                  <div className="flex gap-2">
-                    <Calendar className="h-4 w-4 text-primary" />
-                    <p className="text-sm text-ghost-text">This Month</p>
-                  </div>
-                  <h1 className="text-xl">$1,850</h1>
-                  <p className="text-sm text-active-text">
-                    +12% from last month
-                  </p>
-                </div>
-                <div className="space-y-4 p-8 flex-1 bg-[#1A1A1A] rounded-[10px] border border-border">
-                  <div className="flex gap-2">
-                    <Percent className="h-4 w-4 text-primary" />
-                    <p className="text-sm text-ghost-text">Avg per Session</p>
-                  </div>
-                  <h1 className="text-xl">$85</h1>
-                  <p className="text-sm text-ghost-text">
-                    Based on 145 sessions
-                  </p>
-                </div>
-              </div>
-              <Card className="bg-[#1A1A1A]">
-                <CardHeader>
-                  <h1 className="text-lg text-[#F3F4F6]">
-                    6-Month Revenue Trend
-                  </h1>
-                </CardHeader>
+                );
+              })}
+            </div>
+          </TabsContent>
 
-                <CardContent className="h-76 w-full ">
-                  <ChartContainer
-                    config={chartConfig}
-                    className="h-full w-full"
-                  >
+          <TabsContent value="Revenue" className="space-y-4 p-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="space-y-2 p-4 flex-1 bg-[#1A1A1A] rounded-[10px] border border-border">
+                <div className="flex gap-2">
+                  <DollarSign className="h-4 w-4 text-primary" />
+                  <p className="text-sm text-ghost-text">Total Revenue</p>
+                </div>
+                <h1 className="text-xl">$12,350</h1>
+                <p className="text-sm text-ghost-text">All time earnings</p>
+              </div>
+              <div className="space-y-2 p-4 flex-1 bg-[#1A1A1A] rounded-[10px] border border-border">
+                <div className="flex gap-2">
+                  <TrendingUp className="h-4 w-4 text-active-text" />
+                  <p className="text-sm text-ghost-text">This Month</p>
+                </div>
+                <h1 className="text-xl">$1,850</h1>
+                <p className="text-xs text-active-text">
+                  +12% from last month
+                </p>
+              </div>
+              <div className="space-y-2 p-4 flex-1 bg-[#1A1A1A] rounded-[10px] border border-border">
+                <div className="flex gap-2">
+                  <Calendar className="h-4 w-4 text-info-text" />
+                  <p className="text-sm text-ghost-text">Avg per Session</p>
+                </div>
+                <h1 className="text-xl">$85</h1>
+                <p className="text-sm text-ghost-text">
+                  Based on 145 sessions
+                </p>
+              </div>
+            </div>
+
+            <Card className="bg-[#1A1A1A]">
+              <CardContent className="space-y-2">
+
+                <p className="text-sm">6-Month Revenue Trend</p>
+
+                <div className="grid grid-cols-1">
+                  <div className="h-70 ">
                     <LineChart
-                      data={revenueTrendData}
-                      margin={{ top: 10, left: 8, right: 8 }}
-                    >
-                      <CartesianGrid vertical={false} stroke="#27272A" />
+                      data={COACH_REVENUE_TRED}
+                      config={chartConfig}
+                      xAxisKey="month"
 
-                      <XAxis
-                        dataKey="month"
-                        tick={{ fontSize: 12, fill: "#9CA3AF" }}
-                        tickLine={false}
-                        axisLine={false}
-                        padding={{ left: 10, right: 10 }}
-                      />
-
-                      <YAxis hide domain={[0, "dataMax + 20"]} />
-
-                      <ChartTooltip
-                        cursor={false}
-                        content={<ChartTooltipContent />}
-                      />
-
-                      <Line
-                        dataKey="revenue"
-                        type="natural"
-                        stroke="var(--primary)"
-                        strokeWidth={2}
-                        dot={{ r: 3 }}
-                      />
-                    </LineChart>
-                  </ChartContainer>
-                </CardContent>
-              </Card>
-
-              <div className="space-y-2">
-                <h1 className="text-lg text-[#F3F4F6]">
-                  Revenue by Session Type
-                </h1>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="bg-[#1A1A1A] border border-border rounded-[10px] p-4 space-y-2">
-                    <div className="flex justify-between">
-                      <p className="text-sm text-ghost-text">
-                        Private Sessions
-                      </p>
-                      <h1>$4,750</h1>
-                    </div>
-                    <Progress
-                      value={50}
-                      valueClassName="bg-success-text"
-                      className="bg-[#3A3A3A]"
-                    />
-                  </div>
-
-                  <div className="bg-[#1A1A1A] border border-border rounded-[10px] p-4 space-y-2">
-                    <div className="flex justify-between">
-                      <p className="text-sm text-ghost-text">Group Sessions</p>
-                      <h1>$5,200</h1>
-                    </div>
-                    <Progress
-                      value={13}
-                      valueClassName="bg-info-text"
-                      className="bg-[#3A3A3A]"
-                    />
-                  </div>
-
-                  <div className="bg-[#1A1A1A] border border-border rounded-[10px] p-4 space-y-2">
-                    <div className="flex justify-between">
-                      <p className="text-sm text-ghost-text">
-                        Advanced Training
-                      </p>
-                      <h1>$2,400</h1>
-                    </div>
-                    <Progress
-                      value={53}
-                      valueClassName="bg-active-text"
-                      className="bg-[#3A3A3A]"
+                      tickFormatter={(value) => value.slice(0, 3)}
+                      lines={[
+                        {
+                          key: "value",
+                        },
+                      ]}
                     />
                   </div>
                 </div>
+              </CardContent>
+            </Card>
+
+
+
+            <div className="space-y-2">
+              <h1 className="text-md text-[#F3F4F6]">
+                Revenue by Session Type
+              </h1>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="bg-[#1A1A1A] border border-border rounded-[10px] p-4 space-y-2">
+                  <div className="flex justify-between">
+                    <p className="text-sm text-muted-foreground">
+                      Private Sessions
+                    </p>
+                    <h1>$4,750</h1>
+                  </div>
+                  <Progress
+                    value={50}
+                    valueClassName="bg-success-text"
+                    className="bg-[#3A3A3A]"
+                  />
+                </div>
+
+                <div className="bg-[#1A1A1A] border border-border rounded-[10px] p-4 space-y-2">
+                  <div className="flex justify-between">
+                    <p className="text-sm text-muted-foreground">Group Sessions</p>
+                    <h1>$5,200</h1>
+                  </div>
+                  <Progress
+                    value={13}
+                    valueClassName="bg-info-text"
+                    className="bg-[#3A3A3A]"
+                  />
+                </div>
+
+                <div className="bg-[#1A1A1A] border border-border rounded-[10px] p-4 space-y-2">
+                  <div className="flex justify-between">
+                    <p className="text-sm text-muted-foreground">
+                      Advanced Training
+                    </p>
+                    <h1>$2,400</h1>
+                  </div>
+                  <Progress
+                    value={53}
+                    valueClassName="bg-active-text"
+                    className="bg-[#3A3A3A]"
+                  />
+                </div>
               </div>
-            </TabsContent>
-          </CardContent>
-        </Card>
-      </Tabs>
+            </div>
+          </TabsContent>
+        </Tabs>
+      </div>
+
+
     </div>
   );
+}
+
+const EditProfile = () => {
+
+  const [open, setOpen] = useState(false)
+
+  const [editCoach, setEditCoach] = useState({
+    fullname: "",
+    email: "",
+    phone: "",
+    yearexp: "",
+    bio: "",
+    preferedSchedule: "",
+  });
+
+  const changeCoach = () => {
+    console.log(editCoach);
+  };
+
+  return (
+    <>
+      <Button
+        onClick={() => setOpen(!open)}
+        variant={"outline"}
+      >
+        {" "}
+        <Edit /> Edit Profile
+      </Button>
+      <Dialog open={open} onOpenChange={setOpen}>
+
+        <DialogContent className="bg-[#252525] border border-[#3A3A3A] sm:max-w-4xl p-0">
+          <DialogHeader className="border-b border-[#3A3A3A] p-4">
+            <DialogTitle className="text-[#F3F4F6] font-semibold text-lg">
+              Edit Coach Profile
+            </DialogTitle>
+          </DialogHeader>
+          <form onSubmit={changeCoach} className="">
+            <ScrollArea className=" py-1 space-y-4 px-2 ">
+              <div className="space-y-2 px-2 pb-2">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label className="text-sm text-[#99A1AF]">
+                      Full Name
+                    </Label>
+                    <Input
+                      name="fullName"
+                      placeholder="Coach Martinez"
+                      className="!bg-[#1A1A1A] !border-[#3A3A3A] !text-[#E5E7EB] !p-5"
+                      required
+                      value={editCoach.fullname}
+                      onChange={(e) =>
+                        setEditCoach((prev) => ({
+                          ...prev,
+                          fullname: e.target.value,
+                        }))
+                      }
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-sm text-[#99A1AF]">Email</Label>
+                    <Input
+                      name="email"
+                      placeholder="martinez@ap2t.com"
+                      className="!bg-[#1A1A1A] !border-[#3A3A3A] !text-[#E5E7EB] !p-5"
+                      required
+                      value={editCoach.email}
+                      onChange={(e) =>
+                        setEditCoach((prev) => ({
+                          ...prev,
+                          email: e.target.value,
+                        }))
+                      }
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label className="text-sm text-[#99A1AF]">Phone</Label>
+                    <Input
+                      name="phone"
+                      placeholder="(555) 123-4567"
+                      className="!bg-[#1A1A1A] !border-[#3A3A3A] !text-[#E5E7EB] !p-5"
+                      required
+                      value={editCoach.phone}
+                      onChange={(e) =>
+                        setEditCoach((prev) => ({
+                          ...prev,
+                          phone: e.target.value,
+                        }))
+                      }
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-sm text-[#99A1AF]">
+                      Years of Experience
+                    </Label>
+                    <Input
+                      name="yearsofexp"
+                      placeholder="10"
+                      className="!bg-[#1A1A1A] !border-[#3A3A3A] !text-[#E5E7EB] !p-5"
+                      required
+                      value={editCoach.yearexp}
+                      onChange={(e) =>
+                        setEditCoach((prev) => ({
+                          ...prev,
+                          yearexp: e.target.value,
+                        }))
+                      }
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label className="text-sm text-[#99A1AF]">
+                    Biography
+                  </Label>
+                  <Textarea className="!bg-[#1A1A1A] border border-border rounded-[10px] min-h-28" />
+                </div>
+
+                <div className="space-y-2">
+                  <Label className="text-sm text-[#99A1AF]">
+                    Preferred Schedule
+                  </Label>
+                  <Input
+                    name="preferedscedule"
+                    placeholder="Coach Martinez"
+                    className="!bg-[#1A1A1A] !border-[#3A3A3A] !text-[#E5E7EB] !p-5"
+                    required
+                    value={editCoach.preferedSchedule}
+                    onChange={(e) =>
+                      setEditCoach((prev) => ({
+                        ...prev,
+                        preferedSchedule: e.target.value,
+                      }))
+                    }
+                  />
+                </div>
+              </div>
+            </ScrollArea>
+            <Separator />
+            <div className="p-4">
+              <div className="flex gap-4 flex-wrap">
+                <DialogClose className="text-[13px] font-medium leading-none h-10 px-4 py-2 bg-black text-white border-border rounded-md hover:opacity-70 cursor-pointer flex flex-1 items-center justify-center">
+                  Cancel
+                </DialogClose>
+                <Button
+                  type="submit"
+                  className="flex-1 text-[13px]"
+                  size={"lg"}
+                >
+                  Save Changes
+                </Button>
+              </div>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
+    </>
+  )
+}
+
+const HeaderCard = ({ title = "", description = "", icon = null }: { title: string, description: string, icon: ReactNode }) => {
+
+  return (
+    <Card className="rounded-[10px] bg-[#1A1A1A] border-[#3A3A3A] sm:w-[250px] w-full">
+      <CardContent>
+        <div className="flex gap-4 items-center">
+          {icon}
+          <div>
+            <div className="text-lg text-white">
+              {title}
+            </div>
+            <div className="text-muted-foreground">
+              {description}
+            </div>
+
+          </div>
+        </div>
+
+      </CardContent>
+    </Card>
+  )
 }

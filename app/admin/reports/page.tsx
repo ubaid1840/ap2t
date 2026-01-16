@@ -191,20 +191,21 @@ export default function Page() {
             </div>
             <Button variant={"outline"} size={"icon-sm"} className="h-6 w-6 rounded-sm text-[10px] text-muted-foreground"><Download /></Button>
           </div>
+          <div className="grid grid-cols-1">
+            <div className="h-70">
+              <LineChart
+                data={MONTHLY_SESSIONS_DATA}
+                config={MONTHLY_SESSIONS_CONFIG}
+                xAxisKey="month"
 
-          <div className="h-70">
-            <LineChart
-              data={MONTHLY_SESSIONS_DATA}
-              config={MONTHLY_SESSIONS_CONFIG}
-              xAxisKey="month"
-
-              tickFormatter={(value) => value.slice(0, 3)}
-              lines={[
-                {
-                  key: "value",
-                },
-              ]}
-            />
+                tickFormatter={(value) => value.slice(0, 3)}
+                lines={[
+                  {
+                    key: "value",
+                  },
+                ]}
+              />
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -250,7 +251,7 @@ export default function Page() {
         <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-6 pb-0 gap-4 sm:gap-0">
 
           <div className="flex flex-col gap-1">
-            <h1 className="font-medium text-lg"><MapPin className="text-primary inline-flex" size={20}/> Geographic Distribution by Zip Code</h1>
+            <h1 className="font-medium text-lg"><MapPin className="text-primary inline-flex" size={20} /> Geographic Distribution by Zip Code</h1>
             <p className="text-sm text-muted-foreground">
               Customer location and revenue by area
             </p>
