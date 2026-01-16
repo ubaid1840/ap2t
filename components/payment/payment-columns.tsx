@@ -1,7 +1,7 @@
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { ColumnDef } from "@tanstack/react-table";
-import { ArrowUpDown, Check, CheckCircle, Eye, X } from "lucide-react";
+import { ArrowUpDown, Ban, Check, CheckCircle, CircleX, Eye, FileText, RefreshCcw, Send, X } from "lucide-react";
 import Link from "next/link";
 import getInitials from "../parents/get-initials";
 import CardStatus from "../card-status";
@@ -232,19 +232,41 @@ export const PAYMENT_COLUMNS: ColumnDef<PaymentData>[] = [
             <ViewDialog data={row.original} />
           </Dialog>
 
+          {status === "Completed" &&
+            <>
+              <Button className="text-muted-foreground hover:dark:bg-primary hover:dark:text-black" size="icon" variant="ghost">
+                <CircleX size={16} />
+              </Button>
+              <Button className="text-muted-foreground hover:dark:bg-primary hover:dark:text-black" size="icon" variant="ghost">
+                <FileText size={16} />
+              </Button>
+            </>}
+
+          {status === "Failed" &&
+            <>
+              <Button className="text-muted-foreground hover:dark:bg-primary hover:dark:text-black" size="icon" variant="ghost">
+
+                <RefreshCcw size={16} />
+              </Button>
+              <Button className="text-muted-foreground hover:dark:bg-primary hover:dark:text-black" size="icon" variant="ghost">
+
+                <Send size={16} />
+              </Button>
+            </>}
+
           {status === "Pending" && (
             <>
               <Dialog>
                 <DialogTrigger asChild>
-                  <Button  className="text-muted-foreground hover:dark:bg-primary hover:dark:text-black" size="icon" variant="ghost">
+                  <Button className="text-muted-foreground hover:dark:bg-primary hover:dark:text-black" size="icon" variant="ghost">
                     <CheckCircle size={16} />
                   </Button>
                 </DialogTrigger>
                 <CompedDialog data={row.original} />
               </Dialog>
 
-              <Button  className="text-muted-foreground hover:dark:bg-primary hover:dark:text-black" size="icon" variant="ghost">
-                <X size={16} />
+              <Button className="text-muted-foreground hover:dark:bg-primary hover:dark:text-black" size="icon" variant="ghost">
+                <Ban size={16} />
               </Button>
             </>
           )}
