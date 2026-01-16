@@ -138,8 +138,8 @@ export const SESSION_COLUMNS: ColumnDef<SessionData>[] = [
     cell: ({ row }) => (
       <Dialog>
         <DialogTrigger asChild>
-          <Button size="icon" variant="ghost">
-            <Eye className="h-4 w-4" />
+          <Button>
+            view
           </Button>
         </DialogTrigger>
         
