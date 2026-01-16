@@ -1,14 +1,18 @@
 "use client";
 import PageTable from "@/components/app-table";
 import InputWithIcon from "@/components/input-with-icon";
+import  SessionCalendar  from "@/components/sessions/session-calendar";
+import { CreateSessionDialog } from "@/components/sessions/create-session-dialog";
 import { SESSION_COLUMNS } from "@/components/sessions/session-column";
 import { SESSIONS_DATA } from "@/components/sessions/session-data";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { TabsContent } from "@radix-ui/react-tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+
+
 import { Filter, Plus } from "lucide-react";
 import { useState } from "react";
 
@@ -31,9 +35,15 @@ export default function Page() {
               <TabsTrigger value="Table">Table</TabsTrigger>
               <TabsTrigger value="Calendar">Calendar</TabsTrigger>
             </TabsList>
+          <Dialog>
+            <DialogTrigger>
             <Button className="gap-2 text-sm">
               <Plus /> Create New Session
             </Button>
+            </DialogTrigger>
+            <CreateSessionDialog/>
+          </Dialog>
+            
           </div>
         </div>
 
@@ -85,6 +95,9 @@ export default function Page() {
           
                     }}
           />
+        </TabsContent>
+        <TabsContent value="Calendar">
+        <SessionCalendar/>
         </TabsContent>
       </Tabs>
     </div>

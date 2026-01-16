@@ -1,0 +1,184 @@
+/* =====================================================
+   FULLCALENDAR — CLEAN DARK MONTH GRID (FINAL)
+   ===================================================== */
+
+/* Base calendar colors */
+.fc {
+  --fc-page-bg-color: #252525;
+  --fc-border-color: transparent;
+  --fc-neutral-bg-color: transparent;
+  --fc-neutral-text-color: #e5e7eb;
+}
+
+/* ------------------------------
+   HEADER TOOLBAR (top)
+   ------------------------------ */
+
+/* remove white bar under toolbar */
+.fc-theme-standard .fc-header-toolbar {
+  border-bottom: none !important;
+  margin-bottom: 8px;
+}
+
+/* toolbar layout */
+.fc .fc-header-toolbar {
+  padding: 8px 0;
+}
+
+/* month title */
+.fc .fc-toolbar-title {
+  color: #e5e7eb;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+/* toolbar buttons */
+.fc .fc-button {
+  background: #1a1a1a !important;
+  border: 1px solid var(--border) !important;
+  color: #e5e7eb !important;
+  border-radius: 10px;
+  padding: 6px 10px;
+}
+
+.fc .fc-button:hover {
+  background: #252525 !important;
+}
+
+.fc .fc-button:focus,
+.fc .fc-button:active {
+  box-shadow: none !important;
+}
+
+/* ------------------------------
+   WEEKDAY HEADER (Sun–Sat)
+   ------------------------------ */
+
+.fc .fc-col-header-cell {
+  background: transparent;
+}
+
+.fc .fc-col-header-cell-cushion {
+  color: #9ca3af;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 6px 0;
+}
+
+/* remove header grid borders */
+.fc-theme-standard thead th {
+  border: none;
+}
+
+/* ------------------------------
+   MONTH GRID BODY
+   ------------------------------ */
+
+/* remove outer grid borders */
+.fc-theme-standard .fc-scrollgrid,
+.fc-theme-standard td {
+  border: none;
+}
+
+/* day cell card */
+.fc .fc-daygrid-day-frame {
+  background: #1a1a1a;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 6px;
+
+  /* 🔥 gap between day boxes */
+  margin: 4px;
+
+  min-height: 110px;
+}
+
+/* remove default today background */
+.fc .fc-day-today {
+  background: transparent !important;
+}
+
+/* optional today highlight */
+.fc .fc-day-today .fc-daygrid-day-frame {
+  border-color: var(--color-primary);
+}
+
+/* ------------------------------
+   DATE NUMBER POSITION & STYLE
+   ------------------------------ */
+
+/* move date number to LEFT */
+.fc .fc-daygrid-day-top {
+  justify-content: flex-start;
+}
+
+/* date number */
+.fc .fc-daygrid-day-number {
+  color: #e5e7eb;
+  font-size: 12px;
+  padding: 4px 6px;
+}
+
+/* ------------------------------
+   EVENTS (optional styling)
+   ------------------------------ */
+
+.fc .fc-daygrid-event {
+  background: transparent;
+  border: none;
+  padding: 0;
+  margin-top: 4px;
+}
+
+.fc .fc-event-title {
+  color: #e5e7eb;
+  font-size: 12px;
+}
+
+/* ------------------------------
+   SCROLLGRID HEADER FIX
+   ------------------------------ */
+
+/* kill white strip under weekday header */
+.fc-theme-standard
+  .fc-scrollgrid-section-header
+  td {
+  background: transparent !important;
+  border: none !important;
+}
+
+
+/* =============================
+   FULLCALENDAR EVENT STYLING
+   ============================= */
+
+/* event container */
+.fc .fc-daygrid-event {
+  background: var(--color-active-bg);       /* event background */
+  color: var(--color-active-text);             /* text color */
+  padding: 2px 6px;           /* inner padding */
+  font-size: 20px;            
+  margin-top: 4px;            /* spacing from date number or other events */
+  cursor: pointer;
+  display: block;             /* full width of container */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* hover effect */
+.fc .fc-daygrid-event:hover {
+  background: #00C95033;        
+}
+
+/* optional: add border for comped or pending */
+.fc .fc-daygrid-event[data-status="comped"] {
+  border: 1px dashed var(--color-active-bg);
+  background: #1a1a1a;
+  color: var(--color-active-bg);
+}
+.fc .fc-daygrid-event[data-status="pending"] {
+  border: 1px dashed #ffc107;
+  background: #1a1a1a;
+  color: #ffc107;
+}

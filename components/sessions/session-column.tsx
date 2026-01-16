@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowUpDown, Eye } from "lucide-react";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import CardStatus from "../card-status";
+import Link from "next/link";
 
 
 export type SessionData = {
@@ -136,14 +137,11 @@ export const SESSION_COLUMNS: ColumnDef<SessionData>[] = [
     id: "actions",
     header: "ACTION",
     cell: ({ row }) => (
-      <Dialog>
-        <DialogTrigger asChild>
+          <Link href={`/admin/sessions/${row.original.id}`}>
           <Button>
             view
           </Button>
-        </DialogTrigger>
-        
-      </Dialog>
+          </Link>
     ),
   },
 ];
