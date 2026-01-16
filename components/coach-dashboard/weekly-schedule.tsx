@@ -4,6 +4,17 @@ import React, { useState } from "react";
 import moment from "moment";
 import { Button } from "../ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import { useIsMobile } from "@/hooks/use-mobile";
+
 
 interface Event {
   title: string;
@@ -28,7 +39,7 @@ const timeSlots = [
 
 export const WeeklySchedule: React.FC<WeeklyScheduleProps> = ({ events }) => {
   const [currentWeekStart, setCurrentWeekStart] = useState(moment().startOf("week").add(1, "days")); // Monday
-
+  const isMobile = useIsMobile()
   // Get dates of current week (Monday-Sunday)
   const weekDates = Array.from({ length: 7 }).map((_, i) =>
     moment(currentWeekStart).add(i, "days")
@@ -58,7 +69,7 @@ export const WeeklySchedule: React.FC<WeeklyScheduleProps> = ({ events }) => {
   };
 
   return (
-    <div className="p-4 space-y-4">
+    <div className=" flex flex-1 flex-col p-4 gap-4">
       <div className="flex flex-wrap gap-4 justify-between">
         <h1 className="text-lg text-[#F3F4F6]">Weekly Schedule</h1>
         <div className="flex items-center gap-4">
@@ -90,8 +101,59 @@ export const WeeklySchedule: React.FC<WeeklyScheduleProps> = ({ events }) => {
       </div>
 
 
+      <div className="flex flex-1 flex-col space-y-4">
+        <div className={`relative flex flex-1 flex-col ${isMobile && "max-w-[calc(100vw-112px)]"} `}>
+          <div className={`flex rounded-md border md:overflow-auto `}>
+            <ScrollArea className="overflow-x-auto flex flex-1">
+              <Table className="relative w-[800px] table-fixed sm:w-full">
+                <TableHeader className="hover:bg-inherit ">
+                  <TableRow className="bg-[#1A1A1A] text-white">
+                    <TableHead className="p-2 border font-normal">Time</TableHead>
+                    {weekDates.map((date) => (
+                      <TableHead key={date.format("YYYY-MM-DD")} className="p-2 border border-[#3A3A3A] font-normal">
+                          <div>{date.format("ddd")}</div>
+                          <div className="text-xs ">{date.format("MMM D")}</div>
+                        
+                      </TableHead>
+                    ))}
+                  </TableRow>
 
-      <div className="overflow-x-auto">
+                </TableHeader>
+                <TableBody className="bg-white dark:bg-[#252525]">
+                  {timeSlots.map((time) => (
+                    <TableRow key={time} >
+                      <TableCell className="p-2 border py-4 border-[#3A3A3A] font-normal">{time}</TableCell>
+                      {weekDates.map((date) => {
+                        const event = getEventForCell(date, time);
+                        return (
+                          <TableCell
+                            key={date.format("YYYY-MM-DD") + time}
+                            className={`p-2 border-2 border-border 
+    ${event ? statusColor(event.status) : "bg-[#00C95033]"}
+    overflow-hidden whitespace-nowrap truncate
+  `}
+                          >
+                            {event && event.title !== "Blocked" ? event.title : ""}
+                          </TableCell>
+                        );
+                      })}
+                    </TableRow>
+                  ))}
+
+                </TableBody>
+              </Table>
+
+
+              <ScrollBar orientation="horizontal" />
+            </ScrollArea>
+          </div>
+        </div>
+
+
+      </div>
+
+
+      {/* <div className="overflow-x-auto">
         <table className="w-full table-fixed border-collapse border border-[#3A3A3A] text-sm text-left">
           <thead>
             <tr className="bg-[#1A1A1A] text-white">
@@ -126,7 +188,7 @@ export const WeeklySchedule: React.FC<WeeklyScheduleProps> = ({ events }) => {
             ))}
           </tbody>
         </table>
-      </div>
+      </div> */}
     </div>
   );
 };

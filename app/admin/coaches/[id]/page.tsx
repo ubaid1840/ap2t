@@ -237,7 +237,7 @@ export default function Page() {
           </TabsContent>
 
           <TabsContent value="Availability" className="space-y-4 p-4">
-            <div className="bg-[#1A1A1A] border border-border rounded-[10px] px-4 py-2 flex justify-between">
+            <div className="bg-[#1A1A1A] border border-border rounded-[10px] px-4 py-2 flex justify-between gap-4 flex-wrap">
               <div className="flex gap-2 items-center text-sm">
                 <GoDotFill className="text-active-text" />
                 <h1 className="text-[#D1D5DC]">Synced with booking system</h1>
