@@ -1,14 +1,19 @@
+"use client";
+import PageTable from "@/components/app-table";
 import InputWithIcon from "@/components/input-with-icon";
+import { SESSION_COLUMNS } from "@/components/sessions/session-column";
+import { SESSIONS_DATA } from "@/components/sessions/session-data";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { TabsContent } from "@radix-ui/react-tabs";
 import { Filter, Plus } from "lucide-react";
 import { useState } from "react";
 
 export default function Page() {
-    const [filter,setFilter]=useState(true)
+  const [filter, setFilter] = useState(false);
   return (
     <div className="flex flex-col gap-4 w-full">
       <Tabs defaultValue="Table">
@@ -33,41 +38,54 @@ export default function Page() {
         </div>
 
         <div className="flex flex-col gap-4 rounded-[14px] bg-#252525 border border-[#3A3A3A] p-4 bg-[#252525]">
-                <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
-                   <div className="w-full">
-                    <InputWithIcon  placeholder="Search by player name, parent or position..."/>
-                   </div>
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+            <div className="w-full">
+              <InputWithIcon placeholder="Search by player name, parent or position..." />
+            </div>
 
-                    <Button onClick={() => setFilter(!filter)}>
-                        <Filter /> Filters
-                    </Button>
+            <Button onClick={() => setFilter(!filter)}>
+              <Filter /> Filters
+            </Button>
+          </div>
+          {filter && (
+            <div className="flex flex-col w-full gap-4">
+              <Separator />
+              <div className="flex flex-col sm:flex-row w-full gap-4">
+                <div className="flex flex-1 flex-col gap-2">
+                  <Label className="text-muted-foreground font-normal">
+                    Coach
+                  </Label>
+                  <Input className="rounded-[8px] dark:bg-black" />
                 </div>
+
+                <div className="flex flex-1 flex-col gap-2">
+                  <Label className="text-muted-foreground font-normal">
+                    Session Type
+                  </Label>
+                  <Input className="rounded-[8px] dark:bg-black" />
                 </div>
 
-                {filter &&
-                    <div className="flex flex-col w-full gap-4">
+                <div className="flex flex-1 flex-col gap-2">
+                  <Label className="text-muted-foreground font-normal">
+                    Attendance
+                  </Label>
+                  <Input className="rounded-[8px] dark:bg-black" />
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
 
-                        <Separator />
-                        <div className="flex flex-col sm:flex-row w-full gap-4">
-
-                            <div className="flex flex-1 flex-col gap-2">
-                                <Label className="text-muted-foreground font-normal">Coach</Label>
-                                <Input className="rounded-[8px] dark:bg-black" />
-                            </div>
-
-                            <div className="flex flex-1 flex-col gap-2">
-                                <Label className="text-muted-foreground font-normal">Session Type</Label>
-                                <Input  className="rounded-[8px] dark:bg-black" />
-                            </div>
-
-                             <div className="flex flex-1 flex-col gap-2">
-                                <Label className="text-muted-foreground font-normal">Attendance</Label>
-                                <Input  className="rounded-[8px] dark:bg-black" />
-                            </div>
-
-                        </div>
-                    </div>}
-
+        <TabsContent value="Table">
+          <PageTable
+          headerClassName={"rounded-4xl"}
+                    columns={SESSION_COLUMNS}
+                    data={SESSIONS_DATA}
+                    onRowClick={() => {
+          
+                    }}
+          />
+        </TabsContent>
       </Tabs>
     </div>
   );
