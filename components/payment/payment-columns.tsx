@@ -176,12 +176,27 @@ export const PAYMENT_COLUMNS: ColumnDef<PaymentData>[] = [
       <div className="flex gap-2">
         <Dialog>
         <DialogTrigger asChild>
-            <Button>
-              view
+            <Button size="icon" variant="ghost">
+              <Eye className="h-4 w-4" />
             </Button>
           </DialogTrigger>
         <ViewDialog data={row.original}/>
         </Dialog>
+        {status === "Pending" && (
+          <>
+            <Dialog>
+            <DialogTrigger asChild>
+            <Button size="icon" variant="ghost">
+              <CheckCircle className="h-4 w-4" />
+            </Button>
+          </DialogTrigger>
+        <CompedDialog data={row.original}/>
+        </Dialog>
+            <Button size="icon" variant="ghost">
+              <X className="h-4 w-4" />
+            </Button>
+          </>
+        )}
       </div>
     );
   },
