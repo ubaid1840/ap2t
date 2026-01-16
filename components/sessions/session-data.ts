@@ -1,4 +1,4 @@
-export interface SessionData {
+export interface SessionDataType {
   id: string;
   sessionName: string;
   type: string;
@@ -11,22 +11,7 @@ export interface SessionData {
   status: string;
 }
 
-
-
-export interface SessionData {
-  id: string;
-  sessionName: string;
-  type: string;
-  date: string;
-  time: string;
-  coachName: string;
-  playerName: string;
-  price: string;
-  payment: string;
-  status: string;
-}
-
-export const SESSIONS_DATA: SessionData[] = [
+export const SESSIONS_DATA: SessionDataType[] = [
   {
     id: "1",
     sessionName: "Beginner Skills Training",
