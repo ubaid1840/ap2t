@@ -5,7 +5,6 @@ import { PAYMENT_COLUMNS } from "@/components/payment/payment-columns";
 import { PAYMENT_DATA } from "@/components/payment/payment-data";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { useIsMobile } from "@/hooks/use-mobile";
 import {
   Clock,
   CreditCard,
@@ -14,7 +13,7 @@ import {
   Filter,
   OctagonAlert,
 } from "lucide-react";
-import { useState } from "react";
+import { ReactNode, useState } from "react";
 import { GoDotFill } from "react-icons/go";
 
 const localData = [
@@ -22,7 +21,7 @@ const localData = [
     Icon: <DollarSign />,
     title: "Total Revenue",
     description: "$120.00",
-    type: "success",
+    type: "active",
     going: "active",
   },
   {
@@ -48,42 +47,43 @@ const localData = [
   },
 ];
 
-
+const allFilters = ["All", "Completed", "Pending", "Failed", "Comped", "Voided"]
 
 export default function Page() {
   const [filter, setFilter] = useState<
     "All" | "Completed" | "Pending" | "Failed" | "Comped" | "Voided"
   >("All");
 
-  const filteredData=PAYMENT_DATA.filter((data)=> {
-    if (filter==="All"){
+  const filteredData = PAYMENT_DATA.filter((data) => {
+    if (filter === "All") {
       return data
     }
-    return data.status===filter})
+    return data.status === filter
+  })
 
   return (
-    <div className="flex flex-col gap-4 w-full">
-      <div className="flex justify-between">
-        <div className="text-xl font-semibold text-[#F3F4F6]">
-          <h1>Payments Management</h1>
-          <p className="text-sm text-[#99A1AF]">
-            Secure payment processing powered by Square{" "}
-          </p>
-        </div>
+    <div className="flex flex-col w-full gap-4">
+      <Header>
+        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+          <Card className="p-0">
+            <CardContent className="flex gap-2 p-[16px]">
+              <div
+                className={`rounded-[8px] flex w-10 h-10 items-center justify-center bg-info-bg text-info-text`}
+              >
+                <CreditCard size={20} />
+              </div>
+              <div className="space-y-1 ">
+                <h1 className="text-[#99A1AF] text-xs">Square Integration</h1>
+                <div className="flex items-center gap-2 text-sm">
+                  <GoDotFill className="text-active-text" />
+                  <h1 className="text-active-text">Connected</h1>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
 
-        <div className="bg-[#252525] border border-border rounded-[10px] flex items-center gap-2 p-2">
-          <div className="rounded-[10px] p-2 bg-info-bg text-info-text">
-            <CreditCard className="text-md" />
-          </div>
-          <div className="space-y-1 ">
-            <h1 className="text-[#99A1AF] text-xs">Square Integration</h1>
-            <div className="flex items-center gap-2 text-xs">
-              <GoDotFill className="text-active-text" />
-              <h1 className="text-active-text">Connected</h1>
-            </div>
-          </div>
         </div>
-      </div>
+      </Header>
 
       <div className="flex justify-between gap-4 flex-wrap">
         {localData.map((item, index) => (
@@ -91,7 +91,7 @@ export default function Page() {
             key={index}
             className="rounded-[10px] bg-[#252525] border-[#3A3A3A] flex-1"
           >
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-2">
               <div className="flex gap-4 items-center">
                 <div
                   className={`rounded-[8px] flex w-10 h-10 items-center justify-center bg-${item.type}-bg text-${item.type}-text`}
@@ -108,76 +108,75 @@ export default function Page() {
         ))}
       </div>
 
-      <div className="flex gap-4 p-6 justify-between  bg-[#252525] rounded-2xl border border-border">
-        <InputWithIcon
-          className="flex-1 p-1"
-          placeholder="Search by parent, player, or transaction ID..."
-        />
-        <div className="flex gap-4 items-center">
-          <Filter />
-          <p>Filter:</p>
+      <div className="
+  flex flex-col gap-4
+  rounded-[14px]
+  bg-[#252525]
+  border border-[#3A3A3A]
+  p-4
+  sm:flex-row
+  sm:items-center
+  sm:justify-between
+">
 
-          <div className="flex gap-4">
+        <div className="w-full sm:flex-1">
+          <InputWithIcon
+            placeholder="Search by parent, player, or transaction ID..."
+            className="w-full"
+          />
+        </div>
+
+        {/* Filters */}
+        <div className="
+    flex flex-wrap items-center gap-2
+    w-full
+    sm:w-auto
+  ">
+          <Filter className="text-muted-foreground" size={16} />
+          <p className="text-muted-foreground text-sm mr-1">Status:</p>
+
+          {allFilters.map((item) => (
             <Button
-              className={`text-sm ${
-                filter === "All" ? "" : "bg-[#1A1A1A] text-[#99A1AF]"
-              }`}
-              onClick={() => setFilter("All")}
+              key={item}
+              variant={filter === item ? "default" : "outline"}
+              size="sm"
+              className={
+                filter === item
+                  ? "font-medium"
+                  : "font-normal text-muted-foreground border-muted-foreground"
+              }
+              onClick={() => setFilter(item as typeof filter)}
             >
-              All
+              {item}
             </Button>
-            <Button
-              className={`text-sm ${
-                filter === "Completed" ? "" : "bg-[#1A1A1A] text-[#99A1AF]"
-              }`}
-              onClick={() => setFilter("Completed")}
-            >
-              Completed
-            </Button>
-            <Button
-              className={`text-sm ${
-                filter === "Pending" ? "" : "bg-[#1A1A1A] text-[#99A1AF]"
-              }`}
-              onClick={() => setFilter("Pending")}
-            >
-              Pending
-            </Button>
-            <Button
-              className={`text-sm ${
-                filter === "Failed" ? "" : "bg-[#1A1A1A] text-[#99A1AF]"
-              }`}
-              onClick={() => setFilter("Failed")}
-            >
-              Failed
-            </Button>
-            <Button
-              className={`text-sm ${
-                filter === "Comped" ? "" : "bg-[#1A1A1A] text-[#99A1AF]"
-              }`}
-              onClick={() => setFilter("Comped")}
-            >
-              Comped
-            </Button>
-            <Button
-              className={`text-sm ${
-                filter === "Voided" ? "" : "bg-[#1A1A1A] text-[#99A1AF]"
-              }`}
-              onClick={() => setFilter("Voided")}
-            >
-              Voided
-            </Button>
-          </div>
+          ))}
         </div>
       </div>
 
-      <PageTable
-          headerClassName={"rounded-4xl"}
-          columns={PAYMENT_COLUMNS}
-          data={filteredData}
-          onRowClick={() => {
 
-          }}
-        />
+      <PageTable
+
+        columns={PAYMENT_COLUMNS}
+        data={filteredData}
+        onRowClick={() => {
+
+        }}
+      />
     </div>
   );
 }
+
+const Header = ({ children }: { children: ReactNode }) => {
+  return (
+    <div className="flex w-full gap-4 justify-between flex-wrap items-center">
+      <div className="space-y-1">
+        <p className="text-xl">Payments Management</p>
+        <span className="text-xs text-muted-foreground flex items-center">
+          <span>Secure payment processing powered by Square</span>
+        </span>
+      </div>
+
+      {children}
+    </div>
+  );
+};
