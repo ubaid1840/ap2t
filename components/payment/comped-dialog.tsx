@@ -1,5 +1,5 @@
 import { DialogClose } from "@radix-ui/react-dialog";
-import { DialogContent, DialogHeader } from "../ui/dialog";
+import { DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
 import { ScrollArea } from "../ui/scroll-area";
 import { Button } from "../ui/button";
 import { PaymentData } from "./payment-columns";
@@ -22,17 +22,17 @@ type CompedDialogProps = {
 
 export function CompedDialog({ data }: CompedDialogProps) {
   return (
-    <DialogContent className="bg-[#252525] border border-border p-0 sm:max-w-4xl">
+    <DialogContent className="bg-[#252525] border border-border p-0">
       <DialogHeader className="border-b border-border p-4">
-        <h1 className="text-lg font-semibold text-[#F3F4F6]">
+        <DialogTitle className="text-lg font-semibold text-[#F3F4F6]">
           Mark Session as Comped
-        </h1>
+        </DialogTitle>
         <p className="text-sm text-ghost-text">
           This action is for accounting purposes
         </p>
       </DialogHeader>
       <ScrollArea className="h-[70dvh]">
-        <div className="p-6 space-y-4">
+        <div className="px-6 py-2 space-y-4">
           <div className="bg-[#1A1A1A] border border-border rounded-[10px] space-y-2 p-6">
             <div className="flex justify-between">
               <p className="text-ghost-text">Parent:</p>
@@ -94,12 +94,10 @@ export function CompedDialog({ data }: CompedDialogProps) {
       </ScrollArea>
       <div className="p-2 space-y-1 border-t border-[#3A3A3A]">
         <div className="flex gap-4">
-          <DialogClose className="flex-1">
-            <Button className="bg-[#1A1A1A] hover:bg-[#252525] hover:text-white border border-[#3A3A3A] w-full text-[#D1D5DC] text-md font-semibold py-5">
-              Cencel
-            </Button>
+            <DialogClose className="text-[12px] font-medium tracking-wider leading-none h-10 px-4 py-2 bg-primary text-black rounded-md hover:opacity-70 cursor-pointer flex flex-1 items-center justify-center">
+            Cancel
           </DialogClose>
-          <Button className="bg-[#AD46FF] flex-1 text-md font-semibold py-5">
+          <Button size={"lg"} className="bg-other-text text-white flex-1">
             Mark as Comped
           </Button>
         </div>

@@ -6,7 +6,7 @@ import { Button } from "./ui/button";
 import { Calendar } from "./ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 
-const AppCalendar = ({ date, onChange, required = false } : {date : Date | undefined, onChange : (item : any)=> void, required?: boolean}) => {
+const AppCalendar = ({ date, onChange, required = false , className } : {date : Date | undefined, onChange : (item : any)=> void, required?: boolean, className ?: string}) => {
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   return (
     <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
@@ -15,7 +15,7 @@ const AppCalendar = ({ date, onChange, required = false } : {date : Date | undef
           variant={"outline"}
           className={cn(
             "w-full h-9 rounded-md dark:bg-[#1A1A1A]",
-            !date && "text-muted-foreground"
+            !date && "text-muted-foreground", className
           )}
         >
           {date ? format(date, "PPP") : <p className="text-[14px] font-normal">Pick a date</p>}

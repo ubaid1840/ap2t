@@ -117,11 +117,11 @@ const PageTable = ({
         <div className={`flex rounded-md border md:overflow-auto ${headerClassName}`}>
           <ScrollArea className="overflow-x-auto flex flex-1">
             <Table className="relative w-full">
-              <TableHeader className="hover:bg-inherit">
+              <TableHeader className="hover:bg-inherit ">
                 {table.getHeaderGroups().map((headerGroup) => (
                   <TableRow key={headerGroup.id} className="bg-background hover:bg-inherit">
                     {headerGroup.headers.map((header) => (
-                      <TableHead style={{ width: header.getSize() }} key={header.id}>
+                      <TableHead style={{ width: header.getSize() }} key={header.id} className="p-0 py-2">
                         {header.isPlaceholder
                           ? null
                           : flexRender(header.column.columnDef.header, header.getContext())}
@@ -140,7 +140,7 @@ const PageTable = ({
                       data-state={row.getIsSelected() && "selected"}
                     >
                       {row.getVisibleCells().map((cell: any) => (
-                        <TableCell className="text-[13px]" key={cell.id}>
+                        <TableCell className="text-[12px] p-3" key={cell.id}>
                           {flexRender(cell.column.columnDef.cell, {
                             ...cell.getContext(),
                             stopRowClick: (e: any) => e.stopPropagation(),

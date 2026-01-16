@@ -7,7 +7,7 @@ import {
   ShieldCheck,
   User,
 } from "lucide-react";
-import { DialogClose, DialogContent, DialogHeader } from "../ui/dialog";
+import { DialogClose, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
 import { ScrollArea } from "../ui/scroll-area";
 import { PaymentData } from "./payment-columns";
 import CardStatus from "../card-status";
@@ -40,24 +40,24 @@ export function ViewDialog({ data }: ViewDialogProps) {
   return (
     <DialogContent className="bg-[#252525] border border-border p-0 sm:max-w-4xl">
       <DialogHeader className="border-b border-border p-4">
-        <h1 className="text-lg font-semibold text-[#F3F4F6]">
+        <DialogTitle className="text-lg font-semibold text-[#F3F4F6]">
           Payment Details
-        </h1>
+        </DialogTitle>
         <p className="text-sm text-ghost-text">Transaction</p>
         <p className="text-sm text-ghost-text">{data.transactionId}</p>
       </DialogHeader>
       <ScrollArea className="h-[70dvh]">
-        <div className="p-6 space-y-4">
+        <div className="px-6 py-2 space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div className="bg-[#1A1A1A] border border-border p-4 space-y-1 rounded-[10px]">
-              <div className="flex gap-2">
+              <div className="flex gap-2 items-center">
                 <DollarSign className="text-primary h-4 w-4" />
                 <p className="text-sm text-ghost-text">Amount</p>
               </div>
               <h1 className="text-xl text-[#F3F4F6] ml-2">${data.amount}</h1>
             </div>
             <div className="bg-[#1A1A1A] border border-border p-4 space-y-2 rounded-[10px]">
-              <div className="flex gap-2">
+              <div className="flex gap-2 items-center">
                 <ShieldCheck className="text-primary h-4 w-4" />
                 <p className="text-sm text-ghost-text">Status</p>
               </div>
@@ -69,9 +69,9 @@ export function ViewDialog({ data }: ViewDialogProps) {
             </div>
           </div>
           <div className="space-y-2">
-            <h1 className="text-lg text-[#E5E7EB]">Payment Information</h1>
+            <h1 className="text-lg font-normal text-[#E5E7EB]">Payment Information</h1>
 
-            <div className="space-y-1">
+            <div className="space-y-3">
               <div className="bg-[#1A1A1A] border border-border rounded-[10px] flex justify-between p-4">
                 <div className="flex gap-2 text-[#99A1AF]">
                   <User />
@@ -153,8 +153,8 @@ export function ViewDialog({ data }: ViewDialogProps) {
       </ScrollArea>
       <div className="p-4 border-t border-[#3A3A3A]">
         <div className="flex justify-end gap-4  ">
-          <DialogClose>
-            <Button className="text-md font-semibold py-5">Cancel</Button>
+         <DialogClose className="text-[12px] font-medium tracking-wider leading-none h-10 px-4 py-2 bg-primary text-black rounded-md hover:opacity-70 cursor-pointer flex  items-center justify-center">
+            Close
           </DialogClose>
         </div>
       </div>

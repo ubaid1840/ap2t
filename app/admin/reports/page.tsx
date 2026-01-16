@@ -67,7 +67,6 @@ export default function Page() {
 
   ]
 
-  const isMobile = useIsMobile()
   return (
     <div className="flex flex-col w-full gap-4">
       <Header>
