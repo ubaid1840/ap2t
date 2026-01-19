@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 
-const typeClasses = {
+export const typeClasses = {
   success: "bg-success-bg text-success-text border-success-text/32",
   warning: "bg-warning-bg text-warning-text border-warning-text/32",
   danger: "bg-danger-bg text-danger-text border-danger-text/32",

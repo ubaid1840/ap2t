@@ -70,7 +70,7 @@ export function CreateSessionDialog() {
                   />
                 </div>
 
-                <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   <div className="space-y-2">
                     <Label className="text-sm text-muted-foreground">
                       Session Type *
@@ -113,7 +113,7 @@ export function CreateSessionDialog() {
                   <h1 className="text-[#F3F4F6]">Schedule</h1>
                 </div>
 
-                <div className="grid grid-cols-3 gap-2">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                   <div className="space-y-2">
                     <Label className="text-sm text-muted-foreground">
                       Date *
@@ -173,7 +173,7 @@ export function CreateSessionDialog() {
                   <h1 className="text-[#F3F4F6]">Location & Pricing</h1>
                 </div>
 
-                <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   <div className="space-y-2">
                     <Label className="text-sm text-muted-foreground">
                       Location *
@@ -216,7 +216,7 @@ export function CreateSessionDialog() {
                   <h1 className="text-[#F3F4F6]">Capacity & Promotions</h1>
                 </div>
 
-                <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   <div className="space-y-2">
                     <Label className="text-sm text-muted-foreground">
                       Max Players *

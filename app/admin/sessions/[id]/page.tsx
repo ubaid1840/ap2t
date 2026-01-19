@@ -1,26 +1,24 @@
 "use client";
 import BackButton from "@/components/back-button";
-import CardStatus from "@/components/card-status";
+import CardStatus, { typeClasses } from "@/components/card-status";
 import { EditSessionDialog } from "@/components/sessions/edit-session-dialog";
 import {
   SessionDataType,
   SESSIONS_DATA,
 } from "@/components/sessions/session-data";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
+  CardContent
 } from "@/components/ui/card";
 import {
   Dialog,
   DialogClose,
   DialogContent,
   DialogHeader,
-  DialogTrigger,
+  DialogTitle
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
@@ -35,6 +33,8 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { Scrollbar } from "@radix-ui/react-scroll-area";
 import {
   Ban,
   Calendar,
@@ -44,17 +44,14 @@ import {
   CircleX,
   Clock,
   DollarSign,
-  Edit,
-  Edit2,
   Gift,
   Mail,
   MapPin,
   MessageSquare,
   Phone,
   Plus,
-  SquarePen,
   User,
-  Users,
+  Users
 } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -186,10 +183,10 @@ const notesData = [
 export default function Page() {
   const { id } = useParams();
   const [data, setData] = useState<SessionDataType>();
+  const [tab, setTab] = useState("Participants")
+  const isMobile = useIsMobile()
 
-  const editSession = () => {
-    console.log(data);
-  };
+ 
 
   useEffect(() => {
     if (id) {
@@ -199,144 +196,158 @@ export default function Page() {
   }, [id]);
 
   return (
-    <div className="flex flex-col gap-4 w-full">
-      <div className="flex justify-between">
-        <BackButton title="Back to coaches" route="/admin/sessions" />
-      </div>
-      <div className="bg-[#252525] border border-border p-6 px-0 rounded-[10px] space-y-4 w-full">
-        <div className="flex justify-between px-6">
-          <div className="space-y-1">
-            <div className=" flex item gap-4">
-              <h1 className="text-xl text-[#F3F4F6] font-semibold">
-                {data?.sessionName}
-              </h1>
-              <div className="px-2 py-0 rounded-2xl bg-[#00C95033] border border-[#00C9504D] flex items-center gap-1 text-active-text">
-                <CheckCircle className="h-4 w-4" />
-                <h1>{data?.status}</h1>
+    <div className="flex flex-col w-full gap-6">
+
+      <BackButton title="Back To Sessions" route="/admin/sessions" />
+
+      <Card className="w-full rounded-2xl bg-[#252525]">
+        <CardContent className="p-0 space-y-2">
+          <div className="px-6 space-y-4">
+            <div className="flex justify-between items-center flex-wrap gap-4">
+              <div className="flex gap-2 items-center">
+                <span className="flex gap-2 text-xl items-center leading-none">
+                  {data?.sessionName}
+                </span>
+                <Badge className="bg-info-bg text-info-text border border-info-text/32 h-6">
+                  <div className="flex gap-1 items-center">
+                    <Clock size={16} />
+                    <p>
+                      {data?.status}
+                    </p>
+                  </div>
+                </Badge>
               </div>
+              <EditSessionDialog />
+
+
             </div>
-            <p className="text-sm text-ghost-text">
+            <p className="text-sm text-muted-foreground">
               Advanced skills training session focusing on ball handling,
               agility and awareness{" "}
             </p>
-          </div>
 
-          <Dialog>
-            <DialogTrigger className="flex gap-2 bg-[#1A1A1A] border border-border py-0 px-6 rounded-[10px] items-center hover:bg-primary hover:text-black">
-              <SquarePen className="w-5 h-5" /> Edit
-            </DialogTrigger>
-            <EditSessionDialog />
-          </Dialog>
-        </div>
-
-        <div className="flex gap-2 w-full px-6">
-          <div className="flex-1 flex gap-2 items-center">
-            <Calendar className="h-4 w-4 text-ghost-text" />
-            <div className=" ">
-              <p className="text-sm text-ghost-text">Date</p>
-              <h1 className="text-[#E5E7EB]">{data?.date}</h1>
-            </div>
-          </div>
-
-          <div className="flex-1 flex gap-2 items-center">
-            <Clock className="h-4 w-4 text-ghost-text" />
-            <div className=" ">
-              <p className="text-sm text-ghost-text">Time</p>
-              <h1 className="text-[#E5E7EB]">{data?.time}</h1>
-            </div>
-          </div>
-
-          <div className="flex-1 flex gap-2 items-center">
-            <User className="h-4 w-4 text-ghost-text" />
-            <div className=" ">
-              <p className="text-sm text-ghost-text">Coach</p>
-              <h1 className="text-[#E5E7EB]">{data?.coachName}</h1>
-            </div>
-          </div>
-
-          <div className="flex-1 flex gap-2 items-center">
-            <MapPin className="h-4 w-4 text-ghost-text" />
-            <div className=" ">
-              <p className="text-sm text-ghost-text">Location</p>
-              <h1 className="text-[#E5E7EB]">Court A - Main Facility</h1>
-            </div>
-          </div>
-        </div>
-
-        <div className="flex justify-between gap-4 flex-wrap px-6">
-          {localData.map((item, index) => (
-            <Card
-              key={index}
-              className="rounded-[10px] bg-[#1A1A1A] border-[#3A3A3A] flex-1"
-            >
-              <CardContent className="space-y-4">
-                <div className="flex gap-4 items-center">
-                  <div className={`text-${item.type}-text`}>{item.icon}</div>
-                  <div className="flex flex-col gap-1">
-                    <h1 className="font-semibold text-2xl">{item.h}</h1>
-                    <p className="text-[#B0B0B0]">{item.p}</p>
-                  </div>
+            <div className="flex gap-4 flex-col sm:flex-row">
+              <div className="flex-1 flex gap-3 items-center">
+                <Calendar className="h-4 w-4 text-ghost-text" />
+                <div className=" ">
+                  <p className="text-xs text-ghost-text">Date</p>
+                  <h1 className="text-[#E5E7EB] text-sm">{data?.date}</h1>
                 </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+              </div>
 
-        <Separator />
+              <div className="flex-1 flex gap-3 items-center">
+                <Clock className="h-4 w-4 text-ghost-text" />
+                <div className=" ">
+                  <p className="text-xs text-ghost-text">Time</p>
+                  <h1 className="text-sm text-[#E5E7EB]">{data?.time}</h1>
+                </div>
+              </div>
 
-        <div className="flex px-6 gap-2">
-          <Button
-            variant={"outline"}
-            className="!bg-active-bg flex gap-2 text-active-text"
-          >
-            <Check /> Mark as Completed
-          </Button>
-          <Button
-            variant={"outline"}
-            className="!bg-alternative-bg flex gap-2 text-alternative-text"
-          >
-            <Gift /> Mark as Comped
-          </Button>
-          <Button
-            variant={"outline"}
-            className="!bg-danger-bg flex gap-2 text-danger-text"
-          >
-            <Ban /> Cancel Session
-          </Button>
-        </div>
-      </div>
+              <div className="flex-1 flex gap-3 items-center">
+                <User className="h-4 w-4 text-ghost-text" />
+                <div className=" ">
+                  <p className="text-xs text-ghost-text">Coach</p>
+                  <h1 className="text-[#E5E7EB] text-sm">{data?.coachName}</h1>
+                </div>
+              </div>
 
-      <Tabs defaultValue="Participants">
-        <Card className="p-0">
-          <div className="p-2 flex items-center border-b border-border">
-            <TabsList className="!bg-[#252525] gap-6 p-0">
-              <TabsTrigger value="Participants" className="flex gap-2">
-                <Users />
-                Participants (3){" "}
-              </TabsTrigger>
-              <TabsTrigger value="Payments" className="flex gap-2">
-                <Users />
-                Payments (3){" "}
-              </TabsTrigger>
-              <TabsTrigger value="Notes" className="flex gap-2">
-                <Users />
-                Notes (2){" "}
-              </TabsTrigger>
-            </TabsList>
+              <div className="flex-1 flex gap-3 items-center">
+                <MapPin className="h-4 w-4 text-ghost-text" />
+                <div className=" ">
+                  <p className="text-xs text-ghost-text">Location</p>
+                  <h1 className="text-[#E5E7EB] text-sm">Court A - Main Facility</h1>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex justify-between gap-4 flex-wrap">
+              {localData.map((item, index) => (
+                <Card
+                  key={index}
+                  className="rounded-[10px] bg-[#1A1A1A] border-[#3A3A3A] flex-1 p-0"
+                >
+                  <CardContent className="space-y-4 p-0 p-4">
+                    <div className="flex gap-4 items-center">
+                      <div className={`text-${item.type}-text`}>{item.icon}</div>
+                      <div className="flex flex-col gap-1">
+                        <h1 className="font-semibold text-xl">{item.h}</h1>
+                        <p className="text-[#B0B0B0] text-xs">{item.p}</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
           </div>
-          <CardContent className="px-4 space-y-4 ">
-            <TabsContent value="Participants">
-              {ParticipantsData.map((participent) => {
-                return (
-                  <Card className="bg-[#1A1A1A] border border-border">
-                    <CardHeader className="flex gap-2">
+          <Separator className="my-4" />
+
+          <div className="flex px-6 gap-2 flex-wrap">
+            <Button
+              variant={"outline"}
+              className="dark:bg-active-bg flex gap-2 text-active-text border dark:border-active-text/32"
+            >
+              <Check /> Mark as Completed
+            </Button>
+            <Button
+              variant={"outline"}
+              className="dark:bg-warning-bg flex gap-2 text-warning-text border dark:border-warning-text/32"
+            >
+              <Gift /> Mark as Comped
+            </Button>
+            <Button
+              variant={"outline"}
+              className="dark:bg-danger-bg flex gap-2 text-danger-text border dark:border-danger-text/32"
+            >
+              <Ban /> Cancel Session
+            </Button>
+          </div>
+
+        </CardContent>
+      </Card>
+
+
+      <div className="w-full rounded-2xl bg-[#252525] py-2">
+        <Tabs
+          value={tab}
+          onValueChange={(v) => {
+            setTab(v);
+          }}
+
+        >
+          <ScrollArea className={`overflow-x-auto ${isMobile && "max-w-[calc(100vw-64px)]"}`}>
+            <TabsList className="bg-transparent relative flex gap-2 px-2">
+              {["Participants", "Payments", "Notes"
+              ].map((t) => (
+                <TabsTrigger
+                  key={t}
+                  value={t}
+                  className="h-9 px-4 text-[12px] leading-tight tracking-tight"
+                >
+                  {t === "Participants" && <div className="flex gap-2 items-center py-2"><User /> Participants {"(3)"}</div>}
+                  {t === "Payments" && <div className="flex gap-2 items-center py-2"><DollarSign /> Payments {"(3)"}</div>}
+                  {t === "Notes" && <div className="flex gap-2 items-center py-2"><MessageSquare /> Notes {"(3)"}</div>}
+                </TabsTrigger>
+              ))}
+            </TabsList>
+            <Scrollbar orientation="horizontal" />
+          </ScrollArea>
+          <Separator />
+
+          <TabsContent value="Participants" className="space-y-4 p-4">
+            {ParticipantsData.map((participent, i) =>  (
+                <Card key={i} className="bg-[#1A1A1A] border border-border">
+
+                  <CardContent className="space-y-2">
+
+                    <div className="flex gap-2 items-center">
                       <h1>{participent.name}</h1>
                       <CardStatus
                         value={participent.status}
-                        type={participent.statusType}
+                        type={participent.statusType as keyof typeof typeClasses}
                       />
-                    </CardHeader>
-                    <CardContent className="grid grid-cols-2 gap-4">
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                       <div className="flex gap-2">
                         <User className="w-4 h-4 text-ghost-text" />{" "}
                         <div className="flex text-sm text-ghost-text">
@@ -362,14 +373,15 @@ export default function Page() {
                           <p>Amount:</p> <p>{participent.amount}</p>
                         </div>
                       </div>
-                    </CardContent>
+                    </div>
 
-                    <CardFooter className="border-t border-border flex gap-4">
-                      <Button className="!bg-active-bg !text-active-text flex gap-2">
+                    <Separator />
+                    <div className="flex gap-4 flex-wrap">
+                      <Button className="dark:bg-active-bg text-active-text border dark:border-active-text/32">
                         <CheckCircle />
                         Mark Present
                       </Button>
-                      <Button className="!bg-danger-bg !text-danger-text flex gap-2">
+                      <Button className="dark:bg-danger-bg text-danger-text border dark:border-danger-text/32">
                         <CircleX />
                         Mark Absent
                       </Button>
@@ -385,153 +397,154 @@ export default function Page() {
                           </Button>
                         </div>
                       )}
-                    </CardFooter>
-                  </Card>
-                );
-              })}
-            </TabsContent>
-            <TabsContent value="Payments" className="space-y-4">
-              {paymentData.map((payment, i) => {
-                return (
-                  <Card key={i} className="bg-[#1A1A1A] border border-border">
-                    <CardContent className="space-y-2">
-                      <div className="flex justify-between items-center">
-                        <div className="flex gap-2">
-                          <h1 className="text-lg font-semibold text-[#F3F4F6]">
-                            {payment.name}
-                          </h1>
-                          <CardStatus
-                            value={payment.status}
-                            type={paymentStatusMap[payment.status]}
-                          />
-                        </div>
-                        <h1 className="text-lg font-semibold text-[#F3F4F6]">
-                          {payment.amount}
-                        </h1>
-                      </div>
-                      <div className="grid grid-cols-2">
-                        <div className="flex gap-2 items-center">
-                          <p className="text-sm text-ghost-text">Amount:</p>
-                          <h1 className="text-md text-[#D1D5DC]">
-                            {payment.amount}
-                          </h1>
-                        </div>
-                        <div className="flex gap-2 items-center ">
-                          <p className="text-sm text-ghost-text">Method:</p>
-                          <h1 className="text-md text-[#D1D5DC]">
-                            {payment.method}
-                          </h1>
-                        </div>
-                      </div>
-                      <div className="grid grid-cols-2">
-                        <div className="flex gap-2 items-center">
-                          <p className="text-sm text-ghost-text">Date:</p>
-                          <h1 className="text-md text-[#D1D5DC]">
-                            {payment.date}
-                          </h1>
-                        </div>
-                        <div className="flex gap-2 items-center">
-                          <p className="text-sm text-ghost-text">
-                            Transection ID:
-                          </p>
-                          <h1 className="text-md text-[#D1D5DC]">
-                            {payment.transectionId}
-                          </h1>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                );
-              })}
-            </TabsContent>
-
-            <TabsContent value="Notes" className="space-y-4">
-              <div className="flex justify-between items-center">
-                <h1 className="text-lg font-semibold text-">Internal Notes</h1>
-                <Dialog>
-                  <DialogTrigger className="flex gap-2 bg-primary hover:bg-secondary rounded-[10px] px-4 py-1 text-lg text-black items-center">
-                    <Plus className="h-4 w-4" />
-                    Add Note
-                  </DialogTrigger>
-                  <DialogContent className="bg-[#252525] rounded-[10px] p-0">
-                    <DialogHeader className="p-4 border-b border-border">
-                      <h1 className="text-lg font-semibold text-[#F3F4F6]">
-                        Add Internal Note
-                      </h1>
-                    </DialogHeader>
-                    <div className="space-y-4 p-4">
-                      <div className="space-y-2">
-                        <Label className="text-[#99A1AF] text-sm">
-                          Note Type
-                        </Label>
-
-                        <Select>
-                          <SelectTrigger className="w-full p-6 !bg-[#1A1A1A] border-border rounded-[10px] text-lg">
-                            <SelectValue placeholder="Private" />
-                          </SelectTrigger>
-                          <SelectContent className="!bg-[#1A1A1A]">
-                            <SelectGroup>
-                              <SelectLabel>Select a category</SelectLabel>
-                              <SelectItem value="apple">Apple</SelectItem>
-                              <SelectItem value="banana">Banana</SelectItem>
-                              <SelectItem value="blueberry">
-                                Blueberry
-                              </SelectItem>
-                              <SelectItem value="grapes">Grapes</SelectItem>
-                              <SelectItem value="pineapple">
-                                Pineapple
-                              </SelectItem>
-                            </SelectGroup>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div className="space-y-2">
-                        <Label className="text-[#99A1AF] text-sm">
-                          Note Type
-                        </Label>
-                        <Textarea className="!bg-[#1A1A1A] border border-border rounded-[10px] text-ghost-text min-h-36"></Textarea>
-                      </div>
                     </div>
-                    <div className="border-t border-border flex items-center justify-end p-4">
-                      <div className="flex gap-4">
-                        <DialogClose className="flex gap-2 bg-[#1A1A1A] hover:bg-gray-500 rounded-[10px] px-4 py-1 text-lg text-white items-center">
-                          Cencel
-                        </DialogClose>
-                        <Button>Add Note</Button>
-                      </div>
+                  </CardContent>
+
+
+                </Card>
+              )
+            )}
+          </TabsContent>
+          <TabsContent value="Payments" className="space-y-4 p-4">
+            {paymentData.map((payment, i) => (
+              <Card key={i} className="bg-[#1A1A1A] border border-border">
+
+                <CardContent className="space-y-2">
+
+                  <div className="flex gap-2 items-center">
+                    <h1>{payment.name}</h1>
+                    <CardStatus
+                      value={payment.status}
+                      type={paymentStatusMap[payment.status as "Paid" | "Pending"]}
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+
+                    <div className="flex text-sm text-ghost-text gap-1">
+                      <p className="text-muted-foreground">Payment:</p> <p className="text-[#D1D5DC]"> {payment.amount}</p>
                     </div>
-                  </DialogContent>
-                </Dialog>
-              </div>
-              {notesData.map((note, i) => {
-                return (
-                  <Card
-                    key={i}
-                    className={
-                      note.important
-                        ? "bg-[#F0B1000D] border border-[#F0B1004D]"
-                        : " bg-[#1A1A1A] border border-border "
-                    }
-                  >
-                    <CardContent className="space-y-4">
-                      <div className="flex gap-2">
-                        <h1 className="text-md text-[#E5E7EB]">{note.name}</h1>
-                        {note.important && (
-                          <div className="px-2 py-0 border border-[#F0B1004D] bg-[#F0B10033] text-[#FDC700] rounded-[10px] text-sm">
-                            important
-                          </div>
-                        )}
-                      </div>
-                      <p className="text-sm text-ghost-text">{note.datetime}</p>
-                      <h1 className="text-sm text-[#D1D5DC]">{note.message}</h1>
-                    </CardContent>
-                  </Card>
-                );
-              })}
-            </TabsContent>
-          </CardContent>
-        </Card>
-      </Tabs>
+
+                    <div className="flex text-sm text-ghost-text gap-1">
+                      <p className="text-muted-foreground">Method:</p> <p className="text-[#D1D5DC]">{payment.method}</p>
+                    </div>
+                    <div className="flex text-sm text-ghost-text gap-1">
+                      <p className="text-muted-foreground">Date:</p> <p className="text-[#D1D5DC]">{payment.date}</p>
+                    </div>
+                    <div className="flex text-sm text-ghost-text gap-1">
+                      <p className="text-muted-foreground">Transaction ID:</p> <p className="text-[#D1D5DC]">{payment.transectionId}</p>
+                    </div>
+                  </div>
+
+
+                </CardContent>
+
+
+              </Card>
+            )
+            )}
+          </TabsContent>
+
+          <TabsContent value="Notes" className="space-y-4 p-4">
+            <div className="flex justify-between items-center">
+              <h1 className="text-lg ">Internal Notes</h1>
+              <AddNoteDialog />
+            </div>
+            {notesData.map((note, i) => {
+              return (
+                <Card
+                  key={i}
+                  className={
+                    note.important
+                      ? "bg-[#F0B1000D] border border-[#F0B1004D]"
+                      : " bg-[#1A1A1A] border border-border "
+                  }
+                >
+                  <CardContent className="">
+                    <div className="flex gap-2">
+                      <h1 className="text-sm text-[#E5E7EB]">{note.name}</h1>
+                      {note.important && (
+                        <Badge className="border-[#F0B1004D] bg-[#F0B10033] text-[#FDC700] rounded-sm">
+                          Important
+                        </Badge>
+
+                      )}
+                    </div>
+                    <p className="text-sm text-muted-foreground">{note.datetime}</p>
+                    <h1 className="text-sm text-[#D1D5DC]">{note.message}</h1>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </TabsContent>
+
+        </Tabs>
+      </div>
+
     </div>
   );
+}
+
+const AddNoteDialog = () => {
+  const [open, setOpen] = useState(false)
+
+  return (
+    <>
+      <Button onClick={() => setOpen(!open)}>
+        <Plus />
+        Add Note
+      </Button>
+      <Dialog open={open} onOpenChange={setOpen}>
+
+        <DialogContent className="bg-[#252525] rounded-[10px] p-0">
+          <DialogHeader className="p-4 border-b border-border">
+            <DialogTitle className="text-lg font-semibold text-[#F3F4F6]">
+              Add Internal Note
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 p-4">
+            <div className="space-y-2">
+              <Label className="text-[#99A1AF] text-sm">
+                Note Type
+              </Label>
+
+              <Select>
+                <SelectTrigger className="w-full p-6 !bg-[#1A1A1A] border-border rounded-[10px]">
+                  <SelectValue placeholder="Private" />
+                </SelectTrigger>
+                <SelectContent className="!bg-[#1A1A1A]">
+                  <SelectGroup>
+                    <SelectLabel>Select a category</SelectLabel>
+                    <SelectItem value="apple">Apple</SelectItem>
+                    <SelectItem value="banana">Banana</SelectItem>
+                    <SelectItem value="blueberry">
+                      Blueberry
+                    </SelectItem>
+                    <SelectItem value="grapes">Grapes</SelectItem>
+                    <SelectItem value="pineapple">
+                      Pineapple
+                    </SelectItem>
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label className="text-[#99A1AF] text-sm">
+                Note Content
+              </Label>
+              <Textarea placeholder="Enter your note here..." className="!bg-[#1A1A1A] border border-border rounded-[10px] text-ghost-text min-h-36"></Textarea>
+            </div>
+          </div>
+          <div className="border-t border-border flex items-center justify-end p-4">
+            <div className="flex gap-4">
+              <DialogClose className="text-[13px] font-medium leading-none h-10 px-4 py-2 bg-black text-white border-border rounded-md hover:opacity-70 cursor-pointer flex flex-1 items-center justify-center">
+                Cancel
+              </DialogClose>
+              <Button size={"lg"}>Add Note</Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </>
+  )
 }

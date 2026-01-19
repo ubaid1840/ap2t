@@ -23,7 +23,7 @@ export default function Page() {
     <div className="flex flex-col w-full gap-4">
       <Header>
         <div className="flex flex-wrap gap-4">
-          <div className="flex gap-4">
+          <div className="flex gap-4 items-center flex-wrap">
             <div className="!bg-[#252525] border border-border rounded-[10px] flex flex-wrap items-center p-[2px]">
               <Button  onClick={() => setTab("table")} variant={tab === "table" ? "default" : "ghost"} className="h-7 "> <List />Table</Button>
               <Button  onClick={() => setTab("calendar")} variant={tab === "calendar" ? "default" : "ghost"} className="h-7"><Calendar /> Calendar</Button>
