@@ -15,7 +15,7 @@ export type SessionData = {
   coachName: string;
   playerName: string;
   price: number;
-  payment: "Paid" | "Pending" | "comped"| "partial";
+  payment: "Paid" | "Pending" | "comped" | "partial";
   status: "Upcoming" | "Completed" | "Cancelled";
 };
 
@@ -32,7 +32,7 @@ const paymentStatusMap: Record<SessionData["payment"], CardStatusType> = {
   Paid: "active",
   Pending: "warning",
   comped: "alternative",
-  partial:"warning"
+  partial: "warning"
 };
 
 const sessionStatusMap: Record<SessionData["status"], CardStatusType> = {
@@ -47,7 +47,16 @@ const sessionStatusMap: Record<SessionData["status"], CardStatusType> = {
 export const SESSION_COLUMNS: ColumnDef<SessionData>[] = [
   {
     accessorKey: "sessionName",
-    header: "SESSION NAME",
+    header: ({ column }) => (
+      <Button
+        variant="ghost"
+        className="text-[#99A1AF] text-[12px] tracking-wider dark:hover:bg-transparent dark:hover:text-white/50"
+        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+      >
+        SESSION NAME
+        <ArrowUpDown />
+      </Button>
+    ),
     cell: ({ row }) => (
       <span className="font-medium text-[#D1D5DC]">
         {row.getValue("sessionName")}
@@ -57,18 +66,36 @@ export const SESSION_COLUMNS: ColumnDef<SessionData>[] = [
 
   {
     accessorKey: "type",
-    header: "TYPE",
+    header: ({ column }) => (
+      <Button
+        variant="ghost"
+        className="text-[#99A1AF] text-[12px] tracking-wider dark:hover:bg-transparent dark:hover:text-white/50"
+        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+      >
+        TYPE
+        <ArrowUpDown />
+      </Button>
+    ),
     cell: ({ row }) => (
       <span className="text-[#9CA3AF]">{row.getValue("type")}</span>
     ),
   },
 
   {
-    id: "dateTime",
-    header: "DATE & TIME",
+    id: "date",
+    header: ({ column }) => (
+      <Button
+        variant="ghost"
+        className="text-[#99A1AF] text-[12px] tracking-wider dark:hover:bg-transparent dark:hover:text-white/50"
+        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+      >
+        DATE & TIME
+        <ArrowUpDown />
+      </Button>
+    ),
     cell: ({ row }) => (
       <div className="leading-tight">
-        <div className="text-[#D1D5DC]">{row.original.date}</div>
+        <div className="text-[#D1D5DC]">{row.getValue("date")}</div>
         <div className="text-xs text-[#9CA3AF]">{row.original.time}</div>
       </div>
     ),
@@ -76,7 +103,16 @@ export const SESSION_COLUMNS: ColumnDef<SessionData>[] = [
 
   {
     accessorKey: "coachName",
-    header: "COACH",
+    header: ({ column }) => (
+      <Button
+        variant="ghost"
+        className="text-[#99A1AF] text-[12px] tracking-wider dark:hover:bg-transparent dark:hover:text-white/50"
+        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+      >
+        COACH
+        <ArrowUpDown />
+      </Button>
+    ),
     cell: ({ row }) => (
       <span className="text-[#D1D5DC]">{row.getValue("coachName")}</span>
     ),
@@ -84,7 +120,16 @@ export const SESSION_COLUMNS: ColumnDef<SessionData>[] = [
 
   {
     accessorKey: "playerName",
-    header: "PLAYER",
+    header: ({ column }) => (
+      <Button
+        variant="ghost"
+        className="text-[#99A1AF] text-[12px] tracking-wider dark:hover:bg-transparent dark:hover:text-white/50"
+        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+      >
+        PLAYER
+        <ArrowUpDown />
+      </Button>
+    ),
     cell: ({ row }) => (
       <span className="text-[#D1D5DC]">{row.getValue("playerName")}</span>
     ),
@@ -95,21 +140,32 @@ export const SESSION_COLUMNS: ColumnDef<SessionData>[] = [
     header: ({ column }) => (
       <Button
         variant="ghost"
+        className="text-[#99A1AF] text-[12px] tracking-wider dark:hover:bg-transparent dark:hover:text-white/50"
         onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
       >
-        PRICE <ArrowUpDown />
+        PRICE
+        <ArrowUpDown />
       </Button>
     ),
     cell: ({ row }) => (
       <span className="font-medium text-[#D1D5DC]">
-        $ {row.original.price}
+        $ {row.getValue("price")}
       </span>
     ),
   },
 
   {
     accessorKey: "payment",
-    header: "PAYMENT",
+    header: ({ column }) => (
+      <Button
+        variant="ghost"
+        className="text-[#99A1AF] text-[12px] tracking-wider dark:hover:bg-transparent dark:hover:text-white/50"
+        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+      >
+        PAYMENT
+        <ArrowUpDown />
+      </Button>
+    ),
     cell: ({ row }) => (
       <div className="w-24">
         <CardStatus
@@ -122,7 +178,16 @@ export const SESSION_COLUMNS: ColumnDef<SessionData>[] = [
 
   {
     accessorKey: "status",
-    header: "STATUS",
+    header: ({ column }) => (
+      <Button
+        variant="ghost"
+        className="text-[#99A1AF] text-[12px] tracking-wider dark:hover:bg-transparent dark:hover:text-white/50"
+        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+      >
+        STATUS
+        <ArrowUpDown />
+      </Button>
+    ),
     cell: ({ row }) => (
       <div className="w-24">
         <CardStatus
@@ -135,13 +200,18 @@ export const SESSION_COLUMNS: ColumnDef<SessionData>[] = [
 
   {
     id: "actions",
-    header: "ACTION",
+    header: () => <div className="text-[#99A1AF] text-[12px] tracking-wider dark:hover:bg-transparent dark:hover:text-white/50">ACTIONS</div>,
+
     cell: ({ row }) => (
-          <Link href={`/admin/sessions/${row.original.id}`}>
-          <Button>
-            view
-          </Button>
-          </Link>
+      <Link href={`/admin/sessions/${row.original.id}`}>
+        <Button
+          onClick={(e) => {
+            e.stopPropagation();
+          }}
+        >
+          <Eye /> View
+        </Button>
+      </Link>
     ),
   },
 ];

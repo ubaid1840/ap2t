@@ -1,7 +1,7 @@
 "use client";
 import PageTable from "@/components/app-table";
 import InputWithIcon from "@/components/input-with-icon";
-import  SessionCalendar  from "@/components/sessions/session-calendar";
+import SessionCalendar from "@/components/sessions/session-calendar";
 import { CreateSessionDialog } from "@/components/sessions/create-session-dialog";
 import { SESSION_COLUMNS } from "@/components/sessions/session-column";
 import { SESSIONS_DATA } from "@/components/sessions/session-data";
@@ -13,93 +13,96 @@ import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 
-import { Filter, Plus } from "lucide-react";
-import { useState } from "react";
+import { Calendar, Dot, Filter, List, Plus } from "lucide-react";
+import { ReactNode, useState } from "react";
 
 export default function Page() {
   const [filter, setFilter] = useState(false);
+  const [tab, setTab] = useState("table")
   return (
-    <div className="flex flex-col gap-4 w-full">
-      <Tabs defaultValue="Table">
-        <div className="flex justify-between">
-          <div className="text-xl font-semibold text-[#F3F4F6]">
-            <h1>Sessions Management</h1>
-            <div className="flex">
-              <p className="text-sm text-[#99A1AF]">7 of 7 sessions</p>
-              <p className="text-sm text-warning-text">• 1 pending payments</p>
-            </div>
-          </div>
-
+    <div className="flex flex-col w-full gap-4">
+      <Header>
+        <div className="flex flex-wrap gap-4">
           <div className="flex gap-4">
-            <TabsList className="!bg-[#252525] border border-border rounded-[10px]">
-              <TabsTrigger value="Table">Table</TabsTrigger>
-              <TabsTrigger value="Calendar">Calendar</TabsTrigger>
-            </TabsList>
-          <Dialog>
-            <DialogTrigger>
-            <Button className="gap-2 text-sm">
-              <Plus /> Create New Session
-            </Button>
-            </DialogTrigger>
-            <CreateSessionDialog/>
-          </Dialog>
-            
+            <div className="!bg-[#252525] border border-border rounded-[10px] flex flex-wrap items-center p-[2px]">
+              <Button  onClick={() => setTab("table")} variant={tab === "table" ? "default" : "ghost"} className="h-7 "> <List />Table</Button>
+              <Button  onClick={() => setTab("calendar")} variant={tab === "calendar" ? "default" : "ghost"} className="h-7"><Calendar /> Calendar</Button>
+            </div>
+            <CreateSessionDialog />
           </div>
         </div>
+      </Header>
 
-        <div className="flex flex-col gap-4 rounded-[14px] bg-#252525 border border-[#3A3A3A] p-4 bg-[#252525]">
-          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
-            <div className="w-full">
-              <InputWithIcon placeholder="Search by player name, parent or position..." />
-            </div>
+      
 
-            <Button onClick={() => setFilter(!filter)}>
-              <Filter /> Filters
-            </Button>
+      <div className="flex flex-col gap-4 rounded-[14px] bg-#252525 border border-[#3A3A3A] p-4 bg-[#252525]">
+        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 items-center">
+          <div className="w-full">
+            <InputWithIcon placeholder="Search by player name, parent or position..." />
           </div>
-          {filter && (
-            <div className="flex flex-col w-full gap-4">
-              <Separator />
-              <div className="flex flex-col sm:flex-row w-full gap-4">
-                <div className="flex flex-1 flex-col gap-2">
-                  <Label className="text-muted-foreground font-normal">
-                    Coach
-                  </Label>
-                  <Input className="rounded-[8px] dark:bg-black" />
-                </div>
 
-                <div className="flex flex-1 flex-col gap-2">
-                  <Label className="text-muted-foreground font-normal">
-                    Session Type
-                  </Label>
-                  <Input className="rounded-[8px] dark:bg-black" />
-                </div>
+          <Button onClick={() => setFilter(!filter)}>
+            <Filter /> Filters
+          </Button>
+        </div>
+        {filter && (
+          <div className="flex flex-col w-full gap-4">
+            <Separator />
+            <div className="flex flex-col sm:flex-row w-full gap-4">
+              <div className="flex flex-1 flex-col gap-2">
+                <Label className="text-muted-foreground font-normal">
+                  Coach
+                </Label>
+                <Input className="rounded-[8px] dark:bg-black" />
+              </div>
 
-                <div className="flex flex-1 flex-col gap-2">
-                  <Label className="text-muted-foreground font-normal">
-                    Attendance
-                  </Label>
-                  <Input className="rounded-[8px] dark:bg-black" />
-                </div>
+              <div className="flex flex-1 flex-col gap-2">
+                <Label className="text-muted-foreground font-normal">
+                  Session Type
+                </Label>
+                <Input className="rounded-[8px] dark:bg-black" />
+              </div>
+
+              <div className="flex flex-1 flex-col gap-2">
+                <Label className="text-muted-foreground font-normal">
+                  Attendance
+                </Label>
+                <Input className="rounded-[8px] dark:bg-black" />
               </div>
             </div>
-          )}
-        </div>
+          </div>
+        )}
+      </div>
 
-        <TabsContent value="Table">
-          <PageTable
+      {tab === "table" &&
+        <PageTable
           headerClassName={"rounded-4xl"}
-                    columns={SESSION_COLUMNS}
-                    data={SESSIONS_DATA}
-                    onRowClick={() => {
-          
-                    }}
-          />
-        </TabsContent>
-        <TabsContent value="Calendar">
-        <SessionCalendar/>
-        </TabsContent>
-      </Tabs>
+          columns={SESSION_COLUMNS}
+          data={SESSIONS_DATA}
+          onRowClick={() => {
+
+          }}
+        />
+      }
+      {tab === "calendar" &&
+        <SessionCalendar />}
     </div>
   );
 }
+
+const Header = ({ children }: { children: ReactNode }) => {
+  return (
+    <div className="flex w-full gap-4 justify-between flex-wrap items-center">
+      <div className="space-y-2">
+        <p className="text-xl">Players Management</p>
+        <span className="text-xs text-muted-foreground flex items-center">
+          <span>7 of 7 sessions{' '}</span>
+          <span className="text-warning-text inline-flex"> <Dot size={16} /> 1 pending payments</span>
+        </span>
+      </div>
+
+      {children}
+
+    </div>
+  );
+};
