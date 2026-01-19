@@ -120,7 +120,7 @@ export const DASHBOARD_SESSIONS_COLUMNS: ColumnDef<SessionData>[] = [
         id: "actions",
         header: "Action",
         cell: ({ row }) => (
-            <Link href={`/admin/dashboard/sessions/${row.original.id}`} className="text-primary hover:underline">
+            <Link href={`/admin/sessions/${row.original.id}`} className="text-primary hover:underline">
           
                  View Details
             
