@@ -1,5 +1,6 @@
 "use client"
 
+import AppCalendar from "@/components/app-calendar";
 import getInitials from "@/components/parents/get-initials";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -12,6 +13,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
+import axios from "axios";
 import { Bell, Calendar, CheckCircle, Eye, Plus, Target, TrendingUp, User } from "lucide-react";
 import Link from "next/link";
 import { ReactNode, useState } from "react";
@@ -221,13 +223,21 @@ const CreateCoach = () => {
     fullname: "",
     email: "",
     phone: "",
-    yearexp: "",
+    career_start: "",
     bio: "",
     preferedSchedule: "",
   });
 
   const addCoach = async () => {
-    console.log(coach);
+    try {
+      const result=await axios.post("/api/admin/coaches",{
+        bio:coach.bio,
+        schedule_preference:coach.preferedSchedule
+      })
+      console.log("coach created")
+    } catch (error) {
+      console.log(error)
+    }
   };
 
   return (
@@ -302,21 +312,16 @@ const CreateCoach = () => {
                     <Label className="text-sm text-[#99A1AF]">
                       Years of Experience
                     </Label>
-                    <Input
-                      name="yearsofexp"
-                      placeholder="10"
-                      className="!bg-[#1A1A1A] !border-[#3A3A3A] !text-[#E5E7EB] !p-5"
+                    <AppCalendar
+                      className="h-11"
+                      date={coach.career_start ? new Date(coach.career_start) : undefined}
+                      onChange={(date) =>
+                        setCoach((prevState) => ({
+                          ...prevState,
+                          career_start: date,
+                        }))
+                      }
                       required
-                      value={coach.yearexp}
-                       onChange={(e) =>{
-                        if(!Number.isNaN(Number(e.target.value))){
-                          setCoach((prev) => ({
-                            ...prev,
-                            yearexp: e.target.value,
-                          }))
-
-                        }
-                      }}
                     />
                   </div>
                 </div>
