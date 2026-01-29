@@ -1,4 +1,5 @@
 "use client";
+import axios from "@/lib/axios";
 import {
   Calendar,
   MapPin,
@@ -6,7 +7,9 @@ import {
   Tag,
   Users,
 } from "lucide-react";
-import axios from "@/lib/axios"
+import { useState } from "react";
+import AppCalendar from "../app-calendar";
+import { TimePicker } from "../time-picker";
 import { Button } from "../ui/button";
 import {
   Dialog,
@@ -15,33 +18,31 @@ import {
   DialogHeader,
   DialogTitle,
 } from "../ui/dialog";
-import { ScrollArea } from "../ui/scroll-area";
-import { Label } from "../ui/label";
 import { Input } from "../ui/input";
-import { Textarea } from "../ui/textarea";
-import { useState } from "react";
+import { Label } from "../ui/label";
+import { ScrollArea } from "../ui/scroll-area";
 import { Separator } from "../ui/separator";
-import AppCalendar from "../app-calendar";
+import { Textarea } from "../ui/textarea";
 
 export function CreateSessionDialog() {
   const [open, setOpen] = useState(false);
   const [session, setSession] = useState({
-    name:"",
-    description:"",
-    session_type:"",
-    coach_name:"",
-    location:"",
-    date:"",
-    start_time:"",
-    end_time:"",
-    price:"",
-    max_players:"",
-    apply_promotion:"",
+    name: "",
+    description: "",
+    session_type: "",
+    coach_name: "",
+    location: "",
+    date: "",
+    start_time: "",
+    end_time: "",
+    price: "",
+    max_players: "",
+    apply_promotion: "",
   });
 
   const createSession = async () => {
     try {
-      const result=await axios.post("/admin/sessions",session)
+      const result = await axios.post("/admin/sessions", session)
       console.log("Session created:", result.data);
     } catch (error) {
       console.log(error)
@@ -136,23 +137,20 @@ export function CreateSessionDialog() {
                     <Label className="text-sm text-muted-foreground">
                       Date *
                     </Label>
-                    <AppCalendar className="h-11" date={session.date ? new Date(session.date) : undefined} onChange={(date) => setSession((prevState) => ({ ...prevState, date: date }))} required/>
+                    <AppCalendar className="h-11" date={session.date ? new Date(session.date) : undefined} onChange={(date) => setSession((prevState) => ({ ...prevState, date: date }))} required />
 
                   </div>
                   <div className="space-y-2">
                     <Label className="text-sm text-muted-foreground">
                       Start Time *
                     </Label>
-                    <Input
-                      name="startTime"
-                      className="!bg-[#1A1A1A] !border-[#3A3A3A] !text-[#E5E7EB] !p-5"
-                      required
-                      type="time"
+                    <TimePicker
+                      className="h-11"
                       value={session.start_time}
-                      onChange={(e) =>
+                      onChange={(time) =>
                         setSession((prev) => ({
                           ...prev,
-                          start_time: e.target.value,
+                          start_time: time,
                         }))
                       }
                     />
@@ -161,19 +159,19 @@ export function CreateSessionDialog() {
                     <Label className="text-sm text-muted-foreground">
                       End Time *
                     </Label>
-                    <Input
-                      name="endTime"
-                      className="!bg-[#1A1A1A] !border-[#3A3A3A] !text-[#E5E7EB] !p-5"
-                      type="time"
-                      required
+
+                    <TimePicker
+                      className="h-11"
                       value={session.end_time}
-                      onChange={(e) =>
+                      onChange={(time) =>
                         setSession((prev) => ({
                           ...prev,
-                          end_time: e.target.value,
+                          end_time: time,
                         }))
                       }
                     />
+
+
                   </div>
                 </div>
 
