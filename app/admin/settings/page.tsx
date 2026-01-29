@@ -26,12 +26,13 @@ import {
   User,
   Users
 } from "lucide-react";
-import { ReactNode, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { FaBell, FaCreditCard, FaLock, FaUser } from "react-icons/fa";
 import { FaFloppyDisk } from "react-icons/fa6";
 import { GoDotFill } from "react-icons/go";
 import { RiShieldKeyholeLine } from "react-icons/ri";
 export default function Page() {
+  const [loading,setLoading]=useState(false)
   const [profileInfo, setProfileInfo] = useState({
     adminUser: "",
     email: "",
@@ -145,6 +146,135 @@ export default function Page() {
       icon: <Bell className="text-muted-foreground" size={20} />
     },
   ])
+
+useEffect(() => {
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      console.log("working")
+
+      const res = await fetch("/api/settings", {
+        method: "GET",
+      });
+
+      if (!res.ok) {
+        throw new Error("Failed to fetch data");
+      }
+      const result = await res.json();
+      setProfileInfo({
+        adminUser: result.user.first_name || "",
+        email: result.user.email || "",
+        phoneNo: result.user.phone_no || "",   
+        role: result.user.role || "",
+        password: result.user.password || "",                  
+        blanck: "",
+      });
+       const settings = result.settings;
+
+      // ✅ Map squareIntegration
+      setSquareIntigration([
+        {
+          title: "Merchant ID",
+          type: "input",
+          value: settings.merchant_id || "",
+          placeholder: "MLSQ12345678"
+        },
+        {
+          title: "Location ID",
+          type: "input",
+          value: settings.location_id || "",
+          placeholder: "L12345689"
+        },
+        {
+          title: "API Key",
+          type: "input",
+          value: settings.api_key || "",
+          placeholder: "**********"
+        },
+        {
+          title: "Webhook URL",
+          type: "input",
+          value: settings.webhook_url || "",
+          placeholder: "https:/ap2t.com/api/square/webhook"
+        },
+        {
+          title: "Test Mode",
+          type: "switch",
+          value: settings.test_mode ?? false,
+          description: "Use Square sandbox for testing"
+        },
+        {
+          title: "Auto Sync Catalog",
+          type: "switch",
+          value: settings.auto_sync_catalog ?? false,
+          description: "Automatically sync promotions with square catalog"
+        }
+      ]);
+
+      // ✅ Map securityInfo
+      setSecurityInfo({
+        twoFactorAuth: settings.two_factor_auth ?? false,
+        loginAlert: settings.login_alert ?? false,
+        oldPass: "",
+        newPass: "",
+        confirmNewPass: ""
+      });
+
+      // ✅ Map notificationInfo
+      setNoficationInfo([
+        {
+          title: "New Booking",
+          description: "Get notified when a new session is booked",
+          value: settings.new_booking ?? false,
+          icon: <Calendar className="text-muted-foreground" size={20} />
+        },
+        {
+          title: "Payment Received",
+          description: "Alerts for successful payments",
+          value: settings.payment_received ?? false,
+          icon: <DollarSign className="text-muted-foreground" size={20} />
+        },
+        {
+          title: "Session Cancellation",
+          description: "Alerts when sessions are cancelled",
+          value: settings.session_cancellation ?? false,
+          icon: <Info className="text-muted-foreground" size={20} />
+        },
+        {
+          title: "Promotion Purchase",
+          description: "When customers buy promotional packages",
+          value: settings.promotion_purchase ?? false,
+          icon: <CreditCard className="text-muted-foreground" size={20} />
+        },
+        {
+          title: "Email Notifications",
+          description: "Receive updates via email",
+          value: settings.email_notifications ?? false,
+          icon: <MessageSquare className="text-muted-foreground" size={20} />
+        },
+        {
+          title: "SMS Notifications",
+          description: "Receive updates via text message",
+          value: settings.sms_notifications ?? false,
+          icon: <MessageCircle className="text-muted-foreground" size={20} />
+        },
+        {
+          title: "Push Notifications",
+          description: "Browser push notifications",
+          value: settings.push_notifications ?? false,
+          icon: <Bell className="text-muted-foreground" size={20} />
+        }
+      ])
+
+    } catch (err: any) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchData();
+}, []);
 
 
 
