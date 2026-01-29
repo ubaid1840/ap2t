@@ -1,33 +1,52 @@
-"use client"
-import { Calendar, DollarSign, Eye, Image, Link, MapPin, Plus, Tag, Users } from "lucide-react";
+"use client";
+import {
+  Calendar,
+  MapPin,
+  Plus,
+  Tag,
+  Users,
+} from "lucide-react";
+import axios from "axios";
 import { Button } from "../ui/button";
-import { Dialog, DialogClose, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "../ui/dialog";
 import { ScrollArea } from "../ui/scroll-area";
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
 import { Textarea } from "../ui/textarea";
 import { useState } from "react";
 import { Separator } from "../ui/separator";
+import AppCalendar from "../app-calendar";
 
 export function CreateSessionDialog() {
-  const [open, setOpen] = useState(false)
+  const [open, setOpen] = useState(false);
   const [session, setSession] = useState({
-    sessionName: "",
-    sessionType: "",
-    asignedCoach: "",
-    date: "",
-    startTime: "",
-    endTime: "",
-    location: "",
-    price: "",
-    maxPlayer: "",
-    applyPromotion: "",
-    description: ""
-  })
+    name:"",
+    description:"",
+    session_type:"",
+    coach_name:"",
+    location:"",
+    date:"",
+    start_time:"",
+    end_time:"",
+    price:"",
+    max_players:"",
+    apply_promotion:"",
+  });
 
-  const createSession = () => {
-    console.log(session)
-  }
+  const createSession = async () => {
+    try {
+      const result=await axios.post("/api/admin/sessions",session)
+      console.log("Session created:", result.data);
+    } catch (error) {
+      console.log(error)
+    }
+  };
 
   return (
     <>
@@ -60,11 +79,11 @@ export function CreateSessionDialog() {
                     placeholder="e.g., Advanced Skills Training"
                     className="!bg-[#1A1A1A] !border-[#3A3A3A] !text-[#E5E7EB] !p-5"
                     required
-                    value={session.sessionName}
+                    value={session.name}
                     onChange={(e) =>
                       setSession((prev) => ({
                         ...prev,
-                        sessionName: e.target.value,
+                        name: e.target.value,
                       }))
                     }
                   />
@@ -79,15 +98,14 @@ export function CreateSessionDialog() {
                       name="sessionType"
                       className="!bg-[#1A1A1A] !border-[#3A3A3A] !text-[#E5E7EB] !p-5"
                       required
-                      value={session.sessionType}
+                      value={session.session_type}
                       onChange={(e) =>
                         setSession((prev) => ({
                           ...prev,
-                          sessionType: e.target.value,
+                          session_type: e.target.value,
                         }))
                       }
                     />
-
                   </div>
                   <div className="space-y-2">
                     <Label className="text-sm text-muted-foreground">
@@ -97,11 +115,11 @@ export function CreateSessionDialog() {
                       name="asignedCoach"
                       className="!bg-[#1A1A1A] !border-[#3A3A3A] !text-[#E5E7EB] !p-5"
                       required
-                      value={session.asignedCoach}
+                      value={session.coach_name}
                       onChange={(e) =>
                         setSession((prev) => ({
                           ...prev,
-                          asignedCoach: e.target.value,
+                          coach_name: e.target.value,
                         }))
                       }
                     />
@@ -118,18 +136,7 @@ export function CreateSessionDialog() {
                     <Label className="text-sm text-muted-foreground">
                       Date *
                     </Label>
-                    <Input
-                      name="Date"
-                      className="!bg-[#1A1A1A] !border-[#3A3A3A] !text-[#E5E7EB] !p-5"
-                      required
-                      value={session.date}
-                      onChange={(e) =>
-                        setSession((prev) => ({
-                          ...prev,
-                          date: e.target.value,
-                        }))
-                      }
-                    />
+                    <AppCalendar className="h-11" date={session.date ? new Date(session.date) : undefined} onChange={(date) => setSession((prevState) => ({ ...prevState, date: date }))} required/>
 
                   </div>
                   <div className="space-y-2">
@@ -140,11 +147,12 @@ export function CreateSessionDialog() {
                       name="startTime"
                       className="!bg-[#1A1A1A] !border-[#3A3A3A] !text-[#E5E7EB] !p-5"
                       required
-                      value={session.startTime}
+                      type="time"
+                      value={session.start_time}
                       onChange={(e) =>
                         setSession((prev) => ({
                           ...prev,
-                          startTime: e.target.value,
+                          start_time: e.target.value,
                         }))
                       }
                     />
@@ -156,12 +164,13 @@ export function CreateSessionDialog() {
                     <Input
                       name="endTime"
                       className="!bg-[#1A1A1A] !border-[#3A3A3A] !text-[#E5E7EB] !p-5"
+                      type="time"
                       required
-                      value={session.endTime}
+                      value={session.end_time}
                       onChange={(e) =>
                         setSession((prev) => ({
                           ...prev,
-                          endTime: e.target.value,
+                          end_time: e.target.value,
                         }))
                       }
                     />
@@ -226,11 +235,11 @@ export function CreateSessionDialog() {
                       placeholder="e.g. 12"
                       className="!bg-[#1A1A1A] !border-[#3A3A3A] !text-[#E5E7EB] !p-5"
                       required
-                      value={session.maxPlayer}
+                      value={session.max_players}
                       onChange={(e) =>
                         setSession((prev) => ({
                           ...prev,
-                          maxPlayer: e.target.value,
+                          max_players: e.target.value,
                         }))
                       }
                     />
@@ -243,12 +252,11 @@ export function CreateSessionDialog() {
                       name="applyPromotion"
                       className="!bg-[#1A1A1A] !border-[#3A3A3A] !text-[#E5E7EB] !p-5"
                       required
-                      value={session.applyPromotion}
-
+                      value={session.apply_promotion}
                       onChange={(e) =>
                         setSession((prev) => ({
                           ...prev,
-                          applyPromotion: e.target.value,
+                          apply_promotion: e.target.value,
                         }))
                       }
                     />
@@ -272,14 +280,13 @@ export function CreateSessionDialog() {
                     }
                   />
                 </div>
-
               </div>
             </ScrollArea>
             <Separator />
 
             <div className="p-4">
-                <div className="flex gap-4 flex-wrap">
-                 <DialogClose className="text-[13px] font-medium leading-none h-10 px-4 py-2 bg-black text-white border-border rounded-md hover:opacity-70 cursor-pointer flex flex-1 items-center justify-center">
+              <div className="flex gap-4 flex-wrap">
+                <DialogClose className="text-[13px] font-medium leading-none h-10 px-4 py-2 bg-black text-white border-border rounded-md hover:opacity-70 cursor-pointer flex flex-1 items-center justify-center">
                   Cancel
                 </DialogClose>
                 <Button
@@ -290,13 +297,10 @@ export function CreateSessionDialog() {
                   Create Session
                 </Button>
               </div>
-
             </div>
-
           </form>
         </DialogContent>
       </Dialog>
     </>
-
-  )
+  );
 }

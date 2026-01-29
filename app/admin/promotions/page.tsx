@@ -16,6 +16,7 @@ import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
+import axios from "axios";
 import {
   Archive,
   Calendar,
@@ -297,9 +298,27 @@ const AddNewPromotion = () => {
     showOnStoreFront: false,
   });
 
-  const createPromotion = (e: React.FormEvent<HTMLFormElement>) => {
+  const createPromotion = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    console.log(addPromotion);
+    try {
+      const result=axios.post("/api/admin/promotions",{
+        title:addPromotion.promotionTitle,
+        description:addPromotion.description,
+        image:addPromotion.imageUrl,
+        original_price:addPromotion.originalPrice,
+        promotion_price:addPromotion.promotionPrice,
+        start_date:addPromotion.startDate,
+        end_date:addPromotion.endDate,
+        square_check_url:addPromotion.sqrCheckOutUrl,
+        show_storefront:addPromotion.showOnStoreFront
+      })
+      console.log("promotion created:");
+    } catch (error) {
+      console.log(error)
+    }
+
+
+
   };
 
   const handleChange = (
@@ -435,10 +454,9 @@ const AddNewPromotion = () => {
                       Original Price (Optional)
                     </Label>
                     <Input
-                      name="orignalPrice"
+                      name="originalPrice"
                       placeholder="250.00"
                       className="!bg-[#1A1A1A] !border-[#3A3A3A] !text-[#E5E7EB] !p-5"
-                      required
                       value={addPromotion.originalPrice}
                       onChange={(e) => handleChange(e)}
                     />
