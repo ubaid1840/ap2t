@@ -92,6 +92,7 @@ export const COACH_CHECKINS_DATA = [
   { coach: "Coach Farhan", value: 13900 },
 ]
 
+export const BASE_URL = "/api"
 
 
 

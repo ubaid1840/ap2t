@@ -6,7 +6,7 @@ import {
   Tag,
   Users,
 } from "lucide-react";
-import axios from "axios";
+import axios from "@/lib/axios"
 import { Button } from "../ui/button";
 import {
   Dialog,
@@ -41,7 +41,7 @@ export function CreateSessionDialog() {
 
   const createSession = async () => {
     try {
-      const result=await axios.post("/api/admin/sessions",session)
+      const result=await axios.post("/admin/sessions",session)
       console.log("Session created:", result.data);
     } catch (error) {
       console.log(error)
@@ -63,7 +63,7 @@ export function CreateSessionDialog() {
               Fill in the details to create a new training session
             </p>
           </DialogHeader>
-          <form onSubmit={createSession} className="">
+          <form onSubmit={createSession} >
             <ScrollArea className=" py-1 space-y-4 px-2 h-[70vh]">
               <div className="space-y-2 px-2 pb-2">
                 <div className="flex gap-2 text-md ">
@@ -304,3 +304,4 @@ export function CreateSessionDialog() {
     </>
   );
 }
+

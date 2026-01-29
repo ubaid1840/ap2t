@@ -1,4 +1,3 @@
-import { description } from "@/components/charts/bar-chart";
 import pool from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
 

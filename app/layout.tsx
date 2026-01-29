@@ -4,6 +4,7 @@ import { Geist, Geist_Mono, Inter } from "next/font/google";
 import NextTopLoader from 'nextjs-toploader';
 import { Suspense } from "react";
 import "./globals.css";
+import { Toaster } from '@/components/ui/sonner'
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-sans' });
 
@@ -39,7 +40,7 @@ export default function RootLayout({
             showSpinner={false} />
           {children}
         </Suspense>
-
+  <Toaster richColors position="bottom-right"/>
       </body>
     </html>
   );

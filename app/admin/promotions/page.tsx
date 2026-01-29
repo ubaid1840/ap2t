@@ -16,7 +16,7 @@ import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
-import axios from "axios";
+import axios from "@/lib/axios"
 import {
   Archive,
   Calendar,
@@ -301,7 +301,7 @@ const AddNewPromotion = () => {
   const createPromotion = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     try {
-      const result=axios.post("/api/admin/promotions",{
+      const result=axios.post("/admin/promotions",{
         title:addPromotion.promotionTitle,
         description:addPromotion.description,
         image:addPromotion.imageUrl,
