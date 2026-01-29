@@ -4,6 +4,7 @@ import PageTable from "@/components/app-table"
 import InputWithIcon from "@/components/input-with-icon"
 import { PARENT_COLUMNS } from "@/components/parents/columns"
 import { PARENT_DATA } from "@/components/parents/constatns"
+import { CreateParent } from "@/components/parents/create-parent"
 import Header from "@/components/parents/header"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -26,9 +27,7 @@ export default function Page() {
                         <Download /> Export
                     </Button>
 
-                    <Button >
-                        <Plus /> Add Parent
-                    </Button>
+                    <CreateParent/>
                 </div>
             </Header>
 

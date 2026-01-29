@@ -20,7 +20,6 @@ type EditParentsProps = {
 }
 
 export function EditParents() {
-
     const [open, setOpen] = useState(false)
 
     async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {

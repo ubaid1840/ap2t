@@ -4,6 +4,7 @@ import PageTable from "@/components/app-table"
 import InputWithIcon from "@/components/input-with-icon"
 import { PLAYERS_COLUMNS } from "@/components/players/columns"
 import { PLAYERS_DATA } from "@/components/players/constatns"
+import { CreatePlayer } from "@/components/players/create-player"
 import Header from "@/components/players/header"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -26,9 +27,7 @@ export default function Page() {
                         <Download /> Export
                     </Button>
 
-                    <Button >
-                        <Plus /> Add Player
-                    </Button>
+                    <CreatePlayer/>
                 </div>
             </Header>
 
