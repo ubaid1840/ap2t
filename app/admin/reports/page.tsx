@@ -304,7 +304,7 @@ const Header = ({ children }: { children: ReactNode }) => {
 const HeaderCard = ({ title = "", description = "", icon = null }: { title: string, description: string, icon: ReactNode }) => {
 
   return (
-    <Card className="rounded-[10px] bg-[#1A1A1A] border-[#3A3A3A] sm:w-[204px] w-full p-0 py-2 px-4">
+    <Card className="flex-1 rounded-[10px] bg-[#1A1A1A] border-[#3A3A3A] sm:w-[204px] w-full p-0 py-2 px-4">
       <CardContent className="p-0 py-2 space-y-2">
         <div className="flex gap-2 items-center">
           {icon}
