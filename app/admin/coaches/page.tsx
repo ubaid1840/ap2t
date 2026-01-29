@@ -226,24 +226,24 @@ const CreateCoach = () => {
     preferedSchedule: "",
   });
 
-  const changeCoach = () => {
+  const addCoach = async () => {
     console.log(coach);
   };
 
   return (
     <>
       <Button className="gap-2 text-sm" onClick={() => setOpen(!open)}>
-            <Plus /> Add New Coach
+            <Plus /> Add Coach
           </Button>
       <Dialog open={open} onOpenChange={setOpen}>
 
         <DialogContent className="bg-[#252525] border border-[#3A3A3A] sm:max-w-4xl p-0">
           <DialogHeader className="border-b border-[#3A3A3A] p-4">
             <DialogTitle className="text-[#F3F4F6] font-semibold text-lg">
-              Edit Coach Profile
+              Add New Coach
             </DialogTitle>
           </DialogHeader>
-          <form onSubmit={changeCoach} className="">
+          <form onSubmit={addCoach} className="">
             <ScrollArea className=" py-1 space-y-4 px-2 ">
               <div className="space-y-2 px-2 pb-2">
                 <div className="grid grid-cols-2 gap-4">
@@ -308,12 +308,15 @@ const CreateCoach = () => {
                       className="!bg-[#1A1A1A] !border-[#3A3A3A] !text-[#E5E7EB] !p-5"
                       required
                       value={coach.yearexp}
-                      onChange={(e) =>
-                        setCoach((prev) => ({
-                          ...prev,
-                          yearexp: e.target.value,
-                        }))
-                      }
+                       onChange={(e) =>{
+                        if(!Number.isNaN(Number(e.target.value))){
+                          setCoach((prev) => ({
+                            ...prev,
+                            yearexp: e.target.value,
+                          }))
+
+                        }
+                      }}
                     />
                   </div>
                 </div>

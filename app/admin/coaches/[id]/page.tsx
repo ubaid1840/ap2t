@@ -515,12 +515,15 @@ const EditProfile = () => {
                       className="!bg-[#1A1A1A] !border-[#3A3A3A] !text-[#E5E7EB] !p-5"
                       required
                       value={editCoach.yearexp}
-                      onChange={(e) =>
-                        setEditCoach((prev) => ({
-                          ...prev,
-                          yearexp: e.target.value,
-                        }))
-                      }
+                       onChange={(e) =>{
+                        if(!Number.isNaN(Number(e.target.value))){
+                          setEditCoach((prev) => ({
+                            ...prev,
+                            yearexp: e.target.value,
+                          }))
+
+                        }
+                      }}
                     />
                   </div>
                 </div>

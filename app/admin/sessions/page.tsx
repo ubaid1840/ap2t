@@ -94,7 +94,7 @@ const Header = ({ children }: { children: ReactNode }) => {
   return (
     <div className="flex w-full gap-4 justify-between flex-wrap items-center">
       <div className="space-y-2">
-        <p className="text-xl">Players Management</p>
+        <p className="text-xl">Sessions Management</p>
         <span className="text-xs text-muted-foreground flex items-center">
           <span>7 of 7 sessions{' '}</span>
           <span className="text-warning-text inline-flex"> <Dot size={16} /> 1 pending payments</span>

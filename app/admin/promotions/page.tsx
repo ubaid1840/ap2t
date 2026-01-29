@@ -446,7 +446,11 @@ const AddNewPromotion = () => {
                       className="!bg-[#1A1A1A] !border-[#3A3A3A] !text-[#E5E7EB] !p-5"
                       required
                       value={addPromotion.promotionPrice}
-                      onChange={(e) => handleChange(e)}
+                       onChange={(e) =>{
+                        if(!Number.isNaN(Number(e.target.value))){
+                          handleChange(e)
+                        }
+                      }}
                     />
                   </div>
                   <div className="space-y-2">
@@ -458,7 +462,11 @@ const AddNewPromotion = () => {
                       placeholder="250.00"
                       className="!bg-[#1A1A1A] !border-[#3A3A3A] !text-[#E5E7EB] !p-5"
                       value={addPromotion.originalPrice}
-                      onChange={(e) => handleChange(e)}
+                      onChange={(e) =>{
+                        if(!Number.isNaN(Number(e.target.value))){
+                          handleChange(e)
+                        }
+                      }}
                     />
                   </div>
                 </div>

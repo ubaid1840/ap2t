@@ -1,12 +1,6 @@
 "use client";
 import axios from "@/lib/axios";
-import {
-  Calendar,
-  MapPin,
-  Plus,
-  Tag,
-  Users,
-} from "lucide-react";
+import { Calendar, Loader2, MapPin, Plus, Tag, Users } from "lucide-react";
 import { useState } from "react";
 import AppCalendar from "../app-calendar";
 import { TimePicker } from "../time-picker";
@@ -23,9 +17,19 @@ import { Label } from "../ui/label";
 import { ScrollArea } from "../ui/scroll-area";
 import { Separator } from "../ui/separator";
 import { Textarea } from "../ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
 
 export function CreateSessionDialog() {
   const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [session, setSession] = useState({
     name: "",
     description: "",
@@ -37,15 +41,18 @@ export function CreateSessionDialog() {
     end_time: "",
     price: "",
     max_players: "",
-    apply_promotion: "",
+    apply_promotion: false,
   });
 
   const createSession = async () => {
+    setLoading(true);
     try {
-      const result = await axios.post("/admin/sessions", session)
+      const result = await axios.post("/admin/sessions", session);
       console.log("Session created:", result.data);
     } catch (error) {
-      console.log(error)
+      console.log(error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -64,7 +71,7 @@ export function CreateSessionDialog() {
               Fill in the details to create a new training session
             </p>
           </DialogHeader>
-          <form onSubmit={createSession} >
+          <form onSubmit={createSession}>
             <ScrollArea className=" py-1 space-y-4 px-2 h-[70vh]">
               <div className="space-y-2 px-2 pb-2">
                 <div className="flex gap-2 text-md ">
@@ -137,8 +144,17 @@ export function CreateSessionDialog() {
                     <Label className="text-sm text-muted-foreground">
                       Date *
                     </Label>
-                    <AppCalendar className="h-11" date={session.date ? new Date(session.date) : undefined} onChange={(date) => setSession((prevState) => ({ ...prevState, date: date }))} required />
-
+                    <AppCalendar
+                      className="h-11"
+                      date={session.date ? new Date(session.date) : undefined}
+                      onChange={(date) =>
+                        setSession((prevState) => ({
+                          ...prevState,
+                          date: date,
+                        }))
+                      }
+                      required
+                    />
                   </div>
                   <div className="space-y-2">
                     <Label className="text-sm text-muted-foreground">
@@ -170,8 +186,6 @@ export function CreateSessionDialog() {
                         }))
                       }
                     />
-
-
                   </div>
                 </div>
 
@@ -208,12 +222,15 @@ export function CreateSessionDialog() {
                       className="!bg-[#1A1A1A] !border-[#3A3A3A] !text-[#E5E7EB] !p-5"
                       required
                       value={session.price}
-                      onChange={(e) =>
-                        setSession((prev) => ({
-                          ...prev,
-                          price: e.target.value,
-                        }))
-                      }
+                      onChange={(e) =>{
+                        if(!Number.isNaN(Number(e.target.value))){
+                          setSession((prev) => ({
+                            ...prev,
+                            price: e.target.value,
+                          }))
+
+                        }
+                      }}
                     />
                   </div>
                 </div>
@@ -234,30 +251,43 @@ export function CreateSessionDialog() {
                       className="!bg-[#1A1A1A] !border-[#3A3A3A] !text-[#E5E7EB] !p-5"
                       required
                       value={session.max_players}
-                      onChange={(e) =>
-                        setSession((prev) => ({
-                          ...prev,
-                          max_players: e.target.value,
-                        }))
-                      }
+                      onChange={(e) =>{
+                        if(!Number.isNaN(Number(e.target.value))){
+                          setSession((prev) => ({
+                            ...prev,
+                            max_players: e.target.value,
+                          }))
+
+                        }
+                      }}
                     />
                   </div>
                   <div className="space-y-2">
                     <Label className="text-sm text-muted-foreground">
                       Apply Promotion (Optional)
                     </Label>
-                    <Input
-                      name="applyPromotion"
-                      className="!bg-[#1A1A1A] !border-[#3A3A3A] !text-[#E5E7EB] !p-5"
-                      required
-                      value={session.apply_promotion}
-                      onChange={(e) =>
+
+                    <Select
+                      value={String(session.apply_promotion)}
+                      onValueChange={(value) =>
                         setSession((prev) => ({
                           ...prev,
-                          apply_promotion: e.target.value,
+                          apply_promotion: value === "true",
                         }))
                       }
-                    />
+                    >
+                      <SelectTrigger className="w-full p-6 !bg-[#1A1A1A] border-border rounded-[10px]">
+                        <SelectValue placeholder="Select" />
+                      </SelectTrigger>
+
+                      <SelectContent className="!bg-[#1A1A1A]">
+                        <SelectGroup>
+                          <SelectLabel>Select</SelectLabel>
+                          <SelectItem value="true">Yes</SelectItem>
+                          <SelectItem value="false">No</SelectItem>
+                        </SelectGroup>
+                      </SelectContent>
+                    </Select>
                   </div>
                 </div>
 
@@ -289,10 +319,18 @@ export function CreateSessionDialog() {
                 </DialogClose>
                 <Button
                   type="submit"
+                  disabled={loading}
                   className="flex-1 text-[13px]"
                   size={"lg"}
                 >
-                  Create Session
+                  {loading ? (
+                    <span className="flex items-center gap-2">
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      Creating...
+                    </span>
+                  ) : (
+                    "Create Session"
+                  )}
                 </Button>
               </div>
             </div>
@@ -302,4 +340,3 @@ export function CreateSessionDialog() {
     </>
   );
 }
-
