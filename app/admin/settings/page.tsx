@@ -155,10 +155,9 @@ useEffect(() => {
 
       const res = await axios.get("/api/settings");
 
-      // axios response data is already JSON
+     
       const result = res.data;
 
-      // ---------------- USER ----------------
       setProfileInfo({
         adminUser: result.user?.first_name || "",
         email: result.user?.email || "",
@@ -170,7 +169,7 @@ useEffect(() => {
 
       const settings = result.settings;
 
-      // ---------------- SQUARE INTEGRATION ----------------
+
       setSquareIntigration([
         {
           title: "Merchant ID",
@@ -211,7 +210,7 @@ useEffect(() => {
         },
       ]);
 
-      // ---------------- SECURITY ----------------
+     
       setSecurityInfo({
         twoFactorAuth: settings?.two_factor_auth ?? false,
         loginAlert: settings?.login_alert ?? false,
@@ -220,7 +219,7 @@ useEffect(() => {
         confirmNewPass: "",
       });
 
-      // ---------------- NOTIFICATIONS ----------------
+    
       setNoficationInfo([
         {
           title: "New Booking",
