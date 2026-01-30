@@ -12,6 +12,7 @@ import {
 import { useState } from "react";
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
+import axios from "axios";
 
 type EditParentsProps = {
     visible: boolean
@@ -28,7 +29,12 @@ export function CreateParent() {
   });
 
   const handleSubmit = async () => {
-    console.log(parent);
+    try {
+      const result=await axios.post("/api/admin/parents",parent)
+      console.log("parent created",result)
+    } catch (error) {
+      console.log(error)
+    }
   };
   return (
     <>

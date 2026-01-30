@@ -16,6 +16,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Plus, SquarePen } from "lucide-react"
 import { useState } from "react"
 import AppCalendar from "../app-calendar"
+import axios from "axios"
 
 export function CreatePlayer() {
     const [open, setOpen] = useState(false)
@@ -40,6 +41,12 @@ export function CreatePlayer() {
         console.log(values)
         setOpen(false)
         // call API here
+        try {
+            const result=await axios.post("/api/admin/players",values)
+            console.log("player created",result)
+        } catch (error) {
+            console.log(error)
+        }
     }
 
     return (
