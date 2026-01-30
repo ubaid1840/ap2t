@@ -31,7 +31,7 @@ import { FaBell, FaCreditCard, FaLock, FaUser } from "react-icons/fa";
 import { FaFloppyDisk } from "react-icons/fa6";
 import { GoDotFill } from "react-icons/go";
 import { RiShieldKeyholeLine } from "react-icons/ri";
-import axios from "axios";
+import axios from "@/lib/axios";
 export default function Page() {
   const [loading,setLoading]=useState(false)
   const [profileInfo, setProfileInfo] = useState({
@@ -265,12 +265,6 @@ useEffect(() => {
           icon: <Bell className="text-muted-foreground" size={20} />,
         },
       ]);
-    } catch (err) {
-      if (axios.isAxiosError(err)) {
-        console.error("Axios error:", err.response?.data);
-      } else {
-        console.error(err);
-      }
     } finally {
       setLoading(false);
     }

@@ -35,7 +35,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Scrollbar } from "@radix-ui/react-scroll-area";
-import axios from "axios";
+import axios from "@/lib/axios";
 import {
   Ban,
   Calendar,

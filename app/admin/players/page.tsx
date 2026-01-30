@@ -10,13 +10,27 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
+import axios from "@/lib/axios"
 import { Download, Filter, Plus } from "lucide-react"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 
 
 export default function Page() {
 
     const [filter, setFilter] = useState(true)
+      const [players,setPlayers]=useState()
+    
+          useEffect((()=>{
+              const fetchData=async ()=>{
+                const result=await axios.get("/admin/players")
+                 setPlayers(result.data)
+              }
+              fetchData()
+          }),[])
+      
+          useEffect(() => {
+        console.log(players);
+      }, [players]);
 
     return (
 

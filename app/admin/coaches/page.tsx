@@ -13,10 +13,10 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
-import axios from "axios";
+import axios from "@/lib/axios";
 import { Bell, Calendar, CheckCircle, Eye, Plus, Target, TrendingUp, User } from "lucide-react";
 import Link from "next/link";
-import { ReactNode, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 
 const localData = [
   {
@@ -73,6 +73,20 @@ type CoachCardNamesType = {
 const CoachCardNames: CoachCardNamesType = { totalSessions: "Total Sessions", completed: "Completed", upComing: "Upcoming", players: "Players" }
 
 export default function Page() {
+
+    const [coaches,setCoaches]=useState()
+
+      useEffect((()=>{
+          const fetchData=async ()=>{
+            const result=await axios.get("/admin/coaches")
+             setCoaches(result.data)
+          }
+          fetchData()
+      }),[])
+  
+      useEffect(() => {
+    console.log(coaches);
+  }, [coaches]);
   return (
     <div className="flex flex-col w-full gap-4">
       <Header>

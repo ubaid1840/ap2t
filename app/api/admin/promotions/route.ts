@@ -38,3 +38,22 @@ export async function POST(req:NextRequest,res:NextResponse){
     );
     }
 }
+
+export async function GET() {
+  try {
+    const result = await pool.query(
+      `
+      SELECT * FROM promotions
+      `
+    );
+
+    return NextResponse.json(result.rows);
+  } catch (error) {
+    console.error("GET /api/admin/promotions error:", error);
+
+    return NextResponse.json(
+      { message: "Internal Server Error" },
+      { status: 500 }
+    );
+  }
+}

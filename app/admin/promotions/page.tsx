@@ -33,7 +33,7 @@ import {
   TrendingUp,
   Users
 } from "lucide-react";
-import { ReactNode, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { GoDotFill } from "react-icons/go";
 
 
@@ -74,6 +74,20 @@ export default function Page() {
   const [filter, setFilter] = useState<
     "All" | "Active" | "Upcoming" | "Archive"
   >("Active");
+
+    const [dbPromotions, setDbPromotions] = useState();
+  
+    useEffect(() => {
+      const fetchData = async () => {
+        const result = await axios.get("/admin/promotions");
+        setDbPromotions(result.data);
+      };
+      fetchData();
+    }, []);
+  
+    useEffect(() => {
+      console.log(dbPromotions);
+    }, [dbPromotions]);
 
 
 

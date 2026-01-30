@@ -17,7 +17,7 @@ import { useParams } from "next/navigation"
 import { ReactNode, useEffect, useState } from "react"
 import { IoIosPin } from "react-icons/io"
 import { IoCalendarClear } from "react-icons/io5"
-import axios from "axios"
+import axios from "@/lib/axios"
 
 
 export default function Page() {
@@ -31,7 +31,7 @@ export default function Page() {
             const fetchData=async()=>{
                 try {
                     const temp_parent_id="77ff2fb7-7383-42f3-a9b4-53d7f797745b"
-                    const result=await axios.get(`/api/admin/parents/${temp_parent_id}`)
+                    const result=await axios.get(`/admin/parents/${temp_parent_id}`)
                     console.log(result)
                 } catch (error) {
                     console.log(error)

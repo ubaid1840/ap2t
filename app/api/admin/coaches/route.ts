@@ -29,3 +29,39 @@ export async function POST(req:NextRequest,res:NextResponse){
         console.log(error)
     }
 }
+
+export async function GET() {
+  try {
+    const result = await pool.query(
+      `
+      SELECT
+        c.id AS parent_id,
+        c.user_id,
+        c.bio,
+        c.rating,
+        c.career_start,
+        c.schedule_preference,
+        u.first_name,
+        u.last_name,
+        u.email,
+        u.location,
+        u.status,
+        u.picture,
+        u.phone_no,
+        u.birth_date,
+        u.joining_date
+      FROM coaches c
+      INNER JOIN users u ON u.id = c.user_id
+      `
+    );
+
+    return NextResponse.json(result.rows);
+  } catch (error) {
+    console.error("GET /api/admin/coaches error:", error);
+
+    return NextResponse.json(
+      { message: "Internal Server Error" },
+      { status: 500 }
+    );
+  }
+}

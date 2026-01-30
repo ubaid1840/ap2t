@@ -59,7 +59,7 @@ import { Badge } from "@/components/ui/badge";
 import LineChart from "@/components/charts/line-chart-dots";
 import { COACH_ALL_SESSIONS, COACH_REVENUE_TRED, COACH_WEEKLY_EVENTS } from "@/components/coach-dashboard/constants";
 import { WeeklySchedule } from "@/components/coach-dashboard/weekly-schedule";
-import axios from "axios";
+import axios from "@/lib/axios";
 
 
 
@@ -83,7 +83,7 @@ export default function Page() {
       const fetchData=async()=>{
                 try {
                   const temp_coach_id="c2003915-6fb4-467b-b66c-fe28b5d5ef9a"
-                    const result=await axios.get(`/api/admin/coaches/${temp_coach_id}`)
+                    const result=await axios.get(`/admin/coaches/${temp_coach_id}`)
                     console.log(result)
                 } catch (error) {
                     console.log(error)
