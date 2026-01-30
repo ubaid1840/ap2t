@@ -153,7 +153,7 @@ useEffect(() => {
     try {
       setLoading(true);
 
-      const res = await axios.get("/api/settings");
+      const res = await axios.get("/settings");
 
      
       const result = res.data;
@@ -163,7 +163,7 @@ useEffect(() => {
         email: result.user?.email || "",
         phoneNo: result.user?.phone_no || "",
         role: result.user?.role || "",
-        password: "", // ❌ never set password from backend
+        password: "", 
         blanck: "",
       });
 
