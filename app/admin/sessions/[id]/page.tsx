@@ -35,6 +35,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Scrollbar } from "@radix-ui/react-scroll-area";
+import axios from "axios";
 import {
   Ban,
   Calendar,
@@ -190,6 +191,19 @@ export default function Page() {
 
   useEffect(() => {
     if (id) {
+      const fetchData=async()=>{
+                try {
+                  const temp_session_id="3cfcbbde-1bd4-41e2-9615-4f2ba73a9c50"
+                    const result=await axios.get(`/api/admin/sessions/${temp_session_id}`)
+                    console.log(result)
+                } catch (error) {
+                    console.log(error)
+                }
+            }
+            fetchData()
+
+
+
       const sessionData = SESSIONS_DATA.find((item) => item.id === id);
       setData(sessionData);
     }

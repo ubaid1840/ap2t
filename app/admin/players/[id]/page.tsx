@@ -19,6 +19,7 @@ import { Activity, Bookmark, Calendar, CircleCheckBig, CircleX, Clock, DollarSig
 import { useParams } from "next/navigation"
 import { ReactNode, useEffect, useState } from "react"
 import { IoIosStar, IoIosStarOutline } from "react-icons/io"
+import axios from "axios"
 
 
 export default function Page() {
@@ -29,6 +30,18 @@ export default function Page() {
 
     useEffect(() => {
         if (id) {
+            const fetchData=async()=>{
+                try {
+                    const temp_player_id="772d05a3-f19c-49ac-b6d4-9f2a0c7c7d3b"
+                    const result=await axios.get(`/api/admin/players/${temp_player_id}`)
+                    console.log(result)
+                } catch (error) {
+                    console.log(error)
+                }
+            }
+            fetchData()
+
+
             const currentPlayerData = PLAYERS_DATA.find((item) => item.id === Number(id))
             setData(currentPlayerData)
         }

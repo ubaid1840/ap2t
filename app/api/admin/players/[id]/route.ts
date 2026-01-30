@@ -5,13 +5,14 @@ export async function GET(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const { id: parentId } = await params; 
+  const { id: player_id } = await params; 
   try {
     const result = await pool.query(
       `
       SELECT
-        p.id AS parent_id,
+        p.id AS player_id,
         p.user_id,
+        p.position,
         u.first_name,
         u.last_name,
         u.email,
@@ -21,23 +22,23 @@ export async function GET(
         u.phone_no,
         u.birth_date,
         u.joining_date
-      FROM parents p
+      FROM players p
       INNER JOIN users u ON u.id = p.user_id
       WHERE p.id = $1
       `,
-      [parentId]
+      [player_id]
     );
 
     if (result.rows.length === 0) {
       return NextResponse.json(
-        { message: "Parent not found" },
+        { message: "player not found" },
         { status: 404 }
       );
     }
 
     return NextResponse.json(result.rows[0]);
   } catch (error) {
-    console.error("GET /api/parents/[id] error:", error);
+    console.error("GET /api/player/[id] error:", error);
 
     return NextResponse.json(
       { message: "Internal Server Error" },
