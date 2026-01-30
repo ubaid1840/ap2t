@@ -16,6 +16,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { SquarePen } from "lucide-react"
 import { useState } from "react"
 import AppCalendar from "../app-calendar"
+import axios from "@/lib/axios"
 
 export function EditInfo() {
     const [open, setOpen] = useState(false)
@@ -26,21 +27,46 @@ export function EditInfo() {
     const skillLevels = ["Beginner", "Intermediate", "Advanced", "Expert"]
 
     async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-        e.preventDefault()
-        const formData = new FormData(e.currentTarget)
+  e.preventDefault();
 
-        const values = {
-            name: formData.get("name"),
-            dob: formData.get("dob"),
-            position,
-            skillLevel,
-            medicalNotes: formData.get("medicalNotes"),
-        }
+  const formData = new FormData(e.currentTarget);
 
-        console.log(values)
-        setOpen(false)
-        // call API here
+  const name = formData.get("name") as string | null;
+  const dob = formData.get("dob") as string | null;
+  const position = formData.get("position") as string | null;
+  const skillLevel = formData.get("skillLevel") as string | null;
+  const medicalNotes = formData.get("medicalNotes") as string | null;
+
+  try {
+    const temp_player_id = "772d05a3-f19c-49ac-b6d4-9f2a0c7c7d3b";
+
+    let first_name = "";
+    let last_name = "";
+
+    if (name) {
+      const names = name.trim().split(" ");
+      first_name = names.shift() || "";
+      last_name = names.join(" ");
     }
+
+    const body: any = {};
+    if (first_name) body.first_name = first_name;
+    if (last_name) body.last_name = last_name;
+    if (dob) body.birth_date = dob;
+    if (position) body.position = position;
+    if (skillLevel) body.skill_level = skillLevel;
+    if (medicalNotes) body.medical_notes = medicalNotes;
+
+    const res = await axios.patch(`/admin/players/${temp_player_id}`, body);
+
+    console.log("Player updated successfully:", res.data);
+
+    setOpen(false);
+  } catch (error) {
+    console.error("Failed to update player:", error);
+  }
+}
+
 
     return (
         <>
@@ -56,7 +82,6 @@ export function EditInfo() {
                         </DialogHeader>
 
                         <div className="grid gap-4 py-4 border-t">
-                            {/* Full Name */}
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="grid gap-2">
                                     <Label htmlFor="name" className="text-xs text-muted-foreground">Full Name</Label>
@@ -64,18 +89,18 @@ export function EditInfo() {
                                         id="name"
                                         name="name"
                                         placeholder="Pedro Duarte"
-                                        required
+                                        
                                         className="dark:bg-[#1A1A1A]"
                                     />
                                 </div>
 
-                                {/* Date of Birth */}
+                              
                                 <div className="grid gap-2">
                                     <Label htmlFor="dob" className="text-xs text-muted-foreground">Date of Birth</Label>
                                     <AppCalendar date={date} onChange={setDate} />
                                 </div>
 
-                                {/* Position */}
+                      
                                 <div className="grid gap-2">
                                     <Label htmlFor="position" className="text-xs text-muted-foreground">Position</Label>
                                     <Select value={position} onValueChange={setPosition}>
@@ -90,7 +115,6 @@ export function EditInfo() {
                                     </Select>
                                 </div>
 
-                                {/* Skill Level */}
                                 <div className="grid gap-2">
                                     <Label htmlFor="skillLevel" className="text-xs text-muted-foreground">Skill Level</Label>
                                     <Select value={skillLevel} onValueChange={setSkillLevel}>
@@ -106,7 +130,7 @@ export function EditInfo() {
                                 </div>
                             </div>
 
-                            {/* Medical Notes */}
+                  
                             <div className="grid gap-2">
                                 <Label htmlFor="medicalNotes" className="text-xs text-muted-foreground">Medical Notes</Label>
                                 <Textarea

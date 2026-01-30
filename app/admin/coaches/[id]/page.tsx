@@ -60,6 +60,7 @@ import LineChart from "@/components/charts/line-chart-dots";
 import { COACH_ALL_SESSIONS, COACH_REVENUE_TRED, COACH_WEEKLY_EVENTS } from "@/components/coach-dashboard/constants";
 import { WeeklySchedule } from "@/components/coach-dashboard/weekly-schedule";
 import axios from "@/lib/axios";
+import AppCalendar from "@/components/app-calendar";
 
 
 
@@ -153,7 +154,7 @@ export default function Page() {
               </div>
             </div>
             <div className="flex gap-4 flex-wrap">
-              <EditProfile />
+              <EditProfile/>
             </div>
 
           </div>
@@ -433,18 +434,58 @@ const EditProfile = () => {
   const [open, setOpen] = useState(false)
 
   const [editCoach, setEditCoach] = useState({
-    fullname: "",
+    fullname:"" ,
     email: "",
     phone: "",
-    yearexp: "",
+    career_start: "",
     bio: "",
     preferedSchedule: "",
   });
 
-  const changeCoach = () => {
-    console.log(editCoach);
-  };
+ const changeCoach = async (e: React.FormEvent) => {
+    e.preventDefault(); 
 
+    try {
+      const temp_coach_id = "c2003915-6fb4-467b-b66c-fe28b5d5ef9a";
+      
+      const names = editCoach.fullname.trim().split(" ");
+      const first_name = names.shift() || "";
+      const last_name = names.join(" ") || "";
+
+      
+      const body: any = {};
+      if (first_name) body.first_name = first_name;
+      if (last_name) body.last_name = last_name;
+      if (editCoach.email) body.email = editCoach.email;
+      if (editCoach.phone) body.phone_no = editCoach.phone;
+      if (editCoach.career_start)
+        body.career_start =
+          typeof editCoach.career_start === "string"
+            ? editCoach.career_start
+            : editCoach.career_start.toISOString(); 
+      if (editCoach.bio) body.bio = editCoach.bio;
+      if (editCoach.preferedSchedule)
+        body.schedule_preference = editCoach.preferedSchedule;
+
+ 
+      const res = await axios.patch(`/admin/coaches/${temp_coach_id}`, body);
+
+      console.log("Coach updated successfully:", res.data);
+
+      setEditCoach({
+        fullname: `${res.data.first_name} ${res.data.last_name}`,
+        email: res.data.email || "",
+        phone: res.data.phone_no || "",
+        career_start: res.data.career_start || "",
+        bio: res.data.bio || "",
+        preferedSchedule: res.data.schedule_preference || "",
+      });
+
+      setOpen(false);
+    } catch (error) {
+      console.error("Failed to update coach:", error);
+    }
+  };
   return (
     <>
       <Button
@@ -474,7 +515,7 @@ const EditProfile = () => {
                       name="fullName"
                       placeholder="Coach Martinez"
                       className="!bg-[#1A1A1A] !border-[#3A3A3A] !text-[#E5E7EB] !p-5"
-                      required
+                      
                       value={editCoach.fullname}
                       onChange={(e) =>
                         setEditCoach((prev) => ({
@@ -490,7 +531,7 @@ const EditProfile = () => {
                       name="email"
                       placeholder="martinez@ap2t.com"
                       className="!bg-[#1A1A1A] !border-[#3A3A3A] !text-[#E5E7EB] !p-5"
-                      required
+                      
                       value={editCoach.email}
                       onChange={(e) =>
                         setEditCoach((prev) => ({
@@ -507,7 +548,7 @@ const EditProfile = () => {
                       name="phone"
                       placeholder="(555) 123-4567"
                       className="!bg-[#1A1A1A] !border-[#3A3A3A] !text-[#E5E7EB] !p-5"
-                      required
+                      
                       value={editCoach.phone}
                       onChange={(e) =>
                         setEditCoach((prev) => ({
@@ -519,23 +560,18 @@ const EditProfile = () => {
                   </div>
                   <div className="space-y-2">
                     <Label className="text-sm text-[#99A1AF]">
-                      Years of Experience
+                     Start of Career
                     </Label>
-                    <Input
-                      name="yearsofexp"
-                      placeholder="10"
-                      className="!bg-[#1A1A1A] !border-[#3A3A3A] !text-[#E5E7EB] !p-5"
-                      required
-                      value={editCoach.yearexp}
-                       onChange={(e) =>{
-                        if(!Number.isNaN(Number(e.target.value))){
-                          setEditCoach((prev) => ({
-                            ...prev,
-                            yearexp: e.target.value,
-                          }))
-
-                        }
-                      }}
+                    <AppCalendar
+                      className="h-11"
+                      date={editCoach.career_start ? new Date(editCoach.career_start) : undefined}
+                      onChange={(date) =>
+                        setEditCoach((prevState) => ({
+                          ...prevState,
+                          career_start: date,
+                        }))
+                      }
+                      
                     />
                   </div>
                 </div>
@@ -544,7 +580,15 @@ const EditProfile = () => {
                   <Label className="text-sm text-[#99A1AF]">
                     Biography
                   </Label>
-                  <Textarea className="!bg-[#1A1A1A] border border-border rounded-[10px] min-h-28" />
+                  <Textarea className="!bg-[#1A1A1A] border border-border rounded-[10px] min-h-28" 
+                   value={editCoach.bio}
+                      onChange={(e) =>
+                        setEditCoach((prev) => ({
+                          ...prev,
+                          bio: e.target.value,
+                        }))
+                      }
+                  />
                 </div>
 
                 <div className="space-y-2">
@@ -555,7 +599,7 @@ const EditProfile = () => {
                     name="preferedscedule"
                     placeholder="Coach Martinez"
                     className="!bg-[#1A1A1A] !border-[#3A3A3A] !text-[#E5E7EB] !p-5"
-                    required
+                    
                     value={editCoach.preferedSchedule}
                     onChange={(e) =>
                       setEditCoach((prev) => ({
