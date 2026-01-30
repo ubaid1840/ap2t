@@ -194,7 +194,7 @@ export default function Page() {
       const fetchData=async()=>{
                 try {
                   const temp_session_id="3cfcbbde-1bd4-41e2-9615-4f2ba73a9c50"
-                    const result=await axios.get(`/api/admin/sessions/${temp_session_id}`)
+                    const result=await axios.get(`/admin/sessions/${temp_session_id}`)
                     console.log(result)
                 } catch (error) {
                     console.log(error)

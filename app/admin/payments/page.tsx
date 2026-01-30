@@ -13,8 +13,9 @@ import {
   Filter,
   OctagonAlert,
 } from "lucide-react";
-import { ReactNode, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { GoDotFill } from "react-icons/go";
+import axios from "@/lib/axios";
 
 const localData = [
   {
@@ -53,6 +54,20 @@ export default function Page() {
   const [filter, setFilter] = useState<
     "All" | "Completed" | "Pending" | "Failed" | "Comped" | "Voided"
   >("All");
+
+  const [payments,setPayments]=useState()
+  useEffect(() => {
+    const fetchData = async () => {
+      const result = await axios.get("/admin/payments");
+      setPayments(result.data);
+    };
+    fetchData();
+  }, []);
+
+  useEffect(() => {
+    console.log(payments);
+  }, [payments]);
+
 
   const filteredData = PAYMENT_DATA.filter((data) => {
     if (filter === "All") {
