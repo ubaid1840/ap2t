@@ -324,7 +324,7 @@ const CreateCoach = () => {
                   </div>
                   <div className="space-y-2">
                     <Label className="text-sm text-[#99A1AF]">
-                      Years of Experience
+                      Start of Career
                     </Label>
                     <AppCalendar
                       className="h-11"
