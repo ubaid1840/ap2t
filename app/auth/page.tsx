@@ -17,7 +17,6 @@ export default function Page() {
   const searchParams = useSearchParams();
   const [tab, setTab] = React.useState<"login" | "signup">("login");
 
-
   useEffect(() => {
     const paramTab = searchParams.get("p");
     if (paramTab === "signup") {

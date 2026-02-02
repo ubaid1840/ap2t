@@ -17,12 +17,17 @@ import { Button } from "../ui/button";
 import { Checkbox } from "../ui/checkbox";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { auth } from "@/lib/firebase";
+import axios from "axios";
+import { useRouter } from "next/router";
 
 export default function SignUpForm({
   onClickLogin,
 }: {
   onClickLogin: () => void;
 }) {
+  // const router = useRouter();
   const [signUpData, setSignUpData] = useState({
     first_name: "",
     last_name: "",
@@ -43,14 +48,26 @@ export default function SignUpForm({
   const [waiverData, setWaiverData] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
 
- const signUp=async()=>{
-  if(waiverData){
-    console.log(signUpData)
-    console.log(paymentData)
-  }
- }
+  const signUp = async () => {
+    if (waiverData) {
+      if (signUpData.password === signUpData.confirm_password) {
+        try {
+          const userCredentials = await createUserWithEmailAndPassword(
+            auth,
+            signUpData.email,
+            signUpData.password,
+          );
 
-
+          if (userCredentials) {
+            const result = await axios.post("/auth/signup", signUpData);
+            // router.push("/admin");
+          }
+        } catch (error) {
+          console.error("signup error: ", error);
+        }
+      }
+    }
+  };
 
   const steps = [
     {
@@ -375,16 +392,18 @@ export default function SignUpForm({
 
             <div className="flex gap-4">
               <Button
-                onClick={() => {setCurrentStep(1)
-                signUpData()
-                }
-                }
+                onClick={() => {
+                  setCurrentStep(1);
+                }}
                 className="flex-1 bg-secondary text-white"
               >
                 back
               </Button>
               <Button
-                onClick={() => setCurrentStep(2)}
+                onClick={() => {
+                  setCurrentStep(2);
+                  signUp();
+                }}
                 className="flex-1 bg-primary text-secondary"
               >
                 Sign up
