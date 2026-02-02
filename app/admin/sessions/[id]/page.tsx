@@ -8,16 +8,13 @@ import {
 } from "@/components/sessions/session-data";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent
-} from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   Dialog,
   DialogClose,
   DialogContent,
   DialogHeader,
-  DialogTitle
+  DialogTitle,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -46,13 +43,14 @@ import {
   Clock,
   DollarSign,
   Gift,
+  Loader2,
   Mail,
   MapPin,
   MessageSquare,
   Phone,
   Plus,
   User,
-  Users
+  Users,
 } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -184,34 +182,52 @@ const notesData = [
 export default function Page() {
   const { id } = useParams();
   const [data, setData] = useState<SessionDataType>();
-  const [tab, setTab] = useState("Participants")
-  const isMobile = useIsMobile()
-
- 
+  const [tab, setTab] = useState("Participants");
+  const isMobile = useIsMobile();
+  const [session_id, setSession_id] = useState(
+    "3cfcbbde-1bd4-41e2-9615-4f2ba73a9c50",
+  );
+  const [loading, setLoading] = useState(false);
+  const [loadingStatus, setLoadingStatus] = useState<
+  "completed" | "comped" | "cancelled" | null
+>(null)
 
   useEffect(() => {
     if (id) {
-      const fetchData=async()=>{
-                try {
-                  const temp_session_id="3cfcbbde-1bd4-41e2-9615-4f2ba73a9c50"
-                    const result=await axios.get(`/admin/sessions/${temp_session_id}`)
-                    console.log(result)
-                } catch (error) {
-                    console.log(error)
-                }
-            }
-            fetchData()
+      const fetchData = async () => {
+        try {
+          setLoading(true);
 
-
+          const result = await axios.get(`/admin/sessions/${session_id}`);
+          console.log(result);
+        } catch (error) {
+          console.log(error);
+        } finally {
+          setLoading(false);
+        }
+      };
+      fetchData();
 
       const sessionData = SESSIONS_DATA.find((item) => item.id === id);
       setData(sessionData);
     }
   }, [id]);
 
+  const setStatus = async (status: "completed" | "comped" | "cancelled") => {
+    setLoadingStatus(status)
+    setLoading(true);
+    try {
+      const result = await axios.patch(`/admin/sessions/${session_id}/status`, {
+        status,
+      });
+      console.log(result);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="flex flex-col w-full gap-6">
-
       <BackButton title="Back To Sessions" route="/admin/sessions" />
 
       <Card className="w-full rounded-2xl bg-[#252525]">
@@ -225,15 +241,11 @@ export default function Page() {
                 <Badge className="bg-info-bg text-info-text border border-info-text/32 h-6">
                   <div className="flex gap-1 items-center">
                     <Clock size={16} />
-                    <p>
-                      {data?.status}
-                    </p>
+                    <p>{data?.status}</p>
                   </div>
                 </Badge>
               </div>
               <EditSessionDialog />
-
-
             </div>
             <p className="text-sm text-muted-foreground">
               Advanced skills training session focusing on ball handling,
@@ -269,7 +281,9 @@ export default function Page() {
                 <MapPin className="h-4 w-4 text-ghost-text" />
                 <div className=" ">
                   <p className="text-xs text-ghost-text">Location</p>
-                  <h1 className="text-[#E5E7EB] text-sm">Court A - Main Facility</h1>
+                  <h1 className="text-[#E5E7EB] text-sm">
+                    Court A - Main Facility
+                  </h1>
                 </div>
               </div>
             </div>
@@ -282,7 +296,9 @@ export default function Page() {
                 >
                   <CardContent className="space-y-4 p-0 p-4">
                     <div className="flex gap-4 items-center">
-                      <div className={`text-${item.type}-text`}>{item.icon}</div>
+                      <div className={`text-${item.type}-text`}>
+                        {item.icon}
+                      </div>
                       <div className="flex flex-col gap-1">
                         <h1 className="font-semibold text-xl">{item.h}</h1>
                         <p className="text-[#B0B0B0] text-xs">{item.p}</p>
@@ -299,26 +315,68 @@ export default function Page() {
             <Button
               variant={"outline"}
               className="dark:bg-active-bg flex gap-2 text-active-text border dark:border-active-text/32"
+              onClick={() => {
+                setStatus("completed")
+              }
+                
+            }
             >
-              <Check /> Mark as Completed
+              {loading && loadingStatus==="completed" ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Marking...
+                </>
+              ) : (
+                <>
+                  <Check className="h-4 w-4" />
+                  Mark as Completed
+                </>
+              )}
             </Button>
             <Button
               variant={"outline"}
               className="dark:bg-warning-bg flex gap-2 text-warning-text border dark:border-warning-text/32"
+              onClick={() => {
+               
+                setStatus("comped")
+              }}
             >
-              <Gift /> Mark as Comped
+              {loading&&loadingStatus==="comped" ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Marking...
+                </>
+              ) : (
+                <>
+                  <Check className="h-4 w-4" />
+                  Mark as Comped
+                </>
+              )}
             </Button>
             <Button
               variant={"outline"}
               className="dark:bg-danger-bg flex gap-2 text-danger-text border dark:border-danger-text/32"
+              onClick={() => {
+                
+                setStatus("cancelled")
+
+              }}
             >
-              <Ban /> Cancel Session
+              {loading &&loadingStatus==="cancelled" ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Marking...
+                </>
+              ) : (
+                <>
+                  <Check className="h-4 w-4" />
+                  Mark as cancelled
+                </>
+              )}
             </Button>
           </div>
-
         </CardContent>
       </Card>
-
 
       <div className="w-full rounded-2xl bg-[#252525] py-2">
         <Tabs
@@ -326,20 +384,32 @@ export default function Page() {
           onValueChange={(v) => {
             setTab(v);
           }}
-
         >
-          <ScrollArea className={`overflow-x-auto ${isMobile && "max-w-[calc(100vw-64px)]"}`}>
+          <ScrollArea
+            className={`overflow-x-auto ${isMobile && "max-w-[calc(100vw-64px)]"}`}
+          >
             <TabsList className="bg-transparent relative flex gap-2 px-2">
-              {["Participants", "Payments", "Notes"
-              ].map((t) => (
+              {["Participants", "Payments", "Notes"].map((t) => (
                 <TabsTrigger
                   key={t}
                   value={t}
                   className="h-9 px-4 text-[12px] leading-tight tracking-tight"
                 >
-                  {t === "Participants" && <div className="flex gap-2 items-center py-2"><User /> Participants {"(3)"}</div>}
-                  {t === "Payments" && <div className="flex gap-2 items-center py-2"><DollarSign /> Payments {"(3)"}</div>}
-                  {t === "Notes" && <div className="flex gap-2 items-center py-2"><MessageSquare /> Notes {"(3)"}</div>}
+                  {t === "Participants" && (
+                    <div className="flex gap-2 items-center py-2">
+                      <User /> Participants {"(3)"}
+                    </div>
+                  )}
+                  {t === "Payments" && (
+                    <div className="flex gap-2 items-center py-2">
+                      <DollarSign /> Payments {"(3)"}
+                    </div>
+                  )}
+                  {t === "Notes" && (
+                    <div className="flex gap-2 items-center py-2">
+                      <MessageSquare /> Notes {"(3)"}
+                    </div>
+                  )}
                 </TabsTrigger>
               ))}
             </TabsList>
@@ -348,115 +418,108 @@ export default function Page() {
           <Separator />
 
           <TabsContent value="Participants" className="space-y-4 p-4">
-            {ParticipantsData.map((participent, i) =>  (
-                <Card key={i} className="bg-[#1A1A1A] border border-border">
-
-                  <CardContent className="space-y-2">
-
-                    <div className="flex gap-2 items-center">
-                      <h1>{participent.name}</h1>
-                      <CardStatus
-                        value={participent.status}
-                        type={participent.statusType as keyof typeof typeClasses}
-                      />
-                    </div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                      <div className="flex gap-2">
-                        <User className="w-4 h-4 text-ghost-text" />{" "}
-                        <div className="flex text-sm text-ghost-text">
-                          <p>Parent:</p> <p>{participent.parent}</p>
-                        </div>
-                      </div>
-                      <div className="flex gap-2">
-                        <Mail className="w-4 h-4 text-ghost-text" />{" "}
-                        <p className="flex text-sm text-ghost-text">
-                          {participent.email}
-                        </p>
-                      </div>
-                      <div className="flex gap-2">
-                        <Phone className="w-4 h-4 text-ghost-text" />{" "}
-                        <p className="flex text-sm text-ghost-text">
-                          {participent.phone}
-                        </p>
-                      </div>
-                      <div className="flex gap-2">
-                        <DollarSign className="w-4 h-4 text-ghost-text" />{" "}
-                        <div className="flex text-sm text-ghost-text">
-                          {" "}
-                          <p>Amount:</p> <p>{participent.amount}</p>
-                        </div>
-                      </div>
-                    </div>
-
-                    <Separator />
-                    <div className="flex gap-4 flex-wrap">
-                      <Button className="dark:bg-active-bg text-active-text border dark:border-active-text/32">
-                        <CheckCircle />
-                        Mark Present
-                      </Button>
-                      <Button className="dark:bg-danger-bg text-danger-text border dark:border-danger-text/32">
-                        <CircleX />
-                        Mark Absent
-                      </Button>
-                      {participent.status === "Pending" && (
-                        <div className="flex gap-2">
-                          <Button className="!bg-info-bg !text-info-text flex gap-2">
-                            <DollarSign />
-                            Mark Paid
-                          </Button>
-                          <Button className="!bg-alternative-bg !text-alternative-text flex gap-2">
-                            <Gift />
-                            Comp Session
-                          </Button>
-                        </div>
-                      )}
-                    </div>
-                  </CardContent>
-
-
-                </Card>
-              )
-            )}
-          </TabsContent>
-          <TabsContent value="Payments" className="space-y-4 p-4">
-            {paymentData.map((payment, i) => (
+            {ParticipantsData.map((participent, i) => (
               <Card key={i} className="bg-[#1A1A1A] border border-border">
-
                 <CardContent className="space-y-2">
-
                   <div className="flex gap-2 items-center">
-                    <h1>{payment.name}</h1>
+                    <h1>{participent.name}</h1>
                     <CardStatus
-                      value={payment.status}
-                      type={paymentStatusMap[payment.status as "Paid" | "Pending"]}
+                      value={participent.status}
+                      type={participent.statusType as keyof typeof typeClasses}
                     />
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-
-                    <div className="flex text-sm text-ghost-text gap-1">
-                      <p className="text-muted-foreground">Payment:</p> <p className="text-[#D1D5DC]"> {payment.amount}</p>
+                    <div className="flex gap-2">
+                      <User className="w-4 h-4 text-ghost-text" />{" "}
+                      <div className="flex text-sm text-ghost-text">
+                        <p>Parent:</p> <p>{participent.parent}</p>
+                      </div>
                     </div>
-
-                    <div className="flex text-sm text-ghost-text gap-1">
-                      <p className="text-muted-foreground">Method:</p> <p className="text-[#D1D5DC]">{payment.method}</p>
+                    <div className="flex gap-2">
+                      <Mail className="w-4 h-4 text-ghost-text" />{" "}
+                      <p className="flex text-sm text-ghost-text">
+                        {participent.email}
+                      </p>
                     </div>
-                    <div className="flex text-sm text-ghost-text gap-1">
-                      <p className="text-muted-foreground">Date:</p> <p className="text-[#D1D5DC]">{payment.date}</p>
+                    <div className="flex gap-2">
+                      <Phone className="w-4 h-4 text-ghost-text" />{" "}
+                      <p className="flex text-sm text-ghost-text">
+                        {participent.phone}
+                      </p>
                     </div>
-                    <div className="flex text-sm text-ghost-text gap-1">
-                      <p className="text-muted-foreground">Transaction ID:</p> <p className="text-[#D1D5DC]">{payment.transectionId}</p>
+                    <div className="flex gap-2">
+                      <DollarSign className="w-4 h-4 text-ghost-text" />{" "}
+                      <div className="flex text-sm text-ghost-text">
+                        {" "}
+                        <p>Amount:</p> <p>{participent.amount}</p>
+                      </div>
                     </div>
                   </div>
 
-
+                  <Separator />
+                  <div className="flex gap-4 flex-wrap">
+                    <Button className="dark:bg-active-bg text-active-text border dark:border-active-text/32">
+                      <CheckCircle />
+                      Mark Present
+                    </Button>
+                    <Button className="dark:bg-danger-bg text-danger-text border dark:border-danger-text/32">
+                      <CircleX />
+                      Mark Absent
+                    </Button>
+                    {participent.status === "Pending" && (
+                      <div className="flex gap-2">
+                        <Button className="!bg-info-bg !text-info-text flex gap-2">
+                          <DollarSign />
+                          Mark Paid
+                        </Button>
+                        <Button className="!bg-alternative-bg !text-alternative-text flex gap-2">
+                          <Gift />
+                          Comp Session
+                        </Button>
+                      </div>
+                    )}
+                  </div>
                 </CardContent>
-
-
               </Card>
-            )
-            )}
+            ))}
+          </TabsContent>
+          <TabsContent value="Payments" className="space-y-4 p-4">
+            {paymentData.map((payment, i) => (
+              <Card key={i} className="bg-[#1A1A1A] border border-border">
+                <CardContent className="space-y-2">
+                  <div className="flex gap-2 items-center">
+                    <h1>{payment.name}</h1>
+                    <CardStatus
+                      value={payment.status}
+                      type={
+                        paymentStatusMap[payment.status as "Paid" | "Pending"]
+                      }
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <div className="flex text-sm text-ghost-text gap-1">
+                      <p className="text-muted-foreground">Payment:</p>{" "}
+                      <p className="text-[#D1D5DC]"> {payment.amount}</p>
+                    </div>
+
+                    <div className="flex text-sm text-ghost-text gap-1">
+                      <p className="text-muted-foreground">Method:</p>{" "}
+                      <p className="text-[#D1D5DC]">{payment.method}</p>
+                    </div>
+                    <div className="flex text-sm text-ghost-text gap-1">
+                      <p className="text-muted-foreground">Date:</p>{" "}
+                      <p className="text-[#D1D5DC]">{payment.date}</p>
+                    </div>
+                    <div className="flex text-sm text-ghost-text gap-1">
+                      <p className="text-muted-foreground">Transaction ID:</p>{" "}
+                      <p className="text-[#D1D5DC]">{payment.transectionId}</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
           </TabsContent>
 
           <TabsContent value="Notes" className="space-y-4 p-4">
@@ -481,26 +544,25 @@ export default function Page() {
                         <Badge className="border-[#F0B1004D] bg-[#F0B10033] text-[#FDC700] rounded-sm">
                           Important
                         </Badge>
-
                       )}
                     </div>
-                    <p className="text-sm text-muted-foreground">{note.datetime}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {note.datetime}
+                    </p>
                     <h1 className="text-sm text-[#D1D5DC]">{note.message}</h1>
                   </CardContent>
                 </Card>
               );
             })}
           </TabsContent>
-
         </Tabs>
       </div>
-
     </div>
   );
 }
 
 const AddNoteDialog = () => {
-  const [open, setOpen] = useState(false)
+  const [open, setOpen] = useState(false);
 
   return (
     <>
@@ -509,7 +571,6 @@ const AddNoteDialog = () => {
         Add Note
       </Button>
       <Dialog open={open} onOpenChange={setOpen}>
-
         <DialogContent className="bg-[#252525] rounded-[10px] p-0">
           <DialogHeader className="p-4 border-b border-border">
             <DialogTitle className="text-lg font-semibold text-[#F3F4F6]">
@@ -518,9 +579,7 @@ const AddNoteDialog = () => {
           </DialogHeader>
           <div className="space-y-4 p-4">
             <div className="space-y-2">
-              <Label className="text-[#99A1AF] text-sm">
-                Note Type
-              </Label>
+              <Label className="text-[#99A1AF] text-sm">Note Type</Label>
 
               <Select>
                 <SelectTrigger className="w-full p-6 !bg-[#1A1A1A] border-border rounded-[10px]">
@@ -531,22 +590,19 @@ const AddNoteDialog = () => {
                     <SelectLabel>Select a category</SelectLabel>
                     <SelectItem value="apple">Apple</SelectItem>
                     <SelectItem value="banana">Banana</SelectItem>
-                    <SelectItem value="blueberry">
-                      Blueberry
-                    </SelectItem>
+                    <SelectItem value="blueberry">Blueberry</SelectItem>
                     <SelectItem value="grapes">Grapes</SelectItem>
-                    <SelectItem value="pineapple">
-                      Pineapple
-                    </SelectItem>
+                    <SelectItem value="pineapple">Pineapple</SelectItem>
                   </SelectGroup>
                 </SelectContent>
               </Select>
             </div>
             <div className="space-y-2">
-              <Label className="text-[#99A1AF] text-sm">
-                Note Content
-              </Label>
-              <Textarea placeholder="Enter your note here..." className="!bg-[#1A1A1A] border border-border rounded-[10px] text-ghost-text min-h-36"></Textarea>
+              <Label className="text-[#99A1AF] text-sm">Note Content</Label>
+              <Textarea
+                placeholder="Enter your note here..."
+                className="!bg-[#1A1A1A] border border-border rounded-[10px] text-ghost-text min-h-36"
+              ></Textarea>
             </div>
           </div>
           <div className="border-t border-border flex items-center justify-end p-4">
@@ -560,5 +616,5 @@ const AddNoteDialog = () => {
         </DialogContent>
       </Dialog>
     </>
-  )
-}
+  );
+};
