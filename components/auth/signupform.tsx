@@ -17,21 +17,21 @@ import { Button } from "../ui/button";
 import { Checkbox } from "../ui/checkbox";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import axios from "@/lib/axios";
+import { useRouter } from "next/navigation";
+import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "@/lib/firebase";
-import axios from "axios";
-import { useRouter } from "next/router";
 
 export default function SignUpForm({
   onClickLogin,
 }: {
   onClickLogin: () => void;
 }) {
-  // const router = useRouter();
+  const router = useRouter();
   const [signUpData, setSignUpData] = useState({
     first_name: "",
     last_name: "",
-    birth_year: "",
+    birth_date: "",
     location: "",
     email: "",
     password: "",
@@ -48,24 +48,28 @@ export default function SignUpForm({
   const [waiverData, setWaiverData] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
 
-  const signUp = async () => {
-    if (waiverData) {
-      if (signUpData.password === signUpData.confirm_password) {
-        try {
-          const userCredentials = await createUserWithEmailAndPassword(
-            auth,
-            signUpData.email,
-            signUpData.password,
-          );
+  const signUp = async (e: React.FormEvent) => {
+    e.preventDefault();
 
-          if (userCredentials) {
-            const result = await axios.post("/auth/signup", signUpData);
-            // router.push("/admin");
-          }
-        } catch (error) {
-          console.error("signup error: ", error);
-        }
+    if (!signUpData.email || !signUpData.password) return;
+    if (!waiverData) return;
+    if (signUpData.password !== signUpData.confirm_password) return;
+    try {
+      const res = await axios.post("/auth/signup", {
+        first_name: signUpData.first_name,
+        last_name: signUpData.last_name,
+        email: signUpData.email,
+        password: signUpData.password,
+        birth_date: signUpData.birth_date,
+        location: signUpData.location,
+        role: "admin",
+      });
+      if (res.status === 200) {
+        const { email } = res.data;
+        await signInWithEmailAndPassword(auth, email, signUpData.password);
       }
+    } catch (error) {
+      console.error("signup error:", error);
     }
   };
 
@@ -118,19 +122,21 @@ export default function SignUpForm({
 
             <div className="flex gap-4">
               <div className="flex-1">
-                <Label className="text-sm">Birth year *</Label>
-                <Input
-                  required
-                  type="text"
-                  placeholder="2001"
-                  className="w-full px-4"
-                  value={signUpData.birth_year}
-                  onChange={(e) =>
-                    setSignUpData((prev) => ({
-                      ...prev,
-                      birth_year: e.target.value,
+                <Label className="text-sm">Birth Date *</Label>
+                <AppCalendar
+                  className="h-11"
+                  date={
+                    signUpData.birth_date
+                      ? new Date(signUpData.birth_date)
+                      : undefined
+                  }
+                  onChange={(date) =>
+                    setSignUpData((prevState) => ({
+                      ...prevState,
+                      birth_date: date,
                     }))
                   }
+                  required
                 />
               </div>
               <div className="flex-1">
@@ -400,9 +406,10 @@ export default function SignUpForm({
                 back
               </Button>
               <Button
-                onClick={() => {
+                onClick={(e) => {
+                  e.preventDefault();
                   setCurrentStep(2);
-                  signUp();
+                  signUp(e);
                 }}
                 className="flex-1 bg-primary text-secondary"
               >

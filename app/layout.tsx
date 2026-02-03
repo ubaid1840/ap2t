@@ -5,6 +5,7 @@ import NextTopLoader from 'nextjs-toploader';
 import { Suspense } from "react";
 import "./globals.css";
 import { Toaster } from '@/components/ui/sonner'
+import { AuthProvider } from "./contexts/auth-context";
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-sans' });
 
@@ -38,7 +39,9 @@ export default function RootLayout({
           <NextTopLoader
             color="#d3fb20"
             showSpinner={false} />
+          <AuthProvider>
           {children}
+          </AuthProvider>
         </Suspense>
   <Toaster richColors position="bottom-right"/>
       </body>

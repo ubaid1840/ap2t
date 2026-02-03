@@ -3,8 +3,12 @@ import Link from "next/link";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { useState } from "react";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "@/lib/firebase";
+import { useRouter } from "next/navigation";
 
 export default function LoginForm({ onClickSignup }: { onClickSignup: () => void }) {
+      const router=useRouter()
       const [logindata,setLoginData]=useState(
         {
           email:"",
@@ -12,9 +16,24 @@ export default function LoginForm({ onClickSignup }: { onClickSignup: () => void
         }
       )
 
-    const handlesubmit = () => {
-        console.log(logindata)
+    const handlesubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+
+  try {
+    const res = await signInWithEmailAndPassword(
+      auth,
+      logindata.email,
+      logindata.password
+    );
+
+    if (res.user) {
+      console.log(res.user);
     }
+  } catch (error) {
+    console.error("Sign in failed", error);
+  }
+};
+
     return (
         <form className="space-y-5" onSubmit={handlesubmit}>
             <div className="flex flex-col justify-center items-center gap-5">

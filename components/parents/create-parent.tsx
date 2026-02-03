@@ -13,6 +13,7 @@ import { useState } from "react";
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
 import axios from "axios";
+import { splitFullName } from "@/lib/split-fullname";
 
 type EditParentsProps = {
     visible: boolean
@@ -29,8 +30,18 @@ export function CreateParent() {
   });
 
   const handleSubmit = async () => {
+    const {first_name,last_name}=splitFullName(parent.full_name)
     try {
-      const result=await axios.post("/api/admin/parents",parent)
+      const result=await axios.post("/api/admin/parents",
+        {
+          first_name:first_name,
+          last_name:last_name,
+          email:parent.email,
+          phone_no:parent.phone,
+          location:parent.address,
+          role:"parent"
+        }
+        )
       console.log("parent created",result)
     } catch (error) {
       console.log(error)

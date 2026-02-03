@@ -1,12 +1,10 @@
 "use client";
 
-import {
-  onAuthStateChanged,
-  User as FirebaseUser,
-} from "firebase/auth";
+import { onAuthStateChanged, User as FirebaseUser } from "firebase/auth";
 import { createContext, useContext, useEffect, useState } from "react";
-import axios from "axios";
+import axios from "@/lib/axios";
 import { auth } from "@/lib/firebase";
+import { useRouter } from "next/navigation";
 
 type DBUser = {
   id: string;
@@ -29,27 +27,30 @@ const AuthContext = createContext<AuthContextType>({
   loading: true,
 });
 
-export const AuthProvider = ({
-  children,
-}: {
-  children: React.ReactNode;
-}) => {
+export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [firebaseUser, setFirebaseUser] = useState<FirebaseUser | null>(null);
   const [user, setUser] = useState<DBUser | null>(null);
   const [loading, setLoading] = useState(true);
+  const router = useRouter();
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (fbUser) => {
       setLoading(true);
       setFirebaseUser(fbUser);
+      console.log("ON auth change working")
 
       if (fbUser?.email) {
         try {
           const res = await axios.get("/auth/signup", {
             params: { email: fbUser.email },
           });
-
+          console.log(res.data)
           setUser(res.data);
+          if (res.data.role === "admin") {
+            router.push("/admin");
+          } else {
+            router.push("/");
+          }
         } catch (err) {
           console.error("Failed to load DB user", err);
           setUser(null);

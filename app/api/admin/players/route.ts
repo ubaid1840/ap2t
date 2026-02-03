@@ -1,22 +1,56 @@
 import pool from "@/lib/db";
+import admin from "@/lib/firebase-admin";
 import { NextRequest,NextResponse } from "next/server";
 
-export async function POST(req:NextRequest,res:NextResponse){
-    const userid="379a698f-8d11-40f0-8acb-b12932b205ec"
+export async function POST(req:NextRequest){
     try {
-        const data=await req.json()
+    const {position,skill_level,medical_notes,...data} = await req.json();
+    const password = "12345678"; 
+
+    if (!data || !data.email) {
+      return NextResponse.json({ message: "Required parameters missing" }, { status: 400 });
+    }
+
+    const { email } = data;
+
+    
+    try {
+      await admin.auth().createUser({ email, password });
+    } catch (error: any) {
+      if (error.code === "auth/email-already-exists") {
+        console.warn(`Email ${email} already exists, continuing...`);
+      } else {
+        throw error;
+      }
+    }
+    const fields = Object.keys(data);
+    const values = Object.values(data);
+    const placeholders = fields.map((_, i) => `$${i + 1}`).join(", ");
+
+    const userResult = await pool.query(
+      `INSERT INTO users (${fields.join(",")})
+       VALUES (${placeholders})
+       RETURNING *`,
+      values
+    );
+
+    const user = userResult.rows[0];
+
+    if (!user?.id) {
+      return NextResponse.json({ message: "Failed to create user" }, { status: 500 });
+    }
         const result= await pool.query(
             `
             INSERT INTO players 
-            (user_id,coach_id,parent_id,position)
+            (user_id,position,medical_notes,skill_level)
             VALUES
-            ($1,$2,$3)
+            ($1,$2,$3,$4)
             `,
             [
-                userid,
-                data.coach_id,
-                data.parent_id,
-                data.position
+                user.id,
+                position,
+                medical_notes,
+                skill_level
             ]
         )
 

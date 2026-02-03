@@ -1,30 +1,65 @@
 import pool from "@/lib/db";
+import admin from "@/lib/firebase-admin";
 import { NextRequest,NextResponse } from "next/server";
 
-export async function POST(req:NextRequest,res:NextResponse){
-    const userid="379a698f-8d11-40f0-8acb-b12932b205ec"
-    try {
-        const data=await req.json()
-        const result= await pool.query(
-            `
-            INSERT INTO parents 
-            (user_id)
-            VALUES
-            ($1)
-            `,
-            [
-                userid,
-            ]
-        )
 
-         return NextResponse.json(
-      { success: true, item: result.rows[0] },
+export async function POST(req: NextRequest) {
+  try {
+    const data = await req.json();
+    const password = "12345678"; 
+
+    if (!data || !data.email) {
+      return NextResponse.json({ message: "Required parameters missing" }, { status: 400 });
+    }
+
+    const { email } = data;
+
+    
+    try {
+      await admin.auth().createUser({ email, password });
+    } catch (error: any) {
+      if (error.code === "auth/email-already-exists") {
+        console.warn(`Email ${email} already exists, continuing...`);
+      } else {
+        throw error;
+      }
+    }
+    const fields = Object.keys(data);
+    const values = Object.values(data);
+    const placeholders = fields.map((_, i) => `$${i + 1}`).join(", ");
+
+    const userResult = await pool.query(
+      `INSERT INTO users (${fields.join(",")})
+       VALUES (${placeholders})
+       RETURNING *`,
+      values
+    );
+
+    const user = userResult.rows[0];
+
+    if (!user?.id) {
+      return NextResponse.json({ message: "Failed to create user" }, { status: 500 });
+    }
+
+
+    const parentResult = await pool.query(
+      `INSERT INTO parents (user_id) VALUES ($1) RETURNING *`,
+      [user.id]
+    );
+
+    return NextResponse.json(
+      { success: true, user, parent: parentResult.rows[0] },
       { status: 201 }
     );
-    } catch (error) {
-        console.log(error)
-    }
+  } catch (error) {
+    console.error("POST /api/parent error:", error);
+    return NextResponse.json(
+      { success: false, message: error?.message || "Server error" },
+      { status: 500 }
+    );
+  }
 }
+
 
 export async function GET() {
   try {

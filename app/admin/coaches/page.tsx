@@ -17,6 +17,7 @@ import axios from "@/lib/axios";
 import { Bell, Calendar, CheckCircle, Eye, Plus, Target, TrendingUp, User } from "lucide-react";
 import Link from "next/link";
 import { ReactNode, useEffect, useState } from "react";
+import { splitFullName } from "@/lib/split-fullname";
 
 const localData = [
   {
@@ -243,8 +244,15 @@ const CreateCoach = () => {
   });
 
   const addCoach = async () => {
+    const {first_name,last_name}=splitFullName(coach.fullname)
+    
     try {
-      const result=await axios.post("/api/admin/coaches",{
+      const result=await axios.post("/admin/coaches",{
+        first_name:first_name,
+        last_name:last_name,
+        email:coach.email,
+        phone_no:coach.phone,
+        career_start:coach.career_start,
         bio:coach.bio,
         schedule_preference:coach.preferedSchedule
       })
