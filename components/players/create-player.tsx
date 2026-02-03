@@ -51,6 +51,7 @@ export function CreatePlayer() {
       const result = await axios.post("/admin/players", {
         first_name: first_name,
         last_name: last_name,
+        email:"temp1@gmail.com",
         birth_date: values.dob,
         position: values.position, 
         skill_level: values.skillLevel,
