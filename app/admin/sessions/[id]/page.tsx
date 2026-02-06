@@ -182,9 +182,6 @@ export default function Page() {
   const [data, setData] = useState<SessionDataType>();
   const [tab, setTab] = useState("Participants");
   const isMobile = useIsMobile();
-  // const [session_id, setSession_id] = useState(
-  //   "3cfcbbde-1bd4-41e2-9615-4f2ba73a9c50",
-  // ); // REMOVED HARDCODED ID
   const [loading, setLoading] = useState(false);
   const [loadingStatus, setLoadingStatus] = useState<
     "completed" | "comped" | "cancelled" | null

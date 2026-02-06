@@ -32,18 +32,30 @@ export default function Page() {
         if (id) {
             const fetchData=async()=>{
                 try {
-                    const temp_player_id="772d05a3-f19c-49ac-b6d4-9f2a0c7c7d3b"
-                    const result=await axios.get(`/admin/players/${temp_player_id}`)
-                    console.log(result)
+                    const result=await axios.get(`/admin/players/${id}`)
+                    console.log(result.data)
+                    // Map API response to PlayersData
+                    if (result.data) {
+                        const p = result.data;
+                        const mappedPlayer: any = {
+                            id: p.player_id,
+                            name: `${p.first_name} ${p.last_name}`,
+                            coach_name: "Unassigned", // Placeholder
+                            age: p.birth_date ? new Date().getFullYear() - new Date(p.birth_date).getFullYear() : "N/A",
+                            position: p.position || "N/A",
+                            parent: "Unknown", // Placeholder or fetch if available
+                            joining_date: p.joining_date ? new Date(p.joining_date).toISOString().split('T')[0] : "N/A",
+                        };
+                        setData(mappedPlayer);
+                    }
                 } catch (error) {
                     console.log(error)
+                    // Fallback to mock data if fetch fails (optional, maybe better to show error)
+                    const currentPlayerData = PLAYERS_DATA.find((item) => item.id === Number(id))
+                    if (currentPlayerData) setData(currentPlayerData)
                 }
             }
             fetchData()
-
-
-            const currentPlayerData = PLAYERS_DATA.find((item) => item.id === Number(id))
-            setData(currentPlayerData)
         }
     }, [id])
 
