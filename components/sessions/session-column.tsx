@@ -1,9 +1,8 @@
-import { ColumnDef } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
+import { ColumnDef } from "@tanstack/react-table";
 import { ArrowUpDown, Eye } from "lucide-react";
-import { Dialog, DialogTrigger } from "@/components/ui/dialog";
-import CardStatus from "../card-status";
 import Link from "next/link";
+import CardStatus from "../card-status";
 
 
 export type SessionData = {

@@ -1,11 +1,10 @@
 "use client";
 import BackButton from "@/components/back-button";
-import CardStatus, { typeClasses } from "@/components/card-status";
-import { EditSessionDialog } from "@/components/sessions/edit-session-dialog";
+import CardStatus from "@/components/card-status";
 import { AddParticipantDialog } from "@/components/sessions/add-participant-dialog";
+import { EditSessionDialog } from "@/components/sessions/edit-session-dialog";
 import {
-  SessionDataType,
-  SESSIONS_DATA,
+  SessionDataType
 } from "@/components/sessions/session-data";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -15,8 +14,7 @@ import {
   DialogClose,
   DialogContent,
   DialogHeader,
-  DialogTitle,
-  DialogTrigger,
+  DialogTitle
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -33,10 +31,9 @@ import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { Scrollbar } from "@radix-ui/react-scroll-area";
 import axios from "@/lib/axios";
+import { Scrollbar } from "@radix-ui/react-scroll-area";
 import {
-  Ban,
   Calendar,
   Check,
   CheckCircle,
@@ -44,7 +41,6 @@ import {
   CircleX,
   Clock,
   DollarSign,
-  Gift,
   Loader2,
   Mail,
   MapPin,
@@ -52,7 +48,7 @@ import {
   Phone,
   Plus,
   User,
-  Users,
+  Users
 } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -204,7 +200,6 @@ export default function Page() {
 
           const result = await axios.get(`/admin/sessions/${id}`);
           
-          // Map DB snake_case to UI camelCase
           if (result.data) {
              const d = result.data;
              setData({

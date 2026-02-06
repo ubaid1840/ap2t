@@ -1,19 +1,16 @@
 "use client";
 import PageTable from "@/components/app-table";
 import InputWithIcon from "@/components/input-with-icon";
-import SessionCalendar from "@/components/sessions/session-calendar";
 import { CreateSessionDialog } from "@/components/sessions/create-session-dialog";
+import SessionCalendar from "@/components/sessions/session-calendar";
 import { SESSION_COLUMNS } from "@/components/sessions/session-column";
-import { SESSIONS_DATA } from "@/components/sessions/session-data";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Loader2 } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Loader2 } from "lucide-react";
 
-import { Calendar, Dot, Filter, List, Plus } from "lucide-react";
+import { Calendar, Dot, Filter, List } from "lucide-react";
 import { ReactNode, useEffect, useState } from "react";
 
 import axios from "@/lib/axios";

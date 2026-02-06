@@ -82,7 +82,6 @@ export function CreatePlayer() {
             </DialogHeader>
 
             <div className="grid gap-4 py-4 border-t">
-              {/* Full Name */}
               <div className="grid grid-cols-2 gap-4">
                 <div className="grid gap-2">
                   <Label
@@ -100,7 +99,6 @@ export function CreatePlayer() {
                   />
                 </div>
 
-                {/* Date of Birth */}
                 <div className="grid gap-2">
                   <Label
                     htmlFor="dob"
@@ -111,7 +109,6 @@ export function CreatePlayer() {
                   <AppCalendar date={date} onChange={setDate} />
                 </div>
 
-                {/* Position */}
                 <div className="grid gap-2">
                   <Label
                     htmlFor="position"
@@ -136,7 +133,6 @@ export function CreatePlayer() {
                   </Select>
                 </div>
 
-                {/* Skill Level */}
                 <div className="grid gap-2">
                   <Label
                     htmlFor="skillLevel"
@@ -162,7 +158,6 @@ export function CreatePlayer() {
                 </div>
               </div>
 
-              {/* Medical Notes */}
               <div className="grid gap-2">
                 <Label
                   htmlFor="medicalNotes"
