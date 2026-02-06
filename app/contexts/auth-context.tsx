@@ -4,7 +4,7 @@ import { onAuthStateChanged, User as FirebaseUser } from "firebase/auth";
 import { createContext, useContext, useEffect, useState } from "react";
 import axios from "@/lib/axios";
 import { auth } from "@/lib/firebase";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 type DBUser = {
   id: string;
@@ -32,6 +32,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<DBUser | null>(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
+  const pathname=usePathname()
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (fbUser) => {
@@ -46,10 +47,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           });
           console.log(res.data)
           setUser(res.data);
-          if (res.data.role === "admin") {
-            router.push("/admin");
-          } else {
-            router.push("/");
+          if(pathname.includes("auth")){
+            if (res.data.role === "admin") {
+              router.push("/admin");
+            } else {
+              router.push("/");
+            }
           }
         } catch (err) {
           console.error("Failed to load DB user", err);
