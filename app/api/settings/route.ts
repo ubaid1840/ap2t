@@ -2,7 +2,12 @@ import { NextRequest, NextResponse } from "next/server";
 import pool from "@/lib/db";
 
 export async function GET(req: NextRequest) {
-  const userid = "379a698f-8d11-40f0-8acb-b12932b205ec";
+  const { searchParams } = new URL(req.url);
+  const userid = searchParams.get("user_id");
+
+  if (!userid) {
+    return NextResponse.json({ message: "User ID is required" }, { status: 400 });
+  }
 
   try {
     const userResult = await pool.query(`SELECT * FROM users WHERE id = $1`, [
@@ -15,12 +20,26 @@ export async function GET(req: NextRequest) {
 
     const user = userResult.rows[0];
 
-    const settingsResult = await pool.query(
+    let settingsResult = await pool.query(
       `SELECT * FROM settings WHERE user_id = $1`,
       [userid],
     );
 
-    const settings = settingsResult.rows[0] ?? null;
+
+    if (settingsResult.rows.length === 0) {
+      await pool.query(
+        `INSERT INTO settings (user_id) VALUES ($1)`,
+        [userid]
+      );
+      
+
+      settingsResult = await pool.query(
+        `SELECT * FROM settings WHERE user_id = $1`,
+        [userid],
+      );
+    }
+
+    const settings = settingsResult.rows[0];
 
     return NextResponse.json(
       {
@@ -100,8 +119,12 @@ export async function PATCH(
         data.user_id,
       ],
     );
-    return NextResponse.json(result.rows[0])
+    return NextResponse.json(result.rows[0]);
   } catch (error) {
     console.error("PATCH /api/settings error:", error);
+    return NextResponse.json(
+      { message: "Internal server error" },
+      { status: 500 }
+    );
   }
 }

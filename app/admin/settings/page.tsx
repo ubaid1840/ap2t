@@ -33,6 +33,7 @@ import { FaFloppyDisk } from "react-icons/fa6";
 import { GoDotFill } from "react-icons/go";
 import { RiShieldKeyholeLine } from "react-icons/ri";
 import axios from "@/lib/axios";
+import { useAuth } from "@/app/contexts/auth-context";
 export default function Page() {
   const [loading, setLoading] = useState(false);
   const [savingChanges, setSavingChanges] = useState(false);
@@ -44,9 +45,14 @@ export default function Page() {
     password: "",
     blanck: "",
   });
-  const [user_id, setUser_id] = useState(
-    "379a698f-8d11-40f0-8acb-b12932b205ec",
-  );
+  const [user_id, setUser_id] = useState("");
+  const { user } = useAuth();
+
+  useEffect(() => {
+    if (user?.id) {
+      setUser_id(user.id);
+    }
+  }, [user]);
 
   const [squareIntigration, setSquareIntigration] = useState([
     {
@@ -153,10 +159,14 @@ export default function Page() {
 
   useEffect(() => {
     const fetchData = async () => {
+      if (!user?.id) return;
+      
       try {
         setLoading(true);
 
-        const res = await axios.get("/settings");
+        const res = await axios.get("/settings", {
+          params: { user_id: user.id }
+        });
 
         const result = res.data;
         setUser_id(result.user?.id);
@@ -262,13 +272,15 @@ export default function Page() {
             icon: <Bell className="text-muted-foreground" size={20} />,
           },
         ]);
+      } catch (error) {
+        console.error("Error fetching settings:", error);
       } finally {
         setLoading(false);
       }
     };
 
     fetchData();
-  }, []);
+  }, [user]);
 
 const updateSettings = async () => {
   setSavingChanges(true);
