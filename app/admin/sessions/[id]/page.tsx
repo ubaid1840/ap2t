@@ -186,9 +186,9 @@ export default function Page() {
   const [data, setData] = useState<SessionDataType>();
   const [tab, setTab] = useState("Participants");
   const isMobile = useIsMobile();
-  const [session_id, setSession_id] = useState(
-    "3cfcbbde-1bd4-41e2-9615-4f2ba73a9c50",
-  );
+  // const [session_id, setSession_id] = useState(
+  //   "3cfcbbde-1bd4-41e2-9615-4f2ba73a9c50",
+  // ); // REMOVED HARDCODED ID
   const [loading, setLoading] = useState(false);
   const [loadingStatus, setLoadingStatus] = useState<
     "completed" | "comped" | "cancelled" | null
@@ -202,8 +202,23 @@ export default function Page() {
         try {
           setLoading(true);
 
-          const result = await axios.get(`/admin/sessions/${session_id}`);
-          console.log(result);
+          const result = await axios.get(`/admin/sessions/${id}`);
+          
+          // Map DB snake_case to UI camelCase
+          if (result.data) {
+             const d = result.data;
+             setData({
+                id: d.id,
+                sessionName: d.name,
+                date: new Date(d.date).toLocaleDateString(),
+                time: `${d.start_time} - ${d.end_time}`,
+                coachName: d.coach_name || "Unassigned",
+                status: d.status,
+                price: d.price,
+                max_players: d.max_players,
+                location: d.location
+             } as any);
+          }
         } catch (error) {
           console.log(error);
         } finally {
@@ -213,15 +228,12 @@ export default function Page() {
       
       fetchParticipants();
       fetchData();
-
-      const sessionData = SESSIONS_DATA.find((item) => item.id === id);
-      setData(sessionData);
     }
   }, [id]);
 
   const fetchParticipants = async () => {
     try {
-      const response = await axios.get(`/admin/sessions/${session_id}/participants`);
+      const response = await axios.get(`/admin/sessions/${id}/participants`);
       setParticipants(response.data);
     } catch (error) {
       console.error("Error fetching participants", error);
@@ -232,7 +244,7 @@ export default function Page() {
     setLoadingStatus(status)
     setLoading(true);
     try {
-      const result = await axios.patch(`/admin/sessions/${session_id}/status`, {
+      const result = await axios.patch(`/admin/sessions/${id}/status`, {
         status,
       });
       console.log(result);
@@ -240,6 +252,42 @@ export default function Page() {
       setLoading(false);
     }
   };
+
+
+  const stats = [
+    {
+        h: `${participants.length}/${data?.max_players || '-'}`,
+        p: "Participants",
+        icon: <Users />,
+        type: "info",
+    },
+    {
+        h: `$${participants.length * (Number(data?.price) || 0)}`,
+        p: "Total Revenue",
+        icon: <DollarSign />,
+        type: "success",
+    },
+    {
+        h: `$${participants.length * (Number(data?.price) || 0)}`, // Assuming all are paid/active for now
+        p: "Paid",
+        icon: <CheckCircle />,
+        type: "active",
+    },
+    {
+        h: "$0",
+        p: "Pending",
+        icon: <CircleAlert />,
+        type: "warning",
+    },
+  ];
+
+  if (loading && !data) {
+    return (
+      <div className="flex h-[50vh] w-full items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col w-full gap-6">
@@ -263,6 +311,7 @@ export default function Page() {
               <EditSessionDialog />
             </div>
             <p className="text-sm text-muted-foreground">
+              {/* Description could be added to API/Schema later */}
               Advanced skills training session focusing on ball handling,
               agility and awareness{" "}
             </p>
@@ -297,14 +346,14 @@ export default function Page() {
                 <div className=" ">
                   <p className="text-xs text-ghost-text">Location</p>
                   <h1 className="text-[#E5E7EB] text-sm">
-                    Court A - Main Facility
+                    {data?.location || "Main Facility"}
                   </h1>
                 </div>
               </div>
             </div>
 
             <div className="flex justify-between gap-4 flex-wrap">
-              {localData.map((item, index) => (
+              {stats.map((item, index) => (
                 <Card
                   key={index}
                   className="rounded-[10px] bg-[#1A1A1A] border-[#3A3A3A] flex-1 p-0"
@@ -412,7 +461,7 @@ export default function Page() {
                 >
                   {t === "Participants" && (
                     <div className="flex gap-2 items-center py-2">
-                      <User /> Participants {"(3)"}
+                      <User /> Participants {`(${participants.length})`}
                     </div>
                   )}
                   {t === "Payments" && (
@@ -433,14 +482,14 @@ export default function Page() {
           <Separator />
 
           <TabsContent value="Participants" className="space-y-4 p-4">
-            <AddParticipantDialog sessionId={session_id} onSuccess={fetchParticipants} />
+            <AddParticipantDialog sessionId={id as string} onSuccess={fetchParticipants} />
             {participants.map((participent: any, i) => (
               <Card key={i} className="bg-[#1A1A1A] border border-border">
                 <CardContent className="space-y-2">
                   <div className="flex gap-2 items-center">
                     <h1>{participent.first_name} {participent.last_name}</h1>
                     <CardStatus
-                      value={"pending"} 
+                      value={"Pending"}
                       type={"warning"} 
                     />
                   </div>
@@ -624,61 +673,3 @@ const AddNoteDialog = () => {
     </>
   );
 };
-
-const AddParticipentsDialog=()=>{
-  const [open, setOpen] = useState(false);
-
-  return (
-    <>
-      <Button onClick={() => setOpen(!open)}>
-        <Plus />
-        Add Participent
-      </Button>
-      <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="bg-[#252525] rounded-[10px] p-0">
-          <DialogHeader className="p-4 border-b border-border">
-            <DialogTitle className="text-lg font-semibold text-[#F3F4F6]">
-              Add Participent
-            </DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4 p-4">
-            <div className="space-y-2">
-              <Label className="text-[#99A1AF] text-sm">Note Type</Label>
-
-              <Select>
-                <SelectTrigger className="w-full p-6 !bg-[#1A1A1A] border-border rounded-[10px]">
-                  <SelectValue placeholder="Private" />
-                </SelectTrigger>
-                <SelectContent className="!bg-[#1A1A1A]">
-                  <SelectGroup>
-                    <SelectLabel>Select a category</SelectLabel>
-                    <SelectItem value="apple">Apple</SelectItem>
-                    <SelectItem value="banana">Banana</SelectItem>
-                    <SelectItem value="blueberry">Blueberry</SelectItem>
-                    <SelectItem value="grapes">Grapes</SelectItem>
-                    <SelectItem value="pineapple">Pineapple</SelectItem>
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <Label className="text-[#99A1AF] text-sm">Note Content</Label>
-              <Textarea
-                placeholder="Enter your note here..."
-                className="!bg-[#1A1A1A] border border-border rounded-[10px] text-ghost-text min-h-36"
-              ></Textarea>
-            </div>
-          </div>
-          <div className="border-t border-border flex items-center justify-end p-4">
-            <div className="flex gap-4">
-              <DialogClose className="text-[13px] font-medium leading-none h-10 px-4 py-2 bg-black text-white border-border rounded-md hover:opacity-70 cursor-pointer flex flex-1 items-center justify-center">
-                Cancel
-              </DialogClose>
-              <Button size={"lg"}>Add Note</Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
-    </>
-  );
-}

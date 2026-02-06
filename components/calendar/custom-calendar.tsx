@@ -7,7 +7,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { ScrollArea, ScrollBar } from '../ui/scroll-area'
 import { useIsMobile } from '@/hooks/use-mobile'
 
-export default function CustomCalendar() {
+export default function CustomCalendar({ events = CALENDAR_DATA }: { events?: CalendarEvent[] }) {
     const [currentMonth, setCurrentMonth] = useState(moment())
 
     const startOfMonth = currentMonth.clone().startOf('month')
@@ -30,7 +30,7 @@ export default function CustomCalendar() {
     }, [currentMonth])
 
     const getEventsForDay = (day: moment.Moment): CalendarEvent[] => {
-        return CALENDAR_DATA.filter(
+        return events.filter(
             (event) => event.date === day.format('YYYY-MM-DD')
         )
     }
@@ -192,5 +192,15 @@ const EVENT_STYLES = {
         bg: 'bg-info-bg',
         text: 'text-info-text',
         border: 'border-info-text/32',
+    },
+    warning: {
+        bg: 'bg-warning-bg',
+        text: 'text-warning-text',
+        border: 'border-warning-text/32',
+    },
+    danger: {
+        bg: 'bg-danger-bg',
+        text: 'text-danger-text',
+        border: 'border-danger-text/32',
     },
 }

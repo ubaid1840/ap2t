@@ -9,6 +9,8 @@ export interface SessionDataType {
   price: string;
   payment: string;
   status: string;
+  max_players?: number;
+  location?: string;
 }
 
 export const SESSIONS_DATA: SessionDataType[] = [

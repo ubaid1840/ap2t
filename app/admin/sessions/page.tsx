@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Loader2 } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
@@ -22,10 +23,33 @@ export default function Page() {
   const [tab, setTab] = useState("table");
   const [sessions, setSessions] = useState();
 
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
     const fetchData = async () => {
-      const result = await axios.get("/admin/sessions");
-      setSessions(result.data);
+      try {
+        const result = await axios.get("/admin/sessions");
+        if (result.data) {
+          const mappedSessions = result.data.map((s: any) => ({
+            id: s.id,
+            sessionName: s.name,
+            type: s.session_type,
+            date: new Date(s.date).toLocaleDateString(),
+            rawDate: s.date, 
+            time: `${s.start_time} - ${s.end_time}`,
+            coachName: s.coach_name || "Unassigned",
+            playerName: "Multiple",
+            price: s.price,
+            payment: "Paid", 
+            status: s.status ? s.status.charAt(0).toUpperCase() + s.status.slice(1).toLowerCase() : 'Upcoming' 
+          }));
+          setSessions(mappedSessions);
+        }
+      } catch (error) {
+        console.error("Error fetching sessions", error);
+      } finally {
+        setLoading(false);
+      }
     };
     fetchData();
   }, []);
@@ -101,15 +125,23 @@ export default function Page() {
         )}
       </div>
 
-      {tab === "table" && (
-        <PageTable
-          headerClassName={"rounded-4xl"}
-          columns={SESSION_COLUMNS}
-          data={SESSIONS_DATA}
-          onRowClick={() => {}}
-        />
+      {loading ? (
+        <div className="flex h-[50vh] w-full items-center justify-center">
+            <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        </div>
+      ) : (
+        <>
+            {tab === "table" && (
+                <PageTable
+                headerClassName={"rounded-4xl"}
+                columns={SESSION_COLUMNS}
+                data={sessions || []}
+                onRowClick={() => {}}
+                />
+            )}
+            {tab === "calendar" && <SessionCalendar sessions={sessions} />}
+        </>
       )}
-      {tab === "calendar" && <SessionCalendar />}
     </div>
   );
 }

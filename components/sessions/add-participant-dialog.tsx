@@ -47,7 +47,6 @@ export function AddParticipantDialog({ sessionId, onSuccess }: AddParticipantDia
       }
     };
     
-    // Debounce only if searching, otherwise fetch immediately (or debounce 0)
     const delayDebounceFn = setTimeout(fetchPlayers, search.length > 0 ? 300 : 0);
 
     return () => clearTimeout(delayDebounceFn);
@@ -82,7 +81,7 @@ export function AddParticipantDialog({ sessionId, onSuccess }: AddParticipantDia
           Add Participant
         </Button>
       </DialogTrigger>
-      <DialogContent className="bg-[#252525] border-[#3A3A3A] max-w-5xl p-0 gap-0">
+      <DialogContent className="bg-[#252525] border-[#3A3A3A] max-h-[70vh] max-w-5xl p-0 gap-0">
         <DialogHeader className="border-b border-[#3A3A3A] p-4">
           <DialogTitle className="text-[#F3F4F6] font-semibold text-lg">
             Add Participant
@@ -107,7 +106,7 @@ export function AddParticipantDialog({ sessionId, onSuccess }: AddParticipantDia
                 <Loader2 className="h-6 w-6 animate-spin text-gray-500" />
               </div>
             ) : results.length > 0 ? (
-              <ScrollArea className="h-[250px]">
+              <ScrollArea className="h-[60vh]">
                 <div className="space-y-2">
                   {results.map((player) => (
                     <div

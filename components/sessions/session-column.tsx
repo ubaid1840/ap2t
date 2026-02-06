@@ -95,7 +95,7 @@ export const SESSION_COLUMNS: ColumnDef<SessionData>[] = [
     ),
     cell: ({ row }) => (
       <div className="leading-tight">
-        <div className="text-[#D1D5DC]">{row.getValue("date")}</div>
+        <div className="text-[#D1D5DC]">{row.original.date}</div>
         <div className="text-xs text-[#9CA3AF]">{row.original.time}</div>
       </div>
     ),

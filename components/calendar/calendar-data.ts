@@ -3,7 +3,7 @@ export type CalendarEvent = {
   id: string
   title: string
   date: string // YYYY-MM-DD
-  type: 'active' | 'info'
+  type: 'active' | 'info' | 'warning' | 'danger'
   time : string
 }
 

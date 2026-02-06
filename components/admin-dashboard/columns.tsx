@@ -6,8 +6,6 @@ import Link from "next/link";
 import getInitials from "../parents/get-initials";
 import CardStatus from "../card-status";
 
-
-
 export type SessionData = {
   name: string;
   sessiontype: string;
@@ -15,6 +13,16 @@ export type SessionData = {
   time: string;
   status: string;
   id : number;
+};
+
+type CardStatusType = "success" | "warning" | "danger" | "info" | "active" | "ghost" | "alternative";
+
+const sessionStatusMap: Record<string, CardStatusType> = {
+  Completed: "active",
+  Upcoming: "info",
+  Cancelled: "danger",
+  Pending: "warning",
+  Confirmed: "active"
 };
 
 export const DASHBOARD_SESSIONS_COLUMNS: ColumnDef<SessionData>[] = [
@@ -110,20 +118,24 @@ export const DASHBOARD_SESSIONS_COLUMNS: ColumnDef<SessionData>[] = [
                 <ArrowUpDown />
             </Button>
         ),
-        cell: ({ row }) => (
-            <div className="w-20">
-          <CardStatus value={row.getValue("status")} type={row.original.status === "Confirmed" ? "active" : "alternative"}/>
-          </div>
-        ),
+        cell: ({ row }) => {
+            const status = row.getValue("status") as string;
+            return (
+                <div className="w-20">
+                    <CardStatus 
+                        value={status} 
+                        type={sessionStatusMap[status] || "active"} 
+                    />
+                </div>
+            );
+        },
     },
     {
         id: "actions",
         header: "Action",
         cell: ({ row }) => (
             <Link href={`/admin/sessions/${row.original.id}`} className="text-primary hover:underline">
-          
                  View Details
-            
             </Link>
         ),
     },
