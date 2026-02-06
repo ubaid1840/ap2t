@@ -2,6 +2,7 @@
 import BackButton from "@/components/back-button";
 import CardStatus, { typeClasses } from "@/components/card-status";
 import { EditSessionDialog } from "@/components/sessions/edit-session-dialog";
+import { AddParticipantDialog } from "@/components/sessions/add-participant-dialog";
 import {
   SessionDataType,
   SESSIONS_DATA,
@@ -15,6 +16,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogTrigger,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -189,8 +191,10 @@ export default function Page() {
   );
   const [loading, setLoading] = useState(false);
   const [loadingStatus, setLoadingStatus] = useState<
-  "completed" | "comped" | "cancelled" | null
->(null)
+    "completed" | "comped" | "cancelled" | null
+  >(null);
+
+  const [participants, setParticipants] = useState<any[]>([]);
 
   useEffect(() => {
     if (id) {
@@ -206,12 +210,23 @@ export default function Page() {
           setLoading(false);
         }
       };
+      
+      fetchParticipants();
       fetchData();
 
       const sessionData = SESSIONS_DATA.find((item) => item.id === id);
       setData(sessionData);
     }
   }, [id]);
+
+  const fetchParticipants = async () => {
+    try {
+      const response = await axios.get(`/admin/sessions/${session_id}/participants`);
+      setParticipants(response.data);
+    } catch (error) {
+      console.error("Error fetching participants", error);
+    }
+  };
 
   const setStatus = async (status: "completed" | "comped" | "cancelled") => {
     setLoadingStatus(status)
@@ -418,14 +433,15 @@ export default function Page() {
           <Separator />
 
           <TabsContent value="Participants" className="space-y-4 p-4">
-            {ParticipantsData.map((participent, i) => (
+            <AddParticipantDialog sessionId={session_id} onSuccess={fetchParticipants} />
+            {participants.map((participent: any, i) => (
               <Card key={i} className="bg-[#1A1A1A] border border-border">
                 <CardContent className="space-y-2">
                   <div className="flex gap-2 items-center">
-                    <h1>{participent.name}</h1>
+                    <h1>{participent.first_name} {participent.last_name}</h1>
                     <CardStatus
-                      value={participent.status}
-                      type={participent.statusType as keyof typeof typeClasses}
+                      value={"pending"} 
+                      type={"warning"} 
                     />
                   </div>
 
@@ -433,7 +449,7 @@ export default function Page() {
                     <div className="flex gap-2">
                       <User className="w-4 h-4 text-ghost-text" />{" "}
                       <div className="flex text-sm text-ghost-text">
-                        <p>Parent:</p> <p>{participent.parent}</p>
+                        <p>Position: </p> <p>{participent.position}</p>
                       </div>
                     </div>
                     <div className="flex gap-2">
@@ -445,9 +461,10 @@ export default function Page() {
                     <div className="flex gap-2">
                       <Phone className="w-4 h-4 text-ghost-text" />{" "}
                       <p className="flex text-sm text-ghost-text">
-                        {participent.phone}
+                        {participent.phone_no}
                       </p>
                     </div>
+                    {/*
                     <div className="flex gap-2">
                       <DollarSign className="w-4 h-4 text-ghost-text" />{" "}
                       <div className="flex text-sm text-ghost-text">
@@ -455,6 +472,7 @@ export default function Page() {
                         <p>Amount:</p> <p>{participent.amount}</p>
                       </div>
                     </div>
+                    */}
                   </div>
 
                   <Separator />
@@ -467,18 +485,6 @@ export default function Page() {
                       <CircleX />
                       Mark Absent
                     </Button>
-                    {participent.status === "Pending" && (
-                      <div className="flex gap-2">
-                        <Button className="!bg-info-bg !text-info-text flex gap-2">
-                          <DollarSign />
-                          Mark Paid
-                        </Button>
-                        <Button className="!bg-alternative-bg !text-alternative-text flex gap-2">
-                          <Gift />
-                          Comp Session
-                        </Button>
-                      </div>
-                    )}
                   </div>
                 </CardContent>
               </Card>
@@ -618,3 +624,61 @@ const AddNoteDialog = () => {
     </>
   );
 };
+
+const AddParticipentsDialog=()=>{
+  const [open, setOpen] = useState(false);
+
+  return (
+    <>
+      <Button onClick={() => setOpen(!open)}>
+        <Plus />
+        Add Participent
+      </Button>
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent className="bg-[#252525] rounded-[10px] p-0">
+          <DialogHeader className="p-4 border-b border-border">
+            <DialogTitle className="text-lg font-semibold text-[#F3F4F6]">
+              Add Participent
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 p-4">
+            <div className="space-y-2">
+              <Label className="text-[#99A1AF] text-sm">Note Type</Label>
+
+              <Select>
+                <SelectTrigger className="w-full p-6 !bg-[#1A1A1A] border-border rounded-[10px]">
+                  <SelectValue placeholder="Private" />
+                </SelectTrigger>
+                <SelectContent className="!bg-[#1A1A1A]">
+                  <SelectGroup>
+                    <SelectLabel>Select a category</SelectLabel>
+                    <SelectItem value="apple">Apple</SelectItem>
+                    <SelectItem value="banana">Banana</SelectItem>
+                    <SelectItem value="blueberry">Blueberry</SelectItem>
+                    <SelectItem value="grapes">Grapes</SelectItem>
+                    <SelectItem value="pineapple">Pineapple</SelectItem>
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label className="text-[#99A1AF] text-sm">Note Content</Label>
+              <Textarea
+                placeholder="Enter your note here..."
+                className="!bg-[#1A1A1A] border border-border rounded-[10px] text-ghost-text min-h-36"
+              ></Textarea>
+            </div>
+          </div>
+          <div className="border-t border-border flex items-center justify-end p-4">
+            <div className="flex gap-4">
+              <DialogClose className="text-[13px] font-medium leading-none h-10 px-4 py-2 bg-black text-white border-border rounded-md hover:opacity-70 cursor-pointer flex flex-1 items-center justify-center">
+                Cancel
+              </DialogClose>
+              <Button size={"lg"}>Add Note</Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </>
+  );
+}
