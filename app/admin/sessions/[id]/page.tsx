@@ -204,7 +204,7 @@ export default function Page() {
                 sessionName: d.name,
                 date: new Date(d.date).toLocaleDateString(),
                 time: `${d.start_time} - ${d.end_time}`,
-                coachName: d.coach_name || "Unassigned",
+                coachName: `${d.coach_first_name} ${d.coach_last_name}` || "Unassigned",
                 status: d.status,
                 price: d.price,
                 max_players: d.max_players,
@@ -260,7 +260,7 @@ export default function Page() {
         type: "success",
     },
     {
-        h: `$${participants.length * (Number(data?.price) || 0)}`, // Assuming all are paid/active for now
+        h: `$${participants.length * (Number(data?.price) || 0)}`, 
         p: "Paid",
         icon: <CheckCircle />,
         type: "active",
@@ -303,7 +303,6 @@ export default function Page() {
               <EditSessionDialog />
             </div>
             <p className="text-sm text-muted-foreground">
-              {/* Description could be added to API/Schema later */}
               Advanced skills training session focusing on ball handling,
               agility and awareness{" "}
             </p>

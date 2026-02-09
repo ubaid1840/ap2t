@@ -32,7 +32,7 @@ export default function Page() {
             date: new Date(s.date).toLocaleDateString(),
             rawDate: s.date, 
             time: `${s.start_time} - ${s.end_time}`,
-            coachName: s.coach_name || "Unassigned",
+            coachName: `${s.coach_first_name} ${s.coach_last_name}` || "Unassigned",
             playerName: "Multiple",
             price: s.price,
             payment: "Paid", 
