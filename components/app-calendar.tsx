@@ -6,7 +6,17 @@ import { Button } from "./ui/button";
 import { Calendar } from "./ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 
-const AppCalendar = ({ date, onChange, required = false , className } : {date : Date | undefined, onChange : (item : any)=> void, required?: boolean, className ?: string}) => {
+const AppCalendar = ({
+  date,
+  onChange,
+  required = false,
+  className,
+}: {
+  date: Date | undefined;
+  onChange: (item: any) => void;
+  required?: boolean;
+  className?: string;
+}) => {
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   return (
     <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
@@ -15,17 +25,22 @@ const AppCalendar = ({ date, onChange, required = false , className } : {date : 
           variant={"outline"}
           className={cn(
             "w-full h-9 rounded-md dark:bg-[#1A1A1A]",
-            !date && "text-muted-foreground", className
+            !date && "text-muted-foreground",
+            className,
           )}
         >
-          {date ? format(date, "PPP") : <p className="text-[14px] font-normal">Pick a date</p>}
+          {date ? (
+            format(date, "PPP")
+          ) : (
+            <p className="text-[14px] font-normal">Pick a date</p>
+          )}
           <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-auto p-0 bg-black rounded" align="start">
         <Calendar
-        required
-        className="z-20"
+          required={required}
+          className="z-20"
           mode="single"
           selected={date}
           onSelect={(e) => {

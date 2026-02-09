@@ -27,21 +27,21 @@ export async function GET(
   u.birth_date,
   u.joining_date,
 
-  -- Specialities (array of names)
+
   COALESCE(
-    jsonb_agg(
-      DISTINCT s.name
-    ) FILTER (WHERE s.id IS NOT NULL),
+    jsonb_agg(DISTINCT s.name) FILTER (WHERE s.id IS NOT NULL),
     '[]'
   ) AS specialities,
 
-  -- Certifications (array of names)
+
   COALESCE(
-    jsonb_agg(
-      DISTINCT cert.name
-    ) FILTER (WHERE cert.id IS NOT NULL),
+    jsonb_agg(DISTINCT cert.name) FILTER (WHERE cert.id IS NOT NULL),
     '[]'
-  ) AS certifications
+  ) AS certifications,
+
+ 
+  COALESCE(sess_counts.total_sessions, 0) AS totalSessions,
+  COALESCE(sess_counts.upcoming_sessions, 0) AS upComing
 
 FROM coaches c
 INNER JOIN users u
@@ -57,11 +57,26 @@ LEFT JOIN coach_certifications cc
 LEFT JOIN certifications cert
   ON cert.id = cc.certification_id
 
+
+LEFT JOIN (
+  SELECT
+    coach_id,
+    COUNT(*) AS total_sessions,
+    COUNT(*) FILTER (WHERE status = 'upcoming') AS upcoming_sessions
+  FROM sessions
+  GROUP BY coach_id
+) sess_counts
+  ON sess_counts.coach_id = c.id
+
 WHERE c.id = $1
 
 GROUP BY
   c.id,
-  u.id;
+  u.id,
+  sess_counts.total_sessions,
+  sess_counts.upcoming_sessions;
+
+
       `,
       [coach_id]
     );

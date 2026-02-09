@@ -31,7 +31,7 @@ export function EditSessionDialog() {
     description: ""
   })
 
-  const createSession = () => {
+  const editSession = () => {
     console.log(session)
   }
 
@@ -50,7 +50,7 @@ export function EditSessionDialog() {
               Update session details • 8 participants enrolled
             </p>
           </DialogHeader>
-          <form onSubmit={createSession} className="">
+          <form onSubmit={editSession} className="">
             <ScrollArea className="h-[70dvh] py-2 space-y-4 px-2">
               <div className="space-y-4 px-2">
                 <div className="flex gap-2 text-md ">

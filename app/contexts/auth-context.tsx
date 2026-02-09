@@ -1,6 +1,10 @@
 "use client";
 
-import { onAuthStateChanged, User as FirebaseUser } from "firebase/auth";
+import {
+  onAuthStateChanged,
+  User as FirebaseUser,
+  signOut,
+} from "firebase/auth";
 import { createContext, useContext, useEffect, useState } from "react";
 import axios from "@/lib/axios";
 import { auth } from "@/lib/firebase";
@@ -32,27 +36,34 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<DBUser | null>(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
-  const pathname=usePathname()
+  const pathname = usePathname();
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (fbUser) => {
       setLoading(true);
       setFirebaseUser(fbUser);
-      console.log("ON auth change working")
+      console.log("ON auth change working");
 
       if (fbUser?.email) {
         try {
           const res = await axios.get("/auth/signup", {
             params: { email: fbUser.email },
           });
-          console.log(res.data)
-          setUser(res.data);
-          if(pathname.includes("auth")){
-            if (res.data.role === "admin") {
-              router.push("/admin");
-            } else {
-              router.push("/");
+          console.log(res.data);
+          if (res.data) {
+            setUser(res.data);
+            if (pathname.includes("auth")) {
+              if (res.data.role === "admin") {
+                router.push("/admin");
+              } else if (res.data.role === "player") {
+                router.push("/player");
+              } else {
+                router.push("/");
+              }
             }
+          } else {
+            setUser(null);
+            await signOut(auth);
           }
         } catch (err) {
           console.error("Failed to load DB user", err);
@@ -60,6 +71,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         }
       } else {
         setUser(null);
+        router.push("/auth");
       }
 
       setLoading(false);

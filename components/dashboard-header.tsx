@@ -16,8 +16,9 @@ import NotificationSheet from "./notification-sheet";
 import { Button } from "./ui/button";
 import { signOut } from "firebase/auth";
 import { auth } from "@/lib/firebase";
+import { ReactNode } from "react";
 
-export default function DashboardHeader() {
+export default function DashboardHeader({trigger} :{ trigger ?: ReactNode}) {
   const isMobile = useIsMobile();
 
   const logout = async () => {
@@ -33,7 +34,7 @@ export default function DashboardHeader() {
     <div className="flex flex-1 w-full h-full py-3 px-4">
       <div className="w-full flex justify-between flex-wrap items-center">
         <div className="flex gap-4 items-center">
-          <SidebarTrigger />
+          {trigger}
           <InputWithIcon
             className={isMobile ? "hidden" : "w-100"}
             placeholder="Search player, coaches, sessions..."

@@ -1,6 +1,6 @@
 import AppSidebar from "@/components/app-sidebar";
 import KBar from "@/components/kbar";
-import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
+import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import NotificationContextProvider from "@/store/context/NotificationContext";
 import UserContextProvider from "@/store/context/UserContext";
 import { ReactNode } from "react";
@@ -17,7 +17,7 @@ export default async function CommonLayout({ children }: { children: ReactNode }
             
               <div className="flex flex-1 flex-col">
                 <div className="w-full bg-[#252525]">
-                <DashboardHeader />
+                <DashboardHeader trigger={<SidebarTrigger />}/>
                 </div>
                 <div className="flex flex-1">{children}</div>
               </div>

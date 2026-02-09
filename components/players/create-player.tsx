@@ -40,6 +40,8 @@ export function CreatePlayer() {
     const values = {
       fullname: formData.get("name"),
       dob: formData.get("dob"),
+      email:formData.get("email"),
+      phone_no:formData.get("phone_no"),
       position,
       skillLevel,
       medicalNotes: formData.get("medicalNotes"),
@@ -51,7 +53,8 @@ export function CreatePlayer() {
       const result = await axios.post("/admin/players", {
         first_name: first_name,
         last_name: last_name,
-        email:"temp1@gmail.com",
+        email:values.email,
+        phone_no:values.phone_no,
         birth_date: values.dob,
         position: values.position, 
         skill_level: values.skillLevel,
@@ -108,6 +111,40 @@ export function CreatePlayer() {
                   </Label>
                   <AppCalendar date={date} onChange={setDate} />
                 </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="grid gap-2">
+                  <Label
+                    htmlFor="email"
+                    className="text-xs text-muted-foreground"
+                  >
+                    email
+                  </Label>
+                  <Input
+                    id="email"
+                    name="email"
+                    placeholder="PedroDuarte@example.com"
+                    required
+                    className="dark:bg-[#1A1A1A]"
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label
+                    htmlFor="phone_no"
+                    className="text-xs text-muted-foreground"
+                  >
+                    phone
+                  </Label>
+                  <Input
+                    id="phone_no"
+                    name="phone_no"
+                    placeholder="+1 2983 39843"
+                    required
+                    className="dark:bg-[#1A1A1A]"
+                  />
+                </div>
+
 
                 <div className="grid gap-2">
                   <Label

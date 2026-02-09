@@ -18,6 +18,8 @@ import { Bell, Calendar, CheckCircle, Eye, Plus, Target, TrendingUp, User } from
 import Link from "next/link";
 import { ReactNode, useEffect, useState } from "react";
 import { splitFullName } from "@/lib/split-fullname";
+import { useParams } from "next/navigation";
+import { useAuth } from "@/app/contexts/auth-context";
 
 
 
@@ -48,7 +50,7 @@ type CoachCardNamesType = {
 const CoachCardNames: CoachCardNamesType = { totalSessions: "Total Sessions", completed: "Completed", upComing: "Upcoming", players: "Players" }
 
 export default function Page() {
-
+   const {user} = useAuth()
     const [coaches,setCoaches]=useState<coachinfoType[]>([])
     const localData = [
   {
@@ -103,7 +105,7 @@ export default function Page() {
              setCoaches(mappedCoaches)  
           }
           fetchData()
-      }),[])
+      }),[user?.id])
   
       useEffect(() => {
     console.log(coaches);

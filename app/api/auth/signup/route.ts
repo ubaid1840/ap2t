@@ -69,11 +69,21 @@ export async function GET(req: NextRequest) {
 
   try {
     const result = await pool.query(
-      `
-      SELECT * FROM users WHERE email = $1
-      `,
-      [email]
-    );
+  `
+  SELECT
+  u.*,
+  c.id AS coach_id,
+  p.id AS player_id,
+  pa.id AS parent_id
+FROM users u
+LEFT JOIN coaches c ON c.user_id = u.id
+LEFT JOIN players p ON p.user_id = u.id
+LEFT JOIN parents pa ON pa.user_id = u.id
+WHERE u.email = $1;
+
+  `,
+  [email]
+);
 
     return NextResponse.json(result.rows[0] ?? null);
   } catch (error) {

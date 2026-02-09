@@ -31,6 +31,7 @@ export default function Page() {
                         coach_name: "Unassigned", 
                         age: p.birth_date ? new Date().getFullYear() - new Date(p.birth_date).getFullYear() : "N/A",
                         position: p.position || "N/A",
+                        phone:p.phone_no,
                         parent: "Unknown", 
                         last_session: "Training", 
                         last_session_date: p.joining_date ? new Date(p.joining_date).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
