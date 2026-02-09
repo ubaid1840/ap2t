@@ -58,7 +58,10 @@ export async function POST(req: NextRequest) {
 
 
 export async function GET(req: NextRequest) {
-  const email = req.nextUrl.searchParams.get("email");
+   const searchParams = req.nextUrl.searchParams
+  const email = searchParams.get("email");
+
+  console.log(email)
 
   if (!email) {
     return NextResponse.json(

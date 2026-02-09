@@ -40,10 +40,10 @@ export default function RootLayout({
             color="#d3fb20"
             showSpinner={false} />
           <AuthProvider>
-          {children}
+            {children}
           </AuthProvider>
         </Suspense>
-  <Toaster richColors position="bottom-right"/>
+        <Toaster richColors position="bottom-right" />
       </body>
     </html>
   );

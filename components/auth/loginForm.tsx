@@ -1,15 +1,13 @@
 "use client"
+import { auth } from "@/lib/firebase";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { Loader2 } from "lucide-react";
 import Link from "next/link";
+import { useState } from "react";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
-import { useState } from "react";
-import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from "@/lib/firebase";
-import { useRouter } from "next/navigation";
-import { Loader2 } from "lucide-react";
 
 export default function LoginForm({ onClickSignup }: { onClickSignup: () => void }) {
-      const router=useRouter()
       const [loading,setLoading]=useState(false)
       const [logindata,setLoginData]=useState(
         {

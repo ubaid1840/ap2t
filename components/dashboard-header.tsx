@@ -17,9 +17,11 @@ import { Button } from "./ui/button";
 import { signOut } from "firebase/auth";
 import { auth } from "@/lib/firebase";
 import { ReactNode } from "react";
+import { useAuth } from "@/app/contexts/auth-context";
 
 export default function DashboardHeader({trigger} :{ trigger ?: ReactNode}) {
   const isMobile = useIsMobile();
+  const {user} = useAuth()
 
   const logout = async () => {
     try {
@@ -44,9 +46,9 @@ export default function DashboardHeader({trigger} :{ trigger ?: ReactNode}) {
           <NotificationSheet />
           <Separator orientation="vertical" />
           <div>
-            <p className="text-xs text-white text-right">Admin</p>
+            <p className="text-xs text-white text-right">{user?.first_name}</p>
             <p className="text-xs text-muted-foreground text-right">
-              admin@ap2t.com
+              {user?.email}
             </p>
           </div>
           <Avatar>
@@ -61,9 +63,8 @@ export default function DashboardHeader({trigger} :{ trigger ?: ReactNode}) {
               <ChevronDown size={16} />
             </DropdownMenuTrigger>
             <DropdownMenuContent>
-              <DropdownMenuItem>
-                <Button onClick={() => logout()}>Logout</Button>
-
+              <DropdownMenuItem className="dark:hover:bg-transparent">
+                <Button onClick={() => logout()} className="w-full">Logout</Button>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

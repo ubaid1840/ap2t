@@ -43,7 +43,6 @@ export default function Page() {
 
   useEffect(() => {
     if (id) {
-      console.log(id)
       const fetchData = async () => {
         try {
           const result = await axios.get(`/admin/parents/${id}`);
@@ -74,7 +73,7 @@ export default function Page() {
   const setStatus = async (status: "disabled") => {
     setLoading(true);
     try {
-      const result = await axios.patch(`/admin/parents/${parent_id}/status`, {
+      const result = await axios.patch(`/admin/parents/${id}/status`, {
         status,
       });
       console.log(result);

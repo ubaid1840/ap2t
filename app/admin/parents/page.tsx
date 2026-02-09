@@ -18,6 +18,7 @@ import { useEffect, useState } from "react";
 export default function Page() {
   const [filter, setFilter] = useState(true);
   const [parents, setParents] = useState();
+  const [loading, setLoading] = useState(false)
   const { user } = useAuth();
 
   useEffect(() => {
@@ -41,8 +42,10 @@ export default function Page() {
           : "N/A",
       }));
       setParents(parentsmapped);
+      setLoading(false)
     };
     if (user?.id) {
+      setLoading(true)
       fetchData();
     }
   }, [user]);
@@ -96,6 +99,7 @@ export default function Page() {
       </div>
 
       <PageTable
+      loading={loading}
         columns={PARENT_COLUMNS}
         data={parents || []}
         onRowClick={() => {}}

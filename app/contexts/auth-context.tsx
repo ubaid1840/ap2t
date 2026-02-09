@@ -8,7 +8,8 @@ import {
 import { createContext, useContext, useEffect, useState } from "react";
 import axios from "@/lib/axios";
 import { auth } from "@/lib/firebase";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
+import {useRouter} from 'nextjs-toploader/app'
 
 type DBUser = {
   id: string;
@@ -43,15 +44,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setLoading(true);
       setFirebaseUser(fbUser);
       console.log("ON auth change working");
+      console.log(fbUser?.email)
 
       if (fbUser?.email) {
         try {
-          const res = await axios.get("/auth/signup", {
-            params: { email: fbUser.email },
-          });
-          console.log(res.data);
-          if (res.data) {
+          const res = await axios.get(`/auth/signup?email=${fbUser.email}`);
+          if (res.data?.id) {
             setUser(res.data);
+            console.log(pathname)
             if (pathname.includes("auth")) {
               if (res.data.role === "admin") {
                 router.push("/admin");
