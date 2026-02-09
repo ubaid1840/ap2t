@@ -10,24 +10,58 @@ export async function GET(
     const result = await pool.query(
       `
       SELECT
-        c.id AS parent_id,
-        c.user_id,
-        c.bio,
-        c.rating,
-        c.career_start,
-        c.schedule_preference,
-        u.first_name,
-        u.last_name,
-        u.email,
-        u.location,
-        u.status,
-        u.picture,
-        u.phone_no,
-        u.birth_date,
-        u.joining_date
-      FROM coaches c
-      INNER JOIN users u ON u.id = c.user_id
-      WHERE c.id = $1
+  c.id AS parent_id,
+  c.user_id,
+  c.bio,
+  c.rating,
+  c.career_start,
+  c.schedule_preference,
+
+  u.first_name,
+  u.last_name,
+  u.email,
+  u.location,
+  u.status,
+  u.picture,
+  u.phone_no,
+  u.birth_date,
+  u.joining_date,
+
+  -- Specialities (array of names)
+  COALESCE(
+    jsonb_agg(
+      DISTINCT s.name
+    ) FILTER (WHERE s.id IS NOT NULL),
+    '[]'
+  ) AS specialities,
+
+  -- Certifications (array of names)
+  COALESCE(
+    jsonb_agg(
+      DISTINCT cert.name
+    ) FILTER (WHERE cert.id IS NOT NULL),
+    '[]'
+  ) AS certifications
+
+FROM coaches c
+INNER JOIN users u
+  ON u.id = c.user_id
+
+LEFT JOIN coach_specialities cs
+  ON cs.coach_id = c.id
+LEFT JOIN specialities s
+  ON s.id = cs.speciality_id
+
+LEFT JOIN coach_certifications cc
+  ON cc.coach_id = c.id
+LEFT JOIN certifications cert
+  ON cert.id = cc.certification_id
+
+WHERE c.id = $1
+
+GROUP BY
+  c.id,
+  u.id;
       `,
       [coach_id]
     );

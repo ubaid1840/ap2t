@@ -40,25 +40,33 @@ export default function Page() {
   const [tab, setTab] = useState("linked");
   const isMobile = useIsMobile();
   const [loading, setLoading] = useState(false);
-  const [parent_id, setParent_id] = useState(
-    "77ff2fb7-7383-42f3-a9b4-53d7f797745b",
-  );
 
   useEffect(() => {
     if (id) {
       const fetchData = async () => {
         try {
-          const result = await axios.get(`/admin/parents/${parent_id}`);
-          console.log(result);
+          const result = await axios.get(`/admin/parents/${id}`);
+          const parent=result.data
+          const mappedParent: ParentData = {
+            id: parent.parent_id,
+            name: `${parent.first_name} ${parent.last_name}`, 
+            joining_date: parent.joining_date ? new Date(parent.joining_date).toISOString().split('T')[0] : "N/A",
+            email: parent.email,
+            number: parent.phone_number,
+            location: parent.location || "N/A",
+            children: parent.children_count || 0,
+            card_status: parent.card_status || "N/A", 
+            total_spent: parent.total_spent || 0,
+            last_spent: parent.last_spent || 0,
+            last_transaction_date: parent.last_transaction_date ? new Date(parent.last_transaction_date).toISOString().split('T')[0] : "N/A",
+          };
+          setData(mappedParent);
+          
         } catch (error) {
           console.log(error);
         }
       };
       fetchData();
-      const currentParentData = PARENT_DATA.find(
-        (item) => item.id === Number(id),
-      );
-      setData(currentParentData);
     }
   }, [id]);
 

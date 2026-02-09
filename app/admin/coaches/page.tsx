@@ -19,44 +19,18 @@ import Link from "next/link";
 import { ReactNode, useEffect, useState } from "react";
 import { splitFullName } from "@/lib/split-fullname";
 
-const localData = [
-  {
-    Icon: <User />,
-    title: "Total Coaches",
-    description: "5",
-    type: "success",
-    going: "active",
-  },
-  {
-    Icon: <CheckCircle />,
-    title: "Active Coaches",
-    description: "4",
-    type: "active",
-    going: "active",
-  },
-  {
-    Icon: <Calendar />,
-    title: "Total Sessions",
-    description: "617",
-    type: "info",
-    going: "info",
-  },
-  {
-    Icon: <Target />,
-    title: "Total Players",
-    description: "137",
-    type: "other",
-    going: "active",
-  },
-];
+
 
 export type coachinfoType = {
   name: string;
   email: string;
   phoneNo: string;
   status: string;
+  bio:string;
   notification: string;
   specialities: string[];
+  certifications:string[];
+  preferedSchedule:string;
   totalSessions: string;
   completed: string;
   upComing: string;
@@ -75,12 +49,58 @@ const CoachCardNames: CoachCardNamesType = { totalSessions: "Total Sessions", co
 
 export default function Page() {
 
-    const [coaches,setCoaches]=useState()
-
+    const [coaches,setCoaches]=useState<coachinfoType[]>([])
+    const localData = [
+  {
+    Icon: <User />,
+    title: "Total Coaches",
+    description: coaches.length,
+    type: "success",
+    going: "active",
+  },
+  {
+    Icon: <CheckCircle />,
+    title: "Active Coaches",
+    description: coaches.filter((coach)=>(coach.status==="active")).length,
+    type: "active",
+    going: "active",
+  },
+  {
+    Icon: <Calendar />,
+    title: "Total Sessions",
+    description: "617",
+    type: "info",
+    going: "info",
+  },
+  {
+    Icon: <Target />,
+    title: "Total Players",
+    description: "137",
+    type: "other",
+    going: "active",
+  },
+];
       useEffect((()=>{
           const fetchData=async ()=>{
             const result=await axios.get("/admin/coaches")
-             setCoaches(result.data)
+             const coaches=result.data
+             const mappedCoaches=coaches.map((coach:any)=>(
+              {
+                name: `${coach.first_name} ${coach.last_name}`,
+                email: coach.email,
+                phoneNo:coach.phone_no,
+                status:coach.status,
+                notification:coach.notifications || "0",
+                specialities:coach.specialities || [],
+                totalSessions:coach.total_sessions || "0",  
+                completed:coach.completed_sessions || "0",
+                upComing:coach.upcoming_sessions || "0",
+                players:coach.players_count || "0", 
+                avgRating:coach.rating || "0",
+                id:coach.coach_id
+              }
+             ))
+             setCoaches(mappedCoaches)  
           }
           fetchData()
       }),[])
@@ -122,7 +142,7 @@ export default function Page() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {coachinfo.map((coach, i) => {
+        {coaches.map((coach, i) => {
           return (
             <Card className="bg-[#252525]" key={i}>
               <CardHeader className="flex justify-between">

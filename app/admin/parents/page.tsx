@@ -16,15 +16,26 @@ import { useEffect, useState } from "react"
 
 
 export default function Page() {
-
     const [filter, setFilter] = useState(true)
     const [parents,setParents]=useState()
 
     useEffect((()=>{
         const fetchData=async ()=>{
             const result=await axios.get("/admin/parents")
-            setParents(result.data)
-            
+            const parentsmapped = result.data.map((p: any) => ({
+                id: p.parent_id,
+                name: `${p.first_name} ${p.last_name}`,
+                joining_date: p.joining_date ? new Date(p.joining_date).toISOString().split('T')[0] : "N/A",
+                email: p.email,
+                number: p.phone_number,
+                location: p.location || "N/A",  
+                children: p.children_count || 0,
+                card_status: p.card_status || "N/A",
+                total_spent: p.total_spent || 0,        
+                last_spent: p.last_spent || 0,
+                last_transaction_date: p.last_transaction_date ? new Date(p.last_transaction_date).toISOString().split('T')[0] : "N/A",
+            }));
+            setParents(parentsmapped)
         }
         fetchData()
     }),[])
@@ -82,7 +93,7 @@ export default function Page() {
 
             <PageTable
                 columns={PARENT_COLUMNS}
-                data={PARENT_DATA}
+                data={parents || []}
                 onRowClick={() => {
 
                 }}

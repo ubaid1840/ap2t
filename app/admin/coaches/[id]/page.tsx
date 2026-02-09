@@ -57,20 +57,21 @@ import { Scrollbar } from "@radix-ui/react-scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import LineChart from "@/components/charts/line-chart-dots";
-import { COACH_ALL_SESSIONS, COACH_REVENUE_TRED, COACH_WEEKLY_EVENTS } from "@/components/coach-dashboard/constants";
+import {
+  COACH_ALL_SESSIONS,
+  COACH_REVENUE_TRED,
+  COACH_WEEKLY_EVENTS,
+} from "@/components/coach-dashboard/constants";
 import { WeeklySchedule } from "@/components/coach-dashboard/weekly-schedule";
 import axios from "@/lib/axios";
 import AppCalendar from "@/components/app-calendar";
-
-
 
 export default function Page() {
   const { id } = useParams();
   const [data, setData] = useState<coachinfoType>();
   const [tab, setTab] = useState("Details");
 
-  const isMobile = useIsMobile()
-
+  const isMobile = useIsMobile();
 
   const chartConfig = {
     value: {
@@ -81,16 +82,33 @@ export default function Page() {
 
   useEffect(() => {
     if (id) {
-      const fetchData=async()=>{
-                try {
-                  const temp_coach_id="c2003915-6fb4-467b-b66c-fe28b5d5ef9a"
-                    const result=await axios.get(`/admin/coaches/${temp_coach_id}`)
-                    console.log(result)
-                } catch (error) {
-                    console.log(error)
-                }
-            }
-            fetchData()
+      const fetchData = async () => {
+        try {
+          const result = await axios.get(`/admin/coaches/${id}`);
+          const coachdb = result.data;
+          const coach = {
+            name: `${coachdb.first_name} ${coachdb.last_name}`,
+            email: coachdb.email,
+            phoneNo: coachdb.phone_no,
+            status: coachdb.status,
+            bio:coachdb.bio,
+            notification: coachdb.notifications || "0",
+            specialities: coachdb.specialities || [],
+            certifications:coachdb.certifications||[],
+            preferedSchedule:coachdb.schedule_preference||"no specific schedule",
+            totalSessions: coachdb.total_sessions || "0",
+            completed: coachdb.completed_sessions || "0",
+            upComing: coachdb.upcoming_sessions || "0",
+            players: coachdb.players_count || "0",
+            avgRating: coachdb.rating || "0",
+            id: coachdb.coach_id,
+          };
+          setData(coach)
+        } catch (error) {
+          console.log(error);
+        }
+      };
+      fetchData();
 
       const coachData = coachinfo.find((item) => item.id === Number(id));
       setData(coachData);
@@ -128,47 +146,68 @@ export default function Page() {
     },
     {
       Icon: <DollarSign />,
-      title: "Avg Rating",
+      title: "Total Revenue",
       description: "$12,350",
       type: "warning",
       going: "warning",
     },
   ];
 
-  const coachStatus = data?.status ? data?.status.charAt(0).toUpperCase() + data?.status.slice(1) : ""
+  const coachStatus = data?.status
+    ? data?.status.charAt(0).toUpperCase() + data?.status.slice(1)
+    : "";
   return (
     <div className="flex flex-col w-full gap-6">
       <BackButton title="Back to coaches" route="/admin/coaches" />
 
       <Card className="w-full rounded-[12px] bg-[#252525]">
         <CardContent className="space-y-4">
-
           <div className="w-full flex justify-between flex-wrap gap-4">
             <div className="flex flex-col gap-2">
-              <span className="flex gap-2 text-xl items-center">{data?.name} <span>
-                <CardStatus value={coachStatus} type="active" icon={<CircleCheckBig size={14} />} /></span></span>
+              <span className="flex gap-2 text-xl items-center">
+                {data?.name}{" "}
+                <span>
+                  <CardStatus
+                    value={coachStatus}
+                    type="active"
+                    icon={<CircleCheckBig size={14} />}
+                  />
+                </span>
+              </span>
               <div className="text-[#D1D5DC] text-xs flex flex-col gap-2">
-                <span className="inline-flex gap-2 "><Mail size={14} /> {data?.email}</span>
-                <span className="inline-flex gap-2"><Phone size={14} /> {data?.phoneNo}</span>
-                <span className="inline-flex gap-2"><IoCalendarClear size={14} />  Joined 2023-01-15 • 10 years experience</span>
+                <span className="inline-flex gap-2 ">
+                  <Mail size={14} /> {data?.email}
+                </span>
+                <span className="inline-flex gap-2">
+                  <Phone size={14} /> {data?.phoneNo}
+                </span>
+                <span className="inline-flex gap-2">
+                  <IoCalendarClear size={14} /> Joined 2023-01-15 • 10 years
+                  experience
+                </span>
               </div>
             </div>
             <div className="flex gap-4 flex-wrap">
-              <EditProfile/>
+              <EditProfile />
             </div>
-
           </div>
 
           <div className="flex justify-between gap-4 flex-wrap">
             {localData.map((item, index) => (
-              <HeaderCard key={index} title={item.description as string} description={item.title}
+              <HeaderCard
+                key={index}
+                title={item.description as string}
+                description={item.title}
                 icon={
-                  <div className={`rounded-[8px] flex w-10 h-10 items-center justify-center bg-${item.type}-bg text-${item.type}-text border-${item.type}-text/32`}>
+                  <div
+                    className={`rounded-[8px] flex w-10 h-10 items-center justify-center bg-${item.type}-bg text-${item.type}-text border-${item.type}-text/32`}
+                  >
                     {item.Icon}
-                  </div>} />
+                  </div>
+                }
+              />
             ))}
           </div>
-
         </CardContent>
       </Card>
 
@@ -178,21 +217,37 @@ export default function Page() {
           onValueChange={(v) => {
             setTab(v);
           }}
-
         >
-          <ScrollArea className={`overflow-x-auto ${isMobile && "max-w-[calc(100vw-64px)]"}`}>
+          <ScrollArea
+            className={`overflow-x-auto ${isMobile && "max-w-[calc(100vw-64px)]"}`}
+          >
             <TabsList className="bg-transparent relative flex gap-2 px-2">
-              {["Details", "Availability", "Sessions", "Revenue"
-              ].map((t) => (
+              {["Details", "Availability", "Sessions", "Revenue"].map((t) => (
                 <TabsTrigger
                   key={t}
                   value={t}
                   className="h-9 px-4 text-[12px] leading-tight tracking-tight"
                 >
-                  {t === "Details" && <div className="flex gap-2 items-center py-2"><User /> Details</div>}
-                  {t === "Availability" && <div className="flex gap-2 items-center py-2"><Calendar /> Availability</div>}
-                  {t === "Sessions" && <div className="flex gap-2 items-center py-2"><Clock /> Sessions</div>}
-                  {t === "Revenue" && <div className="flex gap-2 items-center py-2"><DollarSign /> Revenue</div>}
+                  {t === "Details" && (
+                    <div className="flex gap-2 items-center py-2">
+                      <User /> Details
+                    </div>
+                  )}
+                  {t === "Availability" && (
+                    <div className="flex gap-2 items-center py-2">
+                      <Calendar /> Availability
+                    </div>
+                  )}
+                  {t === "Sessions" && (
+                    <div className="flex gap-2 items-center py-2">
+                      <Clock /> Sessions
+                    </div>
+                  )}
+                  {t === "Revenue" && (
+                    <div className="flex gap-2 items-center py-2">
+                      <DollarSign /> Revenue
+                    </div>
+                  )}
                 </TabsTrigger>
               ))}
             </TabsList>
@@ -201,52 +256,44 @@ export default function Page() {
           <Separator />
 
           <TabsContent value="Details" className="space-y-4 p-4">
-
             <h1 className="text-lg text-[#F3F4F6]">Biography</h1>
             <p className="text-sm text-muted-foreground">
-              Experienced sports coach with over 10 years of Training
-              Athletes at all levels. Speacialize in Advance skill
-              development and proformance optimizations
+              {data?.bio}
             </p>
-
 
             <h1 className="text-lg text-[#F3F4F6]">Specialties</h1>
             <div className="flex gap-1">
               {data?.specialities.map((s) => {
                 return (
-                  <div key={s} className="py-2 px-3 rounded-lg bg-[#1A1A1A] border border-border text-xs leading-none text-[#D1D5DC]">{s}</div>
+                  <div
+                    key={s}
+                    className="py-2 px-3 rounded-lg bg-[#1A1A1A] border border-border text-xs leading-none text-[#D1D5DC]"
+                  >
+                    {s}
+                  </div>
                 );
               })}
             </div>
 
-
             <h1 className="text-lg text-[#F3F4F6]">Certifications</h1>
             <div className="space-y-2">
-              <div className="bg-[#1A1A1A] border border-border rounded-[10px] px-4 py-3 flex items-center gap-2">
+              {
+                data?.certifications.map((certification)=>(
+                  <div key={certification} className="bg-[#1A1A1A] border border-border rounded-[10px] px-4 py-3 flex items-center gap-2">
                 <Award className="text-primary" size={16} />
-                <h1 className="text-[#E5E7EB] text-sm">USSF A License</h1>
+                <h1 className="text-[#E5E7EB] text-sm">{certification}</h1>
               </div>
-              <div className="bg-[#1A1A1A] border border-border rounded-[10px] px-4 py-3 flex items-center gap-2">
-                <Award className="text-primary" size={16} />
-                <h1 className="text-[#E5E7EB] text-sm">USSF A License</h1>
-              </div>
-              <div className="bg-[#1A1A1A] border border-border rounded-[10px] px-4 py-3 flex items-center gap-2">
-                <Award className="text-primary" size={16} />
-                <h1 className="text-[#E5E7EB] text-sm">USSF A License</h1>
-              </div>
+                ))
+              }
             </div>
 
-
-            <h1 className="text-lg text-[#F3F4F6]">
-              Scheduling Preferences
-            </h1>
+            <h1 className="text-lg text-[#F3F4F6]">Scheduling Preferences</h1>
             <div className="bg-[#1A1A1A] border border-border text-ghost-text rounded-[10px] px-4 py-3 flex items-center gap-2">
               <Clock size={16} />
               <h1 className="text-[#E5E7EB]">
-                Weekday afternoons, Weekend mornings
+                {data?.preferedSchedule}
               </h1>
             </div>
-
           </TabsContent>
 
           <TabsContent value="Availability" className="space-y-4 p-4">
@@ -256,24 +303,30 @@ export default function Page() {
                 <h1 className="text-[#D1D5DC]">Synced with booking system</h1>
                 <p className="text-ghost-text">Last sync: 5:03:15 PM</p>
               </div>
-              <Button className="flex gap-2"><RefreshCcw /> Sync Now </Button>
+              <Button className="flex gap-2">
+                <RefreshCcw /> Sync Now{" "}
+              </Button>
             </div>
 
             <WeeklySchedule events={COACH_WEEKLY_EVENTS} />
-
 
             <Card className="bg-info-bg p-3 border-info-text/30">
               <CardContent className="p-0">
                 <div className="flex gap-4 items-start">
                   <Info size={14} className="text-info-text" />
                   <div className="font-normal space-y-1">
-                    <Label className="text-info-text text-[14px] leading-none">Availability Management</Label>
-                    <p className="text-[#D1D5DC] text-xs">Click on available slots to block them. Click on block slots to make them available again. Booked slots cannot be modified here</p>
+                    <Label className="text-info-text text-[14px] leading-none">
+                      Availability Management
+                    </Label>
+                    <p className="text-[#D1D5DC] text-xs">
+                      Click on available slots to block them. Click on block
+                      slots to make them available again. Booked slots cannot be
+                      modified here
+                    </p>
                   </div>
                 </div>
               </CardContent>
             </Card>
-
           </TabsContent>
 
           <TabsContent value="Sessions" className="space-y-2 p-4">
@@ -289,11 +342,16 @@ export default function Page() {
                             {session.name}
                           </h1>
                           <div>
-                            <Badge className={session.status === "Completed" ? "leading-none py-1 bg-active-bg border-active-text/32 text-active-text" : "bg-info-bg border-info-text/32 text-info-text leading-none py-1"}>
+                            <Badge
+                              className={
+                                session.status === "Completed"
+                                  ? "leading-none py-1 bg-active-bg border-active-text/32 text-active-text"
+                                  : "bg-info-bg border-info-text/32 text-info-text leading-none py-1"
+                              }
+                            >
                               {session.status}
                             </Badge>
                           </div>
-
                         </div>
                         <h1>{session.amount}</h1>
                       </div>
@@ -310,7 +368,6 @@ export default function Page() {
                       </div>
                     </CardContent>
                   </Card>
-
                 );
               })}
             </div>
@@ -332,9 +389,7 @@ export default function Page() {
                   <p className="text-sm text-ghost-text">This Month</p>
                 </div>
                 <h1 className="text-xl">$1,850</h1>
-                <p className="text-xs text-active-text">
-                  +12% from last month
-                </p>
+                <p className="text-xs text-active-text">+12% from last month</p>
               </div>
               <div className="space-y-2 p-4 flex-1 bg-[#1A1A1A] rounded-[10px] border border-border">
                 <div className="flex gap-2">
@@ -342,15 +397,12 @@ export default function Page() {
                   <p className="text-sm text-ghost-text">Avg per Session</p>
                 </div>
                 <h1 className="text-xl">$85</h1>
-                <p className="text-sm text-ghost-text">
-                  Based on 145 sessions
-                </p>
+                <p className="text-sm text-ghost-text">Based on 145 sessions</p>
               </div>
             </div>
 
             <Card className="bg-[#1A1A1A]">
               <CardContent className="space-y-2">
-
                 <p className="text-sm">6-Month Revenue Trend</p>
 
                 <div className="grid grid-cols-1">
@@ -359,7 +411,6 @@ export default function Page() {
                       data={COACH_REVENUE_TRED}
                       config={chartConfig}
                       xAxisKey="month"
-
                       tickFormatter={(value) => value.slice(0, 3)}
                       lines={[
                         {
@@ -371,8 +422,6 @@ export default function Page() {
                 </div>
               </CardContent>
             </Card>
-
-
 
             <div className="space-y-2">
               <h1 className="text-md text-[#F3F4F6]">
@@ -395,7 +444,9 @@ export default function Page() {
 
                 <div className="bg-[#1A1A1A] border border-border rounded-[10px] p-4 space-y-2">
                   <div className="flex justify-between">
-                    <p className="text-sm text-muted-foreground">Group Sessions</p>
+                    <p className="text-sm text-muted-foreground">
+                      Group Sessions
+                    </p>
                     <h1>$5,200</h1>
                   </div>
                   <Progress
@@ -423,18 +474,15 @@ export default function Page() {
           </TabsContent>
         </Tabs>
       </div>
-
-
     </div>
   );
 }
 
 const EditProfile = () => {
-
-  const [open, setOpen] = useState(false)
+  const [open, setOpen] = useState(false);
 
   const [editCoach, setEditCoach] = useState({
-    fullname:"" ,
+    fullname: "",
     email: "",
     phone: "",
     career_start: "",
@@ -442,17 +490,16 @@ const EditProfile = () => {
     preferedSchedule: "",
   });
 
- const changeCoach = async (e: React.FormEvent) => {
-    e.preventDefault(); 
+  const changeCoach = async (e: React.FormEvent) => {
+    e.preventDefault();
 
     try {
       const temp_coach_id = "c2003915-6fb4-467b-b66c-fe28b5d5ef9a";
-      
+
       const names = editCoach.fullname.trim().split(" ");
       const first_name = names.shift() || "";
       const last_name = names.join(" ") || "";
 
-      
       const body: any = {};
       if (first_name) body.first_name = first_name;
       if (last_name) body.last_name = last_name;
@@ -462,12 +509,11 @@ const EditProfile = () => {
         body.career_start =
           typeof editCoach.career_start === "string"
             ? editCoach.career_start
-            : editCoach.career_start.toISOString(); 
+            : editCoach.career_start.toISOString();
       if (editCoach.bio) body.bio = editCoach.bio;
       if (editCoach.preferedSchedule)
         body.schedule_preference = editCoach.preferedSchedule;
 
- 
       const res = await axios.patch(`/admin/coaches/${temp_coach_id}`, body);
 
       console.log("Coach updated successfully:", res.data);
@@ -488,15 +534,11 @@ const EditProfile = () => {
   };
   return (
     <>
-      <Button
-        onClick={() => setOpen(!open)}
-        variant={"outline"}
-      >
+      <Button onClick={() => setOpen(!open)} variant={"outline"}>
         {" "}
         <Edit /> Edit Profile
       </Button>
       <Dialog open={open} onOpenChange={setOpen}>
-
         <DialogContent className="bg-[#252525] border border-[#3A3A3A] sm:max-w-4xl p-0">
           <DialogHeader className="border-b border-[#3A3A3A] p-4">
             <DialogTitle className="text-[#F3F4F6] font-semibold text-lg">
@@ -508,14 +550,11 @@ const EditProfile = () => {
               <div className="space-y-2 px-2 pb-2">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label className="text-sm text-[#99A1AF]">
-                      Full Name
-                    </Label>
+                    <Label className="text-sm text-[#99A1AF]">Full Name</Label>
                     <Input
                       name="fullName"
                       placeholder="Coach Martinez"
                       className="!bg-[#1A1A1A] !border-[#3A3A3A] !text-[#E5E7EB] !p-5"
-                      
                       value={editCoach.fullname}
                       onChange={(e) =>
                         setEditCoach((prev) => ({
@@ -531,7 +570,6 @@ const EditProfile = () => {
                       name="email"
                       placeholder="martinez@ap2t.com"
                       className="!bg-[#1A1A1A] !border-[#3A3A3A] !text-[#E5E7EB] !p-5"
-                      
                       value={editCoach.email}
                       onChange={(e) =>
                         setEditCoach((prev) => ({
@@ -548,7 +586,6 @@ const EditProfile = () => {
                       name="phone"
                       placeholder="(555) 123-4567"
                       className="!bg-[#1A1A1A] !border-[#3A3A3A] !text-[#E5E7EB] !p-5"
-                      
                       value={editCoach.phone}
                       onChange={(e) =>
                         setEditCoach((prev) => ({
@@ -560,34 +597,36 @@ const EditProfile = () => {
                   </div>
                   <div className="space-y-2">
                     <Label className="text-sm text-[#99A1AF]">
-                     Start of Career
+                      Start of Career
                     </Label>
                     <AppCalendar
                       className="h-11"
-                      date={editCoach.career_start ? new Date(editCoach.career_start) : undefined}
+                      date={
+                        editCoach.career_start
+                          ? new Date(editCoach.career_start)
+                          : undefined
+                      }
                       onChange={(date) =>
                         setEditCoach((prevState) => ({
                           ...prevState,
                           career_start: date,
                         }))
                       }
-                      
                     />
                   </div>
                 </div>
 
                 <div className="space-y-2">
-                  <Label className="text-sm text-[#99A1AF]">
-                    Biography
-                  </Label>
-                  <Textarea className="!bg-[#1A1A1A] border border-border rounded-[10px] min-h-28" 
-                   value={editCoach.bio}
-                      onChange={(e) =>
-                        setEditCoach((prev) => ({
-                          ...prev,
-                          bio: e.target.value,
-                        }))
-                      }
+                  <Label className="text-sm text-[#99A1AF]">Biography</Label>
+                  <Textarea
+                    className="!bg-[#1A1A1A] border border-border rounded-[10px] min-h-28"
+                    value={editCoach.bio}
+                    onChange={(e) =>
+                      setEditCoach((prev) => ({
+                        ...prev,
+                        bio: e.target.value,
+                      }))
+                    }
                   />
                 </div>
 
@@ -599,7 +638,6 @@ const EditProfile = () => {
                     name="preferedscedule"
                     placeholder="Coach Martinez"
                     className="!bg-[#1A1A1A] !border-[#3A3A3A] !text-[#E5E7EB] !p-5"
-                    
                     value={editCoach.preferedSchedule}
                     onChange={(e) =>
                       setEditCoach((prev) => ({
@@ -630,28 +668,29 @@ const EditProfile = () => {
         </DialogContent>
       </Dialog>
     </>
-  )
-}
+  );
+};
 
-const HeaderCard = ({ title = "", description = "", icon = null }: { title: string, description: string, icon: ReactNode }) => {
-
+const HeaderCard = ({
+  title = "",
+  description = "",
+  icon = null,
+}: {
+  title: string;
+  description: string;
+  icon: ReactNode;
+}) => {
   return (
     <Card className="rounded-[10px] bg-[#1A1A1A] border-[#3A3A3A] sm:w-[250px] w-full">
       <CardContent>
         <div className="flex gap-4 items-center">
           {icon}
           <div>
-            <div className="text-lg text-white">
-              {title}
-            </div>
-            <div className="text-muted-foreground">
-              {description}
-            </div>
-
+            <div className="text-lg text-white">{title}</div>
+            <div className="text-muted-foreground">{description}</div>
           </div>
         </div>
-
       </CardContent>
     </Card>
-  )
-}
+  );
+};

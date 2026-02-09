@@ -7,7 +7,7 @@ export async function POST(req:NextRequest,res:NextResponse){
 
         const result=await pool.query(
             `INSERT INTO sessions
-            (name,description,session_type,coach_name,location,date,start_time,end_time,price,max_players,apply_promotion)
+            (name,description,session_type,coach_id,location,date,start_time,end_time,price,max_players,apply_promotion)
             Values
             ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)
             RETURNING *;`,
@@ -15,7 +15,7 @@ export async function POST(req:NextRequest,res:NextResponse){
                 data.name,
                 data.description,
                 data.session_type,
-                data.coach_name,
+                data.coach_id,
                 data.location,
                 data.date,
                 data.start_time,
@@ -50,7 +50,7 @@ export async function GET() {
 
     return NextResponse.json(result.rows);
   } catch (error) {
-    console.error("GET /api/admin/players error:", error);
+    console.error("GET /api/admin/sessions error:", error);
 
     return NextResponse.json(
       { message: "Internal Server Error" },

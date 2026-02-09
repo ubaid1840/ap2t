@@ -34,23 +34,21 @@ export default function Page() {
                 try {
                     const result=await axios.get(`/admin/players/${id}`)
                     console.log(result.data)
-                    // Map API response to PlayersData
                     if (result.data) {
                         const p = result.data;
                         const mappedPlayer: any = {
                             id: p.player_id,
                             name: `${p.first_name} ${p.last_name}`,
-                            coach_name: "Unassigned", // Placeholder
+                            coach_name: "Unassigned", 
                             age: p.birth_date ? new Date().getFullYear() - new Date(p.birth_date).getFullYear() : "N/A",
                             position: p.position || "N/A",
-                            parent: "Unknown", // Placeholder or fetch if available
+                            parent: "Unknown", 
                             joining_date: p.joining_date ? new Date(p.joining_date).toISOString().split('T')[0] : "N/A",
                         };
                         setData(mappedPlayer);
                     }
                 } catch (error) {
                     console.log(error)
-                    // Fallback to mock data if fetch fails (optional, maybe better to show error)
                     const currentPlayerData = PLAYERS_DATA.find((item) => item.id === Number(id))
                     if (currentPlayerData) setData(currentPlayerData)
                 }

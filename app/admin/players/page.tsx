@@ -33,7 +33,7 @@ export default function Page() {
                         position: p.position || "N/A",
                         parent: "Unknown", 
                         last_session: "Training", 
-                        last_session_date: p.joining_date ? new Date(p.joining_date).toISOString().split('T')[0] : new Date().toISOString().split('T')[0], // Placeholder use joining date
+                        last_session_date: p.joining_date ? new Date(p.joining_date).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
                         attendance: 0,
                         joining_date: p.joining_date
                     }));
