@@ -43,6 +43,7 @@ export default function Page() {
 
   useEffect(() => {
     if (id) {
+      console.log(id)
       const fetchData = async () => {
         try {
           const result = await axios.get(`/admin/parents/${id}`);

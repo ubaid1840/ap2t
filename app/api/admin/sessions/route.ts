@@ -44,13 +44,23 @@ export async function GET() {
   try {
     const result = await pool.query(`
       SELECT
-        s.*,
-        u.first_name AS coach_first_name,
-        u.last_name AS coach_last_name
-      FROM sessions s
-      LEFT JOIN coaches c ON c.id = s.coach_id
-      LEFT JOIN users u ON u.id = c.user_id
-    `);
+  s.*,
+  u.first_name AS coach_first_name,
+  u.last_name  AS coach_last_name,
+
+  COALESCE(
+    jsonb_agg(DISTINCT p.status) FILTER (WHERE p.id IS NOT NULL),
+    '[]'
+  ) AS payment_statuses
+
+FROM sessions s
+LEFT JOIN coaches c ON c.id = s.coach_id
+LEFT JOIN users u ON u.id = c.user_id
+LEFT JOIN payments p ON p.session_id = s.id
+
+GROUP BY s.id, u.first_name, u.last_name;
+
+      `);
 
     return NextResponse.json(result.rows);
   } catch (error) {

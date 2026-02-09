@@ -31,7 +31,6 @@ import { AssignCoachDialog } from "./assign-coach-dialog";
 export function CreateSessionDialog() {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [coaches,setCoaches]=useState([])
   const [session, setSession] = useState({
     name: "",
     description: "",
@@ -46,21 +45,6 @@ export function CreateSessionDialog() {
     apply_promotion: false,
   });
 
-  useEffect((()=>{
-    const fetchData=async()=>{
-      const result=await axios.get("admin/coaches")
-      const coaches=result.data
-      const coachesMapped=coaches.map((coach:any)=>(
-        {
-          id:coach.id,
-          first_name:coach.first_name,
-          last_name:coach.last_name,
-        }
-      ))
-      setCoaches(coachesMapped)
-  }
-  fetchData()
-}),[])
 
   const createSession = async () => {
     setLoading(true);

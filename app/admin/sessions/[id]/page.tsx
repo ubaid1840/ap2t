@@ -119,46 +119,14 @@ type CardStatusType =
   | "ghost"
   | "alternative";
 
-const paymentStatusMap: Record<PaymentDataType["status"], CardStatusType> = {
-  Paid: "active",
-  Pending: "warning",
+const paymentStatusMap: Record<string, CardStatusType> = {
+  paid: "active",
+  completed: "active",
+  pending: "warning",
+  partial: "warning",
 };
 
-type PaymentDataType = {
-  name: string;
-  status: "Paid" | "Pending";
-  amount: string;
-  method: string;
-  date: string;
-  transectionId: string;
-};
 
-const paymentData = [
-  {
-    name: "Emma Johnson",
-    status: "Paid",
-    amount: "$85",
-    method: "Square - Credit Card",
-    date: "2025-12-10",
-    transectionId: "sq_ch_abc123",
-  },
-  {
-    name: "Emma Johnson",
-    status: "Paid",
-    amount: "$85",
-    method: "Square - Credit Card",
-    date: "2025-12-10",
-    transectionId: "sq_ch_abc123",
-  },
-  {
-    name: "Emma Johnson",
-    status: "Pending",
-    amount: "$85",
-    method: "Square - Credit Card",
-    date: "2025-12-10",
-    transectionId: "sq_ch_abc123",
-  },
-];
 
 const notesData = [
   {
@@ -180,6 +148,7 @@ const notesData = [
 export default function Page() {
   const { id } = useParams();
   const [data, setData] = useState<SessionDataType>();
+  const [rawSessionData, setRawSessionData] = useState<any>(null);
   const [tab, setTab] = useState("Participants");
   const isMobile = useIsMobile();
   const [loading, setLoading] = useState(false);
@@ -188,40 +157,51 @@ export default function Page() {
   >(null);
 
   const [participants, setParticipants] = useState<any[]>([]);
+  const [payments, setPayments] = useState<any[]>([]);
+  const [paymentStats, setPaymentStats] = useState({
+    total_participants: 0,
+    total_revenue: 0,
+    paid_amount: 0,
+    pending_amount: 0,
+    partial_amount: 0
+  });
 
   useEffect(() => {
     if (id) {
-      const fetchData = async () => {
-        try {
-          setLoading(true);
-
-          const result = await axios.get(`/admin/sessions/${id}`);
-          
-          if (result.data) {
-             const d = result.data;
-             setData({
-                id: d.id,
-                sessionName: d.name,
-                date: new Date(d.date).toLocaleDateString(),
-                time: `${d.start_time} - ${d.end_time}`,
-                coachName: `${d.coach_first_name} ${d.coach_last_name}` || "Unassigned",
-                status: d.status,
-                price: d.price,
-                max_players: d.max_players,
-                location: d.location
-             } as any);
-          }
-        } catch (error) {
-          console.log(error);
-        } finally {
-          setLoading(false);
-        }
-      };
-      
-      fetchParticipants();
       fetchData();
+      fetchParticipants();
+      fetchPaymentStats();
+      fetchPayments();
     }
   }, [id]);
+
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+
+      const result = await axios.get(`/admin/sessions/${id}`);
+      
+      if (result.data) {
+         const d = result.data;
+         setRawSessionData(d);
+         setData({
+            id: d.id,
+            sessionName: d.name,
+            date: new Date(d.date).toLocaleDateString(),
+            time: `${d.start_time} - ${d.end_time}`,
+            coachName: `${d.coach_first_name} ${d.coach_last_name}` || "Unassigned",
+            status: d.status,
+            price: d.price,
+            max_players: d.max_players,
+            location: d.location
+         } as any);
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const fetchParticipants = async () => {
     try {
@@ -229,6 +209,24 @@ export default function Page() {
       setParticipants(response.data);
     } catch (error) {
       console.error("Error fetching participants", error);
+    }
+  };
+
+  const fetchPaymentStats = async () => {
+    try {
+      const response = await axios.get(`/admin/sessions/${id}/payment`);
+      setPaymentStats(response.data);
+    } catch (error) {
+      console.error("Error fetching payment stats", error);
+    }
+  };
+
+  const fetchPayments = async () => {
+    try {
+      const response = await axios.get(`/admin/sessions/${id}/payments`);
+      setPayments(response.data);
+    } catch (error) {
+      console.error("Error fetching payments", error);
     }
   };
 
@@ -254,19 +252,19 @@ export default function Page() {
         type: "info",
     },
     {
-        h: `$${participants.length * (Number(data?.price) || 0)}`,
+        h: `$${paymentStats.total_revenue.toFixed(2)}`,
         p: "Total Revenue",
         icon: <DollarSign />,
         type: "success",
     },
     {
-        h: `$${participants.length * (Number(data?.price) || 0)}`, 
+        h: `$${paymentStats.paid_amount.toFixed(2)}`, 
         p: "Paid",
         icon: <CheckCircle />,
         type: "active",
     },
     {
-        h: "$0",
+        h: `$${paymentStats.pending_amount.toFixed(2)}`,
         p: "Pending",
         icon: <CircleAlert />,
         type: "warning",
@@ -300,7 +298,11 @@ export default function Page() {
                   </div>
                 </Badge>
               </div>
-              <EditSessionDialog />
+              <EditSessionDialog 
+                sessionId={id as string} 
+                sessionData={rawSessionData}
+                onSuccess={fetchData}
+              />
             </div>
             <p className="text-sm text-muted-foreground">
               Advanced skills training session focusing on ball handling,
@@ -531,41 +533,47 @@ export default function Page() {
             ))}
           </TabsContent>
           <TabsContent value="Payments" className="space-y-4 p-4">
-            {paymentData.map((payment, i) => (
-              <Card key={i} className="bg-[#1A1A1A] border border-border">
-                <CardContent className="space-y-2">
-                  <div className="flex gap-2 items-center">
-                    <h1>{payment.name}</h1>
-                    <CardStatus
-                      value={payment.status}
-                      type={
-                        paymentStatusMap[payment.status as "Paid" | "Pending"]
-                      }
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                    <div className="flex text-sm text-ghost-text gap-1">
-                      <p className="text-muted-foreground">Payment:</p>{" "}
-                      <p className="text-[#D1D5DC]"> {payment.amount}</p>
-                    </div>
-
-                    <div className="flex text-sm text-ghost-text gap-1">
-                      <p className="text-muted-foreground">Method:</p>{" "}
-                      <p className="text-[#D1D5DC]">{payment.method}</p>
-                    </div>
-                    <div className="flex text-sm text-ghost-text gap-1">
-                      <p className="text-muted-foreground">Date:</p>{" "}
-                      <p className="text-[#D1D5DC]">{payment.date}</p>
-                    </div>
-                    <div className="flex text-sm text-ghost-text gap-1">
-                      <p className="text-muted-foreground">Transaction ID:</p>{" "}
-                      <p className="text-[#D1D5DC]">{payment.transectionId}</p>
-                    </div>
-                  </div>
+            {payments.length === 0 ? (
+              <Card className="bg-[#1A1A1A] border border-border">
+                <CardContent className="p-8 text-center">
+                  <p className="text-ghost-text">No payments found for this session</p>
                 </CardContent>
               </Card>
-            ))}
+            ) : (
+              payments.map((payment, i) => (
+                <Card key={i} className="bg-[#1A1A1A] border border-border">
+                  <CardContent className="space-y-2">
+                    <div className="flex gap-2 items-center">
+                      <h1>{payment.payer_first_name} {payment.payer_last_name}</h1>
+                      <CardStatus
+                        value={payment.status}
+                        type={paymentStatusMap[payment.status] || "info"}
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      <div className="flex text-sm text-ghost-text gap-1">
+                        <p className="text-muted-foreground">Payment:</p>{" "}
+                        <p className="text-[#D1D5DC]"> ${payment.amount}</p>
+                      </div>
+
+                      <div className="flex text-sm text-ghost-text gap-1">
+                        <p className="text-muted-foreground">Method:</p>{" "}
+                        <p className="text-[#D1D5DC]">{payment.method}</p>
+                      </div>
+                      <div className="flex text-sm text-ghost-text gap-1">
+                        <p className="text-muted-foreground">Date:</p>{" "}
+                        <p className="text-[#D1D5DC]">{payment.paid_at ? new Date(payment.paid_at).toLocaleDateString() : 'Pending'}</p>
+                      </div>
+                      <div className="flex text-sm text-ghost-text gap-1">
+                        <p className="text-muted-foreground">Transaction ID:</p>{" "}
+                        <p className="text-[#D1D5DC]">{payment.transaction_id}</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))
+            )}
           </TabsContent>
 
           <TabsContent value="Notes" className="space-y-4 p-4">

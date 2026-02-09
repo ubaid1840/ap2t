@@ -6,9 +6,11 @@ import { useState } from "react";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "@/lib/firebase";
 import { useRouter } from "next/navigation";
+import { Loader2 } from "lucide-react";
 
 export default function LoginForm({ onClickSignup }: { onClickSignup: () => void }) {
       const router=useRouter()
+      const [loading,setLoading]=useState(false)
       const [logindata,setLoginData]=useState(
         {
           email:"",
@@ -18,6 +20,7 @@ export default function LoginForm({ onClickSignup }: { onClickSignup: () => void
 
     const handlesubmit = async (e: React.FormEvent) => {
   e.preventDefault();
+  setLoading(true)
 
   try {
     const res = await signInWithEmailAndPassword(
@@ -31,6 +34,8 @@ export default function LoginForm({ onClickSignup }: { onClickSignup: () => void
     }
   } catch (error) {
     console.error("Sign in failed", error);
+  }finally{
+    setLoading(false)
   }
 };
 
@@ -59,7 +64,7 @@ export default function LoginForm({ onClickSignup }: { onClickSignup: () => void
             </div>
 
             <div className="flex flex-col gap-2">
-                <Button type="submit" className="bg-primary text-secondary w-full"> Log In</Button>
+                <Button type="submit" className="bg-primary text-secondary w-full"> {loading&& <Loader2 className="h-4 w-4 animate-spin" />}  Log In</Button>
                 <Button onClick={() => onClickSignup()} className="bg-secondary text-white w-full">Sign up</Button>
             </div>
         </form>

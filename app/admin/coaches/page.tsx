@@ -14,7 +14,7 @@ import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import axios from "@/lib/axios";
-import { Bell, Calendar, CheckCircle, Eye, Plus, Target, TrendingUp, User } from "lucide-react";
+import { Bell, Calendar, CheckCircle, Eye, Loader2, Plus, Target, TrendingUp, User } from "lucide-react";
 import Link from "next/link";
 import { ReactNode, useEffect, useState } from "react";
 import { splitFullName } from "@/lib/split-fullname";
@@ -52,6 +52,12 @@ const CoachCardNames: CoachCardNamesType = { totalSessions: "Total Sessions", co
 export default function Page() {
    const {user} = useAuth()
     const [coaches,setCoaches]=useState<coachinfoType[]>([])
+    const [loading, setLoading] = useState(true)
+    const [statsLoading, setStatsLoading] = useState(true)
+    const [stats, setStats] = useState({
+      total_sessions: 0,
+      total_players: 0
+    })
     const localData = [
   {
     Icon: <User />,
@@ -70,41 +76,62 @@ export default function Page() {
   {
     Icon: <Calendar />,
     title: "Total Sessions",
-    description: "617",
+    description: statsLoading ? "0" : stats.total_sessions,
     type: "info",
     going: "info",
   },
   {
     Icon: <Target />,
     title: "Total Players",
-    description: "137",
+    description: statsLoading ? "0" : stats.total_players,
     type: "other",
     going: "active",
   },
 ];
       useEffect((()=>{
           const fetchData=async ()=>{
-            const result=await axios.get("/admin/coaches")
-             const coaches=result.data
-             const mappedCoaches=coaches.map((coach:any)=>(
-              {
-                name: `${coach.first_name} ${coach.last_name}`,
-                email: coach.email,
-                phoneNo:coach.phone_no,
-                status:coach.status,
-                notification:coach.notifications || "0",
-                specialities:coach.specialities || [],
-                totalSessions:coach.total_sessions || "0",  
-                completed:coach.completed_sessions || "0",
-                upComing:coach.upcoming_sessions || "0",
-                players:coach.players_count || "0", 
-                avgRating:coach.rating || "0",
-                id:coach.coach_id
-              }
-             ))
-             setCoaches(mappedCoaches)  
+            try {
+              setLoading(true)
+              const result=await axios.get("/admin/coaches")
+              const coaches=result.data
+              const mappedCoaches=coaches.map((coach:any)=>(
+                {
+                  name: `${coach.first_name} ${coach.last_name}`,
+                  email: coach.email,
+                  phoneNo:coach.phone_no,
+                  status:coach.status,
+                  notification:coach.notifications || "0",
+                  specialities:coach.specialities || [],
+                  totalSessions:coach.total_sessions || "0",  
+                  completed:coach.completed_sessions || "0",
+                  upComing:coach.upcoming_sessions || "0",
+                  players:coach.players_count || "0", 
+                  avgRating:coach.rating || "0",
+                  id:coach.coach_id
+                }
+              ))
+              setCoaches(mappedCoaches)
+            } catch (error) {
+              console.error("Error fetching coaches:", error)
+            } finally {
+              setLoading(false)
+            }
           }
+
+          const fetchStats = async () => {
+            try {
+              setStatsLoading(true)
+              const result = await axios.get("/admin/coaches/stats")
+              setStats(result.data)
+            } catch (error) {
+              console.error("Error fetching stats:", error)
+            } finally {
+              setStatsLoading(false)
+            }
+          }
+
           fetchData()
+          fetchStats()
       }),[user?.id])
   
       useEffect(() => {
@@ -143,7 +170,12 @@ export default function Page() {
         ))}
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      {loading ? (
+        <div className="flex justify-center items-center py-20">
+          <Loader2 className="animate-spin text-primary" size={40} />
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {coaches.map((coach, i) => {
           return (
             <Card className="bg-[#252525]" key={i}>
@@ -174,14 +206,16 @@ export default function Page() {
               <CardContent className="space-y-4">
                 <div className="space-y-1">
                   <h1 className="text-sm text-[#99A1AF]">Specialties</h1>
-                  <div className="flex gap-1">
-                    {coach.specialities.map((s) => {
-                      return (
-                        <div key={s} className="py-2 px-3 rounded-lg bg-[#1A1A1A] border border-border text-xs leading-none text-[#D1D5DC]">{s}</div>
-                      )
-                    }
-                    )
-                    }
+                  <div className="flex gap-1 flex-wrap">
+                    {coach.specialities && coach.specialities.length > 0 ? (
+                      coach.specialities.map((s, idx) => {
+                        return (
+                          <div key={`${s}-${idx}`} className="py-2 px-3 rounded-lg bg-[#1A1A1A] border border-border text-xs leading-none text-[#D1D5DC]">{s}</div>
+                        )
+                      })
+                    ) : (
+                      <p className="text-xs text-muted-foreground italic">No specialties assigned</p>
+                    )}
 
                   </div>
                 </div>
@@ -232,6 +266,7 @@ export default function Page() {
           );
         })}
       </div>
+      )}
     </div>
   );
 }

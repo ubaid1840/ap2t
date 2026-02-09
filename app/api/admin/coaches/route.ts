@@ -86,40 +86,43 @@ export async function GET() {
   u.birth_date,
   u.joining_date,
 
-  -- Specialities
+
   COALESCE(
     jsonb_agg(DISTINCT s.name) FILTER (WHERE s.id IS NOT NULL),
     '[]'
   ) AS specialities,
 
-  -- Certifications
+
   COALESCE(
     jsonb_agg(DISTINCT cert.name) FILTER (WHERE cert.id IS NOT NULL),
     '[]'
   ) AS certifications,
 
-  -- Total sessions assigned to this coach
+
   COUNT(sess.id) AS total_sessions,
 
-  -- Completed sessions
+
   COUNT(sess.id) FILTER (WHERE sess.status = 'completed') AS completed_sessions,
 
-  -- Upcoming sessions
-  COUNT(sess.id) FILTER (WHERE sess.status = 'upcoming') AS upcoming_sessions
+  COUNT(sess.id) FILTER (WHERE sess.status = 'upcoming') AS upcoming_sessions,
+
+  COUNT(DISTINCT p.id) AS players_count
 
 FROM coaches c
 INNER JOIN users u ON u.id = c.user_id
 
--- Specialities joins
 LEFT JOIN coach_specialities cs ON cs.coach_id = c.id
 LEFT JOIN specialities s ON s.id = cs.speciality_id
 
--- Certifications joins
+
 LEFT JOIN coach_certifications cc ON cc.coach_id = c.id
 LEFT JOIN certifications cert ON cert.id = cc.certification_id
 
--- Sessions join
+
 LEFT JOIN sessions sess ON sess.coach_id = c.id
+
+
+LEFT JOIN players p ON p.coach_id = c.id
 
 
 GROUP BY c.id, u.id;

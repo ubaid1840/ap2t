@@ -35,7 +35,7 @@ export default function Page() {
             coachName: `${s.coach_first_name} ${s.coach_last_name}` || "Unassigned",
             playerName: "Multiple",
             price: s.price,
-            payment: "Paid", 
+            payment: s.payment_statuses[0], 
             status: s.status ? s.status.charAt(0).toUpperCase() + s.status.slice(1).toLowerCase() : 'Upcoming' 
           }));
           setSessions(mappedSessions);
