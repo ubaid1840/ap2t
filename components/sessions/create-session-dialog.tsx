@@ -1,7 +1,7 @@
 "use client";
 import axios from "@/lib/axios";
 import { Calendar, Loader2, MapPin, Plus, Tag, Users } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import AppCalendar from "../app-calendar";
 import { TimePicker } from "../time-picker";
 import { Button } from "../ui/button";
@@ -26,15 +26,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
+import { AssignCoachDialog } from "./assign-coach-dialog";
 
 export function CreateSessionDialog() {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [coaches,setCoaches]=useState([])
   const [session, setSession] = useState({
     name: "",
     description: "",
     session_type: "",
-    coach_name: "",
+    coach_id: "",
     location: "",
     date: "",
     start_time: "",
@@ -43,6 +45,22 @@ export function CreateSessionDialog() {
     max_players: "",
     apply_promotion: false,
   });
+
+  useEffect((()=>{
+    const fetchData=async()=>{
+      const result=await axios.get("admin/coaches")
+      const coaches=result.data
+      const coachesMapped=coaches.map((coach:any)=>(
+        {
+          id:coach.id,
+          first_name:coach.first_name,
+          last_name:coach.last_name,
+        }
+      ))
+      setCoaches(coachesMapped)
+  }
+  fetchData()
+}),[])
 
   const createSession = async () => {
     setLoading(true);
@@ -116,22 +134,31 @@ export function CreateSessionDialog() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-sm text-muted-foreground">
-                      Assigned Coach *
-                    </Label>
-                    <Input
-                      name="asignedCoach"
-                      className="!bg-[#1A1A1A] !border-[#3A3A3A] !text-[#E5E7EB] !p-5"
-                      required
-                      value={session.coach_name}
-                      onChange={(e) =>
-                        setSession((prev) => ({
-                          ...prev,
-                          coach_name: e.target.value,
-                        }))
-                      }
-                    />
-                  </div>
+<Label className="text-sm text-muted-foreground">
+  Assigned Coach *
+</Label>
+
+<div className="flex gap-4">
+  <AssignCoachDialog
+  onSelect={(coach) =>
+    setSession((prev) => ({
+      ...prev,
+      coach_id: coach.id,
+      coach_name: `${coach.first_name} ${coach.last_name}`, 
+    }))
+  }
+/>
+{session.coach_id && (
+  <p className="mt-1 text-sm text-ghost-text">
+    Selected Coach: {session.coach_name}
+  </p>
+)}
+  </div>
+  
+
+
+</div>
+
                 </div>
 
                 <div className="flex gap-2 text-md ">

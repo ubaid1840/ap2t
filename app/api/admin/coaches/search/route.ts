@@ -9,13 +9,13 @@ export async function GET(req: NextRequest) {
     const result = await pool.query(
       `
       SELECT
-        p.id AS player_id,
+        c.id AS coach_id,
         u.first_name,
         u.last_name,
         u.email,
         u.picture
-      FROM players p
-      INNER JOIN users u ON u.id = p.user_id
+      FROM coaches c
+      INNER JOIN users u ON u.id = c.user_id
         ${query ? `WHERE 
         u.first_name ILIKE $1 OR 
         u.last_name ILIKE $1 OR
@@ -27,7 +27,7 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json(result.rows);
   } catch (error) {
-    console.error("GET /api/admin/players/search error:", error);
+    console.error("GET /api/admin/coaches/search error:", error);
 
     return NextResponse.json(
       { message: "Internal Server Error" },
