@@ -1,4 +1,5 @@
 "use client";
+import { useAuth } from "@/app/contexts/auth-context";
 import BackButton from "@/components/back-button";
 import CardStatus from "@/components/card-status";
 import { AddParticipantDialog } from "@/components/sessions/add-participant-dialog";
@@ -9,6 +10,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Dialog,
   DialogClose,
@@ -158,6 +160,9 @@ export default function Page() {
 
   const [participants, setParticipants] = useState<any[]>([]);
   const [payments, setPayments] = useState<any[]>([]);
+  const [notes,setNotes]=useState([]
+    
+  )
   const [paymentStats, setPaymentStats] = useState({
     total_participants: 0,
     total_revenue: 0,
@@ -165,6 +170,12 @@ export default function Page() {
     pending_amount: 0,
     partial_amount: 0
   });
+  useEffect((()=>{
+    const fetctData=async()=>{
+      const result=await axios.get("/admin/sessions/[id]/note")
+      setNotes(result.data)
+    }
+  }),[])
 
   useEffect(() => {
     if (id) {
@@ -581,7 +592,7 @@ export default function Page() {
               <h1 className="text-lg ">Internal Notes</h1>
               <AddNoteDialog />
             </div>
-            {notesData.map((note, i) => {
+            {notes.map((note, i) => {
               return (
                 <Card
                   key={i}
@@ -601,9 +612,9 @@ export default function Page() {
                       )}
                     </div>
                     <p className="text-sm text-muted-foreground">
-                      {note.datetime}
+                      {note.create_at}
                     </p>
-                    <h1 className="text-sm text-[#D1D5DC]">{note.message}</h1>
+                    <h1 className="text-sm text-[#D1D5DC]">{note.content}</h1>
                   </CardContent>
                 </Card>
               );
@@ -616,7 +627,28 @@ export default function Page() {
 }
 
 const AddNoteDialog = () => {
+  const {user}=useAuth()
   const [open, setOpen] = useState(false);
+  const [loading,setLoading]=useState(false)
+  const [note,setNote]=useState({
+    note_type:"",
+    content:"",
+    important:false,
+  })
+
+  const handleSubmit=async()=>{
+    setLoading(true)
+    try{
+      const result=await axios.post("/admin/sessions/[id]/note",{
+        ...note,
+        writer_id:user.id
+      })
+      console.log(result.data)
+    }finally{
+      setLoading(false)
+      setOpen(false)
+    }
+  }
 
   return (
     <>
@@ -635,18 +667,20 @@ const AddNoteDialog = () => {
             <div className="space-y-2">
               <Label className="text-[#99A1AF] text-sm">Note Type</Label>
 
-              <Select>
+              <Select
+              value={note.note_type}
+                onValueChange={(value) => setNote({ ...note, note_type: value })}
+              >
                 <SelectTrigger className="w-full p-6 !bg-[#1A1A1A] border-border rounded-[10px]">
                   <SelectValue placeholder="Private" />
                 </SelectTrigger>
                 <SelectContent className="!bg-[#1A1A1A]">
                   <SelectGroup>
-                    <SelectLabel>Select a category</SelectLabel>
-                    <SelectItem value="apple">Apple</SelectItem>
-                    <SelectItem value="banana">Banana</SelectItem>
-                    <SelectItem value="blueberry">Blueberry</SelectItem>
-                    <SelectItem value="grapes">Grapes</SelectItem>
-                    <SelectItem value="pineapple">Pineapple</SelectItem>
+                    <SelectLabel>Select a type</SelectLabel>
+                    <SelectItem value="Reminder">Reminder</SelectItem>
+                    <SelectItem value="Task">Task</SelectItem>
+                    <SelectItem value="Idea">Idea</SelectItem>
+                    <SelectItem value="Sugestion">Sugestion</SelectItem>
                   </SelectGroup>
                 </SelectContent>
               </Select>
@@ -656,15 +690,25 @@ const AddNoteDialog = () => {
               <Textarea
                 placeholder="Enter your note here..."
                 className="!bg-[#1A1A1A] border border-border rounded-[10px] text-ghost-text min-h-36"
+                 value={note.content}
+                onChange={(e) => setNote({ ...note, content: e.target.value })}
               ></Textarea>
             </div>
           </div>
+          <Checkbox
+                  required
+                  className="data-[state=checked]:border-white data-[state=checked]:bg-primary data-[state=checked]:text-black dark:data-[state=checked]:border-white dark:data-[state=checked]:bg-primary"
+                  checked={note.important}
+                  onCheckedChange={(checked) => {
+                    setNote({ ...note, important: checked === true })
+                  }}
+                />
           <div className="border-t border-border flex items-center justify-end p-4">
             <div className="flex gap-4">
               <DialogClose className="text-[13px] font-medium leading-none h-10 px-4 py-2 bg-black text-white border-border rounded-md hover:opacity-70 cursor-pointer flex flex-1 items-center justify-center">
                 Cancel
               </DialogClose>
-              <Button size={"lg"}>Add Note</Button>
+              <Button size={"lg"} onClick={handleSubmit }> {loading&& <Loader2 className="h-4 w-4 animate-spin" />}  Add Note</Button>
             </div>
           </div>
         </DialogContent>
