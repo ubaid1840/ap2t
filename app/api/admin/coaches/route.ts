@@ -53,7 +53,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
             VALUES
             ($1,$2,$3,$4,$5)
             `,
-      [user.id, bio, 5, "2026-01-29 10:35:49.665042+00", schedule_preference],
+      [user.id, bio, 5, career_start, schedule_preference],
     );
 
     return NextResponse.json(
