@@ -80,10 +80,10 @@ export default function Page() {
                 tab === "signup" && "translate-x-full"
               )}
             />
-            <TabsTrigger value="login" className="relative z-10 flex-1 rounded-full">
+            <TabsTrigger value="login" className="relative z-10 flex-1 rounded-full border-none">
               Log in
             </TabsTrigger>
-            <TabsTrigger value="signup" className="relative z-10 flex-1 rounded-full">
+            <TabsTrigger value="signup" className="relative z-10 flex-1 rounded-full border-none">
               Sign up
             </TabsTrigger>
           </TabsList>

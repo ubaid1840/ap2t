@@ -1,10 +1,10 @@
 import AnimatingLoader from "@/components/landing/animating-loader";
+import { Toaster } from '@/components/ui/sonner';
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Inter } from "next/font/google";
 import NextTopLoader from 'nextjs-toploader';
 import { Suspense } from "react";
 import "./globals.css";
-import { Toaster } from '@/components/ui/sonner'
 import { AuthProvider } from "./contexts/auth-context";
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-sans' });

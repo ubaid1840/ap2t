@@ -9,7 +9,9 @@ import { createContext, useContext, useEffect, useState } from "react";
 import axios from "@/lib/axios";
 import { auth } from "@/lib/firebase";
 import { usePathname } from "next/navigation";
-import {useRouter} from 'nextjs-toploader/app'
+import { useRouter } from 'nextjs-toploader/app'
+import { toast } from "sonner";
+import { handleLogout } from "@/lib/logout";
 
 type DBUser = {
   id: string;
@@ -43,37 +45,25 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const unsubscribe = onAuthStateChanged(auth, async (fbUser) => {
       setLoading(true);
       setFirebaseUser(fbUser);
-      console.log("ON auth change working");
-      console.log(fbUser?.email)
-
       if (fbUser?.email) {
         try {
-          const res = await axios.get(`/auth/signup?email=${fbUser.email}`);
-          if (res.data?.id) {
-            setUser(res.data);
-            console.log(pathname)
-            if (pathname.includes("auth")) {
-              if (res.data.role === "admin") {
-                router.push("/admin");
-              } else if (res.data.role === "player") {
-                router.push("/player");
-              } else {
-                router.push("/");
-              }
-            }
-          } else {
-            setUser(null);
-            await signOut(auth);
+          const res = await axios.get(`/userdetail?email=${fbUser.email}`);
+          setUser(res.data);
+          const role = res.data?.role
+          if (!role) {
+            await handleLogout()
+          } else if (!pathname.startsWith(`/${role}`)) {
+            router.push(`/${role}`);
           }
         } catch (err) {
-          console.error("Failed to load DB user", err);
           setUser(null);
+          signOut(auth)
+          router.push("/auth");
         }
       } else {
         setUser(null);
         router.push("/auth");
       }
-
       setLoading(false);
     });
 

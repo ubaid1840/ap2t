@@ -51,7 +51,7 @@ export async function POST(req: NextRequest) {
       { success: true, user, parent: parentResult.rows[0] },
       { status: 201 }
     );
-  } catch (error) {
+  } catch (error : any) {
     console.error("POST /api/parent error:", error);
     return NextResponse.json(
       { success: false, message: error?.message || "Server error" },

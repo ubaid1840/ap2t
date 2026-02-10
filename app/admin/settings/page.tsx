@@ -37,6 +37,7 @@ import { useAuth } from "@/app/contexts/auth-context";
 export default function Page() {
   const [loading, setLoading] = useState(false);
   const [savingChanges, setSavingChanges] = useState(false);
+  const [tab, setTab] = useState("Profile info")
   const [profileInfo, setProfileInfo] = useState({
     adminUser: "",
     email: "",
@@ -160,7 +161,7 @@ export default function Page() {
   useEffect(() => {
     const fetchData = async () => {
       if (!user?.id) return;
-      
+
       try {
         setLoading(true);
 
@@ -282,128 +283,128 @@ export default function Page() {
     fetchData();
   }, [user]);
 
-const updateSettings = async () => {
-  setSavingChanges(true);
+  const updateSettings = async () => {
+    setSavingChanges(true);
 
-  const payLoad = {
-    new_booking: notificationInfo[0].value,
-    payment_receive: notificationInfo[1].value,
-    session_cancel: notificationInfo[2].value,
-    promotion_purchase: notificationInfo[3].value,
-    email_notification: notificationInfo[4].value,
-    sms_notification: notificationInfo[5].value,
-    push_notification: notificationInfo[6].value,
-    merchant_id: squareIntigration[0].value,
-    location_id: squareIntigration[1].value,
-    api_key: squareIntigration[2].value,
-    webhook_url: squareIntigration[3].value,
-    test_mode: squareIntigration[4].value,
-    auto_sync_catalog: squareIntigration[5].value,
-    two_factor_auth: securityInfo.twoFactorAuth,
-    login_alert: securityInfo.loginAlert,
-    user_id: user_id,
+    const payLoad = {
+      new_booking: notificationInfo[0].value,
+      payment_receive: notificationInfo[1].value,
+      session_cancel: notificationInfo[2].value,
+      promotion_purchase: notificationInfo[3].value,
+      email_notification: notificationInfo[4].value,
+      sms_notification: notificationInfo[5].value,
+      push_notification: notificationInfo[6].value,
+      merchant_id: squareIntigration[0].value,
+      location_id: squareIntigration[1].value,
+      api_key: squareIntigration[2].value,
+      webhook_url: squareIntigration[3].value,
+      test_mode: squareIntigration[4].value,
+      auto_sync_catalog: squareIntigration[5].value,
+      two_factor_auth: securityInfo.twoFactorAuth,
+      login_alert: securityInfo.loginAlert,
+      user_id: user_id,
+    };
+
+    try {
+      const res = await axios.patch(`/settings`, payLoad);
+
+      const settings = res.data;
+      setSquareIntigration([
+        {
+          title: "Merchant ID",
+          type: "input",
+          value: settings?.merchant_id || "",
+          placeholder: "MLSQ12345678",
+        },
+        {
+          title: "Location ID",
+          type: "input",
+          value: settings?.location_id || "",
+          placeholder: "L12345689",
+        },
+        {
+          title: "API Key",
+          type: "input",
+          value: settings?.api_key || "",
+          placeholder: "**********",
+        },
+        {
+          title: "Webhook URL",
+          type: "input",
+          value: settings?.webhook_url || "",
+          placeholder: "https:/ap2t.com/api/square/webhook",
+        },
+        {
+          title: "Test Mode",
+          type: "switch",
+          value: settings?.test_mode ?? false,
+          description: "Use Square sandbox for testing",
+        },
+        {
+          title: "Auto Sync Catalog",
+          type: "switch",
+          value: settings?.auto_sync_catalog ?? false,
+          description: "Automatically sync promotions with square catalog",
+        },
+      ]);
+
+      setSecurityInfo({
+        twoFactorAuth: settings?.two_factor_auth ?? false,
+        loginAlert: settings?.login_alert ?? false,
+        oldPass: "",
+        newPass: "",
+        confirmNewPass: "",
+      });
+
+      setNoficationInfo([
+        {
+          title: "New Booking",
+          description: "Get notified when a new session is booked",
+          value: settings?.new_booking ?? false,
+          icon: <Calendar className="text-muted-foreground" size={20} />,
+        },
+        {
+          title: "Payment Received",
+          description: "Alerts for successful payments",
+          value: settings?.payment_receive ?? false,
+          icon: <DollarSign className="text-muted-foreground" size={20} />,
+        },
+        {
+          title: "Session Cancellation",
+          description: "Alerts when sessions are cancelled",
+          value: settings?.session_cancel ?? false,
+          icon: <Info className="text-muted-foreground" size={20} />,
+        },
+        {
+          title: "Promotion Purchase",
+          description: "When customers buy promotional packages",
+          value: settings?.promotion_purchase ?? false,
+          icon: <CreditCard className="text-muted-foreground" size={20} />,
+        },
+        {
+          title: "Email Notifications",
+          description: "Receive updates via email",
+          value: settings?.email_notification ?? false,
+          icon: <MessageSquare className="text-muted-foreground" size={20} />,
+        },
+        {
+          title: "SMS Notifications",
+          description: "Receive updates via text message",
+          value: settings?.sms_notification ?? false,
+          icon: <MessageCircle className="text-muted-foreground" size={20} />,
+        },
+        {
+          title: "Push Notifications",
+          description: "Browser push notifications",
+          value: settings?.push_notification ?? false,
+          icon: <Bell className="text-muted-foreground" size={20} />,
+        },
+      ]);
+
+    } finally {
+      setSavingChanges(false);
+    }
   };
-
-  try {
-    const res = await axios.patch(`/settings`, payLoad);
-
-    const settings = res.data;
-    setSquareIntigration([
-      {
-        title: "Merchant ID",
-        type: "input",
-        value: settings?.merchant_id || "",
-        placeholder: "MLSQ12345678",
-      },
-      {
-        title: "Location ID",
-        type: "input",
-        value: settings?.location_id || "",
-        placeholder: "L12345689",
-      },
-      {
-        title: "API Key",
-        type: "input",
-        value: settings?.api_key || "",
-        placeholder: "**********",
-      },
-      {
-        title: "Webhook URL",
-        type: "input",
-        value: settings?.webhook_url || "",
-        placeholder: "https:/ap2t.com/api/square/webhook",
-      },
-      {
-        title: "Test Mode",
-        type: "switch",
-        value: settings?.test_mode ?? false,
-        description: "Use Square sandbox for testing",
-      },
-      {
-        title: "Auto Sync Catalog",
-        type: "switch",
-        value: settings?.auto_sync_catalog ?? false,
-        description: "Automatically sync promotions with square catalog",
-      },
-    ]);
-
-    setSecurityInfo({
-      twoFactorAuth: settings?.two_factor_auth ?? false,
-      loginAlert: settings?.login_alert ?? false,
-      oldPass: "",
-      newPass: "",
-      confirmNewPass: "",
-    });
-
-    setNoficationInfo([
-      {
-        title: "New Booking",
-        description: "Get notified when a new session is booked",
-        value: settings?.new_booking ?? false,
-        icon: <Calendar className="text-muted-foreground" size={20} />,
-      },
-      {
-        title: "Payment Received",
-        description: "Alerts for successful payments",
-        value: settings?.payment_receive ?? false, 
-        icon: <DollarSign className="text-muted-foreground" size={20} />,
-      },
-      {
-        title: "Session Cancellation",
-        description: "Alerts when sessions are cancelled",
-        value: settings?.session_cancel ?? false, 
-        icon: <Info className="text-muted-foreground" size={20} />,
-      },
-      {
-        title: "Promotion Purchase",
-        description: "When customers buy promotional packages",
-        value: settings?.promotion_purchase ?? false,
-        icon: <CreditCard className="text-muted-foreground" size={20} />,
-      },
-      {
-        title: "Email Notifications",
-        description: "Receive updates via email",
-        value: settings?.email_notification ?? false, 
-        icon: <MessageSquare className="text-muted-foreground" size={20} />,
-      },
-      {
-        title: "SMS Notifications",
-        description: "Receive updates via text message",
-        value: settings?.sms_notification ?? false, 
-        icon: <MessageCircle className="text-muted-foreground" size={20} />,
-      },
-      {
-        title: "Push Notifications",
-        description: "Browser push notifications",
-        value: settings?.push_notification ?? false, 
-        icon: <Bell className="text-muted-foreground" size={20} />,
-      },
-    ]);
-
-  } finally {
-    setSavingChanges(false);
-  }
-};
 
 
   const isMobile = useIsMobile();
@@ -411,23 +412,25 @@ const updateSettings = async () => {
     <div className="flex flex-col w-full gap-4">
       <Header>
         <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
-          <Button onClick={() => updateSettings()}>
-            {savingChanges ? (
-              <>
-                <Loader2 className="h-4 w-4 animate-spin" />
-                saving...
-              </>
-            ) : (
-              <>
-                <FaFloppyDisk className="h-4 w-4" />
-                Save Changes
-              </>
-            )}
-          </Button>
+          {tab !== "Profile info" &&
+            <Button onClick={() => updateSettings()}>
+              {savingChanges ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  saving...
+                </>
+              ) : (
+                <>
+                  <FaFloppyDisk className="h-4 w-4" />
+                  Save Changes
+                </>
+              )}
+            </Button>
+          }
         </div>
       </Header>
       <Card className="bg-[#282828] p-0 overflow-hidden">
-        <Tabs defaultValue="Profile info" className="gap-0">
+        <Tabs value={tab} onValueChange={setTab} className="gap-0">
           <ScrollArea
             className={`overflow-x-auto ${isMobile && "max-w-[calc(100vw-64px)]"}`}
           >
@@ -503,8 +506,8 @@ const updateSettings = async () => {
                   </div>
                 </div>
                 <div className="space-y-1">
-                  <h1 className="text-md font-semibold">Admin User</h1>
-                  <p className="text-sm text-muted-foreground">Super Admin</p>
+                  <h1 className="text-md font-semibold">{user?.first_name} {user?.last_name}</h1>
+                  <p className="text-sm text-muted-foreground">{user?.role}</p>
                   <div className="flex gap-2">
                     <Button variant={"link"} className="p-0 font-normal">
                       Delete
@@ -530,6 +533,7 @@ const updateSettings = async () => {
                 />
 
                 <LocalInput
+                  disabled
                   title="Email"
                   Icon={<MessageSquare className="h-4 w-4 text-gray-400" />}
                   value={profileInfo.email}
@@ -557,6 +561,7 @@ const updateSettings = async () => {
 
                 <LocalInput
                   title="Role"
+                  disabled
                   Icon={<User className="h-4 w-4 text-gray-400" />}
                   value={profileInfo.role}
                   placeholder="Super Admin"
@@ -923,12 +928,14 @@ const LocalInput = ({
   placeholder = "Type here...",
   value,
   onChange,
+  disabled = false
 }: {
   placeholder: string;
   Icon?: ReactNode;
   title: string;
   value: string;
   onChange: (val: string) => void;
+  disabled?: boolean
 }) => {
   return (
     <div className="space-y-1">
@@ -940,6 +947,7 @@ const LocalInput = ({
       >
         {Icon}
         <Input
+          disabled={disabled}
           value={value}
           onChange={(e) => onChange(e.target.value)}
           placeholder={placeholder}

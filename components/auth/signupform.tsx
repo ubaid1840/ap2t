@@ -55,7 +55,7 @@ export default function SignUpForm({
     if (!waiverData) return;
     if (signUpData.password !== signUpData.confirm_password) return;
     try {
-      const res = await axios.post("/auth/signup", {
+      const res = await axios.post("/user", {
         first_name: signUpData.first_name,
         last_name: signUpData.last_name,
         email: signUpData.email,

@@ -2,6 +2,47 @@ import pool from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
 import admin from "@/lib/firebase-admin";
 
+export async function PUT(req : NextRequest, { params  } : {params : {uid : string}}) {
+  try {
+    const data = await req.json();
+    const { ...updates } = data;
+    const { uid } = await params
+
+    if (!uid) {
+      return NextResponse.json({ message: "ID is required" }, { status: 400 });
+    }
+
+    const fields : any[] = [];
+    const values : any[] = [];
+
+    Object.entries(updates).forEach(([key, value], index) => {
+      if (value !== undefined) {
+        fields.push(`${key} = $${index + 1}`);
+        values.push(value);
+      }
+    });
+
+    if (fields.length === 0) {
+      return NextResponse.json({ message: "No valid data provided for update" }, { status: 400 });
+    }
+
+    values.push(uid);
+    const query = `
+          UPDATE users 
+          SET ${fields.join(", ")}
+          WHERE id = $${values.length}
+      `;
+
+    await pool.query(query, values);
+
+    console.log("data updated successfully");
+    return NextResponse.json({ message: "Updated successfully" }, { status: 200 });
+  } catch (error) {
+    console.error("Error updating data:", error);
+    return NextResponse.json({ message: "Internal Server Error" }, { status: 500 });
+  }
+}
+
 export async function POST(req: NextRequest) {
   const {password, ...data} = await req.json();
 
@@ -17,7 +58,7 @@ export async function POST(req: NextRequest) {
 
     if (!email || !password) {
       return NextResponse.json(
-        { message: "required parameters missing" },
+        { message: "Parameters missing" },
         { status: 400 },
       );
     }
@@ -53,47 +94,5 @@ export async function POST(req: NextRequest) {
   } catch (error: any) {
     console.error("POST /api/users error:", error);
     return NextResponse.json(error?.message || "Server error", { status: 200 });
-  }
-}
-
-
-export async function GET(req: NextRequest) {
-   const searchParams = req.nextUrl.searchParams
-  const email = searchParams.get("email");
-
-  console.log(email)
-
-  if (!email) {
-    return NextResponse.json(
-      { error: "Email is required" },
-      { status: 400 }
-    );
-  }
-
-  try {
-    const result = await pool.query(
-  `
-  SELECT
-  u.*,
-  c.id AS coach_id,
-  p.id AS player_id,
-  pa.id AS parent_id
-FROM users u
-LEFT JOIN coaches c ON c.user_id = u.id
-LEFT JOIN players p ON p.user_id = u.id
-LEFT JOIN parents pa ON pa.user_id = u.id
-WHERE u.email = $1;
-
-  `,
-  [email]
-);
-
-    return NextResponse.json(result.rows[0] ?? null);
-  } catch (error) {
-    console.error("GET /api/auth/signup error:", error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
   }
 }
