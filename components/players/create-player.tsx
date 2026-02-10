@@ -23,49 +23,54 @@ import { Plus, SquarePen } from "lucide-react";
 import { useState } from "react";
 import AppCalendar from "../app-calendar";
 import axios from "@/lib/axios";
-import { splitFullName } from "@/lib/split-fullname";
+import { splitFullName } from "@/lib/functions";
+import { Spinner } from "../ui/spinner";
 
-export function CreatePlayer() {
+export function CreatePlayer({ onRefresh }: { onRefresh: () => Promise<void> }) {
   const [open, setOpen] = useState(false);
   const [position, setPosition] = useState("");
   const [skillLevel, setSkillLevel] = useState("");
   const [date, setDate] = useState(undefined);
   const positions = ["Forward", "Defender", "GoalKeeper"];
   const skillLevels = ["Beginner", "Intermediate", "Advanced", "Expert"];
+  const [loading, setLoading] = useState(false)
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    setLoading(true)
     const formData = new FormData(e.currentTarget);
 
     const values = {
       fullname: formData.get("name"),
-      dob: formData.get("dob"),
-      email:formData.get("email"),
-      phone_no:formData.get("phone_no"),
+      dob: date,
+      email: formData.get("email"),
+      phone_no: formData.get("phone_no"),
       position,
       skillLevel,
       medicalNotes: formData.get("medicalNotes"),
     };
 
-    const { first_name, last_name } = splitFullName(values.fullname);
+    const { first_name, last_name } = splitFullName(values?.fullname as string);
 
     try {
-      const result = await axios.post("/admin/players", {
+      await axios.post("/user", {
         first_name: first_name,
         last_name: last_name,
-        email:values.email,
-        phone_no:values.phone_no,
+        email: values.email,
+        phone_no: values.phone_no,
         birth_date: values.dob,
-        position: values.position, 
+        role: "player",
+        position: values.position,
         skill_level: values.skillLevel,
         medical_notes: values.medicalNotes,
-      });
 
-      console.log("player created", result);
+      });
+      await onRefresh()
+      setOpen(false)
     } catch (error) {
       console.log(error);
     } finally {
-      setOpen(false);
+      setLoading(false)
     }
   }
 
@@ -217,7 +222,7 @@ export function CreatePlayer() {
                   Cancel
                 </Button>
               </DialogClose>
-              <Button type="submit">Add Player</Button>
+              <Button disabled={loading} type="submit"> {loading && <Spinner />}Add Player</Button>
             </DialogFooter>
           </form>
         </DialogContent>

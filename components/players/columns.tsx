@@ -48,7 +48,7 @@ export const PLAYERS_COLUMNS: ColumnDef<PlayersData>[] = [
                 <div>
                     <div className="text-[#D1D5DC]">{row.getValue("name")}</div>
                     <div className="text-xs text-muted-foreground">
-                        Coach {row.original.coach_name}
+                      {row.original.coach_name ? `Coach ${row.original.coach_name}` : "N/A"}  
                     </div>
                 </div>
             </div>

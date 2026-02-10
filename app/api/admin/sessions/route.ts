@@ -1,43 +1,41 @@
 import pool from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
 
-export async function POST(req:NextRequest,res:NextResponse){
-    try {
-        const data=await req.json()
+export async function POST(req: NextRequest) {
+  try {
+    const data = await req.json();
 
-        const result=await pool.query(
-            `INSERT INTO sessions
-            (name,description,session_type,coach_id,location,date,start_time,end_time,price,max_players,apply_promotion)
-            Values
-            ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)
-            RETURNING *;`,
-            [
-                data.name,
-                data.description,
-                data.session_type,
-                data.coach_id,
-                data.location,
-                data.date,
-                data.start_time,
-                data.end_time,
-                data.price,
-                data.max_players,
-                data.apply_promotion
-            ]
-        )
-          return NextResponse.json(
-      { success: true, item: result.rows[0] },
+
+
+    if (!data || Object.keys(data).length === 0) {
+
+      return NextResponse.json({ message: "Required parameters missing" }, { status: 400 });
+    }
+
+    const fields = Object.keys(data);
+    const values = Object.values(data);
+    const placeholders = fields.map((_, i) => `$${i + 1}`).join(", ");
+
+    await pool.query(
+      `INSERT INTO sessions (${fields.join(",")})
+       VALUES (${placeholders})
+`,
+      values
+    );
+
+
+
+    return NextResponse.json(
+      { message: "Data inserted" },
       { status: 201 }
     );
   } catch (error: any) {
-    console.error("SESSION POST ERROR:", error);
-
+    console.log("POST /api/parent error:", error);
     return NextResponse.json(
-      { success: false, error: error.message },
+      { message: error?.message || "Server error" },
       { status: 500 }
     );
   }
-
 }
 
 export async function GET() {

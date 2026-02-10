@@ -12,16 +12,18 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { useDebounce } from "@/hooks/use-debounce";
 import axios from "@/lib/axios";
 import { Loader2, Plus, Search } from "lucide-react";
 import { useEffect, useState } from "react";
+import { Spinner } from "../ui/spinner";
 
 interface AssignCoachDialogProps {
-  onSelect: (coach: { id: string; first_name: string; last_name: string }) => void;
+  onSelect: (coach: { id: number; first_name: string; last_name: string }) => void;
 }
 
 interface Coach {
-  coach_id: string;
+  id: number;
   first_name: string;
   last_name: string;
   email: string;
@@ -33,28 +35,27 @@ export function AssignCoachDialog({ onSelect }: AssignCoachDialogProps) {
   const [search, setSearch] = useState("");
   const [results, setResults] = useState<Coach[]>([]);
   const [loading, setLoading] = useState(false);
+  const debouncedSeach = useDebounce(search, 300)
 
   useEffect(() => {
-    const fetchCoaches = async () => {
-      setLoading(true);
-      try {
-        const response = await axios.get(
-          search.length > 1
-            ? `/admin/coaches/search?query=${search}`
-            : `/admin/coaches/search`
-        );
-        setResults(response.data);
-      } catch (error) {
-        console.error("Search error", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+    if (open)
+      fetchCoaches()
+  }, [open]);
 
-    const delayDebounceFn = setTimeout(fetchCoaches, search.length > 0 ? 300 : 0);
+  const fetchCoaches = async () => {
+    setLoading(true);
+    try {
+      const response = await axios.get(
+        `/admin/coaches/search`
+      );
+      console.log(response.data)
+      setResults(response.data);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    return () => clearTimeout(delayDebounceFn);
-  }, [search]);
+  const filteredData = results.filter((item) => `${item.first_name} ${item.last_name}`?.toLocaleLowerCase()?.includes(debouncedSeach?.toLocaleLowerCase()))
 
   return (
     <Dialog
@@ -73,7 +74,7 @@ export function AssignCoachDialog({ onSelect }: AssignCoachDialogProps) {
           Assign Coach
         </Button>
       </DialogTrigger>
-      <DialogContent className="bg-[#252525] border-[#3A3A3A] max-h-[70vh] max-w-5xl p-0 gap-0">
+      <DialogContent className="bg-[#252525] border-[#3A3A3A] max-w-5xl p-0 gap-0">
         <DialogHeader className="border-b border-[#3A3A3A] p-4">
           <DialogTitle className="text-[#F3F4F6] font-semibold text-lg">
             Assign Coach
@@ -95,18 +96,18 @@ export function AssignCoachDialog({ onSelect }: AssignCoachDialogProps) {
 
           {loading ? (
             <div className="flex justify-center py-8">
-              <Loader2 className="h-6 w-6 animate-spin text-gray-500" />
+              <Spinner />
             </div>
           ) : results.length > 0 ? (
-            <ScrollArea className="h-[60vh]">
+            <ScrollArea className="h-[50vh] pr-4">
               <div className="space-y-2">
-                {results.map((coach) => (
+                {filteredData.map((coach) => (
                   <div
-                    key={coach.coach_id}
+                    key={coach.id}
                     className="flex items-center justify-between p-3 rounded-lg bg-[#1A1A1A] border border-[#3A3A3A] cursor-pointer hover:bg-[#2A2A2A]"
                     onClick={() => {
                       onSelect({
-                        id: coach.coach_id,
+                        id: coach.id,
                         first_name: coach.first_name,
                         last_name: coach.last_name,
                       });
@@ -136,7 +137,7 @@ export function AssignCoachDialog({ onSelect }: AssignCoachDialogProps) {
                       <Plus className="h-4 w-4" />
                     </Button>
                   </div>
-                ))}
+                ))}                
               </div>
             </ScrollArea>
           ) : (

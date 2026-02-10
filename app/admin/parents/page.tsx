@@ -14,6 +14,7 @@ import { Separator } from "@/components/ui/separator";
 import axios from "@/lib/axios";
 import { Download, Filter, Plus } from "lucide-react";
 import { useEffect, useState } from "react";
+import moment from "moment";
 
 export default function Page() {
   const [filter, setFilter] = useState(true);
@@ -22,37 +23,35 @@ export default function Page() {
   const { user } = useAuth();
 
   useEffect(() => {
-    const fetchData = async () => {
-      const result = await axios.get("/admin/parents");
-      const parentsmapped = result.data.map((p: any) => ({
-        id: p.parent_id,
-        name: `${p.first_name} ${p.last_name}`,
-        joining_date: p.joining_date
-          ? new Date(p.joining_date).toISOString().split("T")[0]
-          : "N/A",
-        email: p.email,
-        number: p.phone_no,
-        location: p.location || "N/A",
-        children: p.children_count || 0,
-        card_status: p.card_status || "N/A",
-        total_spent: p.total_spent || 0,
-        last_spent: p.last_spent || 0,
-        last_transaction_date: p.last_transaction_date
-          ? new Date(p.last_transaction_date).toISOString().split("T")[0]
-          : "N/A",
-      }));
-      setParents(parentsmapped);
-      setLoading(false)
-    };
+
     if (user?.id) {
       setLoading(true)
       fetchData();
     }
   }, [user]);
 
-  useEffect(() => {
-    console.log(parents);
-  }, [parents]);
+  async function fetchData() {
+    const result = await axios.get("/admin/users?role=parent");
+    const parentsmapped = result.data.map((p: any) => ({
+      id: p.parent_id,
+      name: `${p.first_name} ${p.last_name}`,
+      joining_date: p.created_at
+        ? moment(new Date(p.created_at)).format("YYYY-MM-DD")
+        : "N/A",
+      email: p.email,
+      number: p.phone_no,
+      location: p.location || "N/A",
+      children: p.children_count || 0,
+      card_status: p.card_status || "N/A",
+      total_spent: p.total_spent || 0,
+      last_spent: p.last_spent || 0,
+      last_transaction_date: p.last_transaction_date
+        ? moment(new Date(p.last_transaction_date)).format("YYYY-MM-DD")
+        : "N/A",
+    }));
+    setParents(parentsmapped);
+    setLoading(false)
+  };
 
   return (
     <div className="flex flex-col w-full gap-6">
@@ -62,7 +61,9 @@ export default function Page() {
             <Download /> Export
           </Button>
 
-          <CreateParent />
+          <CreateParent onRefresh={async () => {
+            await fetchData()
+          }} />
         </div>
       </Header>
 
@@ -99,10 +100,10 @@ export default function Page() {
       </div>
 
       <PageTable
-      loading={loading}
+        loading={loading}
         columns={PARENT_COLUMNS}
         data={parents || []}
-        onRowClick={() => {}}
+        onRowClick={() => { }}
       />
     </div>
   );

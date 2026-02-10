@@ -1,6 +1,6 @@
 "use client";
 import axios from "@/lib/axios";
-import { Calendar, Loader2, MapPin, Plus, Tag, Users } from "lucide-react";
+import { Calendar, DollarSign, Loader2, MapPin, Plus, Tag, Users } from "lucide-react";
 import { useEffect, useState } from "react";
 import AppCalendar from "../app-calendar";
 import { TimePicker } from "../time-picker";
@@ -28,31 +28,61 @@ import {
 } from "../ui/select";
 import { AssignCoachDialog } from "./assign-coach-dialog";
 
-export function CreateSessionDialog() {
+type SessionType = {
+  name: string,
+  description: string,
+  session_type: string,
+  coach_id: number | null,
+  coach_name?: string
+  location: string,
+  date: string,
+  start_time: string,
+  end_time: string,
+  price: number | string,
+  max_players: number | string,
+  apply_promotion: boolean,
+  promotion_price?: number | string
+  image?: string
+  end_date: string
+
+}
+
+export function CreateSessionDialog({ onRefresh }: { onRefresh: () => Promise<void> }) {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [session, setSession] = useState({
+  const [session, setSession] = useState<SessionType>({
     name: "",
     description: "",
     session_type: "",
-    coach_id: "",
+    coach_id: null,
     location: "",
     date: "",
     start_time: "",
     end_time: "",
-    price: "",
-    max_players: "",
+    price: 0,
+    max_players: 0,
     apply_promotion: false,
+    promotion_price: 0,
+    image: "",
+    end_date: ""
   });
 
 
-  const createSession = async () => {
+  const createSession = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
     setLoading(true);
+    const { coach_name, ...finalData } = session
+    console.log(finalData)
     try {
-      const result = await axios.post("/admin/sessions", session);
-      console.log("Session created:", result.data);
-    } catch (error) {
-      console.log(error);
+      await axios.post("/admin/sessions",
+        {
+          ...finalData,
+          max_players: finalData.max_players ? finalData.max_players : 0,
+          price: finalData.price ? finalData.price : 0,
+          promotion_price: finalData?.promotion_price ? finalData?.promotion_price : 0
+        });
+      await onRefresh()
+      setOpen(false)
     } finally {
       setLoading(false);
     }
@@ -87,7 +117,7 @@ export function CreateSessionDialog() {
                   <Input
                     name="sessionName"
                     placeholder="e.g., Advanced Skills Training"
-                    className="!bg-[#1A1A1A] !border-[#3A3A3A] !text-[#E5E7EB] !p-5"
+
                     required
                     value={session.name}
                     onChange={(e) =>
@@ -106,7 +136,7 @@ export function CreateSessionDialog() {
                     </Label>
                     <Input
                       name="sessionType"
-                      className="!bg-[#1A1A1A] !border-[#3A3A3A] !text-[#E5E7EB] !p-5"
+
                       required
                       value={session.session_type}
                       onChange={(e) =>
@@ -118,30 +148,31 @@ export function CreateSessionDialog() {
                     />
                   </div>
                   <div className="space-y-2">
-<Label className="text-sm text-muted-foreground">
-  Assigned Coach *
-</Label>
+                    <Label className="text-sm text-muted-foreground">
+                      Assigned Coach *
+                    </Label>
 
-<div className="flex gap-4">
-  <AssignCoachDialog
-  onSelect={(coach) =>
-    setSession((prev) => ({
-      ...prev,
-      coach_id: coach.id,
-      coach_name: `${coach.first_name} ${coach.last_name}`, 
-    }))
-  }
-/>
-{session.coach_id && (
-  <p className="mt-1 text-sm text-ghost-text">
-    Selected Coach: {session.coach_name}
-  </p>
-)}
-  </div>
-  
+                    <div className="flex gap-4">
+                      {session.coach_id && (
+                        <p className="mt-1 text-sm text-ghost-text">
+                          Selected Coach: {session.coach_name}
+                        </p>
+                      )}
+                      <AssignCoachDialog
+                        onSelect={(coach) =>
+                          setSession((prev) => ({
+                            ...prev,
+                            coach_id: coach.id,
+                            coach_name: `${coach.first_name} ${coach.last_name}`,
+                          }))
+                        }
+                      />
+
+                    </div>
 
 
-</div>
+
+                  </div>
 
                 </div>
 
@@ -150,13 +181,14 @@ export function CreateSessionDialog() {
                   <h1 className="text-[#F3F4F6]">Schedule</h1>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+
                   <div className="space-y-2">
                     <Label className="text-sm text-muted-foreground">
-                      Date *
+                      Start Date *
                     </Label>
                     <AppCalendar
-                      className="h-11"
+                      className="h-9"
                       date={session.date ? new Date(session.date) : undefined}
                       onChange={(date) =>
                         setSession((prevState) => ({
@@ -167,12 +199,34 @@ export function CreateSessionDialog() {
                       required
                     />
                   </div>
+
+                  <div className="space-y-2">
+                    <Label className="text-sm text-muted-foreground">
+                      End Date *
+                    </Label>
+                    <AppCalendar
+                      className="h-9"
+                      date={session.end_date ? new Date(session.date) : undefined}
+                      onChange={(date) =>
+                        setSession((prevState) => ({
+                          ...prevState,
+                          end_date: date,
+                        }))
+                      }
+                      required
+                    />
+                  </div>
+
+
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+
                   <div className="space-y-2">
                     <Label className="text-sm text-muted-foreground">
                       Start Time *
                     </Label>
                     <TimePicker
-                      className="h-11"
+                      className="h-9"
                       value={session.start_time}
                       onChange={(time) =>
                         setSession((prev) => ({
@@ -188,7 +242,7 @@ export function CreateSessionDialog() {
                     </Label>
 
                     <TimePicker
-                      className="h-11"
+                      className="h-9"
                       value={session.end_time}
                       onChange={(time) =>
                         setSession((prev) => ({
@@ -212,7 +266,7 @@ export function CreateSessionDialog() {
                     </Label>
                     <Input
                       name="location"
-                      className="!bg-[#1A1A1A] !border-[#3A3A3A] !text-[#E5E7EB] !p-5"
+
                       required
                       value={session.location}
                       onChange={(e) =>
@@ -230,17 +284,24 @@ export function CreateSessionDialog() {
                     <Input
                       name="price"
                       placeholder="$0.00"
-                      className="!bg-[#1A1A1A] !border-[#3A3A3A] !text-[#E5E7EB] !p-5"
                       required
                       value={session.price}
-                      onChange={(e) =>{
-                        if(!Number.isNaN(Number(e.target.value))){
+                      onChange={(e) => {
+                        if (!e.target.value) {
                           setSession((prev) => ({
                             ...prev,
                             price: e.target.value,
                           }))
+                        } else {
+                          if (!Number.isNaN(Number(e.target.value))) {
+                            setSession((prev) => ({
+                              ...prev,
+                              price: Number(e.target.value),
+                            }))
 
+                          }
                         }
+
                       }}
                     />
                   </div>
@@ -259,17 +320,24 @@ export function CreateSessionDialog() {
                     <Input
                       name="maxPlayer"
                       placeholder="e.g. 12"
-                      className="!bg-[#1A1A1A] !border-[#3A3A3A] !text-[#E5E7EB] !p-5"
                       required
                       value={session.max_players}
-                      onChange={(e) =>{
-                        if(!Number.isNaN(Number(e.target.value))){
+                      onChange={(e) => {
+                        if (!e.target.value) {
                           setSession((prev) => ({
                             ...prev,
                             max_players: e.target.value,
                           }))
+                        } else {
+                          if (!Number.isNaN(Number(e.target.value))) {
+                            setSession((prev) => ({
+                              ...prev,
+                              max_players: Number(e.target.value),
+                            }))
 
+                          }
                         }
+
                       }}
                     />
                   </div>
@@ -287,7 +355,7 @@ export function CreateSessionDialog() {
                         }))
                       }
                     >
-                      <SelectTrigger className="w-full p-6 !bg-[#1A1A1A] border-border rounded-[10px]">
+                      <SelectTrigger className="w-full dark:bg-[#1A1A1A] rounded-sm">
                         <SelectValue placeholder="Select" />
                       </SelectTrigger>
 
@@ -302,6 +370,77 @@ export function CreateSessionDialog() {
                   </div>
                 </div>
 
+                {session?.apply_promotion &&
+                  <>
+                    <div className="space-y-2">
+                      <Label className="text-sm text-muted-foreground">
+                        Image URL *
+                      </Label>
+                      <Input
+                        name="imageUrl"
+                        placeholder="https://example.com/image.jpg"
+                        required
+                        value={session?.image}
+                        onChange={(e) => {
+                          setSession((prev) => ({
+                            ...prev,
+                            image: e.target.value,
+                          }))
+                        }}
+                      />
+                    </div>
+
+                    {/* preview */}
+                    <div className="bg-[#1A1A1A] border border-border rounded-[10px] p-4 space-y-2">
+                      <h1 className="text-[#99A1AF]">Preview:</h1>
+
+                      {session.image ?
+                        <img
+                          src={session.image}
+                          className="w-full h-50 object-contain"
+                        />
+                        :
+                        <div className="w-full h-50" />
+
+                      }
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label className="text-sm text-muted-foreground">
+                          Promotion Price *
+                        </Label>
+                        <Input
+                          name="promotionPrice"
+                          placeholder="$200"
+
+                          required
+                          value={session?.promotion_price}
+                          onChange={(e) => {
+                            if (!e.target.value) {
+                              setSession((prev) => ({
+                                ...prev,
+                                promotion_price: e.target.value,
+                              }))
+                            } else {
+                              if (!Number.isNaN(Number(e.target.value))) {
+                                setSession((prev) => ({
+                                  ...prev,
+                                  promotion_price: Number(e.target.value),
+                                }))
+
+                              }
+                            }
+
+                          }}
+                        />
+                      </div>
+                    </div>
+                  </>}
+
+
+
+
                 <div className="space-y-2">
                   <Label className="text-sm text-muted-foreground">
                     Description *
@@ -309,7 +448,7 @@ export function CreateSessionDialog() {
                   <Textarea
                     name="description"
                     placeholder="Add any additional details about this session..."
-                    className="!bg-[#1A1A1A] !border-[#3A3A3A] !text-[#E5E7EB] !p-5"
+                    className="min-h-26"
                     value={session.description}
                     onChange={(e) =>
                       setSession((prev) => ({

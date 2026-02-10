@@ -12,16 +12,18 @@ import {
 import { useState } from "react";
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
-import axios from "axios";
-import { splitFullName } from "@/lib/split-fullname";
+import axios from "@/lib/axios";
+import { splitFullName } from "@/lib/functions";
+import { Spinner } from "../ui/spinner";
 
 type EditParentsProps = {
-    visible: boolean
-    onChange: (open: boolean) => void
+  visible: boolean
+  onChange: (open: boolean) => void
 }
 
-export function CreateParent() {
+export function CreateParent({ onRefresh }: { onRefresh: () => Promise<void> }) {
   const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(false)
   const [parent, setParent] = useState({
     full_name: "",
     email: "",
@@ -29,24 +31,41 @@ export function CreateParent() {
     address: "",
   });
 
-  const handleSubmit = async () => {
-    const {first_name,last_name}=splitFullName(parent.full_name)
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    setLoading(true)
+    const { first_name, last_name } = splitFullName(parent.full_name)
     try {
-      const result=await axios.post("/api/admin/parents",
+      const result = await axios.post("/user",
         {
-          first_name:first_name,
-          last_name:last_name,
-          email:parent.email,
-          phone_no:parent.phone,
-          location:parent.address,
-          role:"parent"
+          first_name: first_name,
+          last_name: last_name,
+          email: parent.email,
+          phone_no: parent.phone,
+          location: parent.address,
+          role: "parent"
         }
-        )
-      console.log("parent created",result)
+      )
+      console.log("parent created", result)
+      await onRefresh()
+      clearForm()
+      setOpen(false)
     } catch (error) {
       console.log(error)
+    } finally {
+      setLoading(false)
     }
   };
+
+  function clearForm() {
+    setParent({
+      full_name: "",
+      email: "",
+      phone: "",
+      address: "",
+    });
+
+  }
   return (
     <>
       <Button
@@ -160,7 +179,7 @@ export function CreateParent() {
                   Cancel
                 </Button>
               </DialogClose>
-              <Button type="submit">Add Parent</Button>
+              <Button type="submit" disabled={loading}>{loading && <Spinner />}Add Parent</Button>
             </DialogFooter>
           </form>
         </DialogContent>

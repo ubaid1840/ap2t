@@ -12,6 +12,7 @@ import { Loader2 } from "lucide-react";
 import { Calendar, Dot, Filter, List } from "lucide-react";
 import { ReactNode, useEffect, useState } from "react";
 import axios from "@/lib/axios";
+import { useAuth } from "@/app/contexts/auth-context";
 
 export default function Page() {
   const [filter, setFilter] = useState(false);
@@ -19,39 +20,39 @@ export default function Page() {
   const [sessions, setSessions] = useState();
 
   const [loading, setLoading] = useState(true);
+  const { user } = useAuth()
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const result = await axios.get("/admin/sessions");
-        if (result.data) {
-          const mappedSessions = result.data.map((s: any) => ({
-            id: s.id,
-            sessionName: s.name,
-            type: s.session_type,
-            date: new Date(s.date).toLocaleDateString(),
-            rawDate: s.date, 
-            time: `${s.start_time} - ${s.end_time}`,
-            coachName: `${s.coach_first_name} ${s.coach_last_name}` || "Unassigned",
-            playerName: "Multiple",
-            price: s.price,
-            payment: s.payment_statuses[0], 
-            status: s.status ? s.status.charAt(0).toUpperCase() + s.status.slice(1).toLowerCase() : 'Upcoming' 
-          }));
-          setSessions(mappedSessions);
-        }
-      } catch (error) {
-        console.error("Error fetching sessions", error);
-      } finally {
-        setLoading(false);
+    if (user?.id)
+      fetchData();
+  }, [user]);
+
+  const fetchData = async () => {
+    try {
+      const result = await axios.get("/admin/sessions");
+      if (result.data) {
+        const mappedSessions = result.data.map((s: any) => ({
+          id: s.id,
+          sessionName: s.name,
+          type: s.session_type,
+          date: new Date(s.date).toLocaleDateString(),
+          rawDate: s.date,
+          time: `${s.start_time} - ${s.end_time}`,
+          coachName: `${s.coach_first_name} ${s.coach_last_name}` || "Unassigned",
+          playerName: "Multiple",
+          price: s.price,
+          payment: s.payment_statuses[0],
+          status: s.status ? s.status.charAt(0).toUpperCase() + s.status.slice(1).toLowerCase() : 'Upcoming'
+        }));
+        setSessions(mappedSessions);
       }
-    };
-    fetchData();
-  }, []);
+    } catch (error) {
+      console.error("Error fetching sessions", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  useEffect(() => {
-    console.log(sessions);
-  }, [sessions]);
 
   return (
     <div className="flex flex-col w-full gap-4">
@@ -76,7 +77,9 @@ export default function Page() {
                 <Calendar /> Calendar
               </Button>
             </div>
-            <CreateSessionDialog />
+            <CreateSessionDialog onRefresh={async () => {
+              await fetchData()
+            }} />
           </div>
         </div>
       </Header>
@@ -122,19 +125,19 @@ export default function Page() {
 
       {loading ? (
         <div className="flex h-[50vh] w-full items-center justify-center">
-            <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
         </div>
       ) : (
         <>
-            {tab === "table" && (
-                <PageTable
-                headerClassName={"rounded-4xl"}
-                columns={SESSION_COLUMNS}
-                data={sessions || []}
-                onRowClick={() => {}}
-                />
-            )}
-            {tab === "calendar" && <SessionCalendar sessions={sessions} />}
+          {tab === "table" && (
+            <PageTable
+              headerClassName={"rounded-4xl"}
+              columns={SESSION_COLUMNS}
+              data={sessions || []}
+              onRowClick={() => { }}
+            />
+          )}
+          {tab === "calendar" && <SessionCalendar sessions={sessions} />}
         </>
       )}
     </div>

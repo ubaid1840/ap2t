@@ -2,97 +2,131 @@ import pool from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
 import admin from "@/lib/firebase-admin";
 
-export async function PUT(req : NextRequest, { params  } : {params : {uid : string}}) {
-  try {
-    const data = await req.json();
-    const { ...updates } = data;
-    const { uid } = await params
+export async function PUT(req: NextRequest) {
+    try {
+        const data = await req.json();
+        const { id, ...updates } = data;
 
-    if (!uid) {
-      return NextResponse.json({ message: "ID is required" }, { status: 400 });
-    }
+        if (!id) {
+            return NextResponse.json({ message: "ID is required" }, { status: 400 });
+        }
 
-    const fields : any[] = [];
-    const values : any[] = [];
+        const fields: any[] = [];
+        const values: any[] = [];
 
-    Object.entries(updates).forEach(([key, value], index) => {
-      if (value !== undefined) {
-        fields.push(`${key} = $${index + 1}`);
-        values.push(value);
-      }
-    });
+        Object.entries(updates).forEach(([key, value], index) => {
+            if (value !== undefined) {
+                fields.push(`${key} = $${index + 1}`);
+                values.push(value);
+            }
+        });
 
-    if (fields.length === 0) {
-      return NextResponse.json({ message: "No valid data provided for update" }, { status: 400 });
-    }
+        if (fields.length === 0) {
+            return NextResponse.json({ message: "No valid data provided for update" }, { status: 400 });
+        }
 
-    values.push(uid);
-    const query = `
+        values.push(id);
+        const query = `
           UPDATE users 
           SET ${fields.join(", ")}
           WHERE id = $${values.length}
       `;
 
-    await pool.query(query, values);
+        await pool.query(query, values);
 
-    console.log("data updated successfully");
-    return NextResponse.json({ message: "Updated successfully" }, { status: 200 });
-  } catch (error) {
-    console.error("Error updating data:", error);
-    return NextResponse.json({ message: "Internal Server Error" }, { status: 500 });
-  }
+
+        return NextResponse.json({ message: "Updated successfully" }, { status: 200 });
+    } catch (error) {
+        console.error("Error updating data:", error);
+        return NextResponse.json({ message: "Internal Server Error" }, { status: 500 });
+    }
 }
 
 export async function POST(req: NextRequest) {
-  const {password, ...data} = await req.json();
-
-  try {
-    if (!data || Object.keys(data).length === 0) {
-      return NextResponse.json(
-        { message: "No data provided for insertion" },
-        { status: 400 },
-      );
-    }
-
-    const { email } = data;
-
-    if (!email || !password) {
-      return NextResponse.json(
-        { message: "Parameters missing" },
-        { status: 400 },
-      );
-    }
     try {
-      await admin.auth().createUser({
-        email,
-        password,
-      });
-    } catch (error: any) {
-      if (error.code === "auth/email-already-exists") {
-        console.warn(
-          `Email ${email} already exists in Firebase, continuing...`,
+        const { email, password: u_pass, position, skill_level, medical_notes, career_start, bio, ...data } = await req.json();
+
+
+
+        if (!data || Object.keys(data).length === 0 || !email) {
+
+            return NextResponse.json({ message: "Required parameters missing" }, { status: 400 });
+        }
+
+        let password = "123456789"
+
+        if (u_pass) {
+            password = u_pass
+        }
+
+
+        try {
+            await admin.auth().createUser({ email, password });
+        } catch (error: any) {
+            if (error.code === "auth/email-already-exists") {
+                console.warn(`Email ${email} already exists, continuing...`);
+            } else {
+
+                throw error;
+            }
+        }
+
+
+
+        const fields = Object.keys({ ...data, email });
+        const values = Object.values({ ...data, email });
+        const placeholders = fields.map((_, i) => `$${i + 1}`).join(", ");
+
+        const userResult = await pool.query(
+            `INSERT INTO users (${fields.join(",")})
+       VALUES (${placeholders})
+       RETURNING id`,
+            values
         );
-      } else {
-        throw error;
-      }
+
+        const user = userResult.rows[0];
+        const { role } = data
+        if (role === 'parent') {
+            await pool.query(
+                `INSERT INTO parents (user_id) VALUES ($1) RETURNING *`,
+                [user.id]
+            );
+        } else if (role === 'player') {
+            await pool.query(
+                `
+            INSERT INTO players 
+            (user_id,position,medical_notes,skill_level)
+            VALUES
+            ($1,$2,$3,$4)
+            `,
+                [
+                    user.id,
+                    position,
+                    medical_notes,
+                    skill_level
+                ]
+            )
+        } else if (role === 'coach') {
+            await pool.query(
+                `
+            INSERT INTO coaches 
+            (user_id,bio,rating,career_start)
+            VALUES
+            ($1,$2,$3,$4)
+            `,
+                [user.id, bio, 5, career_start],
+            );
+        }
+
+        return NextResponse.json(
+            { message: "Data inserted" },
+            { status: 201 }
+        );
+    } catch (error: any) {
+        console.log("POST /api/parent error:", error);
+        return NextResponse.json(
+            { message: error?.message || "Server error" },
+            { status: 500 }
+        );
     }
-
-    const fields = Object.keys(data);
-    const values = Object.values(data);
-    const placeholders = fields.map((_, index) => `$${index + 1}`).join(", ");
-
-    const query = `
-          INSERT INTO users (${fields.join(", ")})
-          VALUES (${placeholders})
-          RETURNING *
-        `;
-
-    const { rows } = await pool.query(query, values);
-    const newUser = rows[0];
-
-    return NextResponse.json(newUser, { status: 200 });
-  } catch (error: any) {
-    console.error("POST /api/users error:", error);
-    return NextResponse.json(error?.message || "Server error", { status: 200 });
-  }
 }
