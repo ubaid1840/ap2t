@@ -4,18 +4,25 @@ import pool from "@/lib/db";
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const sessionId = params.id;
+  const {id:sessionId} =await params;
 
   try {
     const { rows } = await pool.query(
       `
-      SELECT *
-      FROM notes
-      WHERE session_id = $1
-      ORDER BY created_at DESC
-      `,
+  SELECT
+    n.id,
+    n.content,
+    n.important,
+    n.created_at,
+    u.first_name,
+    u.last_name
+  FROM notes n
+  JOIN users u ON u.id = n.writer_id
+  WHERE n.session_id = $1
+  ORDER BY n.created_at DESC
+  `,
       [sessionId]
     );
 
@@ -32,9 +39,9 @@ export async function GET(
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const sessionId = params.id;
+  const {id:sessionId} = await params;
 
   try {
     const { note_type, content, important, writer_id } = await req.json();

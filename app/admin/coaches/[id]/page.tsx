@@ -479,6 +479,7 @@ export default function Page() {
 }
 
 const EditProfile = () => {
+  const {id:coach_id}=useParams()
   const [open, setOpen] = useState(false);
 
   const [editCoach, setEditCoach] = useState({
@@ -494,7 +495,7 @@ const EditProfile = () => {
     e.preventDefault();
 
     try {
-      const temp_coach_id = "c2003915-6fb4-467b-b66c-fe28b5d5ef9a";
+      
 
       const names = editCoach.fullname.trim().split(" ");
       const first_name = names.shift() || "";
@@ -514,7 +515,7 @@ const EditProfile = () => {
       if (editCoach.preferedSchedule)
         body.schedule_preference = editCoach.preferedSchedule;
 
-      const res = await axios.patch(`/admin/coaches/${temp_coach_id}`, body);
+      const res = await axios.patch(`/admin/coaches/${coach_id}`, body);
 
       console.log("Coach updated successfully:", res.data);
 

@@ -52,7 +52,7 @@ export default function Page() {
             name: `${parent.first_name} ${parent.last_name}`, 
             joining_date: parent.joining_date ? new Date(parent.joining_date).toISOString().split('T')[0] : "N/A",
             email: parent.email,
-            number: parent.phone_number,
+            number: parent.phone_no,
             location: parent.location || "N/A",
             children: parent.children_count || 0,
             card_status: parent.card_status || "N/A", 

@@ -128,6 +128,13 @@ const paymentStatusMap: Record<string, CardStatusType> = {
   partial: "warning",
 };
 
+type noteType={
+  id:string;
+  name:string;
+  content:string;
+  created_at:string;
+  important:boolean;
+}
 
 
 const notesData = [
@@ -160,9 +167,7 @@ export default function Page() {
 
   const [participants, setParticipants] = useState<any[]>([]);
   const [payments, setPayments] = useState<any[]>([]);
-  const [notes,setNotes]=useState([]
-    
-  )
+  const [notes,setNotes]=useState([])
   const [paymentStats, setPaymentStats] = useState({
     total_participants: 0,
     total_revenue: 0,
@@ -170,18 +175,13 @@ export default function Page() {
     pending_amount: 0,
     partial_amount: 0
   });
-  useEffect((()=>{
-    const fetctData=async()=>{
-      const result=await axios.get("/admin/sessions/[id]/note")
-      setNotes(result.data)
-    }
-  }),[])
 
   useEffect(() => {
     if (id) {
       fetchData();
       fetchParticipants();
       fetchPaymentStats();
+      fetchNotes()
       fetchPayments();
     }
   }, [id]);
@@ -240,6 +240,27 @@ export default function Page() {
       console.error("Error fetching payments", error);
     }
   };
+const fetchNotes = async () => {
+  try {
+    const result = await axios.get(`/admin/sessions/${id}/note`)
+    const notes=result.data.notes
+    const notesMapped=notes.map((note:any)=>(
+      {name:`${note.first_name} ${note.last_name}`||"unnamed user",
+      content:note.content ||"no content",
+      created_at:note.created_at ? new Date(note.created_at).toISOString().split('T')[0] : "N/A",
+      id:note.id,
+      important:note.important||false
+      }
+    ))
+    setNotes(notesMapped|| [])
+  } catch (error) {
+    console.error("Error fetching notes", error)
+    setNotes([])
+  }
+}
+useEffect((()=>{
+  console.log(notes)
+}),[notes])
 
   const setStatus = async (status: "completed" | "comped" | "cancelled") => {
     setLoadingStatus(status)
@@ -592,10 +613,10 @@ export default function Page() {
               <h1 className="text-lg ">Internal Notes</h1>
               <AddNoteDialog />
             </div>
-            {notes.map((note, i) => {
+            {notes.map((note:noteType) => {
               return (
                 <Card
-                  key={i}
+                  key={note.id}
                   className={
                     note.important
                       ? "bg-[#F0B1000D] border border-[#F0B1004D]"
@@ -612,7 +633,7 @@ export default function Page() {
                       )}
                     </div>
                     <p className="text-sm text-muted-foreground">
-                      {note.create_at}
+                      {note.created_at}
                     </p>
                     <h1 className="text-sm text-[#D1D5DC]">{note.content}</h1>
                   </CardContent>
@@ -628,6 +649,7 @@ export default function Page() {
 
 const AddNoteDialog = () => {
   const {user}=useAuth()
+  const {id:session_id}=useParams()
   const [open, setOpen] = useState(false);
   const [loading,setLoading]=useState(false)
   const [note,setNote]=useState({
@@ -639,7 +661,7 @@ const AddNoteDialog = () => {
   const handleSubmit=async()=>{
     setLoading(true)
     try{
-      const result=await axios.post("/admin/sessions/[id]/note",{
+      const result=await axios.post(`/admin/sessions/${session_id}/note`,{
         ...note,
         writer_id:user.id
       })

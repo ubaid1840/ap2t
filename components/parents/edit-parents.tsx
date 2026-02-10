@@ -14,6 +14,7 @@ import { Label } from "@/components/ui/label"
 import { SquarePen } from "lucide-react"
 import { useState } from "react"
 import axios from "@/lib/axios"
+import { useParams } from "next/navigation"
 
 type EditParentsProps = {
     visible: boolean
@@ -21,6 +22,7 @@ type EditParentsProps = {
 }
 
 export function EditParents() {
+    const {id:parent_id}=useParams()
     const [open, setOpen] = useState(false)
 
    async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -36,9 +38,6 @@ export function EditParents() {
   };
 
   try {
-    const temp_parent_id = "77ff2fb7-7383-42f3-a9b4-53d7f797745b";
-
-    
     let first_name = "";
     let last_name = "";
 
@@ -55,7 +54,7 @@ export function EditParents() {
     if (values.phone) body.phone_no = values.phone;
     if (values.address) body.location = values.address;
     
-    const res = await axios.patch(`/admin/parents/${temp_parent_id}`, body);
+    const res = await axios.patch(`/admin/parents/${parent_id}`, body);
 
     console.log("Parent updated successfully:", res.data);
 

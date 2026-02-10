@@ -63,6 +63,7 @@ export default function MainPlayerPage({
           const mappedPlayer: any = {
             id: p.player_id,
             name: `${p.first_name} ${p.last_name}`,
+            phone:p.phone_no,
             coach_name: "Unassigned",
             age: p.birth_date
               ? new Date().getFullYear() - new Date(p.birth_date).getFullYear()
