@@ -2,7 +2,7 @@
 
 import MainPlayerPage from "@/components/players/main-player-page"
 import { useParams } from "next/navigation"
-import { useAuth } from "../contexts/auth-context"
+import { useAuth } from "../../contexts/auth-context"
 
 
 export default function Page() {

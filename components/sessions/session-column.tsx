@@ -118,23 +118,6 @@ export const SESSION_COLUMNS: ColumnDef<SessionData>[] = [
   },
 
   {
-    accessorKey: "playerName",
-    header: ({ column }) => (
-      <Button
-        variant="ghost"
-        className="text-[#99A1AF] text-[12px] tracking-wider dark:hover:bg-transparent dark:hover:text-white/50"
-        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-      >
-        PLAYER
-        <ArrowUpDown />
-      </Button>
-    ),
-    cell: ({ row }) => (
-      <span className="text-[#D1D5DC]">{row.getValue("playerName")}</span>
-    ),
-  },
-
-  {
     accessorKey: "price",
     header: ({ column }) => (
       <Button
@@ -153,27 +136,6 @@ export const SESSION_COLUMNS: ColumnDef<SessionData>[] = [
     ),
   },
 
-  {
-    accessorKey: "payment",
-    header: ({ column }) => (
-      <Button
-        variant="ghost"
-        className="text-[#99A1AF] text-[12px] tracking-wider dark:hover:bg-transparent dark:hover:text-white/50"
-        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-      >
-        PAYMENT
-        <ArrowUpDown />
-      </Button>
-    ),
-    cell: ({ row }) => (
-      <div className="w-24">
-        <CardStatus
-          value={row.getValue("payment")}
-          type={paymentStatusMap[row.original.payment]}
-        />
-      </div>
-    ),
-  },
 
   {
     accessorKey: "status",
@@ -202,7 +164,7 @@ export const SESSION_COLUMNS: ColumnDef<SessionData>[] = [
     header: () => <div className="text-[#99A1AF] text-[12px] tracking-wider dark:hover:bg-transparent dark:hover:text-white/50">ACTIONS</div>,
 
     cell: ({ row }) => (
-      <Link href={`/admin/sessions/${row.original.id}`}>
+      <Link href={`/portal/admin/sessions/${row.original.id}`}>
         <Button
           onClick={(e) => {
             e.stopPropagation();

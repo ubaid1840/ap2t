@@ -12,7 +12,9 @@ import { Loader2 } from "lucide-react";
 import { Calendar, Dot, Filter, List } from "lucide-react";
 import { ReactNode, useEffect, useState } from "react";
 import axios from "@/lib/axios";
-import { useAuth } from "@/app/contexts/auth-context";
+import { useAuth } from "@/contexts/auth-context";
+import moment from "moment";
+import { joinNames } from "@/lib/functions";
 
 export default function Page() {
   const [filter, setFilter] = useState(false);
@@ -31,17 +33,15 @@ export default function Page() {
     try {
       const result = await axios.get("/admin/sessions");
       if (result.data) {
+        console.log(result.data)
         const mappedSessions = result.data.map((s: any) => ({
           id: s.id,
           sessionName: s.name,
           type: s.session_type,
-          date: new Date(s.date).toLocaleDateString(),
-          rawDate: s.date,
+          date: moment(new Date(s.date)).format("YYYY-MM-DD"),
           time: `${s.start_time} - ${s.end_time}`,
-          coachName: `${s.coach_first_name} ${s.coach_last_name}` || "Unassigned",
-          playerName: "Multiple",
+          coachName: joinNames([s.coach_first_name, s.coach_last_name]),
           price: s.price,
-          payment: s.payment_statuses[0],
           status: s.status ? s.status.charAt(0).toUpperCase() + s.status.slice(1).toLowerCase() : 'Upcoming'
         }));
         setSessions(mappedSessions);
@@ -123,14 +123,11 @@ export default function Page() {
         )}
       </div>
 
-      {loading ? (
-        <div className="flex h-[50vh] w-full items-center justify-center">
-          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-        </div>
-      ) : (
-        <>
+     
+        
           {tab === "table" && (
             <PageTable
+            loading={loading}
               headerClassName={"rounded-4xl"}
               columns={SESSION_COLUMNS}
               data={sessions || []}
@@ -138,8 +135,8 @@ export default function Page() {
             />
           )}
           {tab === "calendar" && <SessionCalendar sessions={sessions} />}
-        </>
-      )}
+        
+   
     </div>
   );
 }

@@ -1,5 +1,5 @@
 "use client";
-import { useAuth } from "@/app/contexts/auth-context";
+import { useAuth } from "@/contexts/auth-context";
 import BackButton from "@/components/back-button";
 import CardStatus from "@/components/card-status";
 import { AddParticipantDialog } from "@/components/sessions/add-participant-dialog";
@@ -54,63 +54,9 @@ import {
 } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
-
-const localData = [
-  {
-    h: "8/12",
-    p: "Participants",
-    icon: <Users />,
-    type: "info",
-  },
-  {
-    h: "$680",
-    p: "Total Revenue",
-    icon: <DollarSign />,
-    type: "success",
-  },
-  {
-    h: "$170",
-    p: "Paid",
-    icon: <CheckCircle />,
-    type: "active",
-  },
-  {
-    h: "$85",
-    p: "Pending",
-    icon: <CircleAlert />,
-    type: "warning",
-  },
-];
-
-const ParticipantsData = [
-  {
-    name: "Emma Johnson",
-    status: "Paid",
-    statusType: "active",
-    parent: "Sarah Johnson",
-    email: "sarah.j@email.com",
-    phone: "(555) 123-4567",
-    amount: "$85",
-  },
-  {
-    name: "Emma Johnson",
-    status: "Paid",
-    statusType: "active",
-    parent: "Sarah Johnson",
-    email: "sarah.j@email.com",
-    phone: "(555) 123-4567",
-    amount: "$85",
-  },
-  {
-    name: "Emma Johnson",
-    status: "Pending",
-    statusType: "active",
-    parent: "Sarah Johnson",
-    email: "sarah.j@email.com",
-    phone: "(555) 123-4567",
-    amount: "$85",
-  },
-];
+import { joinNames } from "@/lib/functions";
+import moment from "moment";
+import { Spinner } from "@/components/ui/spinner";
 
 type CardStatusType =
   | "success"
@@ -128,34 +74,15 @@ const paymentStatusMap: Record<string, CardStatusType> = {
   partial: "warning",
 };
 
-type noteType={
-  id:string;
-  name:string;
-  content:string;
-  created_at:string;
-  important:boolean;
+type noteType = {
+  id: string;
+  name: string;
+  content: string;
+  created_at: string;
+  important: boolean;
 }
 
-
-const notesData = [
-  {
-    importent: false,
-    name: "Admin User",
-    datetime: "2025-12-14 at 2:30 PM",
-    message:
-      "Court A has been confirmed and is ready for the session. Equipment has been checked.",
-  },
-  {
-    important: true,
-    name: "Coach Martinez",
-    datetime: "2025-12-13 at 4:15 PM",
-    message:
-      "Planning to focus on advanced ball handling drills. We need cones and agility ladder.",
-  },
-];
-
-export default function Page() {
-  const { id } = useParams();
+export default function SessionMainPage({id, back, back_title, type} : {id : number, back : string, back_title : string, type : string}) {
   const [data, setData] = useState<SessionDataType>();
   const [rawSessionData, setRawSessionData] = useState<any>(null);
   const [tab, setTab] = useState("Participants");
@@ -167,20 +94,17 @@ export default function Page() {
 
   const [participants, setParticipants] = useState<any[]>([]);
   const [payments, setPayments] = useState<any[]>([]);
-  const [notes,setNotes]=useState([])
+  const [notes, setNotes] = useState([])
   const [paymentStats, setPaymentStats] = useState({
-    total_participants: 0,
     total_revenue: 0,
     paid_amount: 0,
     pending_amount: 0,
-    partial_amount: 0
   });
 
   useEffect(() => {
     if (id) {
       fetchData();
       fetchParticipants();
-      fetchPaymentStats();
       fetchNotes()
       fetchPayments();
     }
@@ -191,24 +115,23 @@ export default function Page() {
       setLoading(true);
 
       const result = await axios.get(`/admin/sessions/${id}`);
-      
+
       if (result.data) {
-         const d = result.data;
-         setRawSessionData(d);
-         setData({
-            id: d.id,
-            sessionName: d.name,
-            date: new Date(d.date).toLocaleDateString(),
-            time: `${d.start_time} - ${d.end_time}`,
-            coachName: `${d.coach_first_name} ${d.coach_last_name}` || "Unassigned",
-            status: d.status,
-            price: d.price,
-            max_players: d.max_players,
-            location: d.location
-         } as any);
+        const d = result.data;
+        setRawSessionData(d);
+        setData({
+          id: d.id,
+          sessionName: d.name,
+          date: moment(new Date(d.date)).format("YYYY-MM-DD"),
+          time: `${d.start_time} - ${d.end_time}`,
+          coachName: joinNames([d.coach_first_name, d.coach_last_name]),
+          status: d.status,
+          price: d.price,
+          promotion_price : d.promotion_price,
+          max_players: d.max_players,
+          location: d.location
+        } as any);
       }
-    } catch (error) {
-      console.log(error);
     } finally {
       setLoading(false);
     }
@@ -223,15 +146,6 @@ export default function Page() {
     }
   };
 
-  const fetchPaymentStats = async () => {
-    try {
-      const response = await axios.get(`/admin/sessions/${id}/payment`);
-      setPaymentStats(response.data);
-    } catch (error) {
-      console.error("Error fetching payment stats", error);
-    }
-  };
-
   const fetchPayments = async () => {
     try {
       const response = await axios.get(`/admin/sessions/${id}/payments`);
@@ -240,27 +154,66 @@ export default function Page() {
       console.error("Error fetching payments", error);
     }
   };
-const fetchNotes = async () => {
-  try {
-    const result = await axios.get(`/admin/sessions/${id}/note`)
-    const notes=result.data.notes
-    const notesMapped=notes.map((note:any)=>(
-      {name:`${note.first_name} ${note.last_name}`||"unnamed user",
-      content:note.content ||"no content",
-      created_at:note.created_at ? new Date(note.created_at).toISOString().split('T')[0] : "N/A",
-      id:note.id,
-      important:note.important||false
-      }
-    ))
-    setNotes(notesMapped|| [])
-  } catch (error) {
-    console.error("Error fetching notes", error)
-    setNotes([])
+  const fetchNotes = async () => {
+    try {
+      const result = await axios.get(`/admin/sessions/${id}/note`)
+      
+      const notesMapped = result.data?.map((note: any) => (
+        {
+          name:joinNames([note.writer_first_name, note.writer_last_name]),
+          content: note.note || "no content",
+          created_at: moment(new Date(note.created_at)).format("YYYY-MM-DD"),
+          id: note.id,
+          important: note.important || false
+        }
+      ))
+      setNotes(notesMapped || [])
+    } catch (error) {
+      console.error("Error fetching notes", error)
+      setNotes([])
+    }
   }
-}
-useEffect((()=>{
-  console.log(notes)
-}),[notes])
+
+  useEffect(() => {
+    const res = calculatePaymentStats(participants, payments, type === "session" ? Number(data?.price || 0): Number(data?.promotion_price || 0))
+    setPaymentStats({ paid_amount: res.totalPaid, pending_amount: res.totalPending, total_revenue: res.totalAmount })
+  }, [participants, payments, data])
+
+  function calculatePaymentStats(
+    participants: any[],
+    payments: any[],
+    price: number = 0
+  ) {
+    let totalAmount = 0;
+    let totalPaid = 0;
+    let totalPending = 0;
+
+    const paymentMap = new Map();
+    payments.forEach(p => paymentMap.set(p.user_id, p));
+
+    participants.forEach(participant => {
+      const payment = paymentMap.get(participant.player_id);
+
+      totalAmount += Number(price || 0);
+
+      if (payment) {
+        if (payment.status === "paid") {
+          totalPaid += Number(price || 0);
+        } else {
+          totalPending += Number(price || 0);
+        }
+      } else {
+
+        totalPending += Number(price || 0);
+      }
+    });
+
+    return {
+      totalAmount,
+      totalPaid,
+      totalPending
+    };
+  }
 
   const setStatus = async (status: "completed" | "comped" | "cancelled") => {
     setLoadingStatus(status)
@@ -278,42 +231,34 @@ useEffect((()=>{
 
   const stats = [
     {
-        h: `${participants.length}/${data?.max_players || '-'}`,
-        p: "Participants",
-        icon: <Users />,
-        type: "info",
+      h: `${participants.length}/${data?.max_players || '-'}`,
+      p: "Participants",
+      icon: <Users />,
+      type: "info",
     },
     {
-        h: `$${paymentStats.total_revenue.toFixed(2)}`,
-        p: "Total Revenue",
-        icon: <DollarSign />,
-        type: "success",
+      h: `$${paymentStats.total_revenue.toFixed(2)}`,
+      p: "Total Revenue",
+      icon: <DollarSign />,
+      type: "success",
     },
     {
-        h: `$${paymentStats.paid_amount.toFixed(2)}`, 
-        p: "Paid",
-        icon: <CheckCircle />,
-        type: "active",
+      h: `$${paymentStats.paid_amount.toFixed(2)}`,
+      p: "Paid",
+      icon: <CheckCircle />,
+      type: "active",
     },
     {
-        h: `$${paymentStats.pending_amount.toFixed(2)}`,
-        p: "Pending",
-        icon: <CircleAlert />,
-        type: "warning",
+      h: `$${paymentStats.pending_amount.toFixed(2)}`,
+      p: "Pending",
+      icon: <CircleAlert />,
+      type: "warning",
     },
   ];
 
-  if (loading && !data) {
-    return (
-      <div className="flex h-[50vh] w-full items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-      </div>
-    );
-  }
-
   return (
     <div className="flex flex-col w-full gap-6">
-      <BackButton title="Back To Sessions" route="/admin/sessions" />
+      <BackButton title={back_title} route={back} />
 
       <Card className="w-full rounded-2xl bg-[#252525]">
         <CardContent className="p-0 space-y-2">
@@ -330,8 +275,8 @@ useEffect((()=>{
                   </div>
                 </Badge>
               </div>
-              <EditSessionDialog 
-                sessionId={id as string} 
+              <EditSessionDialog
+                sessionId={id}
                 sessionData={rawSessionData}
                 onSuccess={fetchData}
               />
@@ -371,7 +316,7 @@ useEffect((()=>{
                 <div className=" ">
                   <p className="text-xs text-ghost-text">Location</p>
                   <h1 className="text-[#E5E7EB] text-sm">
-                    {data?.location || "Main Facility"}
+                    {data?.location}
                   </h1>
                 </div>
               </div>
@@ -407,10 +352,10 @@ useEffect((()=>{
               onClick={() => {
                 setStatus("completed")
               }
-                
-            }
+
+              }
             >
-              {loading && loadingStatus==="completed" ? (
+              {loading && loadingStatus === "completed" ? (
                 <>
                   <Loader2 className="h-4 w-4 animate-spin" />
                   Marking...
@@ -426,11 +371,11 @@ useEffect((()=>{
               variant={"outline"}
               className="dark:bg-warning-bg flex gap-2 text-warning-text border dark:border-warning-text/32"
               onClick={() => {
-               
+
                 setStatus("comped")
               }}
             >
-              {loading&&loadingStatus==="comped" ? (
+              {loading && loadingStatus === "comped" ? (
                 <>
                   <Loader2 className="h-4 w-4 animate-spin" />
                   Marking...
@@ -446,12 +391,12 @@ useEffect((()=>{
               variant={"outline"}
               className="dark:bg-danger-bg flex gap-2 text-danger-text border dark:border-danger-text/32"
               onClick={() => {
-                
+
                 setStatus("cancelled")
 
               }}
             >
-              {loading &&loadingStatus==="cancelled" ? (
+              {loading && loadingStatus === "cancelled" ? (
                 <>
                   <Loader2 className="h-4 w-4 animate-spin" />
                   Marking...
@@ -459,7 +404,7 @@ useEffect((()=>{
               ) : (
                 <>
                   <Check className="h-4 w-4" />
-                  Mark as cancelled
+                  Mark as Cancelled
                 </>
               )}
             </Button>
@@ -491,12 +436,12 @@ useEffect((()=>{
                   )}
                   {t === "Payments" && (
                     <div className="flex gap-2 items-center py-2">
-                      <DollarSign /> Payments {"(3)"}
+                      <DollarSign /> Payments {`(${payments.length})`}
                     </div>
                   )}
                   {t === "Notes" && (
                     <div className="flex gap-2 items-center py-2">
-                      <MessageSquare /> Notes {"(3)"}
+                      <MessageSquare /> Notes {`(${notes.length})`}
                     </div>
                   )}
                 </TabsTrigger>
@@ -507,59 +452,45 @@ useEffect((()=>{
           <Separator />
 
           <TabsContent value="Participants" className="space-y-4 p-4">
-            <AddParticipantDialog sessionId={id as string} onSuccess={fetchParticipants} />
+            <AddParticipantDialog sessionId={Number(id)} onSuccess={fetchParticipants} />
             {participants.map((participent: any, i) => (
               <Card key={i} className="bg-[#1A1A1A] border border-border">
                 <CardContent className="space-y-2">
                   <div className="flex gap-2 items-center">
                     <h1>{participent.first_name} {participent.last_name}</h1>
                     <CardStatus
-                      value={"Pending"}
-                      type={"warning"} 
+                      value={participent?.status?.charAt(0)?.toUpperCase() + participent?.status?.slice(1)}
+                      type={participent?.status_type}
                     />
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                    <div className="flex gap-2">
+                    <div className="flex gap-2 items-center">
                       <User className="w-4 h-4 text-ghost-text" />{" "}
                       <div className="flex text-sm text-ghost-text">
-                        <p>Position: </p> <p>{participent.position}</p>
+                        <p>Position: {participent.position}</p>
                       </div>
                     </div>
-                    <div className="flex gap-2">
+                    <div className="flex gap-2 items-center">
                       <Mail className="w-4 h-4 text-ghost-text" />{" "}
                       <p className="flex text-sm text-ghost-text">
                         {participent.email}
                       </p>
                     </div>
-                    <div className="flex gap-2">
+                    <div className="flex gap-2 items-center">
                       <Phone className="w-4 h-4 text-ghost-text" />{" "}
                       <p className="flex text-sm text-ghost-text">
                         {participent.phone_no}
                       </p>
                     </div>
-                    {/*
-                    <div className="flex gap-2">
-                      <DollarSign className="w-4 h-4 text-ghost-text" />{" "}
-                      <div className="flex text-sm text-ghost-text">
-                        {" "}
-                        <p>Amount:</p> <p>{participent.amount}</p>
-                      </div>
-                    </div>
-                    */}
+
                   </div>
 
                   <Separator />
-                  <div className="flex gap-4 flex-wrap">
-                    <Button className="dark:bg-active-bg text-active-text border dark:border-active-text/32">
-                      <CheckCircle />
-                      Mark Present
-                    </Button>
-                    <Button className="dark:bg-danger-bg text-danger-text border dark:border-danger-text/32">
-                      <CircleX />
-                      Mark Absent
-                    </Button>
-                  </div>
+                  {participent?.status === "pending" && <AttendanceMarking player_id={participent.player_id} session_id={Number(id)} onRefresh={async () => {
+                    await fetchParticipants()
+                  }} />
+                  }
                 </CardContent>
               </Card>
             ))}
@@ -611,9 +542,11 @@ useEffect((()=>{
           <TabsContent value="Notes" className="space-y-4 p-4">
             <div className="flex justify-between items-center">
               <h1 className="text-lg ">Internal Notes</h1>
-              <AddNoteDialog />
+              <AddNoteDialog session_id={Number(id)} onRefresh={async () => {
+                await fetchNotes()
+              }} />
             </div>
-            {notes.map((note:noteType) => {
+            {notes.map((note: noteType) => {
               return (
                 <Card
                   key={note.id}
@@ -647,28 +580,71 @@ useEffect((()=>{
   );
 }
 
-const AddNoteDialog = () => {
-  const {user}=useAuth()
-  const {id:session_id}=useParams()
+const AttendanceMarking = ({ player_id, onRefresh, session_id }: { player_id: number, session_id: number, onRefresh: () => Promise<void> }) => {
+
+  const [loading, setLoaidng] = useState(false)
+
+  async function markAttendance(status: string) {
+    if (!player_id || !session_id) return
+
+    setLoaidng(true)
+    try {
+
+      await axios.post(`/admin/sessions/${session_id}/attendance`, { status, session_id, user_id: player_id })
+      await onRefresh()
+
+    } finally {
+      setLoaidng(false)
+    }
+
+  }
+
+  return (
+    loading ? <Spinner /> :
+      <div className="flex gap-4 flex-wrap">
+
+        <Button className="dark:bg-active-bg text-active-text border dark:border-active-text/32" onClick={() => {
+          markAttendance("present")
+        }}>
+          <CheckCircle />
+          Mark Present
+        </Button>
+        <Button className="dark:bg-danger-bg text-danger-text border dark:border-danger-text/32"
+          onClick={() => {
+            markAttendance("absent")
+          }}>
+          <CircleX />
+          Mark Absent
+        </Button>
+      </div>
+  )
+}
+
+const AddNoteDialog = ({ session_id, onRefresh }: { session_id: number, onRefresh: () => Promise<void> }) => {
+  const { user } = useAuth()
   const [open, setOpen] = useState(false);
-  const [loading,setLoading]=useState(false)
-  const [note,setNote]=useState({
-    note_type:"",
-    content:"",
-    important:false,
+  const [loading, setLoading] = useState(false)
+  const [data, setData] = useState({
+    note_type: "",
+    note: "",
+    important: false,
   })
 
-  const handleSubmit=async()=>{
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    if (!user?.id) return
     setLoading(true)
-    try{
-      const result=await axios.post(`/admin/sessions/${session_id}/note`,{
-        ...note,
-        writer_id:user.id
+    try {
+      await axios.post(`/admin/sessions/${session_id}/note`, {
+        ...data,
+        user_id: user.id,
+        session_id
       })
-      console.log(result.data)
-    }finally{
-      setLoading(false)
+      await onRefresh()
       setOpen(false)
+    } finally {
+      setLoading(false)
+
     }
   }
 
@@ -685,54 +661,59 @@ const AddNoteDialog = () => {
               Add Internal Note
             </DialogTitle>
           </DialogHeader>
-          <div className="space-y-4 p-4">
-            <div className="space-y-2">
-              <Label className="text-[#99A1AF] text-sm">Note Type</Label>
-
-              <Select
-              value={note.note_type}
-                onValueChange={(value) => setNote({ ...note, note_type: value })}
-              >
-                <SelectTrigger className="w-full p-6 !bg-[#1A1A1A] border-border rounded-[10px]">
-                  <SelectValue placeholder="Private" />
-                </SelectTrigger>
-                <SelectContent className="!bg-[#1A1A1A]">
-                  <SelectGroup>
-                    <SelectLabel>Select a type</SelectLabel>
-                    <SelectItem value="Reminder">Reminder</SelectItem>
-                    <SelectItem value="Task">Task</SelectItem>
-                    <SelectItem value="Idea">Idea</SelectItem>
-                    <SelectItem value="Sugestion">Sugestion</SelectItem>
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <Label className="text-[#99A1AF] text-sm">Note Content</Label>
-              <Textarea
-                placeholder="Enter your note here..."
-                className="!bg-[#1A1A1A] border border-border rounded-[10px] text-ghost-text min-h-36"
-                 value={note.content}
-                onChange={(e) => setNote({ ...note, content: e.target.value })}
-              ></Textarea>
-            </div>
-          </div>
-          <Checkbox
-                  required
+          <form onSubmit={handleSubmit}>
+            <div className="space-y-4 p-4">
+              <div className="flex gap-2 items-center">
+                <Checkbox
                   className="data-[state=checked]:border-white data-[state=checked]:bg-primary data-[state=checked]:text-black dark:data-[state=checked]:border-white dark:data-[state=checked]:bg-primary"
-                  checked={note.important}
+                  checked={data.important}
                   onCheckedChange={(checked) => {
-                    setNote({ ...note, important: checked === true })
+                    setData({ ...data, important: checked === true })
                   }}
                 />
-          <div className="border-t border-border flex items-center justify-end p-4">
-            <div className="flex gap-4">
-              <DialogClose className="text-[13px] font-medium leading-none h-10 px-4 py-2 bg-black text-white border-border rounded-md hover:opacity-70 cursor-pointer flex flex-1 items-center justify-center">
-                Cancel
-              </DialogClose>
-              <Button size={"lg"} onClick={handleSubmit }> {loading&& <Loader2 className="h-4 w-4 animate-spin" />}  Add Note</Button>
+                <Label className="text-[#99A1AF] text-sm">Important</Label>
+              </div>
+              <div className="space-y-2">
+                <Label className="text-[#99A1AF] text-sm">Type</Label>
+
+                <Select
+                  value={data.note_type}
+                  onValueChange={(value) => setData({ ...data, note_type: value })}
+                >
+                  <SelectTrigger className="w-full !bg-[#1A1A1A] border-border rounded-[10px]">
+                    <SelectValue placeholder="note type..." />
+                  </SelectTrigger>
+                  <SelectContent className="!bg-[#1A1A1A]">
+                    <SelectGroup>
+                      <SelectLabel>Select a type</SelectLabel>
+                      <SelectItem value="Reminder">Reminder</SelectItem>
+                      <SelectItem value="Task">Task</SelectItem>
+                      <SelectItem value="Idea">Idea</SelectItem>
+                      <SelectItem value="Sugestion">Sugestion</SelectItem>
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label className="text-[#99A1AF] text-sm">Note</Label>
+                <Textarea
+                  placeholder="Enter your note here..."
+                  className="min-h-36"
+                  value={data.note}
+                  onChange={(e) => setData({ ...data, note: e.target.value })}
+                ></Textarea>
+              </div>
             </div>
-          </div>
+
+            <div className="border-t border-border flex items-center justify-end p-4">
+              <div className="flex gap-4">
+                <DialogClose className="text-[13px] font-medium leading-none h-8 px-4 bg-black text-white border-border rounded-md hover:opacity-70 cursor-pointer flex flex-1 items-center justify-center">
+                  Cancel
+                </DialogClose>
+                <Button type="submit" disabled={loading}> {loading && <Spinner className="text-black" />}  Add Note</Button>
+              </div>
+            </div>
+          </form>
         </DialogContent>
       </Dialog>
     </>

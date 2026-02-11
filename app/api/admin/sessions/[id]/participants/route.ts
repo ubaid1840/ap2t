@@ -10,27 +10,27 @@ export async function POST(
     const { player_id } = await req.json();
 
     if (!player_id) {
-        return NextResponse.json(
-            { message: "Player ID is required" },
-            { status: 400 }
-        );
+      return NextResponse.json(
+        { message: "Player ID is required" },
+        { status: 400 }
+      );
     }
-    
+
     const check = await pool.query(
-      `SELECT * FROM session_players WHERE session_id = $1 AND player_id = $2`,
+      `SELECT * FROM session_players WHERE session_id = $1 AND user_id = $2`,
       [session_id, player_id]
     );
 
     if (check.rows.length > 0) {
-        return NextResponse.json(
-            { message: "Player already in session" },
-            { status: 409 }
-        );
+      return NextResponse.json(
+        { message: "Player already in session" },
+        { status: 409 }
+      );
     }
 
     const result = await pool.query(
       `INSERT INTO session_players
-      (session_id, player_id)
+      (session_id, user_id)
       VALUES
       ($1, $2)
       RETURNING *;`,
@@ -57,22 +57,39 @@ export async function GET(
   const { id: session_id } = await params;
   try {
     const result = await pool.query(
-      `
-      SELECT
-        sp.joined_at,
-        p.id AS player_id,
-        u.first_name,
-        u.last_name,
-        u.email,
-        u.phone_no,
-        p.position
-      FROM session_players sp
-      INNER JOIN players p ON p.id = sp.player_id
-      INNER JOIN users u ON u.id = p.user_id
-        WHERE sp.session_id = $1
-      `,
-      [session_id]
-    );
+  `
+  SELECT
+    sp.created_at,
+    p.user_id AS player_id,
+    u.first_name,
+    u.last_name,
+    u.email,
+    u.phone_no,
+    p.position,
+
+    COALESCE(a.status, 'pending') AS status,
+
+    CASE
+      WHEN COALESCE(a.status, 'pending') = 'present' THEN 'success'
+      WHEN COALESCE(a.status, 'pending') = 'absent' THEN 'danger'
+      ELSE 'warning'
+    END AS status_type
+
+  FROM session_players sp
+  INNER JOIN players p ON p.user_id = sp.user_id
+  INNER JOIN users u ON u.id = p.user_id
+
+  LEFT JOIN attendance a 
+    ON a.session_id = sp.session_id 
+    AND a.user_id = sp.user_id
+    AND DATE(a.created_at) = CURRENT_DATE   -- 👈 Only today's attendance
+
+  WHERE sp.session_id = $1
+  `,
+  [session_id]
+);
+
+
 
     return NextResponse.json(result.rows);
   } catch (error) {

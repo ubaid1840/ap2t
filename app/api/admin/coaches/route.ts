@@ -1,6 +1,6 @@
 import pool from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
-import { useAuth } from "@/app/contexts/auth-context";
+import { useAuth } from "@/contexts/auth-context";
 import admin from "@/lib/firebase-admin";
 export async function POST(req: NextRequest, res: NextResponse) {
   try {

@@ -12,6 +12,7 @@ import {
   SquarePen,
   Tag,
   Trash,
+  Trash2,
   Users,
 } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -34,6 +35,11 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import AppCalendar from "../app-calendar";
 import { TimePicker } from "../time-picker";
+import { SessionType } from "./create-session-dialog";
+import { Separator } from "../ui/separator";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "../ui/select";
+import { Spinner } from "../ui/spinner";
+import ConfirmationDialog from "../alert-dialog";
 
 const styles = {
   active:
@@ -45,8 +51,8 @@ const styles = {
 };
 
 interface EditSessionDialogProps {
-  sessionId?: string;
-  sessionData?: any;
+  sessionId?: number;
+  sessionData?: SessionType & { coach_first_name?: string, coach_last_name?: string };
   onSuccess?: () => void;
 }
 
@@ -58,77 +64,61 @@ export function EditSessionDialog({
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(false);
+  const [selectedSession, setSelectedSession] = useState<null | number>(null)
   const router = useRouter();
 
-  const [session, setSession] = useState({
-    sessionName: "",
-    sessionType: "",
-    asignedCoach: "",
-    coach_id: "",
-    date: "",
-    startTime: "",
-    endTime: "",
-    location: "",
-    price: "",
-    maxPlayer: "",
-    applyPromotion: "",
+  const [session, setSession] = useState<SessionType>({
+    name: "",
     description: "",
+    session_type: "",
+    coach_id: null,
+    location: "",
+    date: "",
+    start_time: "",
+    end_time: "",
+    price: 0,
+    max_players: 0,
+    apply_promotion: false,
+    promotion_price: 0,
+    image: "",
+    end_date: "",
+    coach_name: ""
   });
 
   useEffect(() => {
     if (open && sessionData) {
       setSession({
-        sessionName: sessionData.name || "",
-        sessionType: sessionData.session_type || "",
-        asignedCoach:
-          sessionData.coach_first_name && sessionData.coach_last_name
-            ? `${sessionData.coach_first_name} ${sessionData.coach_last_name}`
-            : "",
-        coach_id: sessionData.coach_id || "",
-        date: sessionData.date
-          ? new Date(sessionData.date).toISOString().split("T")[0]
-          : "",
-        startTime: sessionData.start_time || "",
-        endTime: sessionData.end_time || "",
-        location: sessionData.location || "",
-        price: sessionData.price || "",
-        maxPlayer: sessionData.max_players || "",
-        applyPromotion: sessionData.apply_promotion || "",
-        description: sessionData.description || "",
+        name: sessionData.name,
+        description: sessionData.description,
+        session_type: sessionData.session_type,
+        coach_id: sessionData.coach_id,
+        location: sessionData.location,
+        date: sessionData.date,
+        start_time: sessionData.start_time,
+        end_time: sessionData.end_time,
+        price: Number(sessionData.price),
+        max_players: sessionData.max_players,
+        apply_promotion: sessionData.apply_promotion,
+        promotion_price: Number(sessionData.promotion_price),
+        image: sessionData.image,
+        end_date: sessionData.end_date,
+        coach_name: `${sessionData?.coach_first_name} ${sessionData?.coach_last_name}`
       });
     }
   }, [open, sessionData]);
 
   const editSession = async (e: React.FormEvent) => {
     e.preventDefault();
-
     if (!sessionId) {
       toast.error("Session ID is required");
       return;
     }
-
     setLoading(true);
-
+     const {coach_name, ...finalData} = session
     try {
-      const updateData: any = {};
-
-      if (session.sessionName) updateData.name = session.sessionName;
-      if (session.sessionType) updateData.session_type = session.sessionType;
-      if (session.coach_id) updateData.coach_id = session.coach_id;
-      if (session.date) updateData.date = session.date;
-      if (session.startTime) updateData.start_time = session.startTime;
-      if (session.endTime) updateData.end_time = session.endTime;
-      if (session.location) updateData.location = session.location;
-      if (session.price) updateData.price = parseFloat(session.price);
-      if (session.maxPlayer)
-        updateData.max_players = parseInt(session.maxPlayer);
-      if (session.applyPromotion)
-        updateData.apply_promotion = session.applyPromotion;
-      if (session.description) updateData.description = session.description;
-
-      const result = await axios.patch(
-        `/admin/sessions/${sessionId}`,
-        updateData,
+      await axios.put(
+        `/admin/sessions`,
+        { ...finalData, id: sessionId },
       );
 
       toast.success("Session updated successfully");
@@ -137,9 +127,6 @@ export function EditSessionDialog({
       if (onSuccess) {
         onSuccess();
       }
-    } catch (error: any) {
-      console.error("Error updating session:", error);
-      toast.error(error.response?.data?.message || "Failed to update session");
     } finally {
       setLoading(false);
     }
@@ -151,25 +138,15 @@ export function EditSessionDialog({
       return;
     }
 
-    if (
-      !confirm(
-        "Are you sure you want to delete this session? This action cannot be undone.",
-      )
-    ) {
-      return;
-    }
-
-    setDeleteLoading(true);
+    setDeleteLoading(true)
 
     try {
       await axios.delete(`/admin/sessions/${sessionId}`);
-
       toast.success("Session deleted successfully");
+      setDeleteLoading(false)
+      setSelectedSession(null)
       setOpen(false);
-      router.push("/admin/sessions");
-    } catch (error: any) {
-      console.error("Error deleting session:", error);
-      toast.error(error.response?.data?.message || "Failed to delete session");
+      router.push("/portal/admin/sessions");
     } finally {
       setDeleteLoading(false);
     }
@@ -190,24 +167,27 @@ export function EditSessionDialog({
               Update session details • Only fill fields you want to change
             </p>
           </DialogHeader>
-          <form onSubmit={editSession} className="">
-            <ScrollArea className="h-[70dvh] py-2 space-y-4 px-2">
-              <div className="space-y-4 px-2">
+          <form onSubmit={editSession}>
+            <ScrollArea className=" py-1 space-y-4 px-2 h-[70vh]">
+              <div className="space-y-2 px-2 pb-2">
                 <div className="flex gap-2 text-md ">
                   <Tag className="text-primary w-4 w-4" />
                   <h1 className="text-[#F3F4F6]">Basic Information</h1>
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-sm text-[#99A1AF]">Session Name</Label>
+                  <Label className="text-sm text-muted-foreground">
+                    Session Name *
+                  </Label>
                   <Input
                     name="sessionName"
                     placeholder="e.g., Advanced Skills Training"
-                    className="!bg-[#1A1A1A] !border-[#3A3A3A] !text-[#E5E7EB] !p-5"
-                    value={session.sessionName}
+
+                    required
+                    value={session.name}
                     onChange={(e) =>
                       setSession((prev) => ({
                         ...prev,
-                        sessionName: e.target.value,
+                        name: e.target.value,
                       }))
                     }
                   />
@@ -215,40 +195,49 @@ export function EditSessionDialog({
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   <div className="space-y-2">
-                    <Label className="text-sm text-[#99A1AF]">
-                      Session Type
+                    <Label className="text-sm text-muted-foreground">
+                      Session Type *
                     </Label>
                     <Input
                       name="sessionType"
-                      className="!bg-[#1A1A1A] !border-[#3A3A3A] !text-[#E5E7EB] !p-5"
-                      value={session.sessionType}
+
+                      required
+                      value={session.session_type}
                       onChange={(e) =>
                         setSession((prev) => ({
                           ...prev,
-                          sessionType: e.target.value,
+                          session_type: e.target.value,
                         }))
                       }
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-sm text-[#99A1AF]">
-                      Assigned Coach
+                    <Label className="text-sm text-muted-foreground">
+                      Assigned Coach *
                     </Label>
-                    <AssignCoachDialog
-                      onSelect={(coach) =>
-                        setSession((prev) => ({
-                          ...prev,
-                          coach_id: coach.id,
-                          asignedCoach: `${coach.first_name} ${coach.last_name}`,
-                        }))
-                      }
-                    />
-                    {session.coach_id && (
-                      <p className="mt-1 text-sm text-ghost-text">
-                        Selected Coach: {session.asignedCoach}
-                      </p>
-                    )}
+
+                    <div className="flex gap-4">
+                      {session.coach_id && (
+                        <p className="mt-1 text-sm text-ghost-text">
+                          Selected Coach: {session.coach_name}
+                        </p>
+                      )}
+                      <AssignCoachDialog
+                        onSelect={(coach) =>
+                          setSession((prev) => ({
+                            ...prev,
+                            coach_id: coach.id,
+                            coach_name: `${coach.first_name} ${coach.last_name}`,
+                          }))
+                        }
+                      />
+
+                    </div>
+
+
+
                   </div>
+
                 </div>
 
                 <div className="flex gap-2 text-md ">
@@ -256,11 +245,14 @@ export function EditSessionDialog({
                   <h1 className="text-[#F3F4F6]">Schedule</h1>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+
                   <div className="space-y-2">
-                    <Label className="text-sm text-[#99A1AF]">Date</Label>
+                    <Label className="text-sm text-muted-foreground">
+                      Start Date *
+                    </Label>
                     <AppCalendar
-                      className="h-11"
+                      className="h-9"
                       date={session.date ? new Date(session.date) : undefined}
                       onChange={(date) =>
                         setSession((prevState) => ({
@@ -268,52 +260,63 @@ export function EditSessionDialog({
                           date: date,
                         }))
                       }
+                      required
                     />
                   </div>
+
                   <div className="space-y-2">
-                    <Label className="text-sm text-[#99A1AF]">Start Time</Label>
+                    <Label className="text-sm text-muted-foreground">
+                      End Date *
+                    </Label>
+                    <AppCalendar
+                      className="h-9"
+                      date={session.end_date ? new Date(session.date) : undefined}
+                      onChange={(date) =>
+                        setSession((prevState) => ({
+                          ...prevState,
+                          end_date: date,
+                        }))
+                      }
+                      required
+                    />
+                  </div>
+
+
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+
+                  <div className="space-y-2">
+                    <Label className="text-sm text-muted-foreground">
+                      Start Time *
+                    </Label>
                     <TimePicker
-                      className="h-11"
-                      value={session.startTime}
+                      className="h-9"
+                      value={session.start_time}
                       onChange={(time) =>
                         setSession((prev) => ({
                           ...prev,
-                          startTime: time,
+                          start_time: time,
                         }))
                       }
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-sm text-[#99A1AF]">End Time</Label>
+                    <Label className="text-sm text-muted-foreground">
+                      End Time *
+                    </Label>
+
                     <TimePicker
-                      className="h-11"
-                      value={session.endTime}
+                      className="h-9"
+                      value={session.end_time}
                       onChange={(time) =>
                         setSession((prev) => ({
                           ...prev,
-                          endTime: time,
+                          end_time: time,
                         }))
                       }
                     />
                   </div>
                 </div>
-
-                <Card className="bg-alternative-bg p-3 border-alternative-text/30">
-                  <CardContent className="p-0">
-                    <div className="flex gap-4 items-start">
-                      <Info size={14} className="text-alternative-text" />
-                      <div className="font-normal space-y-1">
-                        <Label className="text-alternative-text text-[14px] leading-none">
-                          Changing date or time
-                        </Label>
-                        <p className="text-[#D1D5DC] text-xs">
-                          Enrolled participants will be notified of the schedule
-                          change
-                        </p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
 
                 <div className="flex gap-2 text-md ">
                   <MapPin className="text-primary w-4 w-4" />
@@ -322,10 +325,13 @@ export function EditSessionDialog({
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   <div className="space-y-2">
-                    <Label className="text-sm text-[#99A1AF]">Location</Label>
+                    <Label className="text-sm text-muted-foreground">
+                      Location *
+                    </Label>
                     <Input
                       name="location"
-                      className="!bg-[#1A1A1A] !border-[#3A3A3A] !text-[#E5E7EB] !p-5"
+
+                      required
                       value={session.location}
                       onChange={(e) =>
                         setSession((prev) => ({
@@ -336,22 +342,31 @@ export function EditSessionDialog({
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-sm text-[#99A1AF]">
-                      Price (USD)
+                    <Label className="text-sm text-muted-foreground">
+                      Price (USD) *
                     </Label>
                     <Input
                       name="price"
-                      type="number"
-                      step="0.01"
                       placeholder="$0.00"
-                      className="!bg-[#1A1A1A] !border-[#3A3A3A] !text-[#E5E7EB] !p-5"
+                      required
                       value={session.price}
-                      onChange={(e) =>
-                        setSession((prev) => ({
-                          ...prev,
-                          price: e.target.value,
-                        }))
-                      }
+                      onChange={(e) => {
+                        if (!e.target.value) {
+                          setSession((prev) => ({
+                            ...prev,
+                            price: e.target.value,
+                          }))
+                        } else {
+                          if (!Number.isNaN(Number(e.target.value))) {
+                            setSession((prev) => ({
+                              ...prev,
+                              price: Number(e.target.value),
+                            }))
+
+                          }
+                        }
+
+                      }}
                     />
                   </div>
                 </div>
@@ -363,47 +378,141 @@ export function EditSessionDialog({
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   <div className="space-y-2">
-                    <Label className="text-sm text-[#99A1AF]">
-                      Max Players
+                    <Label className="text-sm text-muted-foreground">
+                      Max Players *
                     </Label>
                     <Input
                       name="maxPlayer"
-                      type="number"
                       placeholder="e.g. 12"
-                      className="!bg-[#1A1A1A] !border-[#3A3A3A] !text-[#E5E7EB] !p-5"
-                      value={session.maxPlayer}
-                      onChange={(e) =>
-                        setSession((prev) => ({
-                          ...prev,
-                          maxPlayer: e.target.value,
-                        }))
-                      }
+                      required
+                      value={session.max_players}
+                      onChange={(e) => {
+                        if (!e.target.value) {
+                          setSession((prev) => ({
+                            ...prev,
+                            max_players: e.target.value,
+                          }))
+                        } else {
+                          if (!Number.isNaN(Number(e.target.value))) {
+                            setSession((prev) => ({
+                              ...prev,
+                              max_players: Number(e.target.value),
+                            }))
+
+                          }
+                        }
+
+                      }}
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-sm text-[#99A1AF]">
+                    <Label className="text-sm text-muted-foreground">
                       Apply Promotion (Optional)
                     </Label>
-                    <Input
-                      name="applyPromotion"
-                      className="!bg-[#1A1A1A] !border-[#3A3A3A] !text-[#E5E7EB] !p-5"
-                      value={session.applyPromotion}
-                      onChange={(e) =>
+
+                    <Select
+                      value={String(session.apply_promotion)}
+                      onValueChange={(value) =>
                         setSession((prev) => ({
                           ...prev,
-                          applyPromotion: e.target.value,
+                          apply_promotion: value === "true",
                         }))
                       }
-                    />
+                    >
+                      <SelectTrigger className="w-full dark:bg-[#1A1A1A] rounded-sm">
+                        <SelectValue placeholder="Select" />
+                      </SelectTrigger>
+
+                      <SelectContent className="!bg-[#1A1A1A]">
+                        <SelectGroup>
+                          <SelectLabel>Select</SelectLabel>
+                          <SelectItem value="true">Yes</SelectItem>
+                          <SelectItem value="false">No</SelectItem>
+                        </SelectGroup>
+                      </SelectContent>
+                    </Select>
                   </div>
                 </div>
 
+                {session?.apply_promotion &&
+                  <>
+                    <div className="space-y-2">
+                      <Label className="text-sm text-muted-foreground">
+                        Image URL *
+                      </Label>
+                      <Input
+                        name="imageUrl"
+                        placeholder="https://example.com/image.jpg"
+                        required
+                        value={session?.image}
+                        onChange={(e) => {
+                          setSession((prev) => ({
+                            ...prev,
+                            image: e.target.value,
+                          }))
+                        }}
+                      />
+                    </div>
+
+                    {/* preview */}
+                    <div className="bg-[#1A1A1A] border border-border rounded-[10px] p-4 space-y-2">
+                      <h1 className="text-[#99A1AF]">Preview:</h1>
+
+                      {session.image ?
+                        <img
+                          src={session.image}
+                          className="w-full h-50 object-contain"
+                        />
+                        :
+                        <div className="w-full h-50" />
+
+                      }
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label className="text-sm text-muted-foreground">
+                          Promotion Price *
+                        </Label>
+                        <Input
+                          name="promotionPrice"
+                          placeholder="$200"
+
+                          required
+                          value={session?.promotion_price}
+                          onChange={(e) => {
+                            if (!e.target.value) {
+                              setSession((prev) => ({
+                                ...prev,
+                                promotion_price: e.target.value,
+                              }))
+                            } else {
+                              if (!Number.isNaN(Number(e.target.value))) {
+                                setSession((prev) => ({
+                                  ...prev,
+                                  promotion_price: Number(e.target.value),
+                                }))
+
+                              }
+                            }
+
+                          }}
+                        />
+                      </div>
+                    </div>
+                  </>}
+
+
+
+
                 <div className="space-y-2">
-                  <Label className="text-sm text-[#99A1AF]">Description</Label>
+                  <Label className="text-sm text-muted-foreground">
+                    Description *
+                  </Label>
                   <Textarea
                     name="description"
                     placeholder="Add any additional details about this session..."
-                    className="!bg-[#1A1A1A] !border-[#3A3A3A] !text-[#E5E7EB] !p-5"
+                    className="min-h-26"
                     value={session.description}
                     onChange={(e) =>
                       setSession((prev) => ({
@@ -413,79 +522,36 @@ export function EditSessionDialog({
                     }
                   />
                 </div>
-
-                <h1>Quick Actions</h1>
-
-                <div className="flex gap-4 items-center flex-wrap ">
-                  <Button
-                    type="button"
-                    variant={"outline"}
-                    className={styles.active}
-                  >
-                    <Check /> Mark as Completed
-                  </Button>
-                  <Button
-                    type="button"
-                    variant={"outline"}
-                    className={styles.warning}
-                  >
-                    <Gift /> Mark as Comped
-                  </Button>
-                  <Button
-                    type="button"
-                    variant={"outline"}
-                    className={styles.danger}
-                  >
-                    <Ban /> Cancel Session
-                  </Button>
-                </div>
               </div>
             </ScrollArea>
-            <div className="p-4 space-y-1 border-t border-[#3A3A3A]">
-              <div className="flex justify-between gap-4 flex-col sm:flex-row">
+            <Separator />
+
+            <div className="p-4 flex flex-wrap gap-4 justify-between">
+              <Button variant={"destructive"} type="button" onClick={() => setSelectedSession(sessionId ? Number(sessionId) : null)}>
+                <Trash2 /> Delete
+              </Button>
+              <div className="flex gap-4 flex-wrap">
+                <DialogClose className="text-[13px] font-medium h-8 px-4 py-2 has-[>svg]:px-3 bg-black text-white border-border rounded-md hover:opacity-70 cursor-pointer flex flex-1 items-center justify-center">
+                  Cancel
+                </DialogClose>
                 <Button
-                  type="button"
-                  size={"lg"}
-                  variant={"outline"}
-                  className={styles.danger}
-                  onClick={deleteSession}
-                  disabled={deleteLoading || loading}
+                  type="submit"
+                  disabled={loading}
+                  className="flex-1 text-[13px]"
+
                 >
-                  {deleteLoading ? (
-                    <>
-                      <Loader2 className="animate-spin" /> Deleting...
-                    </>
-                  ) : (
-                    <>
-                      <Trash /> Delete Session
-                    </>
-                  )}
+                  {loading && <Spinner className="text-black" />}
+                  Save
                 </Button>
-                <div className="flex gap-4 flex-col sm:flex-row">
-                  <DialogClose className="text-[13px] font-medium leading-none h-10 px-4 py-2 bg-black text-white border-border rounded-md hover:opacity-70 cursor-pointer flex flex-1 items-center justify-center">
-                    Cancel
-                  </DialogClose>
-                  <Button
-                    type="submit"
-                    size={"lg"}
-                    disabled={loading || deleteLoading}
-                  >
-                    {loading ? (
-                      <>
-                        <Loader2 className="animate-spin" /> Saving...
-                      </>
-                    ) : (
-                      <>
-                        <Save /> Save Changes
-                      </>
-                    )}
-                  </Button>
-                </div>
               </div>
             </div>
           </form>
         </DialogContent>
       </Dialog>
+
+      <ConfirmationDialog loading={deleteLoading} open={!!selectedSession} onPressCancel={() => setSelectedSession(null)} onPressYes={async () => await deleteSession()}
+        title={"Are you sure you want to delete?"}
+        description={"Your action will remove this item from the system"} />
     </>
   );
 }

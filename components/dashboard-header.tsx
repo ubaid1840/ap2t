@@ -17,7 +17,7 @@ import { Button } from "./ui/button";
 import { signOut } from "firebase/auth";
 import { auth } from "@/lib/firebase";
 import { ReactNode } from "react";
-import { useAuth } from "@/app/contexts/auth-context";
+import { useAuth } from "@/contexts/auth-context";
 
 export default function DashboardHeader({trigger} :{ trigger ?: ReactNode}) {
   const isMobile = useIsMobile();

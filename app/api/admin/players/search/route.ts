@@ -7,22 +7,8 @@ export async function GET(req: NextRequest) {
     const query = searchParams.get("query");
 
     const result = await pool.query(
-      `
-      SELECT
-        p.id AS player_id,
-        u.first_name,
-        u.last_name,
-        u.email,
-        u.picture
-      FROM players p
-      INNER JOIN users u ON u.id = p.user_id
-        ${query ? `WHERE 
-        u.first_name ILIKE $1 OR 
-        u.last_name ILIKE $1 OR
-        CONCAT(u.first_name, ' ', u.last_name) ILIKE $1` : ''}
-      LIMIT 10
+    `SELECT id, first_name,email, last_name, role FROM users WHERE role = 'player'
       `,
-      query ? [`%${query}%`] : []
     );
 
     return NextResponse.json(result.rows);

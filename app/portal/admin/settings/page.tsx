@@ -33,7 +33,7 @@ import { FaFloppyDisk } from "react-icons/fa6";
 import { GoDotFill } from "react-icons/go";
 import { RiShieldKeyholeLine } from "react-icons/ri";
 import axios from "@/lib/axios";
-import { useAuth } from "@/app/contexts/auth-context";
+import { useAuth } from "@/contexts/auth-context";
 import { joinNames } from "@/lib/functions";
 export default function Page() {
   const [loading, setLoading] = useState(false);

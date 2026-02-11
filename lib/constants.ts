@@ -3,63 +3,63 @@ export const admin_nav_items = [
 
   {
     title: 'Dashboard',
-    url: '/admin/dashboard',
+    url: '/portal/admin/dashboard',
     icon: 'dashboard',
    
     shortcut: ['d', 'a', 's', 'h'],
   },
    {
     title: 'Parents',
-    url: '/admin/parents',
+    url: '/portal/admin/parents',
     icon: 'parents',
    
     shortcut: ['d', 'a', 's', 'h'],
   },
    {
     title: 'Players',
-    url: '/admin/players',
+    url: '/portal/admin/players',
     icon: 'players',
     
     shortcut: ['d', 'a', 's', 'h'],
   },
    {
     title: 'Coaches',
-    url: '/admin/coaches',
+    url: '/portal/admin/coaches',
     icon: 'coaches',
     
     shortcut: ['d', 'a', 's', 'h'],
   },
    {
     title: 'Sessions',
-    url: '/admin/sessions',
+    url: '/portal/admin/sessions',
     icon: 'sessions',
     
     shortcut: ['d', 'a', 's', 'h'],
   },
    {
     title: 'Promotions',
-    url: '/admin/promotions',
+    url: '/portal/admin/promotions',
     icon: 'promotions',
     
     shortcut: ['d', 'a', 's', 'h'],
   },
     {
     title: 'Payments',
-    url: '/admin/payments',
+    url: '/portal/admin/payments',
     icon: 'payments',
     
     shortcut: ['d', 'a', 's', 'h'],
   },
     {
     title: 'Reports',
-    url: '/admin/reports',
+    url: '/portal/admin/reports',
     icon: 'reports',
     
     shortcut: ['d', 'a', 's', 'h'],
   },
     {
     title: 'Settings',
-    url: '/admin/settings',
+    url: '/portal/admin/settings',
     icon: 'settings',
     
     shortcut: ['d', 'a', 's', 'h'],

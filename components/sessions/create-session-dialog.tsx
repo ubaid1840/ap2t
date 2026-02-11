@@ -28,7 +28,7 @@ import {
 } from "../ui/select";
 import { AssignCoachDialog } from "./assign-coach-dialog";
 
-type SessionType = {
+export type SessionType = {
   name: string,
   description: string,
   session_type: string,

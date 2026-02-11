@@ -90,7 +90,7 @@ export default function LoginForm({ onClickSignup }: { onClickSignup: () => void
           className="bg-primary text-secondary w-full"
           disabled={loading}
         >
-          {loading && <Spinner />}
+          {loading && <Spinner className="text-black"/>}
           Log In
         </Button>
 

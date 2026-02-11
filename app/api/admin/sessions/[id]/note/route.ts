@@ -1,32 +1,29 @@
 import { NextRequest, NextResponse } from "next/server";
-import pool from "@/lib/db"; 
+import pool from "@/lib/db";
 
 
 export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const {id:sessionId} =await params;
+  const { id: sessionId } = await params;
 
   try {
     const { rows } = await pool.query(
       `
   SELECT
-    n.id,
-    n.content,
-    n.important,
-    n.created_at,
-    u.first_name,
-    u.last_name
+    n.*,
+    u.first_name AS writer_first_name,
+    u.last_name AS writer_last_name
   FROM notes n
-  JOIN users u ON u.id = n.writer_id
+  LEFT JOIN users u ON u.id = n.user_id
   WHERE n.session_id = $1
   ORDER BY n.created_at DESC
   `,
       [sessionId]
     );
 
-    return NextResponse.json({ notes: rows }, { status: 200 });
+    return NextResponse.json(rows , { status: 200 });
   } catch (error) {
     console.error(error);
     return NextResponse.json(
@@ -37,37 +34,33 @@ export async function GET(
 }
 
 
-export async function POST(
-  req: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
-  const {id:sessionId} = await params;
+
+export async function POST(req: NextRequest) {
+
 
   try {
-    const { note_type, content, important, writer_id } = await req.json();
-
-    if (!content || !note_type) {
-      return NextResponse.json(
-        { message: "Missing required fields" },
-        { status: 400 }
-      );
+    const data = await req.json();
+    if (!data || Object.keys(data).length === 0) {
+      return NextResponse.json({ message: "Required parameters missing" }, { status: 400 });
     }
 
-    const { rows } = await pool.query(
-      `
-      INSERT INTO notes (session_id, writer_id, note_type, content, important)
-      VALUES ($1, $2, $3, $4, $5)
-      RETURNING *
-      `,
-      [sessionId, writer_id, note_type, content, important ?? false]
+    const fields = Object.keys(data);
+    const values = Object.values(data);
+    const placeholders = fields.map((_, i) => `$${i + 1}`).join(", ");
+
+    await pool.query(
+      `INSERT INTO notes (${fields.join(",")})
+       VALUES (${placeholders})
+       `,
+      values
     );
 
-    return NextResponse.json({ note: rows[0] }, { status: 201 });
-  } catch (error) {
-    console.error(error);
+    return NextResponse.json({ message: "Note added" }, { status: 200 })
+  } catch (error: any) {
     return NextResponse.json(
-      { message: "Failed to add note" },
+      { message: error?.message || "Internal Server Error" },
       { status: 500 }
     );
   }
 }
+

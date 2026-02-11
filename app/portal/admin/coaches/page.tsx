@@ -19,7 +19,7 @@ import Link from "next/link";
 import { ReactNode, useEffect, useState } from "react";
 import { joinNames, splitFullName } from "@/lib/functions";
 import { useParams } from "next/navigation";
-import { useAuth } from "@/app/contexts/auth-context";
+import { useAuth } from "@/contexts/auth-context";
 import { Spinner } from "@/components/ui/spinner";
 
 
@@ -55,11 +55,6 @@ export default function Page() {
   const { user } = useAuth()
   const [coaches, setCoaches] = useState<{ data: coachinfoType[], stats: { total_active_coaches: string, total_coaches: string, total_players: string, total_sessions: string } }>()
   const [loading, setLoading] = useState(true)
-  const [statsLoading, setStatsLoading] = useState(true)
-  const [stats, setStats] = useState({
-    total_sessions: 0,
-    total_players: 0
-  })
   const localData = [
     {
       Icon: <User />,
@@ -162,7 +157,7 @@ export default function Page() {
 
       {loading ? (
         <div className="flex justify-center items-center py-20">
-          <Loader2 className="animate-spin text-primary" size={40} />
+         <Spinner/>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
