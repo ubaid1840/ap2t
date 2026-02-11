@@ -1,5 +1,4 @@
 import DashboardHeader from "@/components/dashboard-header";
-import { SidebarTrigger } from "@/components/ui/sidebar";
 import { ReactNode } from "react";
 
 export default function Layout({ children }: { children: ReactNode }) {

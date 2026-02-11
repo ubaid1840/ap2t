@@ -62,7 +62,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         }
       } else {
         setUser(null);
-        router.replace("/portal//auth");
+        router.replace("/portal/auth");
       }
       setLoading(false);
     });
