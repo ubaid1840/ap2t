@@ -64,11 +64,6 @@ export default function Page() {
     fetchData();
   }, []);
 
-  useEffect(() => {
-    console.log(payments);
-  }, [payments]);
-
-
   const filteredData = PAYMENT_DATA.filter((data) => {
     if (filter === "All") {
       return data

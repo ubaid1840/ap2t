@@ -5,7 +5,7 @@ import { ArrowUpDown, Eye, Info, Mail, Phone, TrendingDown, TrendingUp, Users } 
 import Link from "next/link";
 import { IoIosPin } from "react-icons/io";
 import getInitials from "../parents/get-initials";
-import CardStatus from "../card-status";
+import CardStatus, { typeClasses } from "../card-status";
 import { DashIcon } from "@radix-ui/react-icons";
 
 
@@ -154,7 +154,7 @@ export const PLAYERS_COLUMNS: ColumnDef<PlayersData>[] = [
             }
             return (
                 <div className="w-20">
-                <CardStatus value={row.getValue("attendance")} type={type} icon={row.original.attendance
+                <CardStatus value={row.getValue("attendance")} type={type as keyof typeof typeClasses} icon={row.original.attendance
                     > 90 ? <Up /> : row.original.attendance >= 80 && row.original.attendance <= 90 ? <In /> : <Down />} />
                     </div>
             )
@@ -164,7 +164,7 @@ export const PLAYERS_COLUMNS: ColumnDef<PlayersData>[] = [
         id: "actions",
         header: () => <div className="text-[#99A1AF] text-[12px] tracking-wider dark:hover:bg-transparent dark:hover:text-white/50">ACTIONS</div>,
         cell: ({ row }) => (
-            <Link href={`/admin/players/${row.original.id}`}>
+            <Link href={`/portal/admin/players/${row.original.id}`}>
                 <Button
                     onClick={(e) => {
                         e.stopPropagation();

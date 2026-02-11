@@ -33,7 +33,6 @@ export default function Page() {
     try {
       const result = await axios.get("/admin/sessions");
       if (result.data) {
-        console.log(result.data)
         const mappedSessions = result.data.map((s: any) => ({
           id: s.id,
           sessionName: s.name,

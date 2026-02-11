@@ -158,7 +158,7 @@ export default function Page() {
     : "";
   return (
     <div className="flex flex-col w-full gap-6">
-      <BackButton title="Back to coaches" route="/admin/coaches" />
+      <BackButton title="Back to coaches" route="/portal/admin/coaches" />
 
       <Card className="w-full rounded-[12px] bg-[#252525]">
         <CardContent className="space-y-4">

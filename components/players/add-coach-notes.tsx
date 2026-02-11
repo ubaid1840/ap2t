@@ -40,7 +40,6 @@ export function AddCoachNotes() {
       notes: formData.get("notes"),
     }
 
-    console.log(values)
     setOpen(false)
     // call API here
   }

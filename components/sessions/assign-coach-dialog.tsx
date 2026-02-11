@@ -48,7 +48,6 @@ export function AssignCoachDialog({ onSelect }: AssignCoachDialogProps) {
       const response = await axios.get(
         `/admin/coaches/search`
       );
-      console.log(response.data)
       setResults(response.data);
     } finally {
       setLoading(false);

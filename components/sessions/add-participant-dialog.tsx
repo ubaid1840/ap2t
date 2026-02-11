@@ -42,7 +42,6 @@ export function AddParticipantDialog({ sessionId, onSuccess }: AddParticipantDia
     setLoading(true);
     try {
       const response = await axios.get(`/admin/players/search`);
-      console.log(response.data)
       setResults(response.data);
     } finally {
       setLoading(false);

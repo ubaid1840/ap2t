@@ -84,7 +84,7 @@ export default function Page() {
 
   return (
     <div className="flex flex-col w-full gap-6">
-      <BackButton title="Back To Parents" route="/admin/parents" />
+      <BackButton title="Back To Parents" route="/portal/admin/parents" />
 
       <Card className="w-full rounded-[12px] bg-[#252525]">
         <CardContent>

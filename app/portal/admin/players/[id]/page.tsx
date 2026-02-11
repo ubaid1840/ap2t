@@ -9,8 +9,8 @@ export default function Page() {
     const {id} = useParams()
 
     return (
-        <MainPlayerPage id={id as string} back = {
-             <BackButton title="Back To Players" route="/admin/players" />
+        <MainPlayerPage id={Number(id) || undefined} back = {
+             <BackButton title="Back To Players" route="/portal/admin/players" />
         }/>
     )
 }

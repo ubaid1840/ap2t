@@ -1,13 +1,10 @@
 "use client";
-import CardStatus from "@/components/card-status";
+import CardStatus, { typeClasses } from "@/components/card-status";
 import { BarChart } from "@/components/charts/bar-chart";
 import { AddCoachNotes } from "@/components/players/add-coach-notes";
 import { PlayersData } from "@/components/players/columns";
 import {
-    CHECKINS_12WEEKS_DATA,
-    COACH_SESSION_NOTES,
-    PLAYERS_DATA,
-    SESSIONS_DATA,
+  CHECKINS_12WEEKS_DATA
 } from "@/components/players/constatns";
 import { EditInfo } from "@/components/players/edit-info";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -17,76 +14,248 @@ import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useAuth } from "@/contexts/auth-context";
 import { useIsMobile } from "@/hooks/use-mobile";
 import axios from "@/lib/axios";
+import { joinNames } from "@/lib/functions";
 import { Scrollbar } from "@radix-ui/react-scroll-area";
 import {
-    Activity,
-    Bookmark,
-    Calendar,
-    CircleCheckBig,
-    CircleX,
-    Clock,
-    DollarSign,
-    Gift,
-    Info,
-    Mail,
-    MapPin,
-    MessageSquare,
-    Phone,
-    TrendingUp,
-    User,
+  Activity,
+  Bookmark,
+  Calendar,
+  CircleCheckBig,
+  CircleX,
+  Clock,
+  DollarSign,
+  Gift,
+  Info,
+  Mail,
+  MapPin,
+  MessageSquare,
+  Phone,
+  TrendingUp,
+  User,
 } from "lucide-react";
+import moment from "moment";
 import { ReactNode, useEffect, useState } from "react";
 import { IoIosStar, IoIosStarOutline } from "react-icons/io";
+
+
+export interface PlayerResponse {
+  id: number;
+  first_name: string;
+  last_name: string;
+  email: string;
+  role: string;
+  status: string;
+  picture: string | null;
+  location: string | null;
+  phone_no: string;
+  joining_date: string | null;
+  birth_date: string;
+  created_at: string;
+
+  profile: PlayerProfile;
+
+  parent_id: number | null;
+  attach_parent: Parent | null;
+
+  sessions_data: SessionData[];
+
+  payment_data: Payment[];
+
+  all_notes: NoteWithCoach[];
+}
+
+export interface PlayerProfile {
+  id: number;
+  user_id: number;
+  parent_id: number | null;
+  position: string;
+  skill_level: string;
+  medical_notes: string | null;
+  created_at: string;
+}
+
+export interface Parent {
+  id: number;
+  first_name: string;
+  last_name: string;
+  email: string;
+  phone_no: string;
+  profile?: any;
+}
+
+export interface SessionData {
+  id: number;
+  name: string;
+  description: string;
+  status: string;
+  session_type: string;
+  coach_id: number;
+  location: string;
+
+  start_time: string;
+  end_time: string;
+  date: string;
+  end_date: string;
+
+  price: string;
+  promotion_price: string | null;
+  apply_promotion: boolean;
+
+  max_players: number;
+  created_at: string;
+
+  image: string;
+  show_storefront: boolean;
+
+  coach_first_name: string | null;
+  coach_last_name: string | null;
+
+  payment_detail: Payment | null;
+
+  note_detail: SessionNote[];
+
+  attendance_detail: Attendance[];
+}
+
+export interface Payment {
+  id: number;
+  session_id: number;
+  user_id: number;
+  status: string;
+  amount?: string | number;
+  created_at?: string;
+}
+
+export interface SessionNote {
+  id: number;
+  user_id: number;
+  session_id: number;
+  note_type: string;
+  note: string;
+  important: boolean;
+  created_at: string;
+}
+export interface Attendance {
+  id: number;
+  user_id: number;
+  session_id: number;
+  status: "present" | "absent" | "pending" | string;
+  created_at: string;
+}
+
+export interface NoteWithCoach {
+  id: number;
+  user_id: number;
+  session_id: number;
+  note_type: string;
+  note: string;
+  important: boolean;
+  created_at: string;
+  rating?: number
+  coach_first_name: string | null;
+  coach_last_name: string | null;
+  session_name: string;
+}
+
 
 export default function MainPlayerPage({
   id,
   back,
 }: {
-  id: string | undefined;
+  id: number | undefined;
   back?: ReactNode;
 }) {
-  const [data, setData] = useState<PlayersData | undefined>();
+  const [data, setData] = useState<PlayerResponse | undefined>();
   const [tab, setTab] = useState("Session History");
+  const { user } = useAuth()
   const isMobile = useIsMobile();
+  const [loading, setLoading] = useState(false)
 
   useEffect(() => {
-    const fetchData = async () => {
-      console.log(id);
-      if (!id) return;
-      try {
-        const result = await axios.get(`/admin/players/${id}`);
-        console.log(result.data);
-        if (result.data) {
-          const p = result.data;
-          const mappedPlayer: any = {
-            id: p.player_id,
-            name: `${p.first_name} ${p.last_name}`,
-            phone:p.phone_no,
-            coach_name: "Unassigned",
-            age: p.birth_date
-              ? new Date().getFullYear() - new Date(p.birth_date).getFullYear()
-              : "N/A",
-            position: p.position || "N/A",
-            parent: "Unknown",
-            joining_date: p.joining_date
-              ? new Date(p.joining_date).toISOString().split("T")[0]
-              : "N/A",
-          };
-          setData(mappedPlayer);
-        }
-      } catch (error) {
-        console.log(error);
-        const currentPlayerData = PLAYERS_DATA.find(
-          (item) => item.id === Number(id),
-        );
-        if (currentPlayerData) setData(currentPlayerData);
-      }
-    };
 
-    fetchData();
-  }, [id]);
+    if (user?.id && id)
+      fetchData();
+  }, [id, user]);
+
+  const fetchData = async () => {
+    if (!id) return;
+
+    try {
+       const result = await axios.get(`/admin/players/${id}`);
+    setData(result.data)
+    } finally {
+      setLoading(false)
+    }
+   
+
+  };
+
+  function calculateTotalPendingPayments(sessions: SessionData[] | undefined) {
+    if (!sessions) return 0;
+
+    return sessions.reduce((count, session) => {
+
+      const isPending =
+        !session.payment_detail ||
+        session.payment_detail.status === "pending";
+
+      return isPending ? count + 1 : count;
+
+    }, 0);
+  }
+
+   function calculateTotalCompedPayments(sessions: SessionData[] | undefined) {
+    if (!sessions) return 0;
+
+    return sessions.reduce((count, session) => {
+
+      const isComped = session?.payment_detail?.status === "comped";
+
+      return isComped ? count + 1 : count;
+
+    }, 0);
+  }
+
+  function calculatePendingStats(sessions: SessionData[] | undefined) {
+    if (!sessions) return 0;
+    return sessions.reduce((total, session) => {
+
+      const isPending =
+        !session.payment_detail ||
+        session.payment_detail.status === "pending";
+
+      if (!isPending) return total;
+
+      // Use promotion price if applicable
+      const amount = session.apply_promotion && session.promotion_price
+        ? Number(session.promotion_price)
+        : Number(session.price);
+
+      return total + amount;
+
+    }, 0);
+  }
+
+
+  const totalPendingCount = calculateTotalPendingPayments(data?.sessions_data)
+
+  const totalCompedCount = calculateTotalCompedPayments(data?.sessions_data)
+  const totalSessionsCount = data?.sessions_data?.length ? data?.sessions_data.length : 0
+
+  function pendingString() {
+
+    const totalPendingCount = calculateTotalPendingPayments(data?.sessions_data)
+    const totalPendingValue = calculatePendingStats(data?.sessions_data)
+
+    if (totalPendingCount && totalPendingCount > 0) {
+      return `${totalPendingCount} session${totalPendingCount > 1 ? "s" : ""} pending payment${totalPendingCount > 1 ? "s" : ""} totalling $${totalPendingValue}`
+    } else null
+
+  }
+
 
   return (
     <div className="flex flex-col w-full gap-6">
@@ -97,11 +266,11 @@ export default function MainPlayerPage({
           <div className="w-full flex justify-between">
             <div className="flex flex-col gap-2">
               <span className="flex gap-2 text-xl items-center">
-                {data?.name}{" "}
+                {joinNames([data?.first_name, data?.last_name])}{" "}
                 <span>
                   <CardStatus
-                    value={"Active"}
-                    type="info"
+                    value={data?.status}
+                    type={data?.status as keyof typeof typeClasses}
                     icon={<Activity size={14} />}
                   />
                 </span>
@@ -112,18 +281,20 @@ export default function MainPlayerPage({
               >
                 <span className="inline-flex gap-2 ">
                   <Calendar size={14} />
-                  Age {data?.age}
+                  Age {data?.birth_date
+                    ? new Date().getFullYear() - new Date(data.birth_date).getFullYear()
+                    : "N/A"}
                 </span>
 
                 <span className="inline-flex gap-2">
-                  <Bookmark size={14} /> {data?.position}
+                  <Bookmark size={14} /> {data?.profile?.position}
                 </span>
                 <span className="inline-flex gap-2">
                   <User size={14} />
-                  Parent: {data?.parent}
+                  Parent: {data?.parent_id ? joinNames([data?.attach_parent?.first_name, data?.attach_parent?.last_name]) : "N/A"}
                 </span>
                 <span className="inline-flex gap-2">
-                  <Clock size={14} /> Joined: {data?.joining_date}
+                  <Clock size={14} /> Joined: {data?.created_at && moment(new Date(data?.created_at)).format("YYYY-MM-DD")}
                 </span>
               </div>
             </div>
@@ -141,7 +312,7 @@ export default function MainPlayerPage({
             />
 
             <HeaderCard
-              title={`20`}
+              title={String(totalSessionsCount)}
               description="Total Sessions"
               icon={
                 <div className="rounded-[8px] flex w-8 h-8 items-center justify-center bg-info-bg">
@@ -161,7 +332,7 @@ export default function MainPlayerPage({
             />
 
             <HeaderCard
-              title={"1"}
+              title={String(totalPendingCount)}
               description="Pending Pay"
               icon={
                 <div className="rounded-[8px] flex w-8 h-8 items-center justify-center bg-alternative-bg">
@@ -171,7 +342,7 @@ export default function MainPlayerPage({
             />
 
             <HeaderCard
-              title={"1"}
+              title={String(totalCompedCount)}
               description="Comped"
               icon={
                 <div className="rounded-[8px] flex w-8 h-8 items-center justify-center bg-other-bg">
@@ -185,46 +356,49 @@ export default function MainPlayerPage({
 
       <Card className="w-full rounded-[12px] bg-[#252525]">
         <CardContent className="space-y-4">
-          <div className="w-full flex justify-between">
-            <p className="text-[18px] text-white">Linked Parent</p>
-            <Button>View Parent Profile</Button>
-          </div>
+          {data?.parent_id &&
+            <>
+              <div className="w-full flex justify-between">
+                <p className="text-[18px] text-white">Linked Parent</p>
+                <Button>View Parent Profile</Button>
+              </div>
 
-          <div className="flex gap-4">
-            <Avatar className="bg-primary text-black">
-              <AvatarImage src={""} />
-              <AvatarFallback>SJ</AvatarFallback>
-            </Avatar>
+              <div className="flex gap-4">
+                <Avatar className="bg-primary text-black">
+                  <AvatarImage src={""} />
+                  <AvatarFallback>SJ</AvatarFallback>
+                </Avatar>
 
-            <div>
-              <p className="text-md">Sarah Johnson</p>
-              <p className="text-xs text-muted-foreground">Primary Contact</p>
-            </div>
-          </div>
+                <div>
+                  <p className="text-md">Sarah Johnson</p>
+                  <p className="text-xs text-muted-foreground">Primary Contact</p>
+                </div>
+              </div>
 
-          <div className="grid grid-cols-2 max-w-lg gap-2 text-xs font-normal">
-            <div className="flex gap-1 items-center">
-              <Mail size={12} className="text-[#99A1AF]" />
-              <p className="text-[#D1D5DC]">sara@gmail.com</p>
-            </div>
+              <div className="grid grid-cols-2 max-w-lg gap-2 text-xs font-normal">
+                <div className="flex gap-1 items-center">
+                  <Mail size={12} className="text-[#99A1AF]" />
+                  <p className="text-[#D1D5DC]">sara@gmail.com</p>
+                </div>
 
-            <div className="flex gap-1 items-center">
-              <Phone size={12} className="text-[#99A1AF]" />
-              <p className="text-[#D1D5DC]">{"(555) 123 4567"}</p>
-            </div>
+                <div className="flex gap-1 items-center">
+                  <Phone size={12} className="text-[#99A1AF]" />
+                  <p className="text-[#D1D5DC]">{"(555) 123 4567"}</p>
+                </div>
 
-            <div className="flex gap-1 items-center">
-              <Info size={12} className="text-[#99A1AF]" />
-              <p className="text-[#D1D5DC]">Emergency: {"(555) 987-6543"}</p>
-            </div>
+                <div className="flex gap-1 items-center">
+                  <Info size={12} className="text-[#99A1AF]" />
+                  <p className="text-[#D1D5DC]">Emergency: {"(555) 987-6543"}</p>
+                </div>
 
-            <div className="flex gap-1 items-center">
-              <MapPin size={12} className="text-[#99A1AF]" />
-              <p className="text-[#D1D5DC]">123 Main street, CA 90210</p>
-            </div>
-          </div>
+                <div className="flex gap-1 items-center">
+                  <MapPin size={12} className="text-[#99A1AF]" />
+                  <p className="text-[#D1D5DC]">123 Main street, CA 90210</p>
+                </div>
+              </div>
 
-          <Separator />
+              <Separator />
+            </>}
 
           <Card className="bg-alternative-bg p-3 border-alternative-text/30">
             <CardContent className="p-0">
@@ -235,7 +409,7 @@ export default function MainPlayerPage({
                     Medical Notes
                   </Label>
                   <p className="text-[#D1D5DC] text-xs">
-                    Mid asthema - inhaler available
+                    {data?.profile?.medical_notes}
                   </p>
                 </div>
               </div>
@@ -279,9 +453,12 @@ export default function MainPlayerPage({
                   {i === 2 && (
                     <div className="flex gap-2 items-center py-2">
                       <DollarSign /> {t}{" "}
-                      <div className="w-4 h-4 text-xs leading-none flex items-center justify-center bg-[#FDC700] text-black rounded-full">
-                        1
-                      </div>
+                      {totalPendingCount > 0 ?
+                        <div className="w-4 h-4 text-xs leading-none flex items-center justify-center bg-[#FDC700] text-black rounded-full">
+                          {totalPendingCount}
+                        </div>
+                        : null
+                      }
                     </div>
                   )}
                   {i === 3 && (
@@ -298,25 +475,25 @@ export default function MainPlayerPage({
           <Separator />
 
           <TabsContent value="Session History" className="space-y-4 p-2">
-            {SESSIONS_DATA.map((item, i) => (
+            {data?.sessions_data && data?.sessions_data?.map((item, i) => (
               <Card key={i} className="bg-black">
                 <CardContent className="space-y-2">
                   <div className="flex justify-between gap-2 flex-wrap">
                     <div className="flex gap-4 items-center text-sm">
-                      <p>{item.session}</p>
+                      <p>{item.name}</p>
                       <CardStatus
                         value={item.status}
                         type={
-                          item.status === "Upcoming"
+                          item.status === "upcoming"
                             ? "info"
-                            : item.status === "Attended"
+                            : item.status === "attended"
                               ? "active"
                               : "danger"
                         }
                         icon={
-                          item.status === "Upcoming" ? (
+                          item.status === "upcoming" ? (
                             <Clock size={14} />
-                          ) : item.status === "Attended" ? (
+                          ) : item.status === "attended" ? (
                             <CircleCheckBig size={14} />
                           ) : (
                             <CircleX size={14} />
@@ -325,43 +502,46 @@ export default function MainPlayerPage({
                       />
 
                       <CardStatus
-                        value={item.payment}
+                        value={item.payment_detail?.status || "pending"}
                         type={
-                          item.payment === "Paid"
+                          item.payment_detail?.status === "paid"
                             ? "active"
-                            : item.payment === "Comped"
+                            : item.payment_detail?.status === "comped"
                               ? "other"
                               : "alternative"
                         }
                       />
                     </div>
                     <p className="text-md">
-                      {item.payment === "Comped" ? "Free" : `$${item.price}`}
+                      {item.payment_detail?.status === "comped" ? "Free" : `$${item?.apply_promotion ? item?.promotion_price : item?.price}`}
                     </p>
                   </div>
 
                   <div className="flex gap-2 items-center text-xs text-muted-foreground flex-wrap">
                     <div className="flex gap-2">
                       <Calendar size={14} />
-                      <p>{item.date}</p>
+                      <p>{item?.date && moment(new Date(item?.date)).format("YYYY-MM-DD")}</p>
                     </div>
                     <div className="flex gap-2">
                       <Clock size={14} />
-                      <p>{item.time}</p>
+                      <p>{item.start_time} - {item.end_time}</p>
                     </div>
                     <div className="flex gap-2">
                       <User size={14} />
-                      <p>Coach {item.coach}</p>
+                      <p>Coach {joinNames([item?.coach_first_name, item?.coach_last_name])}</p>
                     </div>
                   </div>
-                  {item?.coach_note && (
-                    <div className="mt-4 space-y-4">
-                      <Separator />
-                      <div className="flex flex-wrap gap-4 items-center text-xs text-muted-foreground">
-                        <MessageSquare size={14} />
-                        <p>{item.coach_note}</p>
+                  {item?.note_detail && (
+                    item?.note_detail?.map((eachNote) => (
+                      <div key={eachNote.id} className="mt-4 space-y-4">
+                        <Separator />
+                        <div className="flex flex-wrap gap-4 items-center text-xs text-muted-foreground">
+                          <MessageSquare size={14} />
+                          <p>{eachNote?.note}</p>
+                        </div>
                       </div>
-                    </div>
+                    ))
+
                   )}
                 </CardContent>
               </Card>
@@ -382,51 +562,57 @@ export default function MainPlayerPage({
           </TabsContent>
 
           <TabsContent value="Payment Status" className="space-y-4 p-2">
-            <Card className="bg-alternative-bg p-3 border-alternative-text/30">
-              <CardContent className="p-0">
-                <div className="flex gap-4 items-start">
-                  <Info size={14} className="text-alternative-text" />
-                  <div className="font-normal space-y-1">
-                    <Label className="text-alternative-text text-[14px] leading-none">
-                      Pending Payments
-                    </Label>
-                    <p className="text-[#D1D5DC] text-xs">
-                      1 session pending payment totalling $95
-                    </p>
+            {pendingString() &&
+              <Card className="bg-alternative-bg p-3 border-alternative-text/30">
+                <CardContent className="p-0">
+                  <div className="flex gap-4 items-start">
+                    <Info size={14} className="text-alternative-text" />
+                    <div className="font-normal space-y-1">
+                      <Label className="text-alternative-text text-[14px] leading-none">
+                        Pending Payments
+                      </Label>
+                      <p className="text-[#D1D5DC] text-xs">
+                        {pendingString()}
+                      </p>
+                    </div>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            }
 
-            {SESSIONS_DATA.map((item, i) => (
+            {data?.sessions_data && data?.sessions_data?.map((item, i) => (
               <Card key={i} className="bg-black">
                 <CardContent className="space-y-2">
                   <div className="flex justify-between gap-4 flex-wrap">
                     <div className="flex gap-4 items-center text-sm">
-                      <p>{item.session}</p>
+                      <p>{item.name}</p>
                       <CardStatus
-                        value={item.payment}
+                        value={item.payment_detail?.status || "pending"}
                         type={
-                          item.payment === "Paid"
+                          item.payment_detail?.status === "paid"
                             ? "active"
-                            : item.payment === "Comped"
+                            : item.payment_detail?.status === "comped"
                               ? "other"
                               : "alternative"
                         }
                       />
                     </div>
                     <p
-                      className={`text-md ${item.payment === "Pending" && "text-alternative-text"}`}
+                      className={`text-md ${item.payment_detail?.status !== "paid" && item.payment_detail?.status !== "comped" && "text-alternative-text"}`}
                     >
-                      {item.payment === "Comped" ? "Free" : `$${item.price}`}
+                      {item.payment_detail?.status === "comped" ? "Free" : `$${item?.apply_promotion ? item?.promotion_price : item?.price}`}
                     </p>
                   </div>
 
-                  <div className="flex gap-2 items-center text-xs text-muted-foreground">
-                    <Calendar size={14} />
-                    <p>{item.date}</p>
-                    <User size={14} />
-                    <p>Coach {item.coach}</p>
+                  <div className="flex gap-2 items-center text-xs text-muted-foreground flex-wrap">
+                    <div className="flex gap-2">
+                      <Calendar size={14} />
+                      <p>{item?.date && moment(new Date(item?.date)).format("YYYY-MM-DD")}</p>
+                    </div>
+                    <div className="flex gap-2">
+                      <User size={14} />
+                      <p>Coach {joinNames([item?.coach_first_name, item?.coach_last_name])}</p>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
@@ -436,7 +622,7 @@ export default function MainPlayerPage({
           <TabsContent value="Coach Notes" className="space-y-4 p-2">
             <div className="flex gap-4 justify-between flex-wrap">
               <div>
-                <p>Coach Feedback & Noted</p>
+                <p>Coach Feedback & Notes</p>
                 <p className="text-muted-foreground text-xs">
                   3 notes from coaches
                 </p>
@@ -444,16 +630,16 @@ export default function MainPlayerPage({
               <AddCoachNotes />
             </div>
 
-            {COACH_SESSION_NOTES.map((item, i) => (
+            {data?.all_notes && data?.all_notes?.map((item, i) => (
               <Card key={i} className="bg-black">
                 <CardContent className="space-y-2">
                   <div className="flex gap-4 items-center text-sm">
-                    <p>Coach {item.coach}</p>
+                    <p>Coach {joinNames([item?.coach_first_name, item?.coach_last_name])}</p>
 
                     <div className="flex gap-1">
                       <div className="flex gap-1">
                         {Array.from({ length: 5 }).map((_, i) =>
-                          i < item.star ? (
+                          i < (item?.rating || 0) ? (
                             <IoIosStar className="text-primary" key={i} />
                           ) : (
                             <IoIosStarOutline
@@ -468,12 +654,12 @@ export default function MainPlayerPage({
 
                   <div className="flex gap-2 items-center text-xs text-muted-foreground">
                     <Calendar size={14} />
-                    <p>{item.date}</p>
+                    <p>{item?.created_at && moment(new Date(item.created_at)).format("YYYY-MM-DD")}</p>
                     <MessageSquare size={14} />
-                    <p>Coach {item.session}</p>
+                    <p>{item?.session_name}</p>
                   </div>
 
-                  <p className="text-xs text-[#D1D5DC]">{item.note}</p>
+                  <p className="text-xs text-[#D1D5DC]">{item?.note}</p>
                 </CardContent>
               </Card>
             ))}

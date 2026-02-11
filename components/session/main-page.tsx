@@ -222,7 +222,6 @@ export default function SessionMainPage({id, back, back_title, type} : {id : num
       const result = await axios.patch(`/admin/sessions/${id}/status`, {
         status,
       });
-      console.log(result);
     } finally {
       setLoading(false);
     }

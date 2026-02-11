@@ -5,38 +5,138 @@ export async function GET(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const { id: player_id } = await params; 
+  const { id: player_id } = await params;
+
   try {
-    const result = await pool.query(
+    // ---------------- PLAYER + PROFILE ----------------
+    const playerResult = await pool.query(
       `
       SELECT
-        p.id AS player_id,
-        p.user_id,
-        p.position,
-        u.first_name,
-        u.last_name,
-        u.email,
-        u.location,
-        u.status,
-        u.picture,
-        u.phone_no,
-        u.birth_date,
-        u.joining_date
-      FROM players p
-      INNER JOIN users u ON u.id = p.user_id
-      WHERE p.id = $1
+      u.*,
+      to_json(p.*) AS profile,
+      p.parent_id
+      FROM users u
+      INNER JOIN players p ON p.user_id = u.id
+      WHERE u.id = $1
       `,
       [player_id]
     );
 
-    if (result.rows.length === 0) {
+    if (playerResult.rows.length === 0) {
       return NextResponse.json(
         { message: "player not found" },
         { status: 404 }
       );
     }
 
-    return NextResponse.json(result.rows[0]);
+    const player = playerResult.rows[0];
+
+    // ---------------- PARENT DATA ----------------
+    let attach_parent = null;
+
+    if (player.parent_id) {
+      const parentResult = await pool.query(
+        `
+        SELECT
+          u.*,
+          to_json(pr.*) AS profile
+        FROM users u
+        INNER JOIN parents pr ON pr.user_id = u.id
+        WHERE u.id = $1
+        `,
+        [player.parent_id]
+      );
+
+      attach_parent = parentResult.rows[0] || null;
+    }
+
+    // ---------------- SESSION DATA ----------------
+    const sessionsResult = await pool.query(
+      `
+  SELECT
+    s.*,
+
+    cu.first_name AS coach_first_name,
+    cu.last_name AS coach_last_name,
+
+    -- Payment detail for this player & session
+    (
+      SELECT to_json(pay.*)
+      FROM payments pay
+      WHERE pay.session_id = s.id
+      AND pay.user_id = $1
+      LIMIT 1
+    ) AS payment_detail,
+
+    -- Notes for session
+    COALESCE(
+      (
+        SELECT jsonb_agg(n.*)
+        FROM notes n
+        WHERE n.session_id = s.id
+      ),
+      '[]'
+    ) AS note_detail,
+
+    COALESCE(
+      (
+        SELECT jsonb_agg(a.*)
+        FROM attendance a
+        WHERE a.session_id = s.id
+        AND a.user_id = $1
+      ),
+      '[]'
+    ) AS attendance_detail
+
+  FROM session_players sp
+  INNER JOIN sessions s ON s.id = sp.session_id
+  LEFT JOIN users cu ON cu.id = s.coach_id
+
+  WHERE sp.user_id = $1
+  `,
+      [player_id]
+    );
+
+
+    // ---------------- PAYMENT DATA ----------------
+    const paymentsResult = await pool.query(
+      `
+      SELECT *
+      FROM payments
+      WHERE user_id = $1
+      `,
+      [player_id]
+    );
+
+   const allNotes = await pool.query(
+  `
+  SELECT
+    n.*,
+    u.first_name AS coach_first_name,
+    u.last_name  AS coach_last_name,
+    s.name AS session_name
+
+  FROM session_players sp
+  INNER JOIN sessions s ON s.id = sp.session_id
+  INNER JOIN notes n ON n.session_id = s.id
+  LEFT JOIN users u ON u.id = s.coach_id
+
+  WHERE sp.user_id = $1
+  ORDER BY n.created_at DESC
+  `,
+  [player_id]
+);
+
+
+    // ---------------- FINAL RESPONSE ----------------
+    return NextResponse.json({
+      ...player,
+      attach_parent,
+      sessions_data: sessionsResult.rows,
+      payment_data: paymentsResult.rows,
+      all_notes: allNotes.rows
+    });
+
   } catch (error) {
     console.error("GET /api/player/[id] error:", error);
 
@@ -46,6 +146,7 @@ export async function GET(
     );
   }
 }
+
 
 export async function PATCH(
   request: Request,

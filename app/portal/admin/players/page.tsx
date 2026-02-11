@@ -29,10 +29,9 @@ export default function Page() {
             fetchData()
     }), [user])
 
-    async function fetchData () {
+    async function fetchData() {
         try {
             const result = await axios.get("/admin/users?role=player")
-            console.log(result.data)
             if (result.data) {
                 const mappedPlayers = result.data.map((p: any) => ({
                     id: p.id,
@@ -41,13 +40,12 @@ export default function Page() {
                     age: p.birth_date ? new Date().getFullYear() - new Date(p.birth_date).getFullYear() : "N/A",
                     position: p.position || "N/A",
                     phone: p.phone_no,
-                    parent:joinNames([p?.parent_first_name,p?.parent_last_name ]),
+                    parent: joinNames([p?.parent_first_name, p?.parent_last_name]),
                     last_session: p?.last_session || "N/A",
                     last_session_date: p?.last_session_date ? moment(new Date(p?.last_session_date)).format("YYYY-MM-DD") : "N/A",
                     attendance: p?.attendance_percent || 0,
                     joining_date: p.created_at
                 }));
-                console.log(mappedPlayers)
                 setPlayers(mappedPlayers)
             }
         } catch (error) {
@@ -66,9 +64,9 @@ export default function Page() {
                         <Download /> Export
                     </Button>
 
-                    <CreatePlayer onRefresh={async()=>{
+                    <CreatePlayer onRefresh={async () => {
                         await fetchData()
-                    }}/>
+                    }} />
                 </div>
             </Header>
 
@@ -109,17 +107,11 @@ export default function Page() {
 
 
             </div>
-
-            {loading ? (
-                <div className="flex h-[50vh] w-full items-center justify-center">
-                    <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-                </div>
-            ) : (
-                <PageTable
-                    columns={PLAYERS_COLUMNS}
-                    data={players}
-                />
-            )}
+            <PageTable
+                loading={loading}
+                columns={PLAYERS_COLUMNS}
+                data={players}
+            />
         </div>
 
     )

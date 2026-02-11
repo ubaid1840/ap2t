@@ -72,7 +72,6 @@ export function CreateSessionDialog({ onRefresh }: { onRefresh: () => Promise<vo
     e.preventDefault()
     setLoading(true);
     const { coach_name, ...finalData } = session
-    console.log(finalData)
     try {
       await axios.post("/admin/sessions",
         {
