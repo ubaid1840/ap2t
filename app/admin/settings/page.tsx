@@ -34,6 +34,7 @@ import { GoDotFill } from "react-icons/go";
 import { RiShieldKeyholeLine } from "react-icons/ri";
 import axios from "@/lib/axios";
 import { useAuth } from "@/app/contexts/auth-context";
+import { joinNames } from "@/lib/functions";
 export default function Page() {
   const [loading, setLoading] = useState(false);
   const [savingChanges, setSavingChanges] = useState(false);
@@ -169,10 +170,10 @@ export default function Page() {
           params: { user_id: user.id }
         });
 
-        const result = res.data;
+        const result = res.data
         setUser_id(result.user?.id);
         setProfileInfo({
-          adminUser: result.user?.first_name || "",
+          adminUser: joinNames([result.user?.first_name , result.user?.last_name]) || "",
           email: result.user?.email || "",
           phoneNo: result.user?.phone_no || "",
           role: result.user?.role || "",
