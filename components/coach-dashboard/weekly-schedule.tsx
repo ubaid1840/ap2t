@@ -53,7 +53,7 @@ export const WeeklySchedule: React.FC<WeeklyScheduleProps> = ({ events, id, pref
     isBlocked: boolean;
   } | null>(null);
 
-  // Local copy of schedule_preference so we can update without affecting props directly
+  
   const [localPreference, setLocalPreference] = useState<Record<string, string>>(preference || {});
 
   const weekDates = Array.from({ length: 7 }).map((_, i) =>
@@ -63,7 +63,7 @@ export const WeeklySchedule: React.FC<WeeklyScheduleProps> = ({ events, id, pref
   const prevWeek = () => setCurrentWeekStart(moment(currentWeekStart).subtract(7, "days"));
   const nextWeek = () => setCurrentWeekStart(moment(currentWeekStart).add(7, "days"));
 
-  // Combine events with localPreference to get full weekly schedule
+  
   const getEventForCell = (date: moment.Moment, time: string) => {
     const dt = moment(date).set({
       hour: parseInt(time.split(":")[0]),
@@ -79,7 +79,7 @@ export const WeeklySchedule: React.FC<WeeklyScheduleProps> = ({ events, id, pref
     return events.find(e => e.date === date.format("YYYY-MM-DD") && e.time === time);
   };
 
-  const handleRightClick = (e: React.MouseEvent, date: moment.Moment, time: string) => {
+  const handleRightClick = (e: React.MouseEvent, date: moment.Moment, time: string, event : any) => {
     e.preventDefault();
 
     const dateTime = moment(date).set({
@@ -90,6 +90,8 @@ export const WeeklySchedule: React.FC<WeeklyScheduleProps> = ({ events, id, pref
     }).toISOString();
 
     const isBlocked = localPreference[dateTime] === "blocked";
+
+    if(event && event.status !== "Blocked") return
 
     setContextMenu({
       x: e.clientX,
@@ -104,9 +106,9 @@ export const WeeklySchedule: React.FC<WeeklyScheduleProps> = ({ events, id, pref
 
     const updated = { ...localPreference };
     if (contextMenu.isBlocked) {
-      delete updated[contextMenu.dateTime]; // remove block
+      delete updated[contextMenu.dateTime]; 
     } else {
-      updated[contextMenu.dateTime] = "blocked"; // add block
+      updated[contextMenu.dateTime] = "blocked"; 
     }
 
     setLocalPreference(updated);
@@ -114,7 +116,7 @@ export const WeeklySchedule: React.FC<WeeklyScheduleProps> = ({ events, id, pref
 
     if (!id) return;
 
-    // send full updated preference to backend
+    
     await axios.put(`/admin/coaches/${id}`, {
       id,
       schedule_preference: updated,
@@ -191,7 +193,7 @@ export const WeeklySchedule: React.FC<WeeklyScheduleProps> = ({ events, id, pref
                         return (
                           <TableCell
                             key={date.format("YYYY-MM-DD") + time}
-                            onContextMenu={(e) => handleRightClick(e, date, time)}
+                            onContextMenu={(e) => handleRightClick(e, date, time, event)}
                             className={`p-2 border-2 border-border ${statusColor(event?.status || "Available")} overflow-hidden whitespace-nowrap truncate`}
                           >
                             {event?.title || ""}
