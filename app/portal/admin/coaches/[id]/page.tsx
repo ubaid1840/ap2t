@@ -492,7 +492,8 @@ const EditProfile = ({ id, data, onRefresh }: { id: string, data: any, onRefresh
   const [certificationInput, setCertificationInput] = useState("")
 
   const [coach, setCoach] = useState({
-    fullname: "",
+  first_name: "",
+    last_name:"",
     phone: "",
     career_start: "",
     bio: "",
@@ -503,7 +504,8 @@ const EditProfile = ({ id, data, onRefresh }: { id: string, data: any, onRefresh
   useEffect(() => {
     if (data) {
       setCoach({
-        fullname: joinNames([data?.first_name, data?.last_name]),
+       first_name : data?.first_name,
+       last_name : data?.last_name,
         phone: data?.phone_no,
         career_start: data?.profile?.career_start,
         bio: data?.profile?.bio,
@@ -516,7 +518,7 @@ const EditProfile = ({ id, data, onRefresh }: { id: string, data: any, onRefresh
   const changeCoach = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const { first_name, last_name } = splitFullName(coach.fullname)
+   
 
     try {
      
@@ -604,21 +606,40 @@ const handleAddCertification = (e: React.KeyboardEvent<HTMLInputElement>) => {
           <form onSubmit={changeCoach} className="">
             <ScrollArea className="h-[60vh] py-1 space-y-4 px-2 ">
               <div className="space-y-2 px-2 pb-2">
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 gap-2">
                   <div className="space-y-2">
                     <Label className="text-sm text-[#99A1AF]">
-                      Full Name
+                      First Name
                     </Label>
                     <Input
                       name="fullName"
                       placeholder="Coach Martinez"
 
                       required
-                      value={coach.fullname}
+                      value={coach.first_name}
                       onChange={(e) =>
                         setCoach((prev) => ({
                           ...prev,
-                          fullname: e.target.value,
+                          first_name: e.target.value,
+                        }))
+                      }
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label className="text-sm text-[#99A1AF]">
+                      Last Name
+                    </Label>
+                    <Input
+                      name="lastName"
+                      placeholder="Coach Martinez"
+
+                      required
+                      value={coach.last_name}
+                      onChange={(e) =>
+                        setCoach((prev) => ({
+                          ...prev,
+                          last_name: e.target.value,
                         }))
                       }
                     />

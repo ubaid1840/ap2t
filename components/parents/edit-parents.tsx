@@ -31,25 +31,18 @@ export function EditParents() {
   const formData = new FormData(e.currentTarget);
 
   const values = {
-    name: formData.get("name") as string | null,
+    first_name: formData.get("first_name") as string | null,
+    last_name:formData.get("last_name") as string|null,
     email: formData.get("email") as string | null,
     phone: formData.get("phone") as string | null,
     address: formData.get("address") as string | null,
   };
 
   try {
-    let first_name = "";
-    let last_name = "";
-
-    if (values.name) {
-      const names = values.name.trim().split(" ");
-      first_name = names.shift() || "";
-      last_name = names.join(" ") || "";
-    }
     const body: any = {};
 
-    if (first_name) body.first_name = first_name;
-    if (last_name) body.last_name = last_name;
+    if (values.first_name) body.first_name = values.first_name;
+    if (values.last_name) body.last_name = values.last_name;
     if (values.email) body.email = values.email;
     if (values.phone) body.phone_no = values.phone;
     if (values.address) body.location = values.address;
@@ -78,16 +71,26 @@ export function EditParents() {
                         </DialogHeader>
 
                         <div className="grid gap-4 py-4 border-t">
-                            <div className="grid gap-2">
+                            <div className="grid grid-cols-2 gap-2">
+                                <div className="grid gap-2">
                                 <Label htmlFor="name" className="text-xs text-muted-foreground">Full Name</Label>
                                 <Input
-                                    id="name"
-                                    name="name"
-                                    placeholder="Pedro Duarte"
-                                    
+                                    id="first_name"
+                                    name="first_name"
+                                    placeholder="Pedro"
                                     className="dark:bg-black"
                                 />
                             </div>
+                            <div className="grid gap-2">
+                                <Label htmlFor="last_name" className="text-xs text-muted-foreground">Full Name</Label>
+                                <Input
+                                    id="last_name"
+                                    name="last_name"
+                                    placeholder="Duarte"
+                                    className="dark:bg-black"
+                                />
+                            </div>
+                                </div>
 
                             <div className="grid gap-2">
                                 <Label htmlFor="email" className="text-xs text-muted-foreground">Email</Label>

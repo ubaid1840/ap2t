@@ -10,7 +10,7 @@ import {
   StepperTrigger,
 } from "@/components/ui/stepper";
 import { File, FileWarning, User, Wallet } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import AppCalendar from "../app-calendar";
 import GradientIcon from "../landing/icon-container";
 import { Button } from "../ui/button";
@@ -21,6 +21,7 @@ import axios from "@/lib/axios";
 import { useRouter } from "next/navigation";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "@/lib/firebase";
+import { Separator } from "../ui/separator";
 
 export default function SignUpForm({
   onClickLogin,
@@ -28,7 +29,8 @@ export default function SignUpForm({
   onClickLogin: () => void;
 }) {
   const router = useRouter();
-  const [signUpData, setSignUpData] = useState({
+  const [underAged,setUnderAged]=useState(false)
+  const [playerData, setPlayerData] = useState({
     first_name: "",
     last_name: "",
     birth_date: "",
@@ -37,6 +39,17 @@ export default function SignUpForm({
     password: "",
     confirm_password: "",
   });
+
+  const [parentData,setParentData]=useState({
+    first_name: "",
+    last_name: "",
+    birth_date: "",
+    location: "",
+    email: "",
+    password: "",
+    confirm_password: "",
+  })
+
 
   const [paymentData, setPaymentData] = useState({
     cardholder_name: "",
@@ -48,25 +61,57 @@ export default function SignUpForm({
   const [waiverData, setWaiverData] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
 
+  useEffect((()=>{
+    const age=new Date().getFullYear() - new Date(playerData.birth_date).getFullYear()
+    if(age<18){
+      setUnderAged(true)
+    }
+    else{
+      setUnderAged(false)
+    }
+  }),[playerData.birth_date])
+
   const signUp = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!signUpData.email || !signUpData.password) return;
+    if (!playerData.email || !playerData.password) return;
+    if (playerData.password !== playerData.confirm_password) return;
+    if(underAged){
+      if(!parentData.email||!parentData.password)return;
+      if(parentData.password!== parentData.confirm_password) return
+    }
     if (!waiverData) return;
-    if (signUpData.password !== signUpData.confirm_password) return;
+
+    const payload={
+
+        player:{first_name: playerData.first_name,
+        last_name: playerData.last_name,
+        email: playerData.email,
+        password: playerData.password,
+        birth_date: playerData.birth_date,
+        location: playerData.location,
+        role: "player"},
+        underAged:underAged,
+        parent:{}
+      
+    }
+  if (underAged) {
+  payload.parent = {
+    first_name: parentData.first_name,
+    last_name: parentData.last_name,
+    email: parentData.email,
+    password: parentData.password,
+    birth_date: parentData.birth_date,
+    location: parentData.location,
+    role: "parent",
+  };
+}
+    
     try {
-      const res = await axios.post("/user", {
-        first_name: signUpData.first_name,
-        last_name: signUpData.last_name,
-        email: signUpData.email,
-        password: signUpData.password,
-        birth_date: signUpData.birth_date,
-        location: signUpData.location,
-        role: "admin",
-      });
+      const res = await axios.post("/user", payload);
       if (res.status === 200) {
         const { email } = res.data;
-        await signInWithEmailAndPassword(auth, email, signUpData.password);
+        await signInWithEmailAndPassword(auth, email, playerData.password);
       }
     } catch (error) {
       console.error("signup error:", error);
@@ -81,6 +126,7 @@ export default function SignUpForm({
       content: (
         <form className="bg-[#131313] p-6 rounded-[10px] w-full">
           <div className="space-y-6">
+
             <div className="border-b border-[#282828] pb-3">
               <h2 className="text-sm font-medium">Player Information</h2>
             </div>
@@ -93,9 +139,9 @@ export default function SignUpForm({
                   type="text"
                   placeholder="First Name"
                   className="w-full px-4"
-                  value={signUpData.first_name}
+                  value={playerData.first_name}
                   onChange={(e) =>
-                    setSignUpData((prev) => ({
+                    setPlayerData((prev) => ({
                       ...prev,
                       first_name: e.target.value,
                     }))
@@ -109,9 +155,9 @@ export default function SignUpForm({
                   type="text"
                   placeholder="Last Name"
                   className="w-full px-4"
-                  value={signUpData.last_name}
+                  value={playerData.last_name}
                   onChange={(e) =>
-                    setSignUpData((prev) => ({
+                    setPlayerData((prev) => ({
                       ...prev,
                       last_name: e.target.value,
                     }))
@@ -125,12 +171,12 @@ export default function SignUpForm({
                 <Label className="text-sm">Birth Date *</Label>
                 <AppCalendar
                   date={
-                    signUpData.birth_date
-                      ? new Date(signUpData.birth_date)
+                    playerData.birth_date
+                      ? new Date(playerData.birth_date)
                       : undefined
                   }
                   onChange={(date) =>
-                    setSignUpData((prevState) => ({
+                    setPlayerData((prevState) => ({
                       ...prevState,
                       birth_date: date,
                     }))
@@ -145,9 +191,9 @@ export default function SignUpForm({
                   type="text"
                   placeholder="New York"
                   className="w-full px-4"
-                  value={signUpData.location}
+                  value={playerData.location}
                   onChange={(e) =>
-                    setSignUpData((prev) => ({
+                    setPlayerData((prev) => ({
                       ...prev,
                       location: e.target.value,
                     }))
@@ -163,9 +209,9 @@ export default function SignUpForm({
                 type="email"
                 placeholder="johnsmith@gmail.com"
                 className="w-full px-4"
-                value={signUpData.email}
+                value={playerData.email}
                 onChange={(e) =>
-                  setSignUpData((prev) => ({
+                  setPlayerData((prev) => ({
                     ...prev,
                     email: e.target.value,
                   }))
@@ -181,9 +227,9 @@ export default function SignUpForm({
                   type="password"
                   placeholder="••••••••"
                   className="w-full px-4"
-                  value={signUpData.password}
+                  value={playerData.password}
                   onChange={(e) =>
-                    setSignUpData((prev) => ({
+                    setPlayerData((prev) => ({
                       ...prev,
                       password: e.target.value,
                     }))
@@ -197,9 +243,9 @@ export default function SignUpForm({
                   type="password"
                   placeholder="••••••••"
                   className="w-full px-4"
-                  value={signUpData.confirm_password}
+                  value={playerData.confirm_password}
                   onChange={(e) =>
-                    setSignUpData((prev) => ({
+                    setPlayerData((prev) => ({
                       ...prev,
                       confirm_password: e.target.value,
                     }))
@@ -207,6 +253,140 @@ export default function SignUpForm({
                 />
               </div>
             </div>
+            <Separator/>
+            {underAged &&(
+              <>
+              <div className="border-b border-[#282828] pb-3">
+              <h2 className="text-sm font-medium">Parent Information</h2>
+            </div>
+
+            <div className="flex gap-4">
+              <div className="flex-1">
+                <Label className="text-sm">First Name *</Label>
+                <Input
+                  required
+                  type="text"
+                  placeholder="First Name"
+                  className="w-full px-4"
+                  value={parentData.first_name}
+                  onChange={(e) =>
+                    setParentData((prev) => ({
+                      ...prev,
+                      first_name: e.target.value,
+                    }))
+                  }
+                />
+              </div>
+              <div className="flex-1">
+                <Label className="text-sm">Last Name *</Label>
+                <Input
+                  required
+                  type="text"
+                  placeholder="Last Name"
+                  className="w-full px-4"
+                  value={parentData.last_name}
+                  onChange={(e) =>
+                    setParentData((prev) => ({
+                      ...prev,
+                      last_name: e.target.value,
+                    }))
+                  }
+                />
+              </div>
+            </div>
+
+            <div className="flex gap-4">
+              <div className="flex-1">
+                <Label className="text-sm">Birth Date *</Label>
+                <AppCalendar
+                  className="h-11"
+                  date={
+                    parentData.birth_date
+                      ? new Date(parentData.birth_date)
+                      : undefined
+                  }
+                  onChange={(date) =>
+                    setParentData((prevState) => ({
+                      ...prevState,
+                      birth_date: date,
+                    }))
+                  }
+                  required
+                />
+              </div>
+              <div className="flex-1">
+                <Label className="text-sm">Town / City *</Label>
+                <Input
+                  required
+                  type="text"
+                  placeholder="New York"
+                  className="w-full px-4"
+                  value={parentData.location}
+                  onChange={(e) =>
+                    setParentData((prev) => ({
+                      ...prev,
+                      location: e.target.value,
+                    }))
+                  }
+                />
+              </div>
+            </div>
+
+            <div>
+              <Label className="text-sm">Email *</Label>
+              <Input
+                required
+                type="email"
+                placeholder="johnsmith@gmail.com"
+                className="w-full px-4"
+                value={parentData.email}
+                onChange={(e) =>
+                  setParentData((prev) => ({
+                    ...prev,
+                    email: e.target.value,
+                  }))
+                }
+              />
+            </div>
+
+            <div className="flex gap-4">
+              <div className="flex-1">
+                <Label className="text-sm">Password *</Label>
+                <Input
+                  required
+                  type="password"
+                  placeholder="••••••••"
+                  className="w-full px-4"
+                  value={parentData.password}
+                  onChange={(e) =>
+                    setParentData((prev) => ({
+                      ...prev,
+                      password: e.target.value,
+                    }))
+                  }
+                />
+              </div>
+              <div className="flex-1">
+                <Label className="text-sm">Confirm Password *</Label>
+                <Input
+                  required
+                  type="password"
+                  placeholder="••••••••"
+                  className="w-full px-4"
+                  value={parentData.confirm_password}
+                  onChange={(e) =>
+                    setParentData((prev) => ({
+                      ...prev,
+                      confirm_password: e.target.value,
+                    }))
+                  }
+                />
+              </div>
+            </div>
+              </>
+            )
+
+            }
 
             <div className="flex gap-4">
               <Button

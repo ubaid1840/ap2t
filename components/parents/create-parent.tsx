@@ -25,7 +25,8 @@ export function CreateParent({ onRefresh }: { onRefresh: () => Promise<void> }) 
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false)
   const [parent, setParent] = useState({
-    full_name: "",
+    first_name: "",
+    last_name:"",
     email: "",
     phone: "",
     address: "",
@@ -34,12 +35,11 @@ export function CreateParent({ onRefresh }: { onRefresh: () => Promise<void> }) 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setLoading(true)
-    const { first_name, last_name } = splitFullName(parent.full_name)
     try {
       const result = await axios.post("/user",
         {
-          first_name: first_name,
-          last_name: last_name,
+          first_name: parent.first_name,
+          last_name: parent.last_name,
           email: parent.email,
           phone_no: parent.phone,
           location: parent.address,
@@ -59,7 +59,8 @@ export function CreateParent({ onRefresh }: { onRefresh: () => Promise<void> }) 
 
   function clearForm() {
     setParent({
-      full_name: "",
+      first_name: "",
+      last_name:"",
       email: "",
       phone: "",
       address: "",
@@ -83,24 +84,46 @@ export function CreateParent({ onRefresh }: { onRefresh: () => Promise<void> }) 
             </DialogHeader>
 
             <div className="grid gap-4 py-4 border-t">
-              <div className="grid gap-2">
-                <Label htmlFor="name" className="text-xs text-muted-foreground">
-                  Full Name
+              <div className="grid grid-cols-2 gap-2">
+                <div className="flex flex-col gap-2">
+                <Label htmlFor="first_name" className="text-xs text-muted-foreground">
+                  First Name
                 </Label>
                 <Input
-                  id="name"
-                  name="name"
-                  placeholder="Pedro Duarte"
+                  id="first_name"
+                  name="first_name"
+                  placeholder="Pedro"
                   required
                   className="dark:bg-black"
-                  value={parent.full_name}
+                  value={parent.first_name}
                   onChange={(e) =>
                     setParent((prev) => ({
                       ...prev,
-                      full_name: e.target.value,
+                      first_name: e.target.value,
                     }))
                   }
                 />
+                </div>
+                <div className="flex flex-col gap-2">
+                <Label htmlFor="name" className="text-xs text-muted-foreground">
+                  last Name
+                </Label>
+                <Input
+                  id="last_name"
+                  name="last_name"
+                  placeholder="Duarte"
+                  required
+                  className="dark:bg-black"
+                  value={parent.last_name}
+                  onChange={(e) =>
+                    setParent((prev) => ({
+                      ...prev,
+                      last_name: e.target.value,
+                    }))
+                  }
+                />
+                </div>
+
               </div>
 
               <div className="grid gap-2">
