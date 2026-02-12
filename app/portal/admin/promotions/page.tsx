@@ -45,6 +45,7 @@ import { ReactNode, useEffect, useState } from "react";
 import { GoDotFill } from "react-icons/go";
 import { toast } from "sonner";
 import NextLink from "next/link";
+import { TimePickerFixed } from "@/components/time-picker-fixed";
 
 
 
@@ -880,7 +881,7 @@ const EditPromotion = ({ sessionId, sessionData, onSuccess }: { sessionId: numbe
                     <Label className="text-sm text-muted-foreground">
                       Start Time *
                     </Label>
-                    <TimePicker
+                    <TimePickerFixed
                       className="h-9"
                       value={session.start_time}
                       onChange={(time) =>
@@ -896,7 +897,7 @@ const EditPromotion = ({ sessionId, sessionData, onSuccess }: { sessionId: numbe
                       End Time *
                     </Label>
 
-                    <TimePicker
+                    <TimePickerFixed
                       className="h-9"
                       value={session.end_time}
                       onChange={(time) =>

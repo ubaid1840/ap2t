@@ -27,6 +27,7 @@ import {
   SelectValue,
 } from "../ui/select";
 import { AssignCoachDialog } from "./assign-coach-dialog";
+import { TimePickerFixed } from "../time-picker-fixed";
 
 export type SessionType = {
   name: string,
@@ -224,7 +225,7 @@ export function CreateSessionDialog({ onRefresh }: { onRefresh: () => Promise<vo
                     <Label className="text-sm text-muted-foreground">
                       Start Time *
                     </Label>
-                    <TimePicker
+                    <TimePickerFixed
                       className="h-9"
                       value={session.start_time}
                       onChange={(time) =>
@@ -240,7 +241,7 @@ export function CreateSessionDialog({ onRefresh }: { onRefresh: () => Promise<vo
                       End Time *
                     </Label>
 
-                    <TimePicker
+                    <TimePickerFixed
                       className="h-9"
                       value={session.end_time}
                       onChange={(time) =>

@@ -40,6 +40,7 @@ import { Separator } from "../ui/separator";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "../ui/select";
 import { Spinner } from "../ui/spinner";
 import ConfirmationDialog from "../alert-dialog";
+import { TimePickerFixed } from "../time-picker-fixed";
 
 const styles = {
   active:
@@ -289,7 +290,7 @@ export function EditSessionDialog({
                     <Label className="text-sm text-muted-foreground">
                       Start Time *
                     </Label>
-                    <TimePicker
+                    <TimePickerFixed
                       className="h-9"
                       value={session.start_time}
                       onChange={(time) =>
@@ -305,7 +306,7 @@ export function EditSessionDialog({
                       End Time *
                     </Label>
 
-                    <TimePicker
+                    <TimePickerFixed
                       className="h-9"
                       value={session.end_time}
                       onChange={(time) =>
