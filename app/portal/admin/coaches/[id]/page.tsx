@@ -1,77 +1,132 @@
 "use client";
-import { useParams } from "next/navigation";
-import { coachinfo, coachinfoType } from "../page";
+import AppCalendar from "@/components/app-calendar";
 import BackButton from "@/components/back-button";
-import { ReactNode, useEffect, useState } from "react";
+import CardStatus from "@/components/card-status";
+import LineChart from "@/components/charts/line-chart-dots";
+import {
+  COACH_REVENUE_TRED,
+  COACH_WEEKLY_EVENTS
+} from "@/components/coach-dashboard/constants";
+import { WeeklySchedule } from "@/components/coach-dashboard/weekly-schedule";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import {
+  type ChartConfig
+} from "@/components/ui/chart";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogHeader,
+  DialogTitle
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Progress } from "@/components/ui/progress";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Separator } from "@/components/ui/separator";
+import { Spinner } from "@/components/ui/spinner";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Textarea } from "@/components/ui/textarea";
+import { useIsMobile } from "@/hooks/use-mobile";
+import axios from "@/lib/axios";
+import { getYear, joinNames } from "@/lib/functions";
+import { Scrollbar } from "@radix-ui/react-scroll-area";
 import {
   Award,
-  Bell,
   Calendar,
-  CheckCircle,
-  CircleCheckBig,
   CircleCheckBigIcon,
   Clock,
   DollarSign,
   Edit,
   Info,
   Mail,
-  Medal,
-  MessageSquare,
-  NotebookPen,
-  OctagonAlert,
-  Percent,
   Phone,
-  Recycle,
-  RefreshCcw,
   TrendingUp,
-  User,
-  Users,
+  User
 } from "lucide-react";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Progress } from "@/components/ui/progress";
-import {
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-  type ChartConfig,
-} from "@/components/ui/chart";
-import { GoDotFill } from "react-icons/go";
-import CardStatus from "@/components/card-status";
-import { IoCalendarClear } from "react-icons/io5";
-import { useIsMobile } from "@/hooks/use-mobile";
-import { Scrollbar } from "@radix-ui/react-scroll-area";
-import { Separator } from "@/components/ui/separator";
-import { Badge } from "@/components/ui/badge";
-import LineChart from "@/components/charts/line-chart-dots";
-import {
-  COACH_ALL_SESSIONS,
-  COACH_REVENUE_TRED,
-  COACH_WEEKLY_EVENTS,
-} from "@/components/coach-dashboard/constants";
-import { WeeklySchedule } from "@/components/coach-dashboard/weekly-schedule";
-import axios from "@/lib/axios";
-import AppCalendar from "@/components/app-calendar";
-import { getYear, joinNames, splitFullName } from "@/lib/functions";
 import moment from "moment";
-import { Spinner } from "@/components/ui/spinner";
+import { useParams } from "next/navigation";
+import { ReactNode, useEffect, useState } from "react";
+import { IoCalendarClear } from "react-icons/io5";
+import { coachinfoType } from "../page";
+
+
+export interface CoachResponse {
+  id: number;
+  first_name: string;
+  last_name: string;
+  email: string;
+  role: string;
+  status: string;
+  picture: string | null;
+  location: string | null;
+  phone_no: string | null;
+  joining_date: string | null;
+  birth_date: string | null;
+  created_at: string;
+
+  profile: CoachProfile;
+
+  session_data: SessionData[];
+  payment_data: PaymentData[];
+}
+
+export interface CoachProfile {
+  id: number;
+  bio: string | null;
+  rating: number | null;
+  user_id: number;
+  created_at: string;
+  career_start: string | null;
+
+  specialities: string[];
+  certifications: string[];
+
+  schedule_preference: string | null;
+}
+
+export interface SessionData {
+  id: number;
+  name: string;
+  description: string;
+  status: string;
+  session_type: string;
+  coach_id: number;
+  location: string;
+
+  start_time: string;
+  end_time: string;
+  date: string;
+  end_date: string;
+
+  price: number;
+  promotion_price: number;
+
+  max_players: number;
+  apply_promotion: boolean;
+  show_storefront: boolean;
+
+  image: string;
+
+  created_at: string;
+}
+
+export interface PaymentData {
+  id: number;
+  session_id: number;
+  user_id: number;
+  amount: number;
+  status: string;
+  created_at: string;
+}
+
+
+
 
 export default function Page() {
   const { id } = useParams();
-  const [data, setData] = useState<coachinfoType>();
+  const [data, setData] = useState<CoachResponse>();
   const [tab, setTab] = useState("Details");
   const [loading, setLoading] = useState(false)
 
@@ -102,7 +157,7 @@ export default function Page() {
 
 
 
-  function calculateStats(sessions, payments) {
+  function calculateStats(sessions : SessionData[] | undefined, payments : PaymentData[] | undefined) {
     let totalSessions = 0
     let totalCompleted = 0
     let totalUpcoming = 0
@@ -197,7 +252,7 @@ export default function Page() {
                   <Phone size={14} /> {data?.phone_no}
                 </span>
                 <span className="inline-flex gap-2">
-                  <IoCalendarClear size={14} /> Joined {data?.created_at && moment(new Date(data?.created_at)).format("YYYY-MM-DD")} • {getYear(data?.profile?.career_start)} years
+                  <IoCalendarClear size={14} /> Joined {data?.created_at && moment(new Date(data?.created_at)).format("YYYY-MM-DD")} • {getYear(data?.profile?.career_start || "")} years
                   experience
                 </span>
               </div>
@@ -211,7 +266,7 @@ export default function Page() {
             {localData.map((item, index) => (
               <HeaderCard
                 key={index}
-                title={item.description as string}
+                title={String(item.description)}
                 description={item.title}
                 icon={
                   <div
