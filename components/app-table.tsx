@@ -42,6 +42,7 @@ import {
 } from "@/components/ui/select";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Spinner } from "./ui/spinner";
+import { useSidebar } from "./ui/sidebar";
 
 const PageTable = ({
   columns,
@@ -62,6 +63,7 @@ const PageTable = ({
     pageIndex: currentPage - 1,
     pageSize: pageSize,
   };
+  const {open} = useSidebar()
 
 
   const pageCount = Math.ceil(data.length / pageSize);
@@ -113,7 +115,7 @@ const PageTable = ({
 
   return (
     <div className="flex flex-1 flex-col space-y-4">
-      <div className={`relative flex flex-1 flex-col ${isMobile && "max-w-[calc(100vw-44px)]"} `}>
+      <div className={`relative flex flex-1 flex-col ${open ? "w-[calc(100dvw-304px)]" : "w-[calc(100dvw-96px)]"} ${isMobile && "w-[calc(100vw-44px)]"} `}>
         <div className={`flex rounded-md border md:overflow-auto ${headerClassName}`}>
           <ScrollArea className="overflow-x-auto flex flex-1">
             <Table className="relative w-full">
