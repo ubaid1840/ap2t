@@ -54,7 +54,7 @@ export function TimePickerFixed({ value, onChange, className }: TimePickerProps)
                 variant={h === selectedHour ? "default" : "ghost"}
                 onClick={() => updateTime(h)}
               >
-                {pad(h)}
+                {pad(h)}:00
               </Button>
             ))}
           </div>
