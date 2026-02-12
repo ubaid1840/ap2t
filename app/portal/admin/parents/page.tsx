@@ -105,6 +105,8 @@ export default function Page() {
         data={parents || []}
         onRowClick={() => { }}
       />
+
+     
     </div>
   );
 }

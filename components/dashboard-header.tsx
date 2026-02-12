@@ -6,18 +6,17 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useIsMobile } from "@/hooks/use-mobile";
-import { Bell, ChevronDown } from "lucide-react";
-import InputWithIcon from "./input-with-icon";
-import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
-import { Separator } from "./ui/separator";
-import { SidebarTrigger } from "./ui/sidebar";
-import NotificationSheet from "./notification-sheet";
-import { Button } from "./ui/button";
-import { signOut } from "firebase/auth";
-import { auth } from "@/lib/firebase";
-import { ReactNode } from "react";
 import { useAuth } from "@/contexts/auth-context";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { auth } from "@/lib/firebase";
+import { signOut } from "firebase/auth";
+import { ChevronDown } from "lucide-react";
+import { ReactNode } from "react";
+import InputWithIcon from "./input-with-icon";
+import NotificationSheet from "./notification-sheet";
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+import { Button } from "./ui/button";
+import { Separator } from "./ui/separator";
 
 export default function DashboardHeader({trigger} :{ trigger ?: ReactNode}) {
   const isMobile = useIsMobile();
