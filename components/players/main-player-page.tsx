@@ -3,9 +3,7 @@ import CardStatus, { typeClasses } from "@/components/card-status";
 import { BarChart } from "@/components/charts/bar-chart";
 import { AddCoachNotes } from "@/components/players/add-coach-notes";
 import { PlayersData } from "@/components/players/columns";
-import {
-  CHECKINS_12WEEKS_DATA
-} from "@/components/players/constatns";
+import { CHECKINS_12WEEKS_DATA } from "@/components/players/constatns";
 import { EditInfo } from "@/components/players/edit-info";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -39,7 +37,11 @@ import {
 import moment from "moment";
 import { ReactNode, useEffect, useState } from "react";
 import { IoIosStar, IoIosStarOutline } from "react-icons/io";
-
+import { AddParentDialog } from "./add-parents";
+import { useParams, useRouter } from "next/navigation";
+import getInitials from "../parents/get-initials";
+import { Router } from "next/router";
+import Link from "next/link";
 
 export interface PlayerResponse {
   id: number;
@@ -83,6 +85,8 @@ export interface Parent {
   last_name: string;
   email: string;
   phone_no: string;
+  picture: string;
+  location: string;
   profile?: any;
 }
 
@@ -154,12 +158,11 @@ export interface NoteWithCoach {
   note: string;
   important: boolean;
   created_at: string;
-  rating?: number
+  rating?: number;
   coach_first_name: string | null;
   coach_last_name: string | null;
   session_name: string;
 }
-
 
 export default function MainPlayerPage({
   id,
@@ -170,92 +173,86 @@ export default function MainPlayerPage({
 }) {
   const [data, setData] = useState<PlayerResponse | undefined>();
   const [tab, setTab] = useState("Session History");
-  const { user } = useAuth()
+  const { user } = useAuth();
   const isMobile = useIsMobile();
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(false);
+  const { id: player_id } = useParams();
+  const router = useRouter();
 
   useEffect(() => {
-
-    if (user?.id && id)
-      fetchData();
+    if (user?.id && id) fetchData();
   }, [id, user]);
 
   const fetchData = async () => {
     if (!id) return;
 
     try {
-       const result = await axios.get(`/admin/players/${id}`);
-    setData(result.data)
-    } finally {
-      setLoading(false)
-    }
-   
+      const result = await axios.get(`/admin/players/${id}`);
 
+      setData(result.data);
+    } finally {
+      setLoading(false);
+    }
   };
+
+  useEffect(() => {
+    console.log(data);
+  }, [data]);
 
   function calculateTotalPendingPayments(sessions: SessionData[] | undefined) {
     if (!sessions) return 0;
 
     return sessions.reduce((count, session) => {
-
       const isPending =
-        !session.payment_detail ||
-        session.payment_detail.status === "pending";
+        !session.payment_detail || session.payment_detail.status === "pending";
 
       return isPending ? count + 1 : count;
-
     }, 0);
   }
 
-   function calculateTotalCompedPayments(sessions: SessionData[] | undefined) {
+  function calculateTotalCompedPayments(sessions: SessionData[] | undefined) {
     if (!sessions) return 0;
 
     return sessions.reduce((count, session) => {
-
       const isComped = session?.payment_detail?.status === "comped";
 
       return isComped ? count + 1 : count;
-
     }, 0);
   }
 
   function calculatePendingStats(sessions: SessionData[] | undefined) {
     if (!sessions) return 0;
     return sessions.reduce((total, session) => {
-
       const isPending =
-        !session.payment_detail ||
-        session.payment_detail.status === "pending";
+        !session.payment_detail || session.payment_detail.status === "pending";
 
       if (!isPending) return total;
-
-      // Use promotion price if applicable
-      const amount = session.apply_promotion && session.promotion_price
-        ? Number(session.promotion_price)
-        : Number(session.price);
+      const amount =
+        session.apply_promotion && session.promotion_price
+          ? Number(session.promotion_price)
+          : Number(session.price);
 
       return total + amount;
-
     }, 0);
   }
 
+  const totalPendingCount = calculateTotalPendingPayments(data?.sessions_data);
 
-  const totalPendingCount = calculateTotalPendingPayments(data?.sessions_data)
-
-  const totalCompedCount = calculateTotalCompedPayments(data?.sessions_data)
-  const totalSessionsCount = data?.sessions_data?.length ? data?.sessions_data.length : 0
+  const totalCompedCount = calculateTotalCompedPayments(data?.sessions_data);
+  const totalSessionsCount = data?.sessions_data?.length
+    ? data?.sessions_data.length
+    : 0;
 
   function pendingString() {
-
-    const totalPendingCount = calculateTotalPendingPayments(data?.sessions_data)
-    const totalPendingValue = calculatePendingStats(data?.sessions_data)
+    const totalPendingCount = calculateTotalPendingPayments(
+      data?.sessions_data,
+    );
+    const totalPendingValue = calculatePendingStats(data?.sessions_data);
 
     if (totalPendingCount && totalPendingCount > 0) {
-      return `${totalPendingCount} session${totalPendingCount > 1 ? "s" : ""} pending payment${totalPendingCount > 1 ? "s" : ""} totalling $${totalPendingValue}`
-    } else null
-
+      return `${totalPendingCount} session${totalPendingCount > 1 ? "s" : ""} pending payment${totalPendingCount > 1 ? "s" : ""} totalling $${totalPendingValue}`;
+    } else null;
   }
-
 
   return (
     <div className="flex flex-col w-full gap-6">
@@ -268,10 +265,7 @@ export default function MainPlayerPage({
               <span className="flex gap-2 text-xl items-center">
                 {joinNames([data?.first_name, data?.last_name])}{" "}
                 <span>
-                  <CardStatus
-                    value={data?.status}
-                   icon={true}
-                  />
+                  <CardStatus value={data?.status} icon={true} />
                 </span>
               </span>
               <div
@@ -280,8 +274,10 @@ export default function MainPlayerPage({
               >
                 <span className="inline-flex gap-2 ">
                   <Calendar size={14} />
-                  Age {data?.birth_date
-                    ? new Date().getFullYear() - new Date(data.birth_date).getFullYear()
+                  Age{" "}
+                  {data?.birth_date
+                    ? new Date().getFullYear() -
+                      new Date(data.birth_date).getFullYear()
                     : "N/A"}
                 </span>
 
@@ -290,10 +286,18 @@ export default function MainPlayerPage({
                 </span>
                 <span className="inline-flex gap-2">
                   <User size={14} />
-                  Parent: {data?.parent_id ? joinNames([data?.attach_parent?.first_name, data?.attach_parent?.last_name]) : "N/A"}
+                  Parent:{" "}
+                  {data?.parent_id
+                    ? joinNames([
+                        data?.attach_parent?.first_name,
+                        data?.attach_parent?.last_name,
+                      ])
+                    : "N/A"}
                 </span>
                 <span className="inline-flex gap-2">
-                  <Clock size={14} /> Joined: {data?.created_at && moment(new Date(data?.created_at)).format("YYYY-MM-DD")}
+                  <Clock size={14} /> Joined:{" "}
+                  {data?.created_at &&
+                    moment(new Date(data?.created_at)).format("YYYY-MM-DD")}
                 </span>
               </div>
             </div>
@@ -355,49 +359,75 @@ export default function MainPlayerPage({
 
       <Card className="w-full rounded-[12px] bg-[#252525]">
         <CardContent className="space-y-4">
-          {data?.parent_id &&
+          {!data?.parent_id && (
+            <AddParentDialog playerId={player_id} onSuccess={fetchData} />
+          )}
+          {data?.parent_id && (
             <>
               <div className="w-full flex justify-between">
                 <p className="text-[18px] text-white">Linked Parent</p>
-                <Button>View Parent Profile</Button>
+                <Link target="blank" href={`/portal/admin/parents/${data?.parent_id}`}>
+                  <Button>View Parent Profile</Button>
+                </Link>
               </div>
 
               <div className="flex gap-4">
                 <Avatar className="bg-primary text-black">
-                  <AvatarImage src={""} />
-                  <AvatarFallback>SJ</AvatarFallback>
+                  <AvatarImage src={data.attach_parent?.picture} />
+                  <AvatarFallback className="bg-primary text-black">
+                    {getInitials(
+                      joinNames([
+                        data.attach_parent?.first_name,
+                        data.attach_parent?.last_name,
+                      ]),
+                    )}
+                  </AvatarFallback>
                 </Avatar>
 
                 <div>
-                  <p className="text-md">Sarah Johnson</p>
-                  <p className="text-xs text-muted-foreground">Primary Contact</p>
+                  <p className="text-md">
+                    {joinNames([
+                      data.attach_parent?.first_name,
+                      data.attach_parent?.last_name,
+                    ])}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    Primary Contact
+                  </p>
                 </div>
               </div>
 
               <div className="grid grid-cols-2 max-w-lg gap-2 text-xs font-normal">
                 <div className="flex gap-1 items-center">
                   <Mail size={12} className="text-[#99A1AF]" />
-                  <p className="text-[#D1D5DC]">sara@gmail.com</p>
+                  <p className="text-[#D1D5DC]">{data.attach_parent?.email}</p>
                 </div>
 
                 <div className="flex gap-1 items-center">
                   <Phone size={12} className="text-[#99A1AF]" />
-                  <p className="text-[#D1D5DC]">{"(555) 123 4567"}</p>
+                  <p className="text-[#D1D5DC]">
+                    {data.attach_parent?.phone_no}
+                  </p>
                 </div>
 
                 <div className="flex gap-1 items-center">
                   <Info size={12} className="text-[#99A1AF]" />
-                  <p className="text-[#D1D5DC]">Emergency: {"(555) 987-6543"}</p>
+                  <p className="text-[#D1D5DC]">
+                    Emergency: {data.attach_parent?.phone_no}
+                  </p>
                 </div>
 
                 <div className="flex gap-1 items-center">
                   <MapPin size={12} className="text-[#99A1AF]" />
-                  <p className="text-[#D1D5DC]">123 Main street, CA 90210</p>
+                  <p className="text-[#D1D5DC]">
+                    {data.attach_parent?.location}
+                  </p>
                 </div>
               </div>
 
               <Separator />
-            </>}
+            </>
+          )}
 
           <Card className="bg-alternative-bg p-3 border-alternative-text/30">
             <CardContent className="p-0">
@@ -452,12 +482,11 @@ export default function MainPlayerPage({
                   {i === 2 && (
                     <div className="flex gap-2 items-center py-2">
                       <DollarSign /> {t}{" "}
-                      {totalPendingCount > 0 ?
+                      {totalPendingCount > 0 ? (
                         <div className="w-4 h-4 text-xs leading-none flex items-center justify-center bg-[#FDC700] text-black rounded-full">
                           {totalPendingCount}
                         </div>
-                        : null
-                      }
+                      ) : null}
                     </div>
                   )}
                   {i === 3 && (
@@ -474,55 +503,64 @@ export default function MainPlayerPage({
           <Separator />
 
           <TabsContent value="Session History" className="space-y-4 p-2">
-            {data?.sessions_data && data?.sessions_data?.map((item, i) => (
-              <Card key={i} className="bg-black">
-                <CardContent className="space-y-2">
-                  <div className="flex justify-between gap-2 flex-wrap">
-                    <div className="flex gap-4 items-center text-sm">
-                      <p>{item.name}</p>
-                      <CardStatus
-                        value={item.status}
-                        icon={true}
-                      />
+            {data?.sessions_data &&
+              data?.sessions_data?.map((item, i) => (
+                <Card key={i} className="bg-black">
+                  <CardContent className="space-y-2">
+                    <div className="flex justify-between gap-2 flex-wrap">
+                      <div className="flex gap-4 items-center text-sm">
+                        <p>{item.name}</p>
+                        <CardStatus value={item.status} icon={true} />
 
-                      <CardStatus
-                        value={item.payment_detail?.status || "pending"}
-                      />
-                    </div>
-                    <p className="text-md">
-                      {item.payment_detail?.status === "comped" ? "Free" : `$${item?.apply_promotion ? item?.promotion_price : item?.price}`}
-                    </p>
-                  </div>
-
-                  <div className="flex gap-2 items-center text-xs text-muted-foreground flex-wrap">
-                    <div className="flex gap-2">
-                      <Calendar size={14} />
-                      <p>{item?.date && moment(new Date(item?.date)).format("YYYY-MM-DD")}</p>
-                    </div>
-                    <div className="flex gap-2">
-                      <Clock size={14} />
-                      <p>{item.start_time} - {item.end_time}</p>
-                    </div>
-                    <div className="flex gap-2">
-                      <User size={14} />
-                      <p>Coach {joinNames([item?.coach_first_name, item?.coach_last_name])}</p>
-                    </div>
-                  </div>
-                  {item?.note_detail && (
-                    item?.note_detail?.map((eachNote) => (
-                      <div key={eachNote.id} className="mt-4 space-y-4">
-                        <Separator />
-                        <div className="flex flex-wrap gap-4 items-center text-xs text-muted-foreground">
-                          <MessageSquare size={14} />
-                          <p>{eachNote?.note}</p>
-                        </div>
+                        <CardStatus
+                          value={item.payment_detail?.status || "pending"}
+                        />
                       </div>
-                    ))
+                      <p className="text-md">
+                        {item.payment_detail?.status === "comped"
+                          ? "Free"
+                          : `$${item?.apply_promotion ? item?.promotion_price : item?.price}`}
+                      </p>
+                    </div>
 
-                  )}
-                </CardContent>
-              </Card>
-            ))}
+                    <div className="flex gap-2 items-center text-xs text-muted-foreground flex-wrap">
+                      <div className="flex gap-2">
+                        <Calendar size={14} />
+                        <p>
+                          {item?.date &&
+                            moment(new Date(item?.date)).format("YYYY-MM-DD")}
+                        </p>
+                      </div>
+                      <div className="flex gap-2">
+                        <Clock size={14} />
+                        <p>
+                          {item.start_time} - {item.end_time}
+                        </p>
+                      </div>
+                      <div className="flex gap-2">
+                        <User size={14} />
+                        <p>
+                          Coach{" "}
+                          {joinNames([
+                            item?.coach_first_name,
+                            item?.coach_last_name,
+                          ])}
+                        </p>
+                      </div>
+                    </div>
+                    {item?.note_detail &&
+                      item?.note_detail?.map((eachNote) => (
+                        <div key={eachNote.id} className="mt-4 space-y-4">
+                          <Separator />
+                          <div className="flex flex-wrap gap-4 items-center text-xs text-muted-foreground">
+                            <MessageSquare size={14} />
+                            <p>{eachNote?.note}</p>
+                          </div>
+                        </div>
+                      ))}
+                  </CardContent>
+                </Card>
+              ))}
           </TabsContent>
 
           <TabsContent value="Attendance Timeline" className="space-y-4 p-2">
@@ -539,7 +577,7 @@ export default function MainPlayerPage({
           </TabsContent>
 
           <TabsContent value="Payment Status" className="space-y-4 p-2">
-            {pendingString() &&
+            {pendingString() && (
               <Card className="bg-alternative-bg p-3 border-alternative-text/30">
                 <CardContent className="p-0">
                   <div className="flex gap-4 items-start">
@@ -555,38 +593,50 @@ export default function MainPlayerPage({
                   </div>
                 </CardContent>
               </Card>
-            }
+            )}
 
-            {data?.sessions_data && data?.sessions_data?.map((item, i) => (
-              <Card key={i} className="bg-black">
-                <CardContent className="space-y-2">
-                  <div className="flex justify-between gap-4 flex-wrap">
-                    <div className="flex gap-4 items-center text-sm">
-                      <p>{item.name}</p>
-                      <CardStatus
-                        value={item.payment_detail?.status || "pending"}
-                      />
+            {data?.sessions_data &&
+              data?.sessions_data?.map((item, i) => (
+                <Card key={i} className="bg-black">
+                  <CardContent className="space-y-2">
+                    <div className="flex justify-between gap-4 flex-wrap">
+                      <div className="flex gap-4 items-center text-sm">
+                        <p>{item.name}</p>
+                        <CardStatus
+                          value={item.payment_detail?.status || "pending"}
+                        />
+                      </div>
+                      <p
+                        className={`text-md ${item.payment_detail?.status !== "paid" && item.payment_detail?.status !== "comped" && "text-alternative-text"}`}
+                      >
+                        {item.payment_detail?.status === "comped"
+                          ? "Free"
+                          : `$${item?.apply_promotion ? item?.promotion_price : item?.price}`}
+                      </p>
                     </div>
-                    <p
-                      className={`text-md ${item.payment_detail?.status !== "paid" && item.payment_detail?.status !== "comped" && "text-alternative-text"}`}
-                    >
-                      {item.payment_detail?.status === "comped" ? "Free" : `$${item?.apply_promotion ? item?.promotion_price : item?.price}`}
-                    </p>
-                  </div>
 
-                  <div className="flex gap-2 items-center text-xs text-muted-foreground flex-wrap">
-                    <div className="flex gap-2">
-                      <Calendar size={14} />
-                      <p>{item?.date && moment(new Date(item?.date)).format("YYYY-MM-DD")}</p>
+                    <div className="flex gap-2 items-center text-xs text-muted-foreground flex-wrap">
+                      <div className="flex gap-2">
+                        <Calendar size={14} />
+                        <p>
+                          {item?.date &&
+                            moment(new Date(item?.date)).format("YYYY-MM-DD")}
+                        </p>
+                      </div>
+                      <div className="flex gap-2">
+                        <User size={14} />
+                        <p>
+                          Coach{" "}
+                          {joinNames([
+                            item?.coach_first_name,
+                            item?.coach_last_name,
+                          ])}
+                        </p>
+                      </div>
                     </div>
-                    <div className="flex gap-2">
-                      <User size={14} />
-                      <p>Coach {joinNames([item?.coach_first_name, item?.coach_last_name])}</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+                  </CardContent>
+                </Card>
+              ))}
           </TabsContent>
 
           <TabsContent value="Coach Notes" className="space-y-4 p-2">
@@ -600,39 +650,51 @@ export default function MainPlayerPage({
               <AddCoachNotes />
             </div>
 
-            {data?.all_notes && data?.all_notes?.map((item, i) => (
-              <Card key={i} className="bg-black">
-                <CardContent className="space-y-2">
-                  <div className="flex gap-4 items-center text-sm">
-                    <p>Coach {joinNames([item?.coach_first_name, item?.coach_last_name])}</p>
+            {data?.all_notes &&
+              data?.all_notes?.map((item, i) => (
+                <Card key={i} className="bg-black">
+                  <CardContent className="space-y-2">
+                    <div className="flex gap-4 items-center text-sm">
+                      <p>
+                        Coach{" "}
+                        {joinNames([
+                          item?.coach_first_name,
+                          item?.coach_last_name,
+                        ])}
+                      </p>
 
-                    <div className="flex gap-1">
                       <div className="flex gap-1">
-                        {Array.from({ length: 5 }).map((_, i) =>
-                          i < (item?.rating || 0) ? (
-                            <IoIosStar className="text-primary" key={i} />
-                          ) : (
-                            <IoIosStarOutline
-                              key={i}
-                              className="text-muted-foreground"
-                            />
-                          ),
-                        )}
+                        <div className="flex gap-1">
+                          {Array.from({ length: 5 }).map((_, i) =>
+                            i < (item?.rating || 0) ? (
+                              <IoIosStar className="text-primary" key={i} />
+                            ) : (
+                              <IoIosStarOutline
+                                key={i}
+                                className="text-muted-foreground"
+                              />
+                            ),
+                          )}
+                        </div>
                       </div>
                     </div>
-                  </div>
 
-                  <div className="flex gap-2 items-center text-xs text-muted-foreground">
-                    <Calendar size={14} />
-                    <p>{item?.created_at && moment(new Date(item.created_at)).format("YYYY-MM-DD")}</p>
-                    <MessageSquare size={14} />
-                    <p>{item?.session_name}</p>
-                  </div>
+                    <div className="flex gap-2 items-center text-xs text-muted-foreground">
+                      <Calendar size={14} />
+                      <p>
+                        {item?.created_at &&
+                          moment(new Date(item.created_at)).format(
+                            "YYYY-MM-DD",
+                          )}
+                      </p>
+                      <MessageSquare size={14} />
+                      <p>{item?.session_name}</p>
+                    </div>
 
-                  <p className="text-xs text-[#D1D5DC]">{item?.note}</p>
-                </CardContent>
-              </Card>
-            ))}
+                    <p className="text-xs text-[#D1D5DC]">{item?.note}</p>
+                  </CardContent>
+                </Card>
+              ))}
           </TabsContent>
         </Tabs>
       </div>
