@@ -7,7 +7,7 @@ import {
   COACH_REVENUE_TRED,
   COACH_WEEKLY_EVENTS
 } from "@/components/coach-dashboard/constants";
-import { WeeklySchedule } from "@/components/coach-dashboard/weekly-schedule";
+import { Event, WeeklySchedule } from "@/components/coach-dashboard/weekly-schedule";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -84,7 +84,7 @@ export interface CoachProfile {
   specialities: string[];
   certifications: string[];
 
-  schedule_preference: string | null;
+  schedule_preference: Record<string, string> | null;
 }
 
 export interface SessionData {
@@ -227,6 +227,35 @@ export default function Page() {
       going: "warning",
     },
   ];
+
+  const weeklyEvents = data?.session_data
+    ? data.session_data.map((session) => ({
+      title: session.name,
+      date: moment(session.date).format("YYYY-MM-DD"),
+      time: session.start_time,
+      status: "Booked",
+    }))
+    : [];
+
+  const blockedEvents: Event[] = [];
+
+  if (data?.profile?.schedule_preference) {
+    Object.entries(data.profile.schedule_preference).forEach(([timestamp, status]) => {
+      if (status === "blocked") {
+        const m = moment(timestamp);
+        blockedEvents.push({
+          title: "",
+          date: m.format("YYYY-MM-DD"),
+          time: m.format("HH:mm"),
+          status: "Blocked",
+        });
+      }
+    });
+  }
+
+  const combinedEvents = blockedEvents ? [...weeklyEvents, ...blockedEvents] : weeklyEvents;
+
+
 
   return (
     <div className="flex flex-col w-full gap-6">
@@ -379,7 +408,7 @@ export default function Page() {
               </Button>
             </div> */}
 
-            <WeeklySchedule events={COACH_WEEKLY_EVENTS} />
+            <WeeklySchedule events={combinedEvents} id={id as string} preference={data?.profile?.schedule_preference}/>
 
             <Card className="bg-info-bg p-3 border-info-text/30">
               <CardContent className="p-0">
