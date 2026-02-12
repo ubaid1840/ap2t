@@ -54,7 +54,7 @@ export interface PlayerResponse {
   location: string | null;
   phone_no: string;
   joining_date: string | null;
-  birth_date: string;
+  birth_date: Date | null;
   created_at: string;
 
   profile: PlayerProfile;
@@ -176,8 +176,6 @@ export default function MainPlayerPage({
   const { user } = useAuth();
   const isMobile = useIsMobile();
   const [loading, setLoading] = useState(false);
-  const { id: player_id } = useParams();
-  const router = useRouter();
 
   useEffect(() => {
     if (user?.id && id) fetchData();
@@ -277,7 +275,7 @@ export default function MainPlayerPage({
                   Age{" "}
                   {data?.birth_date
                     ? new Date().getFullYear() -
-                      new Date(data.birth_date).getFullYear()
+                    new Date(data.birth_date).getFullYear()
                     : "N/A"}
                 </span>
 
@@ -289,9 +287,9 @@ export default function MainPlayerPage({
                   Parent:{" "}
                   {data?.parent_id
                     ? joinNames([
-                        data?.attach_parent?.first_name,
-                        data?.attach_parent?.last_name,
-                      ])
+                      data?.attach_parent?.first_name,
+                      data?.attach_parent?.last_name,
+                    ])
                     : "N/A"}
                 </span>
                 <span className="inline-flex gap-2">
@@ -301,7 +299,7 @@ export default function MainPlayerPage({
                 </span>
               </div>
             </div>
-            <EditInfo />
+            {data && <EditInfo player_id={id} data={data} onRefresh={fetchData}/> }
           </div>
           <div className="mt-4 flex w-full justify-between flex-wrap gap-2">
             <HeaderCard
@@ -359,8 +357,8 @@ export default function MainPlayerPage({
 
       <Card className="w-full rounded-[12px] bg-[#252525]">
         <CardContent className="space-y-4">
-          {!data?.parent_id && (
-            <AddParentDialog playerId={player_id} onSuccess={fetchData} />
+          {data && !data?.parent_id && (
+            <AddParentDialog playerId={id} onSuccess={fetchData} />
           )}
           {data?.parent_id && (
             <>

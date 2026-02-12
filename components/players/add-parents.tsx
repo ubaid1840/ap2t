@@ -13,8 +13,8 @@ import { useEffect, useState } from "react";
 import { Spinner } from "../ui/spinner";
 
 interface AddParentDialogProps {
-  playerId: number;
-  onSuccess: () => void;
+  playerId: number | undefined;
+  onSuccess: () => Promise<void>;
 }
 
 interface parent {
@@ -50,7 +50,6 @@ export function AddParentDialog({ playerId, onSuccess }: AddParentDialogProps) {
 
   const addParents = async (parent_id: number | null) => {
 
-    setAddingId(playerId);
     try {
       await axios.post(`/admin/players/${playerId}/parent`, {
         parent_id: parent_id,

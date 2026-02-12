@@ -101,11 +101,8 @@ export default function Page() {
                                 <Label className="text-muted-foreground font-normal">Attendance</Label>
                                 <Input className="rounded-[8px] dark:bg-black" />
                             </div>
-
                         </div>
                     </div>}
-
-
             </div>
             <PageTable
                 loading={loading}

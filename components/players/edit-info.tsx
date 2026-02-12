@@ -20,55 +20,90 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { SquarePen } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import AppCalendar from "../app-calendar";
 import axios from "@/lib/axios";
 import { useParams } from "next/navigation";
+import { PlayerResponse } from "./main-player-page";
+import { Spinner } from "../ui/spinner";
 
-export function EditInfo() {
-  const player_id = useParams();
+type DataProps = {
+    first_name: string,
+    last_name: string,
+    phone_no: string,
+    position: string,
+    skillLevel: string,
+    medicalNotes: string,
+    birth_date: null | Date
+  
+}
+
+export function EditInfo({ player_id, data, onRefresh }: { player_id: number | undefined, data: PlayerResponse, onRefresh: () => Promise<void> }) {
+
   const [open, setOpen] = useState(false);
   const [position, setPosition] = useState("");
   const [skillLevel, setSkillLevel] = useState("");
   const [date, setDate] = useState(undefined);
   const positions = ["Forward", "Defender", "GoalKeeper"];
   const skillLevels = ["Beginner", "Intermediate", "Advanced", "Expert"];
+  const [loading, setLoading] = useState(false)
+  const [localData, setLocalData] = useState<DataProps>({
+    first_name: "",
+    last_name: "",
+    phone_no: "",
+    position: "",
+    skillLevel: "",
+    medicalNotes: "",
+    birth_date: null
+  })
+
+  useEffect(() => {
+    if (data) {
+      setLocalData({
+        first_name: data?.first_name || "",
+        last_name: data?.last_name || "",
+        birth_date: data?.birth_date  || null,
+        phone_no: data?.phone_no  || "",
+        position: data?.profile?.position  || "",
+        skillLevel: data?.profile?.skill_level || "" ,
+        medicalNotes: data?.profile?.medical_notes || "",
+      })
+
+    }
+  }, [data])
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-
-    const formData = new FormData(e.currentTarget);
-
-    const first_name = formData.get("first_name") as string | null;
-    const last_name = formData.get("last_name") as string | null;
-    const email = formData.get("email") as string | null;
-    const dob = formData.get("dob") as string | null;
-    const phone_no = formData.get("phone_no") as string | null;
-    const position = formData.get("position") as string | null;
-    const skillLevel = formData.get("skillLevel") as string | null;
-    const medicalNotes = formData.get("medicalNotes") as string | null;
+    setLoading(true)
 
     try {
-      const body: any = {};
-      if (first_name) body.first_name = first_name;
-      if (last_name) body.last_name = last_name;
-      if (email) body.email = email;
-      if (dob) body.birth_date = dob;
-      if (phone_no) body.phone_no = phone_no;
-      if (position) body.position = position;
-      if (skillLevel) body.skill_level = skillLevel;
-      if (medicalNotes) body.medical_notes = medicalNotes;
 
-      const res = await axios.patch(`/admin/players/${player_id}`, body);
+      await axios.put(`/user`, {
+        id : player_id,
+        first_name: localData.first_name,
+        last_name: localData.last_name,
+        phone_no: localData.phone_no,
+        birth_date: localData.birth_date,
+      });
+      await axios.put(`/admin/players/${player_id}`, {
+         id : player_id,
+        position: localData.position,
+        skill_level: localData.skillLevel,
+        medical_notes: localData.medicalNotes,
 
-      console.log("Player updated successfully:", res.data);
-
-      setOpen(false);
+      });
+      await onRefresh()
+      setOpen(false)
     } catch (error) {
-      console.error("Failed to update player:", error);
+      console.log(error);
+    } finally {
+      setLoading(false)
     }
   }
 
+  function handleChange (key : string, value : string){
+    setLocalData((prevState)=>({...prevState, [key] : value}))
+  }
   return (
     <>
       <Button
@@ -92,7 +127,7 @@ export function EditInfo() {
               <div className="grid grid-cols-2 gap-4">
                 <div className="grid gap-2">
                   <Label
-                    htmlFor="name"
+                    htmlFor="first_name"
                     className="text-xs text-muted-foreground"
                   >
                     First Name
@@ -101,12 +136,15 @@ export function EditInfo() {
                     id="first_name"
                     name="first_name"
                     placeholder="Pedro"
+                    required
                     className="dark:bg-[#1A1A1A]"
+                      value={localData.first_name}
+                    onChange={(e)=> handleChange("first_name",e.target.value)}
                   />
                 </div>
                 <div className="grid gap-2">
                   <Label
-                    htmlFor="name"
+                    htmlFor="last_name"
                     className="text-xs text-muted-foreground"
                   >
                     Last Name
@@ -115,28 +153,15 @@ export function EditInfo() {
                     id="last_name"
                     name="last_name"
                     placeholder="Duarte"
+                    required
                     className="dark:bg-[#1A1A1A]"
+                    value={localData.last_name}
+                    onChange={(e)=> handleChange("last_name",e.target.value)}
                   />
                 </div>
               </div>
-
-              <div className="grid gap-2">
-                <Label
-                  htmlFor="email"
-                  className="text-xs text-muted-foreground"
-                >
-                  email
-                </Label>
-                <Input
-                  id="email"
-                  name="email"
-                  placeholder="PedroDuarte@example.com"
-                  required
-                  className="dark:bg-[#1A1A1A]"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-2">
+             
+              <div className="grid grid-cols-2 gap-4">
                 <div className="grid gap-2">
                   <Label
                     htmlFor="dob"
@@ -144,7 +169,7 @@ export function EditInfo() {
                   >
                     Date of Birth
                   </Label>
-                  <AppCalendar date={date} onChange={setDate} />
+                  <AppCalendar date={localData.birth_date} onChange={(d)=> handleChange("birth_date", d)} />
                 </div>
 
                 <div className="grid gap-2">
@@ -160,8 +185,12 @@ export function EditInfo() {
                     placeholder="+1 2983 39843"
                     required
                     className="dark:bg-[#1A1A1A]"
+                      value={localData.phone_no}
+                    onChange={(e)=> handleChange("phone_no",e.target.value)}
                   />
                 </div>
+
+
                 <div className="grid gap-2">
                   <Label
                     htmlFor="position"
@@ -169,7 +198,7 @@ export function EditInfo() {
                   >
                     Position
                   </Label>
-                  <Select value={position} onValueChange={setPosition}>
+                  <Select value={localData.position} onValueChange={(val)=>handleChange("position", val)}>
                     <SelectTrigger
                       id="position"
                       className="dark:bg-[#1A1A1A] w-full"
@@ -193,7 +222,7 @@ export function EditInfo() {
                   >
                     Skill Level
                   </Label>
-                  <Select value={skillLevel} onValueChange={setSkillLevel}>
+                  <Select value={localData.skillLevel} onValueChange={(val)=>handleChange("skillLevel", val)}>
                     <SelectTrigger
                       id="skillLevel"
                       className="dark:bg-[#1A1A1A] w-full"
@@ -223,6 +252,8 @@ export function EditInfo() {
                   name="medicalNotes"
                   placeholder="Enter medical notes or observations..."
                   className="dark:bg-[#1A1A1A] h-30"
+                     value={localData.medicalNotes}
+                    onChange={(e)=> handleChange("medicalNotes",e.target.value)}
                 />
               </div>
             </div>
@@ -233,7 +264,7 @@ export function EditInfo() {
                   Cancel
                 </Button>
               </DialogClose>
-              <Button type="submit">Save changes</Button>
+              <Button disabled={loading} type="submit"> {loading && <Spinner className="text-black" />}Save</Button>
             </DialogFooter>
           </form>
         </DialogContent>

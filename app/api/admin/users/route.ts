@@ -45,6 +45,7 @@ SELECT
     pl.position,
     pl.skill_level,
     pl.medical_notes,
+    pl.parent_id,
     parent_user.first_name AS parent_first_name,
     parent_user.last_name AS parent_last_name,
     ls.session_name AS last_session,
@@ -74,7 +75,6 @@ INNER JOIN players pl
 LEFT JOIN users parent_user
     ON parent_user.id = pl.parent_id
 
-/* Last session */
 LEFT JOIN LATERAL (
     SELECT 
         s.id,
@@ -90,13 +90,11 @@ LEFT JOIN LATERAL (
     LIMIT 1
 ) ls ON true
 
-/* Coach info */
 LEFT JOIN coaches c
-    ON c.id = ls.coach_id
+    ON c.user_id = ls.coach_id
 LEFT JOIN users coach_user
     ON coach_user.id = c.user_id
 
-/* Attendance count for last session */
 LEFT JOIN LATERAL (
     SELECT COUNT(*) AS attendance_count
     FROM attendance a

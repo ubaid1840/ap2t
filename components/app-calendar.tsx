@@ -12,7 +12,7 @@ const AppCalendar = ({
   required = false,
   className,
 }: {
-  date: Date | undefined;
+  date: Date | undefined | null;
   onChange: (item: any) => void;
   required?: boolean;
   className?: string;
@@ -42,8 +42,8 @@ const AppCalendar = ({
           required={required}
           className="z-20"
           mode="single"
-          selected={date}
-          onSelect={(e) => {
+          selected={date || undefined}
+          onSelect={(e : any) => {
             onChange(e);
             setIsCalendarOpen(false);
           }}
