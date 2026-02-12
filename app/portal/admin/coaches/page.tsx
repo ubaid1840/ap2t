@@ -277,7 +277,8 @@ const CreateCoach = ({ onRefresh }: { onRefresh: () => Promise<void> }) => {
   const [open, setOpen] = useState(false)
   const [loading, setLoading] = useState(false)
   const [coach, setCoach] = useState({
-    fullname: "",
+    first_name: "",
+    last_name:"",
     email: "",
     phone: "",
     career_start: "",
@@ -287,12 +288,11 @@ const CreateCoach = ({ onRefresh }: { onRefresh: () => Promise<void> }) => {
   const addCoach = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setLoading(true)
-    const { first_name, last_name } = splitFullName(coach.fullname)
 
     try {
       await axios.post("/user", {
-        first_name: first_name,
-        last_name: last_name,
+        first_name: coach.first_name,
+        last_name: coach.last_name,
         email: coach.email,
         phone_no: coach.phone,
         career_start: coach.career_start,
@@ -325,17 +325,35 @@ const CreateCoach = ({ onRefresh }: { onRefresh: () => Promise<void> }) => {
           <form onSubmit={addCoach} className="">
             <ScrollArea className=" py-1 space-y-4 px-2 ">
               <div className="space-y-2 px-2 pb-2">
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 gap-2">
                   <div className="space-y-2">
                     <Label className="text-sm text-[#99A1AF]">
-                      Full Name
+                      Frist Name
                     </Label>
                     <Input
-                      name="fullName"
+                      name="first_name"
                       placeholder="Coach Martinez"
                       className="!bg-[#1A1A1A] !border-[#3A3A3A] !text-[#E5E7EB] !p-5"
                       required
-                      value={coach.fullname}
+                      value={coach.first_name}
+                      onChange={(e) =>
+                        setCoach((prev) => ({
+                          ...prev,
+                          first_name: e.target.value,
+                        }))
+                      }
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-sm text-[#99A1AF]">
+                      Last Name
+                    </Label>
+                    <Input
+                      name="last_name"
+                      placeholder="Coach Martinez"
+                      className="!bg-[#1A1A1A] !border-[#3A3A3A] !text-[#E5E7EB] !p-5"
+                      required
+                      value={coach.last_name}
                       onChange={(e) =>
                         setCoach((prev) => ({
                           ...prev,
@@ -344,6 +362,7 @@ const CreateCoach = ({ onRefresh }: { onRefresh: () => Promise<void> }) => {
                       }
                     />
                   </div>
+                </div>
                   <div className="space-y-2">
                     <Label className="text-sm text-[#99A1AF]">Email</Label>
                     <Input
@@ -360,7 +379,7 @@ const CreateCoach = ({ onRefresh }: { onRefresh: () => Promise<void> }) => {
                       }
                     />
                   </div>
-
+                <div className="grid grid-cols-2 gap-2">
                   <div className="space-y-2">
                     <Label className="text-sm text-[#99A1AF]">Phone</Label>
                     <Input

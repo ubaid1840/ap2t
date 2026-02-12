@@ -41,7 +41,8 @@ export function CreatePlayer({ onRefresh }: { onRefresh: () => Promise<void> }) 
     const formData = new FormData(e.currentTarget);
 
     const values = {
-      fullname: formData.get("name"),
+      first_name: formData.get("first_name"),
+      last_name: formData.get("last_name"),
       dob: date,
       email: formData.get("email"),
       phone_no: formData.get("phone_no"),
@@ -50,12 +51,11 @@ export function CreatePlayer({ onRefresh }: { onRefresh: () => Promise<void> }) 
       medicalNotes: formData.get("medicalNotes"),
     };
 
-    const { first_name, last_name } = splitFullName(values?.fullname as string);
 
     try {
       await axios.post("/user", {
-        first_name: first_name,
-        last_name: last_name,
+        first_name: values.first_name,
+        last_name: values.last_name,
         email: values.email,
         phone_no: values.phone_no,
         birth_date: values.dob,
@@ -93,32 +93,35 @@ export function CreatePlayer({ onRefresh }: { onRefresh: () => Promise<void> }) 
               <div className="grid grid-cols-2 gap-4">
                 <div className="grid gap-2">
                   <Label
-                    htmlFor="name"
+                    htmlFor="first_name"
                     className="text-xs text-muted-foreground"
                   >
-                    Full Name
+                    First Name
                   </Label>
                   <Input
-                    id="name"
-                    name="name"
-                    placeholder="Pedro Duarte"
+                    id="first_name"
+                    name="first_name"
+                    placeholder="Pedro"
                     required
                     className="dark:bg-[#1A1A1A]"
                   />
                 </div>
-
                 <div className="grid gap-2">
                   <Label
-                    htmlFor="dob"
+                    htmlFor="last_name"
                     className="text-xs text-muted-foreground"
                   >
-                    Date of Birth
+                    Last Name
                   </Label>
-                  <AppCalendar date={date} onChange={setDate} />
+                  <Input
+                    id="last_name"
+                    name="last_name"
+                    placeholder="Duarte"
+                    required
+                    className="dark:bg-[#1A1A1A]"
+                  />
                 </div>
               </div>
-
-              <div className="grid grid-cols-2 gap-4">
                 <div className="grid gap-2">
                   <Label
                     htmlFor="email"
@@ -134,6 +137,17 @@ export function CreatePlayer({ onRefresh }: { onRefresh: () => Promise<void> }) 
                     className="dark:bg-[#1A1A1A]"
                   />
                 </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="grid gap-2">
+                  <Label
+                    htmlFor="dob"
+                    className="text-xs text-muted-foreground"
+                  >
+                    Date of Birth
+                  </Label>
+                  <AppCalendar date={date} onChange={setDate} />
+                </div>
+                
                 <div className="grid gap-2">
                   <Label
                     htmlFor="phone_no"

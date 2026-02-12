@@ -483,7 +483,8 @@ const EditProfile = () => {
   const [open, setOpen] = useState(false);
 
   const [editCoach, setEditCoach] = useState({
-    fullname: "",
+    first_name: "",
+    last_name:"",
     email: "",
     phone: "",
     career_start: "",
@@ -495,15 +496,10 @@ const EditProfile = () => {
     e.preventDefault();
 
     try {
-      
-
-      const names = editCoach.fullname.trim().split(" ");
-      const first_name = names.shift() || "";
-      const last_name = names.join(" ") || "";
 
       const body: any = {};
-      if (first_name) body.first_name = first_name;
-      if (last_name) body.last_name = last_name;
+      if (editCoach.first_name) body.first_name = editCoach.first_name;
+      if (editCoach.last_name) body.last_name = editCoach.last_name;
       if (editCoach.email) body.email = editCoach.email;
       if (editCoach.phone) body.phone_no = editCoach.phone;
       if (editCoach.career_start)
@@ -512,21 +508,10 @@ const EditProfile = () => {
             ? editCoach.career_start
             : editCoach.career_start.toISOString();
       if (editCoach.bio) body.bio = editCoach.bio;
-      if (editCoach.preferedSchedule)
-        body.schedule_preference = editCoach.preferedSchedule;
 
       const res = await axios.patch(`/admin/coaches/${coach_id}`, body);
 
       console.log("Coach updated successfully:", res.data);
-
-      setEditCoach({
-        fullname: `${res.data.first_name} ${res.data.last_name}`,
-        email: res.data.email || "",
-        phone: res.data.phone_no || "",
-        career_start: res.data.career_start || "",
-        bio: res.data.bio || "",
-        preferedSchedule: res.data.schedule_preference || "",
-      });
 
       setOpen(false);
     } catch (error) {
@@ -549,21 +534,37 @@ const EditProfile = () => {
           <form onSubmit={changeCoach} className="">
             <ScrollArea className=" py-1 space-y-4 px-2 ">
               <div className="space-y-2 px-2 pb-2">
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 gap-2">
                   <div className="space-y-2">
-                    <Label className="text-sm text-[#99A1AF]">Full Name</Label>
+                    <Label className="text-sm text-[#99A1AF]">First Name</Label>
                     <Input
                       name="fullName"
-                      placeholder="Coach Martinez"
+                      placeholder="Coach"
                       className="!bg-[#1A1A1A] !border-[#3A3A3A] !text-[#E5E7EB] !p-5"
-                      value={editCoach.fullname}
+                      value={editCoach.first_name}
                       onChange={(e) =>
                         setEditCoach((prev) => ({
                           ...prev,
-                          fullname: e.target.value,
+                          first_name: e.target.value,
                         }))
                       }
                     />
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-sm text-[#99A1AF]">Last Name</Label>
+                    <Input
+                      name="last_Name"
+                      placeholder="Martinez"
+                      className="!bg-[#1A1A1A] !border-[#3A3A3A] !text-[#E5E7EB] !p-5"
+                      value={editCoach.last_name}
+                      onChange={(e) =>
+                        setEditCoach((prev) => ({
+                          ...prev,
+                          last_name: e.target.value,
+                        }))
+                      }
+                    />
+                  </div>
                   </div>
                   <div className="space-y-2">
                     <Label className="text-sm text-[#99A1AF]">Email</Label>
@@ -580,7 +581,7 @@ const EditProfile = () => {
                       }
                     />
                   </div>
-
+                  <div className="grid grid-cols-2 gap-2">
                   <div className="space-y-2">
                     <Label className="text-sm text-[#99A1AF]">Phone</Label>
                     <Input
@@ -626,24 +627,6 @@ const EditProfile = () => {
                       setEditCoach((prev) => ({
                         ...prev,
                         bio: e.target.value,
-                      }))
-                    }
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label className="text-sm text-[#99A1AF]">
-                    Preferred Schedule
-                  </Label>
-                  <Input
-                    name="preferedscedule"
-                    placeholder="Coach Martinez"
-                    className="!bg-[#1A1A1A] !border-[#3A3A3A] !text-[#E5E7EB] !p-5"
-                    value={editCoach.preferedSchedule}
-                    onChange={(e) =>
-                      setEditCoach((prev) => ({
-                        ...prev,
-                        preferedSchedule: e.target.value,
                       }))
                     }
                   />

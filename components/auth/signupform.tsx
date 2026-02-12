@@ -82,7 +82,7 @@ export default function SignUpForm({
     }
     if (!waiverData) return;
 
-    const data={
+    const payload={
 
         player:{first_name: playerData.first_name,
         last_name: playerData.last_name,
@@ -91,11 +91,12 @@ export default function SignUpForm({
         birth_date: playerData.birth_date,
         location: playerData.location,
         role: "player"},
+        underAged:underAged,
         parent:{}
       
     }
   if (underAged) {
-  data.parent = {
+  payload.parent = {
     first_name: parentData.first_name,
     last_name: parentData.last_name,
     email: parentData.email,
@@ -107,7 +108,7 @@ export default function SignUpForm({
 }
     
     try {
-      const res = await axios.post("/user", data);
+      const res = await axios.post("/user", payload);
       if (res.status === 200) {
         const { email } = res.data;
         await signInWithEmailAndPassword(auth, email, playerData.password);
