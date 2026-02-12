@@ -278,13 +278,13 @@ export default function Page() {
 
             <h1 className="text-lg text-[#F3F4F6]">Specialties</h1>
             <div className="flex gap-1">
-              {data?.specialities.map((s) => {
+              {data?.profile?.specialities && data?.profile?.specialities?.map((s) => {
                 return (
                   <div
                     key={s}
                     className="py-2 px-3 rounded-lg bg-[#1A1A1A] border border-border text-xs leading-none text-[#D1D5DC]"
                   >
-                    {s?.name}
+                    {s}
                   </div>
                 );
               })}
@@ -293,10 +293,10 @@ export default function Page() {
             <h1 className="text-lg text-[#F3F4F6]">Certifications</h1>
             <div className="space-y-2">
               {
-                data?.certifications.map((certification) => (
+                data?.profile?.certifications && data?.profile?.certifications?.map((certification) => (
                   <div key={certification} className="bg-[#1A1A1A] border border-border rounded-[10px] px-4 py-3 flex items-center gap-2">
                     <Award className="text-primary" size={16} />
-                    <h1 className="text-[#E5E7EB] text-sm">{certification?.name}</h1>
+                    <h1 className="text-[#E5E7EB] text-sm">{certification}</h1>
                   </div>
                 ))
               }
@@ -492,25 +492,25 @@ const EditProfile = ({ id, data, onRefresh }: { id: string, data: any, onRefresh
   const [certificationInput, setCertificationInput] = useState("")
 
   const [coach, setCoach] = useState({
-  first_name: "",
-    last_name:"",
+    first_name: "",
+    last_name: "",
     phone: "",
     career_start: "",
     bio: "",
     specialities: [],
-    certification: []
+    certifications: []
   });
 
   useEffect(() => {
     if (data) {
       setCoach({
-       first_name : data?.first_name,
-       last_name : data?.last_name,
+        first_name: data?.first_name,
+        last_name: data?.last_name,
         phone: data?.phone_no,
         career_start: data?.profile?.career_start,
         bio: data?.profile?.bio,
-        specialities: data?.specialities,
-        certification: data?.certifications
+        specialities: data?.profile?.specialities,
+        certifications: data?.profile?.certifications
       })
     }
   }, [data])
@@ -518,15 +518,23 @@ const EditProfile = ({ id, data, onRefresh }: { id: string, data: any, onRefresh
   const changeCoach = async (e: React.FormEvent) => {
     e.preventDefault();
 
-   
-
     try {
-     
+      await axios.put(`/user`, {
+        id: id,
+        first_name: coach?.first_name,
+        last_name: coach?.last_name,
+        phone_no: coach?.phone,
+      })
+      await axios.put(`/admin/coaches/${id}`, {
+        id: id,
+        career_start: coach?.career_start,
+        bio: coach?.bio,
+        specialities: coach?.specialities,
+        certifications: coach?.certifications
+      })
 
       await onRefresh()
       setOpen(false)
-    } catch (error) {
-      console.log(error)
     } finally {
       setLoading(false)
     }
@@ -534,61 +542,61 @@ const EditProfile = ({ id, data, onRefresh }: { id: string, data: any, onRefresh
 
 
   const handleAddSpeciality = (e: React.KeyboardEvent<HTMLInputElement>) => {
-  if (e.key === "Enter") {
-    e.preventDefault();
+    if (e.key === "Enter") {
+      e.preventDefault();
 
-    const trimmed = specialityInput.trim();
-    if (!trimmed) return;
+      const trimmed = specialityInput.trim();
+      if (!trimmed) return;
 
-    setCoach((prev : any)  => {
-      if (prev.specialities.includes(trimmed)) return prev;
+      setCoach((prev: any) => {
+        if (prev.specialities.includes(trimmed)) return prev;
 
-      return {
-        ...prev,
-        specialities: [...prev.specialities, trimmed]
-      };
-    });
+        return {
+          ...prev,
+          specialities: [...prev.specialities, trimmed]
+        };
+      });
 
-    setSpecialityInput("");
-  }
-};
-
-
- const handleRemoveSpeciality = (tag: string) => {
-  setCoach(prev => ({
-    ...prev,
-    specialities: prev.specialities.filter(t => t !== tag)
-  }));
-};
+      setSpecialityInput("");
+    }
+  };
 
 
-const handleAddCertification = (e: React.KeyboardEvent<HTMLInputElement>) => {
-  if (e.key === "Enter") {
-    e.preventDefault();
-
-    const trimmed = certificationInput.trim();
-    if (!trimmed) return;
-
-    setCoach((prev : any)  => {
-      if (prev.certification.includes(trimmed)) return prev;
-
-      return {
-        ...prev,
-        certification: [...prev.certification, trimmed]
-      };
-    });
-
-    setSpecialityInput("");
-  }
-};
+  const handleRemoveSpeciality = (tag: string) => {
+    setCoach(prev => ({
+      ...prev,
+      specialities: prev.specialities.filter(t => t !== tag)
+    }));
+  };
 
 
- const handleRemoveCertification = (tag: string) => {
-  setCoach(prev => ({
-    ...prev,
-    certification: prev.certification.filter(t => t !== tag)
-  }));
-};
+  const handleAddCertification = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+
+      const trimmed = certificationInput.trim();
+      if (!trimmed) return;
+
+      setCoach((prev: any) => {
+        if (prev.certifications.includes(trimmed)) return prev;
+
+        return {
+          ...prev,
+          certifications: [...prev.certifications, trimmed]
+        };
+      });
+
+      setCertificationInput("");
+    }
+  };
+
+
+  const handleRemoveCertification = (tag: string) => {
+    setCoach(prev => ({
+      ...prev,
+      certifications: prev.certifications.filter(t => t !== tag)
+    }));
+  };
 
   return (
     <>
@@ -694,10 +702,10 @@ const handleAddCertification = (e: React.KeyboardEvent<HTMLInputElement>) => {
                   />
                 </div>
 
-               <div className="space-y-2">
-                    <Label className="text-sm text-[#99A1AF]">Specialities</Label>
+                <div className="space-y-2">
+                  <Label className="text-sm text-[#99A1AF]">Specialities</Label>
                   <div className="flex flex-col gap-2 border rounded-md p-2">
-                    
+
                     <Input
                       placeholder="Type speciality and press Enter"
                       value={specialityInput}
@@ -705,30 +713,30 @@ const handleAddCertification = (e: React.KeyboardEvent<HTMLInputElement>) => {
                       onKeyDown={handleAddSpeciality}
                     />
                     <div className="flex flex-wrap gap-2">
-                    {coach.specialities.map((tag, idx) => (
-                      <span
-                        key={idx}
-                        className="flex items-center gap-1 bg-primary text-black px-2 py-1 rounded-md text-sm"
-                      >
-                        {tag}
-                        <button
-                          type="button"
-                          onClick={() => handleRemoveSpeciality(tag)}
-                          className="ml-1 text-xs hover:text-red-300"
+                      {coach.specialities.map((tag, idx) => (
+                        <span
+                          key={idx}
+                          className="flex items-center gap-1 bg-primary text-black px-2 py-1 rounded-md text-sm"
                         >
-                          ✕
-                        </button>
-                      </span>
-                    ))}
+                          {tag}
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveSpeciality(tag)}
+                            className="ml-1 text-xs hover:text-red-300"
+                          >
+                            ✕
+                          </button>
+                        </span>
+                      ))}
                     </div>
                   </div>
                 </div>
 
 
-                 <div className="space-y-2">
-                    <Label className="text-sm text-[#99A1AF]">Certifications</Label>
+                <div className="space-y-2">
+                  <Label className="text-sm text-[#99A1AF]">Certifications</Label>
                   <div className="flex flex-col gap-2 border rounded-md p-2">
-                    
+
                     <Input
                       placeholder="Type certification and press Enter"
                       value={certificationInput}
@@ -736,21 +744,21 @@ const handleAddCertification = (e: React.KeyboardEvent<HTMLInputElement>) => {
                       onKeyDown={handleAddCertification}
                     />
                     <div className="flex flex-wrap gap-2">
-                    {coach.certification.map((tag, idx) => (
-                      <span
-                        key={idx}
-                        className="flex items-center gap-1 bg-primary text-black px-2 py-1 rounded-md text-sm"
-                      >
-                        {tag}
-                        <button
-                          type="button"
-                          onClick={() => handleRemoveCertification(tag)}
-                          className="ml-1 text-xs hover:text-red-300"
+                      {coach.certifications?.map((tag, idx) => (
+                        <span
+                          key={idx}
+                          className="flex items-center gap-1 bg-primary text-black px-2 py-1 rounded-md text-sm"
                         >
-                          ✕
-                        </button>
-                      </span>
-                    ))}
+                          {tag}
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveCertification(tag)}
+                            className="ml-1 text-xs hover:text-red-300"
+                          >
+                            ✕
+                          </button>
+                        </span>
+                      ))}
                     </div>
                   </div>
                 </div>

@@ -1,5 +1,5 @@
 import pool from "@/lib/db";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(
   request: Request,
@@ -25,21 +25,7 @@ export async function GET(
         jsonb_agg(DISTINCT pay) 
         FILTER (WHERE pay.id IS NOT NULL),
         '[]'
-    ) AS payment_data,
-
-    /* Specialities */
-    COALESCE(
-        jsonb_agg(DISTINCT cs.name)
-        FILTER (WHERE cs.id IS NOT NULL),
-        '[]'
-    ) AS specialities,
-
-    /* Certifications */
-    COALESCE(
-        jsonb_agg(DISTINCT cc.name)
-        FILTER (WHERE cc.id IS NOT NULL),
-        '[]'
-    ) AS certifications
+    ) AS payment_data
 
 FROM users u
 
@@ -53,15 +39,6 @@ LEFT JOIN sessions sess
 /* Payments */
 LEFT JOIN payments pay
     ON pay.session_id = sess.id
-
-/* Specialities */
-LEFT JOIN specialities cs
-    ON cs.user_id = c.id
-
-/* Certifications */
-LEFT JOIN certifications cc
-    ON cc.user_id = c.id
-
 
 WHERE u.id = $1
 
@@ -90,105 +67,43 @@ GROUP BY u.id, c.id;
 
 
 
-export async function PATCH(
-  request: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
-  const { id: coach_id } = await params;
+export async function PUT(req: NextRequest) {
+    try {
+        const data = await req.json();
+        const { id, ...updates } = data;
 
-  try {
-    const body = await request.json();
-    const {
-      bio,
-      rating,
-      career_start,
-      schedule_preference,
-      first_name,
-      last_name,
-      email,
-      location,
-      phone_no,
-      birth_date,
-    } = body;
+        if (!id) {
+            return NextResponse.json({ message: "ID is required" }, { status: 400 });
+        }
 
-    await pool.query("BEGIN");
-    if (bio || rating || career_start || schedule_preference) {
-      await pool.query(
-        `
-        UPDATE coaches
-        SET
-          bio = COALESCE($1, bio),
-          rating = COALESCE($2, rating),
-          career_start = COALESCE($3, career_start),
-          schedule_preference = COALESCE($4, schedule_preference)
-        WHERE id = $5
-        `,
-        [bio, rating, career_start, schedule_preference, coach_id]
-      );
+        const fields: any[] = [];
+        const values: any[] = [];
+
+        Object.entries(updates).forEach(([key, value], index) => {
+            if (value !== undefined) {
+                fields.push(`${key} = $${index + 1}`);
+                values.push(value);
+            }
+        });
+
+        if (fields.length === 0) {
+            return NextResponse.json({ message: "No valid data provided for update" }, { status: 400 });
+        }
+
+        values.push(id);
+        const query = `
+          UPDATE coaches 
+          SET ${fields.join(", ")}
+          WHERE user_id = $${values.length}
+      `;
+
+        await pool.query(query, values);
+
+
+        return NextResponse.json({ message: "Updated successfully" }, { status: 200 });
+    } catch (error : any) {
+        console.log("Error updating data:", error?.message);
+        return NextResponse.json({ message:  error?.message || "Internal Server Error" }, { status: 500 });
     }
-
-
-    if (first_name || last_name || email || location || phone_no || birth_date) {
-      await pool.query(
-        `
-        UPDATE users
-        SET
-          first_name = COALESCE($1, first_name),
-          last_name = COALESCE($2, last_name),
-          email = COALESCE($3, email),
-          location = COALESCE($4, location),
-          phone_no = COALESCE($5, phone_no),
-          birth_date = COALESCE($6, birth_date)
-        WHERE id = (
-          SELECT user_id FROM coaches WHERE id = $7
-        )
-        `,
-        [first_name, last_name, email, location, phone_no, birth_date, coach_id]
-      );
-    }
-
-    await pool.query("COMMIT");
-
-    const updated = await pool.query(
-      `
-      SELECT
-        c.id AS coach_id,
-        c.user_id,
-        c.bio,
-        c.rating,
-        c.career_start,
-        c.schedule_preference,
-        u.first_name,
-        u.last_name,
-        u.email,
-        u.location,
-        u.status,
-        u.picture,
-        u.phone_no,
-        u.birth_date,
-        u.joining_date
-      FROM coaches c
-      INNER JOIN users u ON u.id = c.user_id
-      WHERE c.id = $1
-      `,
-      [coach_id]
-    );
-
-    if (updated.rows.length === 0) {
-      return NextResponse.json(
-        { message: "coach not found" },
-        { status: 404 }
-      );
-    }
-
-    return NextResponse.json(updated.rows[0]);
-  } catch (error) {
-    console.error("PATCH /api/coaches/[id] error:", error);
-    await pool.query("ROLLBACK");
-    return NextResponse.json(
-      { message: "Internal Server Error" },
-      { status: 500 }
-    );
-  }
 }
 
