@@ -22,12 +22,13 @@ import {
   MessageCircle,
   MessageSquare,
   Phone,
+  Plus,
   Shield,
   Trash,
   User,
   Users,
 } from "lucide-react";
-import { ReactNode, useEffect, useState } from "react";
+import { ReactNode, useEffect, useRef, useState } from "react";
 import { FaBell, FaCreditCard, FaLock, FaUser } from "react-icons/fa";
 import { FaFloppyDisk } from "react-icons/fa6";
 import { GoDotFill } from "react-icons/go";
@@ -35,10 +36,18 @@ import { RiShieldKeyholeLine } from "react-icons/ri";
 import axios from "@/lib/axios";
 import { useAuth } from "@/contexts/auth-context";
 import { joinNames } from "@/lib/functions";
+import { deleteObject, ref } from "firebase/storage";
+import { storage } from "@/lib/firebase";
+import { uploadProfileImage } from "@/lib/upload-profile-image";
+import getInitials from "@/components/parents/get-initials";
 export default function Page() {
   const [loading, setLoading] = useState(false);
   const [savingChanges, setSavingChanges] = useState(false);
   const [tab, setTab] = useState("Profile info")
+  const [profileImage,setProfileImage]=useState<string|null>()
+  const [uploading, setUploading] = useState(false);
+const fileInputRef = useRef<HTMLInputElement | null>(null);
+
   const [profileInfo, setProfileInfo] = useState({
     adminUser: "",
     email: "",
@@ -180,6 +189,8 @@ export default function Page() {
           password: "",
           blanck: "",
         });
+        setProfileImage(result.user?.picture || null);
+        console.log(result.user?.picture)
 
         const settings = result.settings;
 
@@ -407,6 +418,54 @@ export default function Page() {
     }
   };
 
+  const handleSelectFile = () => {
+  fileInputRef.current?.click();
+};
+
+const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const file = e.target.files?.[0];
+  if (!file || !user?.id) return;
+
+  setUploading(true);
+  try {
+    const path = `ap2t/user/picture/${user.id}`;
+
+    const res = await uploadProfileImage(file, path);
+
+    const imageUrl = await uploadProfileImage(file, path);
+
+setProfileImage(imageUrl);
+
+await axios.put("/settings/profileimage", {
+  user_id: user.id,
+  profile_image: imageUrl,
+});
+  } finally {
+    setUploading(false);
+  }
+};
+
+
+
+  const handleDeleteImage = async () => {
+  if (!user?.id) return;
+
+  try {
+    const storageRef = ref(storage, `ap2t/user/picture/${user.id}`);
+    await deleteObject(storageRef);
+
+    await axios.put("/settings/profileimage", {
+      user_id: user.id,
+      profile_image: null,
+    });
+
+    setProfileImage(null);
+  } catch (err) {
+    console.error("Delete failed", err);
+  }
+};
+
+
 
   const isMobile = useIsMobile();
   return (
@@ -495,30 +554,70 @@ export default function Page() {
               </div>
 
               <div className="flex items-center gap-8">
-                <div className="relative w-24 h-24">
-                  <img
-                    className="w-full h-full rounded-full object-cover"
-                    src="/settings/profilepic.png"
-                    alt=""
-                  />
 
-                  <div className="absolute bottom-0 right-0 bg-primary p-2 rounded-full">
-                    <User size={14} className="text-black text-sm" />
-                  </div>
-                </div>
-                <div className="space-y-1">
-                  <h1 className="text-md font-semibold">{user?.first_name} {user?.last_name}</h1>
-                  <p className="text-sm text-muted-foreground">{user?.role}</p>
-                  <div className="flex gap-2">
-                    <Button variant={"link"} className="p-0 font-normal">
-                      Delete
-                    </Button>
-                    <Button variant={"link"} className="p-0 font-normal">
-                      Update
-                    </Button>
-                  </div>
-                </div>
-              </div>
+  <input
+    ref={fileInputRef}
+    type="file"
+    accept="image/*"
+    className="hidden"
+    onChange={handleUpload}
+  />
+
+  <div className="relative w-24 h-24">
+    {profileImage ? (
+      <img
+        src={profileImage}
+        className="w-full h-full rounded-full object-cover"
+      />
+    ) : (
+      <div className="w-full h-full rounded-full bg-[#1A1A1A] border border-border flex items-center justify-center text-lg font-semibold">
+        {getInitials(joinNames([user?.first_name, user?.last_name]))}
+      </div>
+    )}
+
+    <button
+      onClick={handleSelectFile}
+      className="absolute bottom-0 right-0 bg-primary p-2 rounded-full"
+    >
+      {uploading ? (
+        <Loader2 size={14} className="animate-spin text-black" />
+      ) : profileImage ? (
+        <User size={14} className="text-black" />
+      ) : (
+        <Plus size={14} className="text-black" />
+      )}
+    </button>
+  </div>
+
+
+  <div className="space-y-1">
+    <h1 className="text-md font-semibold">
+      {user?.first_name} {user?.last_name}
+    </h1>
+    <p className="text-sm text-muted-foreground">{user?.role}</p>
+
+    <div className="flex gap-2">
+      {profileImage && (
+        <Button
+          variant="link"
+          className="p-0 font-normal"
+          onClick={handleDeleteImage}
+        >
+          Delete
+        </Button>
+      )}
+
+      <Button
+        variant="link"
+        className="p-0 font-normal"
+        onClick={handleSelectFile}
+      >
+        Update
+      </Button>
+    </div>
+  </div>
+</div>
+
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <LocalInput
                   title="Full Name"
