@@ -114,37 +114,20 @@ WHERE u.role = $1;
 
         const statsQuery = `
   SELECT
-    COUNT(*) FILTER (WHERE u.role = 'coach') AS total_coaches,
-    COUNT(*) FILTER (WHERE u.role = 'coach' AND u.status = 'active') AS total_active_coaches,
-    COUNT(*) FILTER (WHERE u.role = 'player') AS total_players,
-    COUNT(s.id) AS total_sessions
-  FROM users u
-  LEFT JOIN sessions s ON s.coach_id = u.id;
+  (SELECT COUNT(*) FROM users WHERE role = 'coach') AS total_coaches,
+  (SELECT COUNT(*) FROM users WHERE role = 'coach' AND status = 'active') AS total_active_coaches,
+  (SELECT COUNT(*) FROM users WHERE role = 'player') AS total_players,
+  (SELECT COUNT(*) FROM sessions) AS total_sessions;
 `;
-
-
-
         const statsResult = await pool.query(statsQuery);
         const stats = statsResult.rows[0];
 
         const coachesQuery = `
   SELECT 
-    u.id, u.first_name, u.last_name, u.email, u.status,
-    to_json(c.*) AS profile, 
-    COALESCE(sp.specialities, '{}') AS specialities,
-    COALESCE(cert.certifications, '{}') AS certifications
+   u.*,
+    to_json(c.*) AS profile
   FROM users u
   LEFT JOIN coaches c ON c.user_id = u.id
-  LEFT JOIN (
-    SELECT user_id, ARRAY_AGG(name) AS specialities
-    FROM specialities
-    GROUP BY user_id
-  ) sp ON sp.user_id = u.id
-  LEFT JOIN (
-    SELECT user_id, ARRAY_AGG(name) AS certifications
-    FROM certifications
-    GROUP BY user_id
-  ) cert ON cert.user_id = u.id
   WHERE u.role = 'coach';
 `;
 
@@ -186,8 +169,18 @@ WHERE u.role = $1;
                 [coach.id]
             );
             coach.player_count = parseInt(playersResult.rows[0].count);
-        }
 
+            const ratingResult = await pool.query(
+                `SELECT ROUND(AVG(sp.rating)::numeric, 2) AS average_rating
+     FROM session_players sp
+     INNER JOIN sessions s ON s.id = sp.session_id
+     WHERE s.coach_id = $1
+     AND sp.rating IS NOT NULL`,
+                [coach.id]
+            );
+
+            coach.average_rating = Number(ratingResult.rows[0].average_rating || 0);
+        }
         return NextResponse.json({
             stats,
             data: coaches

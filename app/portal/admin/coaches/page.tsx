@@ -1,32 +1,24 @@
 "use client"
 
-import AppCalendar from "@/components/app-calendar";
+import CardStatus from "@/components/card-status";
+import CreateCoach from "@/components/coach/CreateCoach";
 import getInitials from "@/components/parents/get-initials";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Dialog, DialogClose, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Separator } from "@/components/ui/separator";
-import { Textarea } from "@/components/ui/textarea";
-import { cn } from "@/lib/utils";
+import { Spinner } from "@/components/ui/spinner";
+import { useAuth } from "@/contexts/auth-context";
 import axios from "@/lib/axios";
-import { Bell, Calendar, CheckCircle, Eye, Loader2, Plus, Target, TrendingUp, User } from "lucide-react";
+import { joinNames } from "@/lib/functions";
+import { cn } from "@/lib/utils";
+import { Calendar, CheckCircle, Eye, Target, TrendingUp, User } from "lucide-react";
 import Link from "next/link";
 import { ReactNode, useEffect, useState } from "react";
-import { joinNames, splitFullName } from "@/lib/functions";
-import { useParams } from "next/navigation";
-import { useAuth } from "@/contexts/auth-context";
-import { Spinner } from "@/components/ui/spinner";
-import CardStatus from "@/components/card-status";
 
 
 
 export type coachinfoType = {
-  id : number
+  id: number
   name: string;
   email: string;
   phoneNo: string;
@@ -96,6 +88,7 @@ export default function Page() {
     try {
       setLoading(true)
       const result = await axios.get("/admin/users?role=coach")
+      console.log(result.data)
       const mappedCoaches = result?.data?.data?.map((coach: any) => (
         {
           name: joinNames([coach.first_name, coach.last_name]),
@@ -103,12 +96,12 @@ export default function Page() {
           phoneNo: coach.phone_no,
           status: coach.status,
           notification: coach.notifications || "0",
-          specialities: coach.specialities || [],
+          specialities: coach?.profile?.specialities || [],
           totalSessions: coach.total_sessions || "0",
           completed: coach.completed_sessions || "0",
           upComing: coach.upcoming_sessions || "0",
-          players: coach.players_count || "0",
-          avgRating: coach?.profile?.rating || "0",
+          players: coach.player_count || "0",
+          avgRating: coach?.average_rating || "0",
           id: coach.id
         }
       ))
@@ -158,7 +151,7 @@ export default function Page() {
 
       {loading ? (
         <div className="flex justify-center items-center py-20">
-         <Spinner/>
+          <Spinner />
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -180,8 +173,8 @@ export default function Page() {
                     </div>
                   </div>
                   <div className="gap-2 flex flex-col items-end">
-                   <CardStatus value={coach?.status}/>
-{/* 
+                    <CardStatus value={coach?.status} />
+                    {/* 
                     <Badge className={` bg-warning-bg text-warning-text border-warning-text/32 leading-none py-1`}>
                       <Bell />  <span >{coach.notification} new</span>
                     </Badge> */}
@@ -271,188 +264,7 @@ const Header = ({ children }: { children: ReactNode }) => {
 };
 
 
-const CreateCoach = ({ onRefresh }: { onRefresh: () => Promise<void> }) => {
 
-  const [open, setOpen] = useState(false)
-  const [loading, setLoading] = useState(false)
-  const [coach, setCoach] = useState({
-    first_name: "",
-    last_name:"",
-    email: "",
-    phone: "",
-    career_start: "",
-    bio: "",
-  });
-
-  const addCoach = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    setLoading(true)
-
-    try {
-      await axios.post("/user", {
-        first_name: coach.first_name,
-        last_name: coach.last_name,
-        email: coach.email,
-        phone_no: coach.phone,
-        career_start: coach.career_start,
-        bio: coach.bio,
-        role: "coach"
-      })
-
-      await onRefresh()
-      setOpen(false)
-    } catch (error) {
-      console.log(error)
-    } finally {
-      setLoading(false)
-    }
-  };
-
-  return (
-    <>
-      <Button className="gap-2 text-sm" onClick={() => setOpen(!open)}>
-        <Plus /> Add Coach
-      </Button>
-      <Dialog open={open} onOpenChange={setOpen}>
-
-        <DialogContent className="bg-[#252525] border border-[#3A3A3A] sm:max-w-4xl p-0">
-          <DialogHeader className="border-b border-[#3A3A3A] p-4">
-            <DialogTitle className="text-[#F3F4F6] font-semibold text-lg">
-              Add New Coach
-            </DialogTitle>
-          </DialogHeader>
-          <form onSubmit={addCoach} className="">
-            <ScrollArea className=" py-1 space-y-4 px-2 ">
-              <div className="space-y-2 px-2 pb-2">
-                <div className="grid grid-cols-2 gap-2">
-                  <div className="space-y-2">
-                    <Label className="text-sm text-[#99A1AF]">
-                      Frist Name
-                    </Label>
-                    <Input
-                      name="first_name"
-                      placeholder="Coach Martinez"
-                      className="!bg-[#1A1A1A] !border-[#3A3A3A] !text-[#E5E7EB] !p-5"
-                      required
-                      value={coach.first_name}
-                      onChange={(e) =>
-                        setCoach((prev) => ({
-                          ...prev,
-                          first_name: e.target.value,
-                        }))
-                      }
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label className="text-sm text-[#99A1AF]">
-                      Last Name
-                    </Label>
-                    <Input
-                      name="last_name"
-                      placeholder="Coach Martinez"
-                      className="!bg-[#1A1A1A] !border-[#3A3A3A] !text-[#E5E7EB] !p-5"
-                      required
-                      value={coach.last_name}
-                      onChange={(e) =>
-                        setCoach((prev) => ({
-                          ...prev,
-                          fullname: e.target.value,
-                        }))
-                      }
-                    />
-                  </div>
-                </div>
-                  <div className="space-y-2">
-                    <Label className="text-sm text-[#99A1AF]">Email</Label>
-                    <Input
-                      name="email"
-                      placeholder="martinez@ap2t.com"
-                      className="!bg-[#1A1A1A] !border-[#3A3A3A] !text-[#E5E7EB] !p-5"
-                      required
-                      value={coach.email}
-                      onChange={(e) =>
-                        setCoach((prev) => ({
-                          ...prev,
-                          email: e.target.value,
-                        }))
-                      }
-                    />
-                  </div>
-                <div className="grid grid-cols-2 gap-2">
-                  <div className="space-y-2">
-                    <Label className="text-sm text-[#99A1AF]">Phone</Label>
-                    <Input
-                      name="phone"
-                      placeholder="(555) 123-4567"
-                      className="!bg-[#1A1A1A] !border-[#3A3A3A] !text-[#E5E7EB] !p-5"
-                      required
-                      value={coach.phone}
-                      onChange={(e) =>
-                        setCoach((prev) => ({
-                          ...prev,
-                          phone: e.target.value,
-                        }))
-                      }
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label className="text-sm text-[#99A1AF]">
-                      Start of Career
-                    </Label>
-                    <AppCalendar
-                      className="h-11"
-                      date={coach.career_start ? new Date(coach.career_start) : undefined}
-                      onChange={(date) =>
-                        setCoach((prevState) => ({
-                          ...prevState,
-                          career_start: date,
-                        }))
-                      }
-                      required
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label className="text-sm text-[#99A1AF]">
-                    Biography
-                  </Label>
-                  <Textarea className="!bg-[#1A1A1A] border border-border rounded-[10px] min-h-28"
-                    value={coach.bio}
-                    onChange={(e) =>
-                      setCoach((prev) => ({
-                        ...prev,
-                        bio: e.target.value,
-                      }))
-                    }
-                  />
-                </div>
-
-
-              </div>
-            </ScrollArea>
-            <Separator />
-            <div className="p-4">
-              <div className="flex gap-4 flex-wrap">
-                <DialogClose className="text-[13px] font-medium leading-none h-10 px-4 py-2 bg-black text-white border-border rounded-md hover:opacity-70 cursor-pointer flex flex-1 items-center justify-center">
-                  Cancel
-                </DialogClose>
-                <Button
-                  disabled={loading}
-                  type="submit"
-                  className="flex-1 text-[13px]"
-                  size={"lg"}
-                >
-                  {loading && <Spinner />} Add Coach
-                </Button>
-              </div>
-            </div>
-          </form>
-        </DialogContent>
-      </Dialog>
-    </>
-  )
-}
 
 
 
