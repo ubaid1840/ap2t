@@ -206,7 +206,7 @@ export const PAYMENT_COLUMNS: ColumnDef<PaymentData>[] = [
       <div className="w-24">
         <CardStatus
           value={row.getValue("status")}
-          type={paymentStatusMap[row.original.status]}
+        
         />
       </div>
     ),

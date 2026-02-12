@@ -82,7 +82,7 @@ export default function SignUpForm({
         <form className="bg-[#131313] p-6 rounded-[10px] w-full">
           <div className="space-y-6">
             <div className="border-b border-[#282828] pb-3">
-              <h2 className="text-sm font-medium">Personal Information</h2>
+              <h2 className="text-sm font-medium">Player Information</h2>
             </div>
 
             <div className="flex gap-4">
@@ -124,7 +124,6 @@ export default function SignUpForm({
               <div className="flex-1">
                 <Label className="text-sm">Birth Date *</Label>
                 <AppCalendar
-                  className="h-11"
                   date={
                     signUpData.birth_date
                       ? new Date(signUpData.birth_date)
@@ -315,7 +314,7 @@ export default function SignUpForm({
             <div className="bg-[#CBFD0026] flex items-center gap-2 p-2 rounded-[5px]">
               <p className="text-xs text-muted-foreground">
                 Note: Your card will be securely stored for membership payments.
-                You will not be charged until you select a membership plan.
+                You will not be charged until you select a session.
               </p>
             </div>
 

@@ -21,6 +21,7 @@ import { joinNames, splitFullName } from "@/lib/functions";
 import { useParams } from "next/navigation";
 import { useAuth } from "@/contexts/auth-context";
 import { Spinner } from "@/components/ui/spinner";
+import CardStatus from "@/components/card-status";
 
 
 
@@ -179,9 +180,7 @@ export default function Page() {
                     </div>
                   </div>
                   <div className="gap-2 flex flex-col items-end">
-                    <Badge className={`bg-${coach.status}-bg text-${coach.status}-text border-${coach.status}-text/32 leading-none py-1`}>
-                      {coach.status?.charAt(0).toUpperCase() + coach.status?.slice(1)}
-                    </Badge>
+                   <CardStatus value={coach?.status}/>
 {/* 
                     <Badge className={` bg-warning-bg text-warning-text border-warning-text/32 leading-none py-1`}>
                       <Bell />  <span >{coach.notification} new</span>
@@ -243,7 +242,7 @@ export default function Page() {
                       </div>
                     </div>
                   </div>
-                  <Link href={`/admin/coaches/${coach.id}`}>
+                  <Link href={`/portal/admin/coaches/${coach.id}`}>
                     <Button className="w-full"><Eye /> View Schedule & Manage</Button>
                   </Link>
                 </CardContent>

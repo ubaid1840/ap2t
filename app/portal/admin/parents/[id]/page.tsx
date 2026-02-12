@@ -95,8 +95,7 @@ export default function Page() {
                 <span>
                   <CardStatus
                     value={data?.card_status || ""}
-                    type="active"
-                    icon={<CircleCheckBig size={14} />}
+                    icon={true}
                   />
                 </span>
               </span>
@@ -344,13 +343,6 @@ export default function Page() {
                       <p>{item.session}</p>
                       <CardStatus
                         value={item.status}
-                        type={
-                          item.status === "Completed"
-                            ? "active"
-                            : item.status === "Refunded"
-                              ? "other"
-                              : "danger"
-                        }
                       />
                     </div>
                     <p

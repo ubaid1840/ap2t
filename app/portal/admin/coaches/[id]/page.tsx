@@ -65,11 +65,15 @@ import {
 import { WeeklySchedule } from "@/components/coach-dashboard/weekly-schedule";
 import axios from "@/lib/axios";
 import AppCalendar from "@/components/app-calendar";
+import { getYear, joinNames, splitFullName } from "@/lib/functions";
+import moment from "moment";
+import { Spinner } from "@/components/ui/spinner";
 
 export default function Page() {
   const { id } = useParams();
   const [data, setData] = useState<coachinfoType>();
   const [tab, setTab] = useState("Details");
+  const [loading, setLoading] = useState(false)
 
   const isMobile = useIsMobile();
 
@@ -82,80 +86,92 @@ export default function Page() {
 
   useEffect(() => {
     if (id) {
-      const fetchData = async () => {
-        try {
-          const result = await axios.get(`/admin/coaches/${id}`);
-          const coachdb = result.data;
-          const coach = {
-            name: `${coachdb.first_name} ${coachdb.last_name}`,
-            email: coachdb.email,
-            phoneNo: coachdb.phone_no,
-            status: coachdb.status,
-            bio:coachdb.bio,
-            notification: coachdb.notifications || "0",
-            specialities: coachdb.specialities || [],
-            certifications:coachdb.certifications||[],
-            preferedSchedule:coachdb.schedule_preference||"no specific schedule",
-            totalSessions: coachdb.total_sessions || "0",
-            completed: coachdb.completed_sessions || "0",
-            upComing: coachdb.upcoming_sessions || "0",
-            players: coachdb.players_count || "0",
-            avgRating: coachdb.rating || "0",
-            id: coachdb.coach_id,
-          };
-          setData(coach)
-        } catch (error) {
-          console.log(error);
-        }
-      };
-      fetchData();
-
-      const coachData = coachinfo.find((item) => item.id === Number(id));
-      setData(coachData);
+      fetchData()
     }
   }, [id]);
+
+  const fetchData = async () => {
+    try {
+      const response = await axios.get(`/admin/coaches/${id}`);
+      console.log(response.data)
+      setData(response.data)
+    } finally {
+      setLoading(false)
+    }
+  };
+
+
+
+  function calculateStats(sessions, payments) {
+    let totalSessions = 0
+    let totalCompleted = 0
+    let totalUpcoming = 0
+    let averageRating = 0
+    let totalRevenue = 0
+    if (sessions) {
+
+      totalSessions = sessions.length
+      totalCompleted = sessions.filter((item) => item.status === 'completed').length
+      totalUpcoming = sessions.filter((item) => item.status === 'upcoming').length
+
+
+    }
+    if (payments) {
+      const filteredPayments = payments.filter((item) => item.status === 'paid')
+      totalRevenue = filteredPayments.reduce(
+        (sum, item) => sum + Number(item.amount || 0),
+        0
+      );
+    }
+    return (
+      {
+        totalSessions, totalCompleted, totalRevenue, totalUpcoming, averageRating
+      }
+    )
+
+  }
+
+  const statsData = calculateStats(data?.session_data, data?.payment_data)
+
 
   const localData = [
     {
       Icon: <Calendar />,
       title: "Total Sessions",
-      description: data?.totalSessions,
+      description: statsData?.totalSessions,
       type: "success",
       going: "active",
     },
     {
       Icon: <Clock />,
       title: "Completed",
-      description: data?.completed,
+      description: statsData?.totalCompleted,
       type: "active",
       going: "active",
     },
     {
       Icon: <CircleCheckBigIcon />,
       title: "Upcoming",
-      description: data?.upComing,
+      description: statsData?.totalUpcoming,
       type: "info",
       going: "info",
     },
     {
       Icon: <Award />,
       title: "Avg Rating",
-      description: data?.avgRating,
+      description: statsData?.averageRating,
       type: "other",
       going: "active",
     },
     {
       Icon: <DollarSign />,
       title: "Total Revenue",
-      description: "$12,350",
+      description: statsData?.totalRevenue,
       type: "warning",
       going: "warning",
     },
   ];
 
-  const coachStatus = data?.status
-    ? data?.status.charAt(0).toUpperCase() + data?.status.slice(1)
-    : "";
   return (
     <div className="flex flex-col w-full gap-6">
       <BackButton title="Back to coaches" route="/portal/admin/coaches" />
@@ -165,12 +181,11 @@ export default function Page() {
           <div className="w-full flex justify-between flex-wrap gap-4">
             <div className="flex flex-col gap-2">
               <span className="flex gap-2 text-xl items-center">
-                {data?.name}{" "}
+                {joinNames([data?.first_name, data?.last_name])}{" "}
                 <span>
                   <CardStatus
-                    value={coachStatus}
-                    type="active"
-                    icon={<CircleCheckBig size={14} />}
+                    value={data?.status}
+                    icon={true}
                   />
                 </span>
               </span>
@@ -179,16 +194,16 @@ export default function Page() {
                   <Mail size={14} /> {data?.email}
                 </span>
                 <span className="inline-flex gap-2">
-                  <Phone size={14} /> {data?.phoneNo}
+                  <Phone size={14} /> {data?.phone_no}
                 </span>
                 <span className="inline-flex gap-2">
-                  <IoCalendarClear size={14} /> Joined 2023-01-15 • 10 years
+                  <IoCalendarClear size={14} /> Joined {data?.created_at && moment(new Date(data?.created_at)).format("YYYY-MM-DD")} • {getYear(data?.profile?.career_start)} years
                   experience
                 </span>
               </div>
             </div>
             <div className="flex gap-4 flex-wrap">
-              <EditProfile />
+              <EditProfile id={id as string} onRefresh={async () => await fetchData()} data={data} />
             </div>
           </div>
 
@@ -258,7 +273,7 @@ export default function Page() {
           <TabsContent value="Details" className="space-y-4 p-4">
             <h1 className="text-lg text-[#F3F4F6]">Biography</h1>
             <p className="text-sm text-muted-foreground">
-              {data?.bio}
+              {data?.profile?.bio}
             </p>
 
             <h1 className="text-lg text-[#F3F4F6]">Specialties</h1>
@@ -269,7 +284,7 @@ export default function Page() {
                     key={s}
                     className="py-2 px-3 rounded-lg bg-[#1A1A1A] border border-border text-xs leading-none text-[#D1D5DC]"
                   >
-                    {s}
+                    {s?.name}
                   </div>
                 );
               })}
@@ -278,26 +293,26 @@ export default function Page() {
             <h1 className="text-lg text-[#F3F4F6]">Certifications</h1>
             <div className="space-y-2">
               {
-                data?.certifications.map((certification)=>(
+                data?.certifications.map((certification) => (
                   <div key={certification} className="bg-[#1A1A1A] border border-border rounded-[10px] px-4 py-3 flex items-center gap-2">
-                <Award className="text-primary" size={16} />
-                <h1 className="text-[#E5E7EB] text-sm">{certification}</h1>
-              </div>
+                    <Award className="text-primary" size={16} />
+                    <h1 className="text-[#E5E7EB] text-sm">{certification?.name}</h1>
+                  </div>
                 ))
               }
             </div>
 
-            <h1 className="text-lg text-[#F3F4F6]">Scheduling Preferences</h1>
+            {/* <h1 className="text-lg text-[#F3F4F6]">Scheduling Preferences</h1>
             <div className="bg-[#1A1A1A] border border-border text-ghost-text rounded-[10px] px-4 py-3 flex items-center gap-2">
               <Clock size={16} />
               <h1 className="text-[#E5E7EB]">
                 {data?.preferedSchedule}
               </h1>
-            </div>
+            </div> */}
           </TabsContent>
 
           <TabsContent value="Availability" className="space-y-4 p-4">
-            <div className="bg-[#1A1A1A] border border-border rounded-[10px] px-4 py-2 flex justify-between gap-4 flex-wrap">
+            {/* <div className="bg-[#1A1A1A] border border-border rounded-[10px] px-4 py-2 flex justify-between gap-4 flex-wrap">
               <div className="flex gap-2 items-center text-sm">
                 <GoDotFill className="text-active-text" />
                 <h1 className="text-[#D1D5DC]">Synced with booking system</h1>
@@ -306,7 +321,7 @@ export default function Page() {
               <Button className="flex gap-2">
                 <RefreshCcw /> Sync Now{" "}
               </Button>
-            </div>
+            </div> */}
 
             <WeeklySchedule events={COACH_WEEKLY_EVENTS} />
 
@@ -332,7 +347,7 @@ export default function Page() {
           <TabsContent value="Sessions" className="space-y-2 p-4">
             <h1 className="text-lg text-[#F3F4F6]">All Sessions</h1>
             <div className="space-y-4 pt-2">
-              {COACH_ALL_SESSIONS.map((session, i) => {
+              {data?.session_data && data?.session_data?.map((session, i) => {
                 return (
                   <Card key={i} className="p-0 overflow-hidden">
                     <CardContent className="bg-[#1A1A1A] p-4 space-y-2">
@@ -342,33 +357,25 @@ export default function Page() {
                             {session.name}
                           </h1>
                           <div>
-                            <Badge
-                              className={
-                                session.status === "Completed"
-                                  ? "leading-none py-1 bg-active-bg border-active-text/32 text-active-text"
-                                  : "bg-info-bg border-info-text/32 text-info-text leading-none py-1"
-                              }
-                            >
-                              {session.status}
-                            </Badge>
+                            <CardStatus value={session?.status} />
                           </div>
                         </div>
-                        <h1>{session.amount}</h1>
+                        <h1>${session?.apply_promotion ? session.promotion_price : session.price}</h1>
                       </div>
                       <div className="flex gap-4 text-xs text-muted-foreground">
                         <div className="flex gap-2  items-center">
-                          <Calendar size={12} /> <p>{session.date}</p>
+                          <Calendar size={12} /> <p>{moment(new Date(session.date)).format("YYYY-MM-DD")}</p>
                         </div>
                         <div className="flex gap-2  items-center">
-                          <Clock size={12} /> <p>{session.time}</p>
+                          <Clock size={12} /> <p>{session.start_time} {session.end_time}</p>
                         </div>
-                        <div className="flex gap-2 items-center">
+                        {/* <div className="flex gap-2 items-center">
                           <Users size={12} /> <p>{session.player}</p>
-                        </div>
+                        </div> */}
                       </div>
                     </CardContent>
                   </Card>
-                );
+                )
               })}
             </div>
           </TabsContent>
@@ -478,61 +485,109 @@ export default function Page() {
   );
 }
 
-const EditProfile = () => {
-  const {id:coach_id}=useParams()
+const EditProfile = ({ id, data, onRefresh }: { id: string, data: any, onRefresh: () => Promise<void> }) => {
   const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(false)
+  const [specialityInput, setSpecialityInput] = useState("")
+  const [certificationInput, setCertificationInput] = useState("")
 
-  const [editCoach, setEditCoach] = useState({
+  const [coach, setCoach] = useState({
     fullname: "",
-    email: "",
     phone: "",
     career_start: "",
     bio: "",
-    preferedSchedule: "",
+    specialities: [],
+    certification: []
   });
+
+  useEffect(() => {
+    if (data) {
+      setCoach({
+        fullname: joinNames([data?.first_name, data?.last_name]),
+        phone: data?.phone_no,
+        career_start: data?.profile?.career_start,
+        bio: data?.profile?.bio,
+        specialities: data?.specialities,
+        certification: data?.certifications
+      })
+    }
+  }, [data])
 
   const changeCoach = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    const { first_name, last_name } = splitFullName(coach.fullname)
+
     try {
-      
+     
 
-      const names = editCoach.fullname.trim().split(" ");
-      const first_name = names.shift() || "";
-      const last_name = names.join(" ") || "";
-
-      const body: any = {};
-      if (first_name) body.first_name = first_name;
-      if (last_name) body.last_name = last_name;
-      if (editCoach.email) body.email = editCoach.email;
-      if (editCoach.phone) body.phone_no = editCoach.phone;
-      if (editCoach.career_start)
-        body.career_start =
-          typeof editCoach.career_start === "string"
-            ? editCoach.career_start
-            : editCoach.career_start.toISOString();
-      if (editCoach.bio) body.bio = editCoach.bio;
-      if (editCoach.preferedSchedule)
-        body.schedule_preference = editCoach.preferedSchedule;
-
-      const res = await axios.patch(`/admin/coaches/${coach_id}`, body);
-
-      console.log("Coach updated successfully:", res.data);
-
-      setEditCoach({
-        fullname: `${res.data.first_name} ${res.data.last_name}`,
-        email: res.data.email || "",
-        phone: res.data.phone_no || "",
-        career_start: res.data.career_start || "",
-        bio: res.data.bio || "",
-        preferedSchedule: res.data.schedule_preference || "",
-      });
-
-      setOpen(false);
+      await onRefresh()
+      setOpen(false)
     } catch (error) {
-      console.error("Failed to update coach:", error);
+      console.log(error)
+    } finally {
+      setLoading(false)
     }
   };
+
+
+  const handleAddSpeciality = (e: React.KeyboardEvent<HTMLInputElement>) => {
+  if (e.key === "Enter") {
+    e.preventDefault();
+
+    const trimmed = specialityInput.trim();
+    if (!trimmed) return;
+
+    setCoach((prev : any)  => {
+      if (prev.specialities.includes(trimmed)) return prev;
+
+      return {
+        ...prev,
+        specialities: [...prev.specialities, trimmed]
+      };
+    });
+
+    setSpecialityInput("");
+  }
+};
+
+
+ const handleRemoveSpeciality = (tag: string) => {
+  setCoach(prev => ({
+    ...prev,
+    specialities: prev.specialities.filter(t => t !== tag)
+  }));
+};
+
+
+const handleAddCertification = (e: React.KeyboardEvent<HTMLInputElement>) => {
+  if (e.key === "Enter") {
+    e.preventDefault();
+
+    const trimmed = certificationInput.trim();
+    if (!trimmed) return;
+
+    setCoach((prev : any)  => {
+      if (prev.certification.includes(trimmed)) return prev;
+
+      return {
+        ...prev,
+        certification: [...prev.certification, trimmed]
+      };
+    });
+
+    setSpecialityInput("");
+  }
+};
+
+
+ const handleRemoveCertification = (tag: string) => {
+  setCoach(prev => ({
+    ...prev,
+    certification: prev.certification.filter(t => t !== tag)
+  }));
+};
+
   return (
     <>
       <Button onClick={() => setOpen(!open)} variant={"outline"}>
@@ -547,35 +602,23 @@ const EditProfile = () => {
             </DialogTitle>
           </DialogHeader>
           <form onSubmit={changeCoach} className="">
-            <ScrollArea className=" py-1 space-y-4 px-2 ">
+            <ScrollArea className="h-[60vh] py-1 space-y-4 px-2 ">
               <div className="space-y-2 px-2 pb-2">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label className="text-sm text-[#99A1AF]">Full Name</Label>
+                    <Label className="text-sm text-[#99A1AF]">
+                      Full Name
+                    </Label>
                     <Input
                       name="fullName"
                       placeholder="Coach Martinez"
-                      className="!bg-[#1A1A1A] !border-[#3A3A3A] !text-[#E5E7EB] !p-5"
-                      value={editCoach.fullname}
+
+                      required
+                      value={coach.fullname}
                       onChange={(e) =>
-                        setEditCoach((prev) => ({
+                        setCoach((prev) => ({
                           ...prev,
                           fullname: e.target.value,
-                        }))
-                      }
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label className="text-sm text-[#99A1AF]">Email</Label>
-                    <Input
-                      name="email"
-                      placeholder="martinez@ap2t.com"
-                      className="!bg-[#1A1A1A] !border-[#3A3A3A] !text-[#E5E7EB] !p-5"
-                      value={editCoach.email}
-                      onChange={(e) =>
-                        setEditCoach((prev) => ({
-                          ...prev,
-                          email: e.target.value,
                         }))
                       }
                     />
@@ -586,10 +629,11 @@ const EditProfile = () => {
                     <Input
                       name="phone"
                       placeholder="(555) 123-4567"
-                      className="!bg-[#1A1A1A] !border-[#3A3A3A] !text-[#E5E7EB] !p-5"
-                      value={editCoach.phone}
+
+                      required
+                      value={coach.phone}
                       onChange={(e) =>
-                        setEditCoach((prev) => ({
+                        setCoach((prev) => ({
                           ...prev,
                           phone: e.target.value,
                         }))
@@ -601,29 +645,27 @@ const EditProfile = () => {
                       Start of Career
                     </Label>
                     <AppCalendar
-                      className="h-11"
-                      date={
-                        editCoach.career_start
-                          ? new Date(editCoach.career_start)
-                          : undefined
-                      }
+
+                      date={coach.career_start ? new Date(coach.career_start) : undefined}
                       onChange={(date) =>
-                        setEditCoach((prevState) => ({
+                        setCoach((prevState) => ({
                           ...prevState,
                           career_start: date,
                         }))
                       }
+                      required
                     />
                   </div>
                 </div>
 
                 <div className="space-y-2">
-                  <Label className="text-sm text-[#99A1AF]">Biography</Label>
-                  <Textarea
-                    className="!bg-[#1A1A1A] border border-border rounded-[10px] min-h-28"
-                    value={editCoach.bio}
+                  <Label className="text-sm text-[#99A1AF]">
+                    Biography
+                  </Label>
+                  <Textarea className="min-h-28"
+                    value={coach.bio}
                     onChange={(e) =>
-                      setEditCoach((prev) => ({
+                      setCoach((prev) => ({
                         ...prev,
                         bio: e.target.value,
                       }))
@@ -631,23 +673,68 @@ const EditProfile = () => {
                   />
                 </div>
 
-                <div className="space-y-2">
-                  <Label className="text-sm text-[#99A1AF]">
-                    Preferred Schedule
-                  </Label>
-                  <Input
-                    name="preferedscedule"
-                    placeholder="Coach Martinez"
-                    className="!bg-[#1A1A1A] !border-[#3A3A3A] !text-[#E5E7EB] !p-5"
-                    value={editCoach.preferedSchedule}
-                    onChange={(e) =>
-                      setEditCoach((prev) => ({
-                        ...prev,
-                        preferedSchedule: e.target.value,
-                      }))
-                    }
-                  />
+               <div className="space-y-2">
+                    <Label className="text-sm text-[#99A1AF]">Specialities</Label>
+                  <div className="flex flex-col gap-2 border rounded-md p-2">
+                    
+                    <Input
+                      placeholder="Type speciality and press Enter"
+                      value={specialityInput}
+                      onChange={(e) => setSpecialityInput(e.target.value)}
+                      onKeyDown={handleAddSpeciality}
+                    />
+                    <div className="flex flex-wrap gap-2">
+                    {coach.specialities.map((tag, idx) => (
+                      <span
+                        key={idx}
+                        className="flex items-center gap-1 bg-primary text-black px-2 py-1 rounded-md text-sm"
+                      >
+                        {tag}
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveSpeciality(tag)}
+                          className="ml-1 text-xs hover:text-red-300"
+                        >
+                          ✕
+                        </button>
+                      </span>
+                    ))}
+                    </div>
+                  </div>
                 </div>
+
+
+                 <div className="space-y-2">
+                    <Label className="text-sm text-[#99A1AF]">Certifications</Label>
+                  <div className="flex flex-col gap-2 border rounded-md p-2">
+                    
+                    <Input
+                      placeholder="Type certification and press Enter"
+                      value={certificationInput}
+                      onChange={(e) => setCertificationInput(e.target.value)}
+                      onKeyDown={handleAddCertification}
+                    />
+                    <div className="flex flex-wrap gap-2">
+                    {coach.certification.map((tag, idx) => (
+                      <span
+                        key={idx}
+                        className="flex items-center gap-1 bg-primary text-black px-2 py-1 rounded-md text-sm"
+                      >
+                        {tag}
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveCertification(tag)}
+                          className="ml-1 text-xs hover:text-red-300"
+                        >
+                          ✕
+                        </button>
+                      </span>
+                    ))}
+                    </div>
+                  </div>
+                </div>
+
+
               </div>
             </ScrollArea>
             <Separator />
@@ -657,11 +744,12 @@ const EditProfile = () => {
                   Cancel
                 </DialogClose>
                 <Button
+                  disabled={loading}
                   type="submit"
                   className="flex-1 text-[13px]"
                   size={"lg"}
                 >
-                  Save Changes
+                  {loading && <Spinner />} Save
                 </Button>
               </div>
             </div>

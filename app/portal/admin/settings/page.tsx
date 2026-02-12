@@ -679,35 +679,35 @@ export default function Page() {
                     <Users className="text-gray-400" size={16} />
                     <h1 className="text-[#E5E7EB] text-sm">Manage Users</h1>
                   </div>
-                  <CardStatus value={"Enabled"} type="active" />
+                  <CardStatus value={"Enabled"}  />
                 </div>
                 <div className="flex justify-between bg-[#1A1A1A] border border-[#3A3A3A] rounded-[10px] p-4">
                   <div className="flex items-center gap-2">
                     <User className="text-gray-400 " size={16} />
                     <h1 className="text-[#E5E7EB] text-sm">Manage Players</h1>
                   </div>
-                  <CardStatus value={"Enabled"} type="active" />
+                  <CardStatus value={"Enabled"}  />
                 </div>
                 <div className="flex justify-between bg-[#1A1A1A] border border-[#3A3A3A] rounded-[10px] p-4">
                   <div className="flex items-center gap-2">
                     <Shield className="text-gray-400 " size={16} />
                     <h1 className="text-[#E5E7EB] text-sm">Manage Coaches </h1>
                   </div>
-                  <CardStatus value={"Enabled"} type="active" />
+                  <CardStatus value={"Enabled"}  />
                 </div>
                 <div className="flex justify-between bg-[#1A1A1A] border border-[#3A3A3A] rounded-[10px] p-4">
                   <div className="flex items-center gap-2">
                     <Calendar className="text-gray-400 " size={16} />
                     <h1 className="text-[#E5E7EB] text-sm">Manage Sessions</h1>
                   </div>
-                  <CardStatus value={"Enabled"} type="active" />
+                  <CardStatus value={"Enabled"}  />
                 </div>
                 <div className="flex justify-between bg-[#1A1A1A] border border-[#3A3A3A] rounded-[10px] p-4">
                   <div className="flex items-center gap-2">
                     <CreditCard className="text-gray-400" size={16} />
                     <h1 className="text-[#E5E7EB] text-sm">Manage Payments</h1>
                   </div>
-                  <CardStatus value={"Enabled"} type="active" />
+                  <CardStatus value={"Enabled"}  />
                 </div>
                 <div className="flex justify-between bg-[#1A1A1A] border border-[#3A3A3A] rounded-[10px] p-4">
                   <div className="flex items-center gap-2">
@@ -716,21 +716,21 @@ export default function Page() {
                       Manage Promotions
                     </h1>
                   </div>
-                  <CardStatus value={"Enabled"} type="active" />
+                  <CardStatus value={"Enabled"}  />
                 </div>
                 <div className="flex justify-between bg-[#1A1A1A] border border-[#3A3A3A] rounded-[10px] p-4">
                   <div className="flex items-center gap-2">
                     <GearIcon className="text-gray-400 h-4 w-4" />
                     <h1 className="text-[#E5E7EB] text-sm">System Settings</h1>
                   </div>
-                  <CardStatus value={"Enabled"} type="active" />
+                  <CardStatus value={"Enabled"}  />
                 </div>
                 <div className="flex justify-between bg-[#1A1A1A] border border-[#3A3A3A] rounded-[10px] p-4">
                   <div className="flex items-center gap-2">
                     <GearIcon className="text-gray-400 h-4 w-4" />
                     <h1 className="text-[#E5E7EB] text-sm">View Reports</h1>
                   </div>
-                  <CardStatus value={"Enabled"} type="active" />
+                  <CardStatus value={"Enabled"}  />
                 </div>
               </div>
             </TabsContent>
@@ -747,8 +747,7 @@ export default function Page() {
                 <div>
                   <CardStatus
                     value={"Connected"}
-                    type="active"
-                    icon={<GoDotFill />}
+                    icon={true}
                     className="gap-0"
                   />
                 </div>

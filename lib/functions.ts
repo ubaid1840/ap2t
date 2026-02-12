@@ -1,5 +1,5 @@
 export function splitFullName(fullName: string | null) {
-  if(!fullName) return {first_name : "", last_name :""}
+  if (!fullName) return { first_name: "", last_name: "" }
   const parts = fullName.trim().split(/\s+/);
 
   const last_name = parts.pop() || "";
@@ -14,5 +14,10 @@ export function joinNames(data: (string | null | undefined)[]): string {
     .map((s) => s!.trim())  // trim each string (s! because filtered)
     .filter(Boolean)        // remove strings that were only spaces
     .join(" ");             // join with space
+}
+
+export function getYear(val: string) {
+
+  return val ? new Date().getFullYear() - new Date(val).getFullYear() : "N/A"
 }
 

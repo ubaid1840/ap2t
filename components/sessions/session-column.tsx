@@ -14,8 +14,8 @@ export type SessionData = {
   coachName: string;
   playerName: string;
   price: number;
-  payment: "Paid" | "Pending" | "comped" | "partial";
-  status: "Upcoming" | "Completed" | "Cancelled";
+  payment: "paid" | "pending" | "comped" | "failed";
+  status: "upcoming" | "completed" | "cancelled" | "comped";
 };
 
 type CardStatusType =
@@ -28,16 +28,17 @@ type CardStatusType =
   | "alternative";
 
 const paymentStatusMap: Record<SessionData["payment"], CardStatusType> = {
-  Paid: "active",
-  Pending: "warning",
+  paid: "active",
+  pending: "warning",
   comped: "alternative",
-  partial: "warning"
+  failed: "danger"
 };
 
 const sessionStatusMap: Record<SessionData["status"], CardStatusType> = {
-  Completed: "active",
-  Upcoming: "info",
-  Cancelled: "danger",
+  completed: "active",
+  upcoming: "info",
+  cancelled: "danger",
+  comped : "alternative"
 };
 
 
@@ -153,7 +154,7 @@ export const SESSION_COLUMNS: ColumnDef<SessionData>[] = [
       <div className="w-24">
         <CardStatus
           value={row.getValue("status")}
-          type={sessionStatusMap[row.original.status]}
+
         />
       </div>
     ),

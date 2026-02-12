@@ -270,8 +270,7 @@ export default function MainPlayerPage({
                 <span>
                   <CardStatus
                     value={data?.status}
-                    type={data?.status as keyof typeof typeClasses}
-                    icon={<Activity size={14} />}
+                   icon={true}
                   />
                 </span>
               </span>
@@ -483,33 +482,11 @@ export default function MainPlayerPage({
                       <p>{item.name}</p>
                       <CardStatus
                         value={item.status}
-                        type={
-                          item.status === "upcoming"
-                            ? "info"
-                            : item.status === "attended"
-                              ? "active"
-                              : "danger"
-                        }
-                        icon={
-                          item.status === "upcoming" ? (
-                            <Clock size={14} />
-                          ) : item.status === "attended" ? (
-                            <CircleCheckBig size={14} />
-                          ) : (
-                            <CircleX size={14} />
-                          )
-                        }
+                        icon={true}
                       />
 
                       <CardStatus
                         value={item.payment_detail?.status || "pending"}
-                        type={
-                          item.payment_detail?.status === "paid"
-                            ? "active"
-                            : item.payment_detail?.status === "comped"
-                              ? "other"
-                              : "alternative"
-                        }
                       />
                     </div>
                     <p className="text-md">
@@ -588,13 +565,6 @@ export default function MainPlayerPage({
                       <p>{item.name}</p>
                       <CardStatus
                         value={item.payment_detail?.status || "pending"}
-                        type={
-                          item.payment_detail?.status === "paid"
-                            ? "active"
-                            : item.payment_detail?.status === "comped"
-                              ? "other"
-                              : "alternative"
-                        }
                       />
                     </div>
                     <p

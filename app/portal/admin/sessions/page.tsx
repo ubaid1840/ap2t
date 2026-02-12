@@ -41,7 +41,7 @@ export default function Page() {
           time: `${s.start_time} - ${s.end_time}`,
           coachName: joinNames([s.coach_first_name, s.coach_last_name]),
           price: s.price,
-          status: s.status ? s.status.charAt(0).toUpperCase() + s.status.slice(1).toLowerCase() : 'Upcoming'
+          status: s?.status || 'upcoming'
         }));
         setSessions(mappedSessions);
       }

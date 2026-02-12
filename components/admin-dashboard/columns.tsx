@@ -124,7 +124,6 @@ export const DASHBOARD_SESSIONS_COLUMNS: ColumnDef<SessionData>[] = [
                 <div className="w-20">
                     <CardStatus 
                         value={status} 
-                        type={sessionStatusMap[status] || "active"} 
                     />
                 </div>
             );

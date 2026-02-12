@@ -10,73 +10,62 @@ export async function GET(
     const result = await pool.query(
       `
       SELECT
-  c.id AS parent_id,
-  c.user_id,
-  c.bio,
-  c.rating,
-  c.career_start,
-  c.schedule_preference,
+    u.*,
+    to_jsonb(c.*) AS profile,
 
-  u.first_name,
-  u.last_name,
-  u.email,
-  u.location,
-  u.status,
-  u.picture,
-  u.phone_no,
-  u.birth_date,
-  u.joining_date,
+    /* Sessions */
+    COALESCE(
+        jsonb_agg(DISTINCT sess) 
+        FILTER (WHERE sess.id IS NOT NULL),
+        '[]'
+    ) AS session_data,
 
+    /* Payments */
+    COALESCE(
+        jsonb_agg(DISTINCT pay) 
+        FILTER (WHERE pay.id IS NOT NULL),
+        '[]'
+    ) AS payment_data,
 
-  COALESCE(
-    jsonb_agg(DISTINCT s.name) FILTER (WHERE s.id IS NOT NULL),
-    '[]'
-  ) AS specialities,
+    /* Specialities */
+    COALESCE(
+        jsonb_agg(DISTINCT cs.name)
+        FILTER (WHERE cs.id IS NOT NULL),
+        '[]'
+    ) AS specialities,
 
+    /* Certifications */
+    COALESCE(
+        jsonb_agg(DISTINCT cc.name)
+        FILTER (WHERE cc.id IS NOT NULL),
+        '[]'
+    ) AS certifications
 
-  COALESCE(
-    jsonb_agg(DISTINCT cert.name) FILTER (WHERE cert.id IS NOT NULL),
-    '[]'
-  ) AS certifications,
+FROM users u
 
- 
-  COALESCE(sess_counts.total_sessions, 0) AS totalSessions,
-  COALESCE(sess_counts.upcoming_sessions, 0) AS upComing
+INNER JOIN coaches c
+    ON c.user_id = u.id
 
-FROM coaches c
-INNER JOIN users u
-  ON u.id = c.user_id
+/* Sessions */
+LEFT JOIN sessions sess
+    ON sess.coach_id = u.id
 
-LEFT JOIN coach_specialities cs
-  ON cs.coach_id = c.id
-LEFT JOIN specialities s
-  ON s.id = cs.speciality_id
+/* Payments */
+LEFT JOIN payments pay
+    ON pay.session_id = sess.id
 
-LEFT JOIN coach_certifications cc
-  ON cc.coach_id = c.id
-LEFT JOIN certifications cert
-  ON cert.id = cc.certification_id
+/* Specialities */
+LEFT JOIN specialities cs
+    ON cs.user_id = c.id
 
-
-LEFT JOIN (
-  SELECT
-    coach_id,
-    COUNT(*) AS total_sessions,
-    COUNT(*) FILTER (WHERE status = 'upcoming') AS upcoming_sessions
-  FROM sessions
-  GROUP BY coach_id
-) sess_counts
-  ON sess_counts.coach_id = c.id
-
-WHERE c.id = $1
-
-GROUP BY
-  c.id,
-  u.id,
-  sess_counts.total_sessions,
-  sess_counts.upcoming_sessions;
+/* Certifications */
+LEFT JOIN certifications cc
+    ON cc.user_id = c.id
 
 
+WHERE u.id = $1
+
+GROUP BY u.id, c.id;
       `,
       [coach_id]
     );

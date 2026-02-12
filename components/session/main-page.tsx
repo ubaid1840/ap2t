@@ -237,7 +237,7 @@ export default function SessionMainPage({id, back, back_title, type} : {id : num
     },
     {
       h: `$${paymentStats.total_revenue.toFixed(2)}`,
-      p: "Total Revenue",
+      p: "Expected Revenue",
       icon: <DollarSign />,
       type: "success",
     },
@@ -267,6 +267,7 @@ export default function SessionMainPage({id, back, back_title, type} : {id : num
                 <span className="flex gap-2 text-xl items-center leading-none">
                   {data?.sessionName}
                 </span>
+                <CardStatus value={data?.status}/>
                 <Badge className="bg-info-bg text-info-text border border-info-text/32 h-6">
                   <div className="flex gap-1 items-center">
                     <Clock size={16} />
@@ -458,8 +459,8 @@ export default function SessionMainPage({id, back, back_title, type} : {id : num
                   <div className="flex gap-2 items-center">
                     <h1>{participent.first_name} {participent.last_name}</h1>
                     <CardStatus
-                      value={participent?.status?.charAt(0)?.toUpperCase() + participent?.status?.slice(1)}
-                      type={participent?.status_type}
+                      value={participent?.status}
+                     
                     />
                   </div>
 
@@ -509,7 +510,6 @@ export default function SessionMainPage({id, back, back_title, type} : {id : num
                       <h1>{payment.payer_first_name} {payment.payer_last_name}</h1>
                       <CardStatus
                         value={payment.status}
-                        type={paymentStatusMap[payment.status] || "info"}
                       />
                     </div>
 

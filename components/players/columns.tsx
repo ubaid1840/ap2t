@@ -139,26 +139,11 @@ export const PLAYERS_COLUMNS: ColumnDef<PlayersData>[] = [
                 <ArrowUpDown />
             </Button>
         ),
-        cell: ({ row }) => {
-            let type = ""
-            const Up = () => <TrendingUp size={14} />
-            const Down = () => <TrendingDown size={14} />
-            const In = () => <DashIcon />
-
-            if (row.original.attendance > 90) {
-                type = "success"
-            } else if (row.original.attendance >= 80 && row.original.attendance <= 90) {
-                type = "warning"
-            } else {
-                type = "danger"
-            }
-            return (
+        cell: ({ row }) =>  (
                 <div className="w-20">
-                <CardStatus value={row.getValue("attendance")} type={type as keyof typeof typeClasses} icon={row.original.attendance
-                    > 90 ? <Up /> : row.original.attendance >= 80 && row.original.attendance <= 90 ? <In /> : <Down />} />
+                <CardStatus value={row.getValue("attendance")} icon={true}/>
                     </div>
             )
-        },
     },
     {
         id: "actions",

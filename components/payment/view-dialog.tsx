@@ -62,7 +62,7 @@ export function ViewDialog({ data }: ViewDialogProps) {
                 <p className="text-sm text-ghost-text">Status</p>
               </div>
               <CardStatus
-                type={paymentStatusMap[data.status]}
+              
                 value={data.status}
                 className="w-20"
               />

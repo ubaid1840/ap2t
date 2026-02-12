@@ -1,4 +1,7 @@
+import { DashIcon } from "@radix-ui/react-icons";
+import { CircleCheckBig, CircleX, Clock, Info, TrendingDown, TrendingUp } from "lucide-react";
 import { ReactNode } from "react";
+import { GoDotFill } from "react-icons/go";
 
 export const typeClasses = {
     success: "bg-success-bg text-success-text border-success-text/32",
@@ -9,27 +12,79 @@ export const typeClasses = {
     other: "bg-other-bg text-other-text border-other-text/32",
     ghost: "bg-ghost-bg text-ghost-text border-ghost-text/32",
     alternative: "bg-alternative-bg text-alternative-text border-alternative-text/32",
+    paid: "bg-active-bg text-active-text border-active-text/32",
+    comped: "bg-other-bg text-other-text border-other-text/32",
+    completed: "bg-success-bg text-success-text border-success-text/32",
+    refunded: "bg-alternative-bg text-alternative-text border-alternative-text/32",
+    failed: "bg-danger-bg text-danger-text border-danger-text/32",
+    upcoming: "bg-info-bg text-info-text border-info-text/32",
+    pending: "bg-warning-bg text-warning-text border-warning-text/32",
+    inactive: "bg-ghost-bg text-ghost-text border-ghost-text/32"
+
+}
+
+export const IconType = {
+    active: <CircleCheckBig size={14} />,
+    failed: <CircleX size={14} />,
+    upcoming: <Clock size={14} />,
+    expired: <Info size={14} />,
+    "no_card": <CircleX size={14} />,
+    error: <Info size={14} />,
+    attended: <CircleCheckBig size={14} />,
+    connected: <GoDotFill size={14} />
 }
 
 interface CardStatusProps {
     value: number | string | undefined;
-    type?: keyof typeof typeClasses | undefined
-    icon?: null | ReactNode
+    icon?: boolean
     className?: string
 }
 
-const CardStatus = ({ value, type = "success", icon = null, className = "" }: CardStatusProps) => {
+const CardStatus = ({ value, icon = false, className = "" }: CardStatusProps) => {
 
-    let str = null
-    if (typeof value === 'string')
-        str = value.charAt(0).toUpperCase() + value.slice(1)
-    else
-        str = value
+   
+
+   if (value === undefined || value === null) return null
+
+    let str: string = ""
+    let localIcon: null | ReactNode = null
+    let localType = typeClasses.other
+
+    
+    const numericValue =
+  typeof value === "string" && !isNaN(Number(value))
+    ? Number(value)
+    : value
+
+if (typeof numericValue === "number") {
+  str = String(numericValue)
+
+  localIcon =
+    numericValue > 90
+      ? <TrendingUp size={14} />
+      : numericValue >= 80
+      ? <DashIcon />
+      : <TrendingDown size={14} />
+
+  localType =
+    numericValue > 90
+      ? typeClasses.success
+      : numericValue >= 80
+      ? typeClasses.warning
+      : typeClasses.danger
+}
+else if (typeof value === "string") {
+  str = value.charAt(0).toUpperCase() + value.slice(1)
+
+  localIcon = IconType[value as keyof typeof IconType] ?? null
+  localType = typeClasses[value as keyof typeof typeClasses] ?? typeClasses.other
+}
+
     return (
         <div
-            className={`px-2 py-1 justify-center rounded-full flex items-center gap-2 ${typeClasses[type]} ${className}`}
+            className={`px-2 py-1 justify-center rounded-full flex items-center gap-2 ${localType} ${className}`}
         >
-            {icon && icon}
+            {icon && localIcon}
             <p className="text-xs leading-none tracking-normal">
                 {str}
             </p>
