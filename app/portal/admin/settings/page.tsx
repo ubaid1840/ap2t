@@ -110,8 +110,6 @@ const fileInputRef = useRef<HTMLInputElement | null>(null);
   ]);
 
   const [securityInfo, setSecurityInfo] = useState({
-    twoFactorAuth: false,
-    loginAlert: false,
     oldPass: "",
     newPass: "",
     confirmNewPass: "",
@@ -198,44 +196,36 @@ const fileInputRef = useRef<HTMLInputElement | null>(null);
           {
             title: "Merchant ID",
             type: "input",
-            value: settings?.merchant_id || "",
+            value: settings.mode? settings?.test_merchant_id:settings?.live_merchant_id || "",
             placeholder: "MLSQ12345678",
           },
           {
             title: "Location ID",
             type: "input",
-            value: settings?.location_id || "",
+            value: settings.mode ? settings?.test_location_id :settings?.live_location_id || "",
             placeholder: "L12345689",
           },
           {
             title: "API Key",
             type: "input",
-            value: settings?.api_key || "",
+            value: settings.mode? settings?.test_api_key:settings?.live_api_key || "",
             placeholder: "**********",
           },
           {
             title: "Webhook URL",
             type: "input",
-            value: settings?.webhook_url || "",
+            value: settings.mode? settings?.text_webhook:settings?.live_webhook || "",
             placeholder: "https:/ap2t.com/api/square/webhook",
           },
           {
             title: "Test Mode",
             type: "switch",
-            value: settings?.test_mode ?? false,
+            value: settings?.mode ?? false,
             description: "Use Square sandbox for testing",
-          },
-          {
-            title: "Auto Sync Catalog",
-            type: "switch",
-            value: settings?.auto_sync_catalog ?? false,
-            description: "Automatically sync promotions with square catalog",
           },
         ]);
 
         setSecurityInfo({
-          twoFactorAuth: settings?.two_factor_auth ?? false,
-          loginAlert: settings?.login_alert ?? false,
           oldPass: "",
           newPass: "",
           confirmNewPass: "",
@@ -306,59 +296,68 @@ const fileInputRef = useRef<HTMLInputElement | null>(null);
       email_notification: notificationInfo[4].value,
       sms_notification: notificationInfo[5].value,
       push_notification: notificationInfo[6].value,
-      merchant_id: squareIntigration[0].value,
-      location_id: squareIntigration[1].value,
-      api_key: squareIntigration[2].value,
-      webhook_url: squareIntigration[3].value,
-      test_mode: squareIntigration[4].value,
-      auto_sync_catalog: squareIntigration[5].value,
-      two_factor_auth: securityInfo.twoFactorAuth,
-      login_alert: securityInfo.loginAlert,
+      live_merchant_id: "",
+      live_location_id: "",
+      live_api_key: "",
+      live_webhook: "",
+      test_merchant_id: "",
+      test_location_id: "",
+      test_api_key: "",
+      test_webhook: "",
+      mode: squareIntigration[4].value,
       user_id: user_id,
     };
+
+    if(squareIntigration[4].value===false){
+      payLoad.live_merchant_id= squareIntigration[0].value,
+      payLoad.live_location_id= squareIntigration[1].value,
+      payLoad.live_api_key= squareIntigration[2].value,
+      payLoad.live_webhook= squareIntigration[3].value,
+      payLoad.mode= squareIntigration[4].value
+    }else{
+      payLoad.test_merchant_id= squareIntigration[0].value,
+      payLoad.test_location_id= squareIntigration[1].value,
+      payLoad.test_api_key= squareIntigration[2].value,
+      payLoad.text_webhook= squareIntigration[3].value,
+      payLoad.mode= squareIntigration[4].value
+    }
 
     try {
       const res = await axios.patch(`/settings`, payLoad);
 
       const settings = res.data;
-      setSquareIntigration([
-        {
-          title: "Merchant ID",
-          type: "input",
-          value: settings?.merchant_id || "",
-          placeholder: "MLSQ12345678",
-        },
-        {
-          title: "Location ID",
-          type: "input",
-          value: settings?.location_id || "",
-          placeholder: "L12345689",
-        },
-        {
-          title: "API Key",
-          type: "input",
-          value: settings?.api_key || "",
-          placeholder: "**********",
-        },
-        {
-          title: "Webhook URL",
-          type: "input",
-          value: settings?.webhook_url || "",
-          placeholder: "https:/ap2t.com/api/square/webhook",
-        },
-        {
-          title: "Test Mode",
-          type: "switch",
-          value: settings?.test_mode ?? false,
-          description: "Use Square sandbox for testing",
-        },
-        {
-          title: "Auto Sync Catalog",
-          type: "switch",
-          value: settings?.auto_sync_catalog ?? false,
-          description: "Automatically sync promotions with square catalog",
-        },
-      ]);
+       setSquareIntigration([
+          {
+            title: "Merchant ID",
+            type: "input",
+            value: settings.mode? settings?.test_merchant_id:settings?.live_merchant_id || "",
+            placeholder: "MLSQ12345678",
+          },
+          {
+            title: "Location ID",
+            type: "input",
+            value: settings.mode ? settings?.test_location_id :settings?.live_location_id || "",
+            placeholder: "L12345689",
+          },
+          {
+            title: "API Key",
+            type: "input",
+            value: settings.mode? settings?.test_api_key:settings?.live_api_key || "",
+            placeholder: "**********",
+          },
+          {
+            title: "Webhook URL",
+            type: "input",
+            value: settings.mode? settings?.text_webhook:settings?.live_webhook || "",
+            placeholder: "https:/ap2t.com/api/square/webhook",
+          },
+          {
+            title: "Test Mode",
+            type: "switch",
+            value: settings?.mode ?? false,
+            description: "Use Square sandbox for testing",
+          },
+        ]);
 
       setSecurityInfo({
         twoFactorAuth: settings?.two_factor_auth ?? false,
@@ -904,7 +903,7 @@ await axios.put("/settings/profileimage", {
                   Keep your account secure with extra Authentication.
                 </p>
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {/* <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <LocalSwitch
                   title="Two-Factor Authentication"
                   description="Add an extra layer of protection to your account."
@@ -915,9 +914,9 @@ await axios.put("/settings/profileimage", {
                       twoFactorAuth: val,
                     }))
                   }
-                />
+                /> */}
 
-                <LocalSwitch
+                {/* <LocalSwitch
                   title="Login Alert Notification"
                   description="Get notified when your account is accessed from a new device."
                   value={securityInfo.loginAlert}
@@ -928,7 +927,7 @@ await axios.put("/settings/profileimage", {
                     }))
                   }
                 />
-              </div>
+              </div> */}
 
               <div className="space-y-4">
                 <h1 className="text-[18px] font normal">Password Management</h1>
