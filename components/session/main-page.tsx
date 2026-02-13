@@ -448,7 +448,7 @@ export default function SessionMainPage({id, back, back_title, type} : {id : num
           <Separator />
 
           <TabsContent value="Participants" className="space-y-4 p-4">
-            <AddParticipantDialog sessionId={Number(id)} onSuccess={fetchParticipants} />
+            {data?.status==="upcoming" &&<AddParticipantDialog sessionId={Number(id)} onSuccess={fetchParticipants} />}
             {participants.map((participent: any, i) => (
               <Card key={i} className="bg-[#1A1A1A] border border-border">
                 <CardContent className="space-y-2">
