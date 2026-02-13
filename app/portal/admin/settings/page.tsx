@@ -318,7 +318,7 @@ const fileInputRef = useRef<HTMLInputElement | null>(null);
       payLoad.test_merchant_id= squareIntigration[0].value,
       payLoad.test_location_id= squareIntigration[1].value,
       payLoad.test_api_key= squareIntigration[2].value,
-      payLoad.text_webhook= squareIntigration[3].value,
+      payLoad.test_webhook= squareIntigration[3].value,
       payLoad.mode= squareIntigration[4].value
     }
 
@@ -348,7 +348,7 @@ const fileInputRef = useRef<HTMLInputElement | null>(null);
           {
             title: "Webhook URL",
             type: "input",
-            value: settings.mode? settings?.text_webhook:settings?.live_webhook || "",
+            value: settings.mode? settings?.test_webhook:settings?.live_webhook || "",
             placeholder: "https:/ap2t.com/api/square/webhook",
           },
           {
