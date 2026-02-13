@@ -22,19 +22,27 @@ SELECT
     (
         SELECT p2.amount
         FROM payments p2
-        WHERE p2.user_id = u.id
+        INNER JOIN players pl2 ON pl2.user_id = p2.user_id
+        WHERE pl2.parent_id = u.id
+          AND p2.status = 'paid'
         ORDER BY p2.created_at DESC
         LIMIT 1
     ) AS last_spent,
-    MAX(pay.paid_at) AS last_transaction_date
+    (
+        SELECT MAX(p3.paid_at)
+        FROM payments p3
+        INNER JOIN players pl3 ON pl3.user_id = p3.user_id
+        WHERE pl3.parent_id = u.id
+          AND p3.status = 'paid'
+    ) AS last_transaction_date
 FROM users u
 INNER JOIN parents p ON p.user_id = u.id
-LEFT JOIN players pl 
-    ON pl.parent_id = u.id
-LEFT JOIN payments pay 
-    ON pay.user_id = u.id
+LEFT JOIN players pl ON pl.parent_id = u.id
+LEFT JOIN payments pay ON pay.user_id = pl.user_id
+                     AND pay.status = 'paid'  -- only consider paid payments
 WHERE u.role = $1
-GROUP BY u.id
+GROUP BY u.id;
+
 `
     }
 

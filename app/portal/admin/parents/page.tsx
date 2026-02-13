@@ -15,11 +15,30 @@ import axios from "@/lib/axios";
 import { Download, Filter, Plus } from "lucide-react";
 import { useEffect, useState } from "react";
 import moment from "moment";
+import ExportExcel from "@/components/export-excel";
+import { joinNames } from "@/lib/functions";
+import { useDebounce } from "@/hooks/use-debounce";
+
+export interface ParentData {
+  id: number | string;
+  name: string;
+  joining_date: string; // formatted as "YYYY-MM-DD" or "N/A"
+  email: string;
+  number: string | null;
+  location: string;
+  children: string;
+  card_status: string;
+  total_spent: string;
+  last_spent: string;
+  last_transaction_date: string; // formatted as "YYYY-MM-DD" or "N/A"
+}
 
 export default function Page() {
   const [filter, setFilter] = useState(false);
-  const [parents, setParents] = useState([]);
+  const [parents, setParents] = useState<ParentData[] | []>([]);
   const [loading, setLoading] = useState(false)
+  const [search, setSearch] = useState("")
+  const debouncedSearch = useDebounce(search, 300)
   const { user } = useAuth();
 
   useEffect(() => {
@@ -41,10 +60,10 @@ export default function Page() {
       email: p.email,
       number: p.phone_no,
       location: p.location || "N/A",
-      children: p.children_count || 0,
+      children: String(p.children_count || 0),
       card_status: p.card_status || "N/A",
-      total_spent: p.total_spent || 0,
-      last_spent: p.last_spent || 0,
+      total_spent: String(p.total_spent || 0),
+      last_spent: String(p.last_spent || 0),
       last_transaction_date: p.last_transaction_date
         ? moment(new Date(p.last_transaction_date)).format("YYYY-MM-DD")
         : "N/A",
@@ -53,13 +72,27 @@ export default function Page() {
     setLoading(false)
   };
 
+  const filteredData = parents.filter((item)=>{
+    const localSearch = `${item.name} ${item.email} ${item.number}`.toLocaleLowerCase()
+    if(localSearch.includes(debouncedSearch?.toLocaleLowerCase())) return item
+  })
+
   return (
     <div className="flex flex-col w-full gap-6">
-      <Header totalParents ={parents.length}>
+      <Header totalParents={parents.length}>
         <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
-          <Button variant={"outline"}>
-            <Download /> Export
-          </Button>
+          <ExportExcel header={["Parent", "Joining Date", "Email", "Contact", "Location", "children", "Card Status", "Total Spent", "Last Spent", "Last Transaction Date"]} fileName="parents_data.xlsx" data={parents.map((item)=>[
+            item?.name || "",
+            item?.joining_date || "",
+            item?.email || "",
+            item?.number || "",
+            item?.location || "",
+            item?.children || "",
+            item?.card_status || "",
+            item?.total_spent || "",
+            item?.last_spent || "",
+            item?.last_transaction_date || ""
+          ])}/>
 
           <CreateParent onRefresh={async () => {
             await fetchData()
@@ -70,7 +103,7 @@ export default function Page() {
       <div className="flex flex-col gap-4 rounded-[14px] bg-#252525 border border-[#3A3A3A] p-4 bg-[#252525]">
         <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
           <div className="w-full">
-            <InputWithIcon placeholder="Search by name, email, or phone..." />
+            <InputWithIcon value={search} onChange={(e)=> setSearch(e.target.value)} placeholder="Search by name, email, or phone..." />
           </div>
 
           <Button onClick={() => setFilter(!filter)}>
@@ -102,11 +135,11 @@ export default function Page() {
       <PageTable
         loading={loading}
         columns={PARENT_COLUMNS}
-        data={parents || []}
+        data={filteredData || []}
         onRowClick={() => { }}
       />
 
-     
+
     </div>
   );
 }

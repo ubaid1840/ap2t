@@ -577,7 +577,7 @@ export default function Page() {
                 />
 
                 <div className="relative w-24 h-24">
-                  <RenderAvatar img={user?.picture} fallback={joinNames([user?.first_name, user?.last_name])} className="w-full h-full" fallbackClassName="bg-[#1A1A1A] text-white" />
+                  <RenderAvatar img={user?.picture} fallback={joinNames([user?.first_name, user?.last_name])} className="w-full h-full bg-[#1A1A1A]" fallbackClassName="bg-[#1A1A1A] text-white" />
 
                   <button
                     onClick={handleSelectFile}

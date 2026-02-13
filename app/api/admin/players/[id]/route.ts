@@ -59,7 +59,6 @@ export async function GET(
     cu.first_name AS coach_first_name,
     cu.last_name AS coach_last_name,
 
-    -- Payment detail for this player & session
     (
       SELECT to_json(pay.*)
       FROM payments pay
@@ -68,7 +67,6 @@ export async function GET(
       LIMIT 1
     ) AS payment_detail,
 
-    -- Notes for session
     COALESCE(
       (
         SELECT jsonb_agg(n.*)
@@ -110,19 +108,22 @@ export async function GET(
 
    const allNotes = await pool.query(
   `
-  SELECT
+ SELECT
     n.*,
     u.first_name AS coach_first_name,
     u.last_name  AS coach_last_name,
     s.name AS session_name
 
-  FROM session_players sp
-  INNER JOIN sessions s ON s.id = sp.session_id
-  INNER JOIN notes n ON n.session_id = s.id
-  LEFT JOIN users u ON u.id = s.coach_id
+FROM session_players sp
+INNER JOIN sessions s ON s.id = sp.session_id
+INNER JOIN notes n ON n.session_id = s.id
+LEFT JOIN users u ON u.id = n.user_id
 
-  WHERE sp.user_id = $1
-  ORDER BY n.created_at DESC
+WHERE 
+    sp.user_id = $1
+    AND (n.player_id IS NULL OR n.player_id = $1)
+
+ORDER BY n.created_at DESC
   `,
   [player_id]
 );

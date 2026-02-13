@@ -51,6 +51,7 @@ import { ReactNode, useEffect, useState } from "react";
 import { IoCalendarClear } from "react-icons/io5";
 import { coachinfoType } from "../page";
 import EditCoachProfile from "@/components/coach/EditCoachProfile";
+import { Skeleton } from "@/components/ui/skeleton";
 
 
 export interface CoachResponse {
@@ -129,7 +130,7 @@ export default function Page() {
   const { id } = useParams();
   const [data, setData] = useState<CoachResponse>();
   const [tab, setTab] = useState("Details");
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(true)
 
   const isMobile = useIsMobile();
 
@@ -147,9 +148,9 @@ export default function Page() {
   }, [id]);
 
   const fetchData = async () => {
+    setLoading(true)
     try {
       const response = await axios.get(`/admin/coaches/${id}`);
-      console.log(response.data)
       setData(response.data)
     } finally {
       setLoading(false)
@@ -255,6 +256,16 @@ export default function Page() {
 
   const combinedEvents = blockedEvents ? [...weeklyEvents, ...blockedEvents] : weeklyEvents;
 
+  if (loading) {
+    return (
+      <div className="flex flex-col w-full gap-6">
+        <BackButton title="Back to coaches" route="/portal/admin/coaches" />
+        <Skeleton className="h-[200px] w-full bg-secondary rounded-sm" />
+        <Skeleton className="h-[300px] w-full bg-secondary rounded-sm" />
+
+      </div>
+    )
+  }
 
 
   return (
@@ -408,7 +419,7 @@ export default function Page() {
               </Button>
             </div> */}
 
-            <WeeklySchedule events={combinedEvents} id={id as string} preference={data?.profile?.schedule_preference}/>
+            <WeeklySchedule events={combinedEvents} id={id as string} preference={data?.profile?.schedule_preference} />
 
             <Card className="bg-info-bg p-3 border-info-text/30">
               <CardContent className="p-0">

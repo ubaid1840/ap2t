@@ -1,15 +1,14 @@
 "use client";
 import BackButton from "@/components/back-button";
 import CardStatus from "@/components/card-status";
-import { ParentData } from "@/components/parents/columns";
 import { PAYMENT_HISTORY } from "@/components/parents/constatns";
 import { EditParents } from "@/components/parents/edit-parents";
 import RenderAvatar from "@/components/render-avatar";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "@/contexts/auth-context";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -117,6 +116,7 @@ export default function Page() {
   const [tab, setTab] = useState("linked");
   const isMobile = useIsMobile();
   const [loading, setLoading] = useState(false);
+  const [dataLoading, setDataLoading] = useState(true)
   const { user } = useAuth()
 
   useEffect(() => {
@@ -126,13 +126,14 @@ export default function Page() {
   }, [id, user]);
 
   const fetchData = async () => {
+    setDataLoading(true)
     try {
+
       const result = await axios.get(`/admin/parents/${id}`);
-      console.log(result.data)
       setData(result.data)
 
-    } catch (error) {
-      console.log(error);
+    } finally {
+      setDataLoading(false)
     }
   };
 
@@ -140,8 +141,8 @@ export default function Page() {
     setLoading(true);
     try {
       const result = await axios.put(`/user`, {
-        id : id,
-        status : status,
+        id: id,
+        status: status,
       });
       setData((prevState) => {
         if (!prevState) return prevState;
@@ -158,6 +159,18 @@ export default function Page() {
       setLoading(false);
     }
   };
+
+
+  if (dataLoading) {
+    return (
+      <div className="flex flex-col w-full gap-6">
+        <BackButton title="Back To Parents" route="/portal/admin/parents" />
+        <Skeleton className="h-[200px] w-full bg-secondary rounded-sm" />
+        <Skeleton className="h-[300px] w-full bg-secondary rounded-sm" />
+
+      </div>
+    )
+  }
 
   return (
     <div className="flex flex-col w-full gap-6">
@@ -194,12 +207,12 @@ export default function Page() {
             </div>
             {data && <div className="flex gap-4 flex-wrap">
               <EditParents parent_id={data?.parent?.id} data={{
-                first_name : data?.parent?.first_name,
-                last_name : data?.parent?.last_name,
-                phone_no : data?.parent?.phone_no,
-                location : data?.parent?.location
-                }}
-                onRefresh={fetchData}/>
+                first_name: data?.parent?.first_name,
+                last_name: data?.parent?.last_name,
+                phone_no: data?.parent?.phone_no,
+                location: data?.parent?.location
+              }}
+                onRefresh={fetchData} />
               <Button>
                 <Send /> Send Reminder
               </Button>

@@ -2,42 +2,78 @@
 
 import { Button } from "@/components/ui/button"
 import {
-    Dialog,
-    DialogClose,
-    DialogContent,
-    DialogFooter,
-    DialogHeader,
-    DialogOverlay,
-    DialogTitle,
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogOverlay,
+  DialogTitle,
 } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
+import { useAuth } from "@/contexts/auth-context"
+import axios from "@/lib/axios"
 import { SquarePen } from "lucide-react"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { IoIosStar, IoIosStarOutline } from "react-icons/io"
+import SelectSession from "./select-session"
+import { Spinner } from "../ui/spinner"
 
-export function AddCoachNotes() {
+export function AddCoachNotes({ player_id, onRefresh }: { player_id: number | undefined, onRefresh: () => Promise<void> }) {
   const [open, setOpen] = useState(false)
-  const [selectedSession, setSelectedSession] = useState("")
+  const [selectedSession, setSelectedSession] = useState<string | number>("")
   const [rating, setRating] = useState(0)
+  const { user } = useAuth()
+  const [loading, setLoading] = useState(false)
+  const [sessionLoading, setSessionLoading] = useState(false)
 
-  const sessions = [
-    "Basketball Training",
-    "Goalkeeper Drills",
-    "Defensive Skills",
-    "Strength & Conditioning",
-    "Shooting Practice",
-  ]
+
+  const [sessions, setSessions] = useState<{ value: string, label: string }[] | []>([]);
+
+  useEffect(() => {
+    if (open)
+      fetchSession()
+  }, [open])
+
+  async function fetchSession() {
+    if (!player_id) return
+
+    setSessionLoading(true)
+    try {
+      const response = await axios.get(`/admin/players/${player_id}/sessions`)
+      const finalData = response.data.map((item: any) => {
+        return { value: item.id, label: item.name };
+      });
+      setSessions(finalData)
+    } finally {
+      setSessionLoading(false)
+    }
+  }
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
+
     const formData = new FormData(e.currentTarget)
 
     const values = {
-      session: formData.get("session"),
-      performance: rating,
-      notes: formData.get("notes"),
+      note: formData.get("notes"),
+      session_id: selectedSession,
+      user_id: user?.id,
+      player_id: player_id,
+      rating
+    }
+
+    if (!selectedSession || !player_id || !formData.get("notes")) return
+
+    setLoading(true)
+    try {
+      await axios.post(`/admin/sessions/${selectedSession}/note`, values)
+      await onRefresh()
+      setOpen(false)
+
+    } finally {
+      setLoading(false)
     }
 
     setOpen(false)
@@ -67,18 +103,9 @@ export function AddCoachNotes() {
                 <Label htmlFor="session" className="text-xs text-muted-foreground">
                   Session
                 </Label>
-                <Select value={selectedSession} onValueChange={setSelectedSession}>
-                  <SelectTrigger id="session" className="dark:bg-black w-full">
-                    <SelectValue placeholder="Select session" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {sessions.map((s, i) => (
-                      <SelectItem key={i} value={s}>
-                        {s}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                {sessionLoading ? <Spinner /> : 
+                <SelectSession sessions={sessions} value={selectedSession} onReturn={setSelectedSession} player_id={player_id} />
+}
               </div>
 
               {/* Performance Stars */}
@@ -125,7 +152,7 @@ export function AddCoachNotes() {
                   Cancel
                 </Button>
               </DialogClose>
-              <Button type="submit">Add Note</Button>
+              <Button disabled={loading} type="submit">{loading && <Spinner className="text-black" />}Add Note</Button>
             </DialogFooter>
           </form>
         </DialogContent>

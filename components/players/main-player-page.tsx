@@ -1,9 +1,7 @@
 "use client";
-import CardStatus, { typeClasses } from "@/components/card-status";
+import CardStatus from "@/components/card-status";
 import { BarChart } from "@/components/charts/bar-chart";
 import { AddCoachNotes } from "@/components/players/add-coach-notes";
-import { PlayersData } from "@/components/players/columns";
-import { CHECKINS_12WEEKS_DATA } from "@/components/players/constatns";
 import { EditInfo } from "@/components/players/edit-info";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -15,14 +13,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "@/contexts/auth-context";
 import { useIsMobile } from "@/hooks/use-mobile";
 import axios from "@/lib/axios";
-import { joinNames } from "@/lib/functions";
+import { getYear, joinNames } from "@/lib/functions";
 import { Scrollbar } from "@radix-ui/react-scroll-area";
 import {
-  Activity,
   Bookmark,
   Calendar,
   CircleCheckBig,
-  CircleX,
   Clock,
   DollarSign,
   Gift,
@@ -32,16 +28,15 @@ import {
   MessageSquare,
   Phone,
   TrendingUp,
-  User,
+  User
 } from "lucide-react";
 import moment from "moment";
+import Link from "next/link";
 import { ReactNode, useEffect, useState } from "react";
 import { IoIosStar, IoIosStarOutline } from "react-icons/io";
-import { AddParentDialog } from "./add-parents";
-import { useParams, useRouter } from "next/navigation";
 import getInitials from "../parents/get-initials";
-import { Router } from "next/router";
-import Link from "next/link";
+import { Skeleton } from "../ui/skeleton";
+import { AddParentDialog } from "./add-parents";
 
 export interface PlayerResponse {
   id: number;
@@ -175,7 +170,7 @@ export default function MainPlayerPage({
   const [tab, setTab] = useState("Session History");
   const { user } = useAuth();
   const isMobile = useIsMobile();
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (user?.id && id) fetchData();
@@ -183,19 +178,14 @@ export default function MainPlayerPage({
 
   const fetchData = async () => {
     if (!id) return;
-
+    setLoading(true)
     try {
       const result = await axios.get(`/admin/players/${id}`);
-
       setData(result.data);
     } finally {
       setLoading(false);
     }
   };
-
-  useEffect(() => {
-    console.log(data);
-  }, [data]);
 
   function calculateTotalPendingPayments(sessions: SessionData[] | undefined) {
     if (!sessions) return 0;
@@ -234,8 +224,70 @@ export default function MainPlayerPage({
     }, 0);
   }
 
-  const totalPendingCount = calculateTotalPendingPayments(data?.sessions_data);
+  function calculateAttendancePercentage(sessions: SessionData[] | undefined) {
+    if (!sessions) return 0
 
+    const completedSessions = sessions.filter(s => s.status === "completed");
+
+    if (completedSessions.length === 0) return 0;
+
+
+    const presentCount = completedSessions.reduce((acc, session) => {
+
+      const attendanceRecords = session.attendance_detail || [];
+      const isPresent = attendanceRecords.some(
+        (a: any) => a.status === "present"
+      );
+      return acc + (isPresent ? 1 : 0);
+    }, 0);
+
+
+    return (presentCount / completedSessions.length) * 100;
+  }
+
+
+  function generate12WeekCheckins(sessions: SessionData[] | undefined) {
+    if (!sessions) return []
+    const now = moment();
+
+    const validSessions = sessions.filter((session) => {
+      if (session.status !== "completed") return false;
+
+      const attendance = session.attendance_detail || [];
+      return attendance.some((a: any) => a.status === "present");
+    });
+
+
+    const weekMap: Record<string, number> = {};
+
+    validSessions.forEach((session) => {
+      const weekKey = moment(session.date).startOf("week").format("YYYY-MM-DD");
+
+      weekMap[weekKey] = (weekMap[weekKey] || 0) + 1;
+    });
+
+    let weeksArray = Object.entries(weekMap)
+      .sort(([a], [b]) => moment(a).diff(moment(b)))
+      .map(([week, count]) => ({
+        week,
+        checkins: count,
+      }));
+
+    if (weeksArray.length > 12) {
+      weeksArray = weeksArray.slice(-12);
+    }
+
+    return weeksArray.map((w, index) => ({
+      time: `W${index + 1}`,
+      checkins: w.checkins,
+    }));
+  }
+
+  const CHECKINS_12WEEKS_DATA = generate12WeekCheckins(data?.sessions_data);
+
+
+  const attendancePercent = calculateAttendancePercentage(data?.sessions_data);
+  const totalPendingCount = calculateTotalPendingPayments(data?.sessions_data);
   const totalCompedCount = calculateTotalCompedPayments(data?.sessions_data);
   const totalSessionsCount = data?.sessions_data?.length
     ? data?.sessions_data.length
@@ -250,6 +302,21 @@ export default function MainPlayerPage({
     if (totalPendingCount && totalPendingCount > 0) {
       return `${totalPendingCount} session${totalPendingCount > 1 ? "s" : ""} pending payment${totalPendingCount > 1 ? "s" : ""} totalling $${totalPendingValue}`;
     } else null;
+  }
+
+
+
+  if (loading) {
+    return (
+      <div className="flex flex-col w-full gap-6">
+        {back}
+
+        <Skeleton className="h-[150px] w-full bg-secondary rounded-sm" />
+        <Skeleton className="h-[100px] w-full bg-secondary rounded-sm" />
+        <Skeleton className="h-[200px] w-full bg-secondary rounded-sm" />
+
+      </div>
+    )
   }
 
   return (
@@ -273,10 +340,7 @@ export default function MainPlayerPage({
                 <span className="inline-flex gap-2 ">
                   <Calendar size={14} />
                   Age{" "}
-                  {data?.birth_date
-                    ? new Date().getFullYear() -
-                    new Date(data.birth_date).getFullYear()
-                    : "N/A"}
+                  {getYear(data?.birth_date)}
                 </span>
 
                 <span className="inline-flex gap-2">
@@ -303,7 +367,7 @@ export default function MainPlayerPage({
           </div>
           <div className="mt-4 flex w-full justify-between flex-wrap gap-2">
             <HeaderCard
-              title={"92%"}
+              title={String(attendancePercent) + "%"}
               description="Attendance"
               icon={
                 <div className="rounded-[8px] flex w-8 h-8 items-center justify-center bg-success-bg">
@@ -647,7 +711,7 @@ export default function MainPlayerPage({
                   3 notes from coaches
                 </p>
               </div>
-              <AddCoachNotes />
+              <AddCoachNotes player_id={id} onRefresh={fetchData}/>
             </div>
 
             {data?.all_notes &&
