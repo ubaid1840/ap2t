@@ -170,6 +170,19 @@ export default function Page() {
     },
   ]);
 
+  const [rolePermissions,setRolePermissions]=useState(
+    {
+      manage_users:true,
+      manage_players:true,
+      manage_coaches:true,
+      manage_sessions:true,
+      manage_payments:true,
+      manage_promotions:true,
+      system_settings:true,
+      view_reports:true
+    }
+  )
+
   useEffect(() => {
     const fetchData = async () => {
       if (!user?.id) return;
@@ -240,12 +253,16 @@ export default function Page() {
             description: "Use Square sandbox for testing",
           },
         ]);
-
-        setSecurityInfo({
-          oldPass: "",
-          newPass: "",
-          confirmNewPass: "",
-        });
+        setRolePermissions({
+          manage_users:settings.manage_users,
+          manage_coaches:settings.manage_coaches,
+          manage_players:settings.manage_players,
+          manage_payments:settings.manage_payments,
+          manage_promotions:settings.manage_promotions,
+          manage_sessions:settings.manage_sessions,
+          system_settings:settings.system_settings,
+          view_reports:settings.view_reports
+        })
 
         setNoficationInfo([
           {
@@ -383,13 +400,6 @@ export default function Page() {
         },
       ]);
 
-      setSecurityInfo({
-        twoFactorAuth: settings?.two_factor_auth ?? false,
-        loginAlert: settings?.login_alert ?? false,
-        oldPass: "",
-        newPass: "",
-        confirmNewPass: "",
-      });
 
       setNoficationInfo([
         {
@@ -788,35 +798,35 @@ export default function Page() {
                     <Users className="text-gray-400" size={16} />
                     <h1 className="text-[#E5E7EB] text-sm">Manage Users</h1>
                   </div>
-                  <CardStatus value={"Enabled"} />
+                  <CardStatus value={rolePermissions.manage_users? "enabled" : "disabled"} />
                 </div>
                 <div className="flex justify-between bg-[#1A1A1A] border border-[#3A3A3A] rounded-[10px] p-4">
                   <div className="flex items-center gap-2">
                     <User className="text-gray-400 " size={16} />
                     <h1 className="text-[#E5E7EB] text-sm">Manage Players</h1>
                   </div>
-                  <CardStatus value={"Enabled"} />
+                  <CardStatus value={rolePermissions.manage_players? "enabled" : "disabled"} />
                 </div>
                 <div className="flex justify-between bg-[#1A1A1A] border border-[#3A3A3A] rounded-[10px] p-4">
                   <div className="flex items-center gap-2">
                     <Shield className="text-gray-400 " size={16} />
                     <h1 className="text-[#E5E7EB] text-sm">Manage Coaches </h1>
                   </div>
-                  <CardStatus value={"Enabled"} />
+                  <CardStatus value={rolePermissions.manage_coaches? "enabled" : "disabled"} />
                 </div>
                 <div className="flex justify-between bg-[#1A1A1A] border border-[#3A3A3A] rounded-[10px] p-4">
                   <div className="flex items-center gap-2">
                     <Calendar className="text-gray-400 " size={16} />
                     <h1 className="text-[#E5E7EB] text-sm">Manage Sessions</h1>
                   </div>
-                  <CardStatus value={"Enabled"} />
+                  <CardStatus value={rolePermissions.manage_sessions? "enabled" : "disabled"} />
                 </div>
                 <div className="flex justify-between bg-[#1A1A1A] border border-[#3A3A3A] rounded-[10px] p-4">
                   <div className="flex items-center gap-2">
                     <CreditCard className="text-gray-400" size={16} />
                     <h1 className="text-[#E5E7EB] text-sm">Manage Payments</h1>
                   </div>
-                  <CardStatus value={"Enabled"} />
+                  <CardStatus value={rolePermissions.manage_payments? "enabled" : "disabled"} />
                 </div>
                 <div className="flex justify-between bg-[#1A1A1A] border border-[#3A3A3A] rounded-[10px] p-4">
                   <div className="flex items-center gap-2">
@@ -825,21 +835,21 @@ export default function Page() {
                       Manage Promotions
                     </h1>
                   </div>
-                  <CardStatus value={"Enabled"} />
+                  <CardStatus value={rolePermissions.manage_promotions? "enabled" : "disabled"} />
                 </div>
                 <div className="flex justify-between bg-[#1A1A1A] border border-[#3A3A3A] rounded-[10px] p-4">
                   <div className="flex items-center gap-2">
                     <GearIcon className="text-gray-400 h-4 w-4" />
                     <h1 className="text-[#E5E7EB] text-sm">System Settings</h1>
                   </div>
-                  <CardStatus value={"Enabled"} />
+                  <CardStatus value={rolePermissions.system_settings? "enabled" : "disabled"} />
                 </div>
                 <div className="flex justify-between bg-[#1A1A1A] border border-[#3A3A3A] rounded-[10px] p-4">
                   <div className="flex items-center gap-2">
                     <GearIcon className="text-gray-400 h-4 w-4" />
                     <h1 className="text-[#E5E7EB] text-sm">View Reports</h1>
                   </div>
-                  <CardStatus value={"Enabled"} />
+                  <CardStatus value={rolePermissions.view_reports? "enabled" : "disabled"} />
                 </div>
               </div>
             </TabsContent>

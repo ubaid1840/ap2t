@@ -19,8 +19,9 @@ export const typeClasses = {
     failed: "bg-danger-bg text-danger-text border-danger-text/32",
     upcoming: "bg-info-bg text-info-text border-info-text/32",
     pending: "bg-warning-bg text-warning-text border-warning-text/32",
-    inactive: "bg-ghost-bg text-ghost-text border-ghost-text/32"
-
+    inactive: "bg-ghost-bg text-ghost-text border-ghost-text/32",
+    enabled:"bg-success-bg text-success-text border-success-text/32",
+    disabled:"bg-warning-bg text-warning-text border-warning-text/32",
 }
 
 export const IconType = {
