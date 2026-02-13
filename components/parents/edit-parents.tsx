@@ -12,50 +12,65 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { SquarePen } from "lucide-react"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import axios from "@/lib/axios"
 import { useParams } from "next/navigation"
+import { Spinner } from "../ui/spinner"
+import { toast } from "sonner"
 
 type EditParentsProps = {
-    visible: boolean
-    onChange: (open: boolean) => void
+    parent_id: number | null
+    data: DataProp
+    onRefresh: () => Promise<void>
 }
 
-export function EditParents() {
-    const {id:parent_id}=useParams()
+type DataProp = {
+
+    first_name: string
+    last_name: string
+    phone_no: string | null
+    location: string | null
+
+}
+
+export function EditParents({ parent_id, data, onRefresh }: EditParentsProps) {
     const [open, setOpen] = useState(false)
+    const [localData, setLocalData] = useState<DataProp | undefined>()
+    const [loading, setLoading] = useState(false)
 
-   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-  e.preventDefault();
+    useEffect(() => {
+        if (data) {
+            setLocalData(data)
+        }
+    }, [parent_id, data])
 
-  const formData = new FormData(e.currentTarget);
+    async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+        e.preventDefault();
+        setLoading(true)
+        try {
 
-  const values = {
-    first_name: formData.get("first_name") as string | null,
-    last_name:formData.get("last_name") as string|null,
-    email: formData.get("email") as string | null,
-    phone: formData.get("phone") as string | null,
-    address: formData.get("address") as string | null,
-  };
+            await axios.put(`/user`, {
+                id: parent_id,
+                ...localData
+            });
+            toast.success("Profile updated")
+            await onRefresh()
+            setOpen(false);
+        } finally {
+            setLoading(false)
+        }
+    }
 
-  try {
-    const body: any = {};
+    function handleChange(key: string, val: string) {
+        setLocalData((prevState) => {
+            if (!prevState) return prevState
+            return {
+                ...prevState,
+                [key]: val
+            }
 
-    if (values.first_name) body.first_name = values.first_name;
-    if (values.last_name) body.last_name = values.last_name;
-    if (values.email) body.email = values.email;
-    if (values.phone) body.phone_no = values.phone;
-    if (values.address) body.location = values.address;
-    
-    const res = await axios.patch(`/admin/parents/${parent_id}`, body);
-
-    console.log("Parent updated successfully:", res.data);
-
-    setOpen(false);
-  } catch (error) {
-    console.error("Failed to update parent:", error);
-  }
-}
+        })
+    }
 
 
     return (
@@ -73,36 +88,29 @@ export function EditParents() {
                         <div className="grid gap-4 py-4 border-t">
                             <div className="grid grid-cols-2 gap-2">
                                 <div className="grid gap-2">
-                                <Label htmlFor="name" className="text-xs text-muted-foreground">Full Name</Label>
-                                <Input
-                                    id="first_name"
-                                    name="first_name"
-                                    placeholder="Pedro"
-                                    className="dark:bg-black"
-                                />
-                            </div>
-                            <div className="grid gap-2">
-                                <Label htmlFor="last_name" className="text-xs text-muted-foreground">Full Name</Label>
-                                <Input
-                                    id="last_name"
-                                    name="last_name"
-                                    placeholder="Duarte"
-                                    className="dark:bg-black"
-                                />
-                            </div>
+                                    <Label htmlFor="name" className="text-xs text-muted-foreground">First Name</Label>
+                                    <Input
+                                        id="first_name"
+                                        name="first_name"
+                                        placeholder="Pedro"
+                                        className="dark:bg-black"
+                                        value={localData?.first_name}
+                                        onChange={(e) => handleChange("first_name", e.target.value)}
+                                    />
                                 </div>
-
-                            <div className="grid gap-2">
-                                <Label htmlFor="email" className="text-xs text-muted-foreground">Email</Label>
-                                <Input
-                                    id="email"
-                                    name="email"
-                                    type="email"
-                                    placeholder="pedro@example.com"
-                                    
-                                     className="dark:bg-black"
-                                />
+                                <div className="grid gap-2">
+                                    <Label htmlFor="last_name" className="text-xs text-muted-foreground">Last Name</Label>
+                                    <Input
+                                        id="last_name"
+                                        name="last_name"
+                                        placeholder="Duarte"
+                                        className="dark:bg-black"
+                                        value={localData?.last_name}
+                                        onChange={(e) => handleChange("last_name", e.target.value)}
+                                    />
+                                </div>
                             </div>
+
 
                             <div className="grid gap-2">
                                 <Label htmlFor="phone" className="text-xs text-muted-foreground">Phone</Label>
@@ -111,7 +119,9 @@ export function EditParents() {
                                     name="phone"
                                     type="tel"
                                     placeholder="+1 234 567 890"
-                                     className="dark:bg-black"
+                                    className="dark:bg-black"
+                                    value={localData?.phone_no || ""}
+                                    onChange={(e) => handleChange("phone_no", e.target.value)}
                                 />
                             </div>
 
@@ -121,7 +131,9 @@ export function EditParents() {
                                     id="address"
                                     name="address"
                                     placeholder="New York, USA"
-                                     className="dark:bg-black"
+                                    className="dark:bg-black"
+                                    value={localData?.location || ""}
+                                    onChange={(e) => handleChange("location", e.target.value)}
                                 />
                             </div>
                         </div>
@@ -132,7 +144,7 @@ export function EditParents() {
                                     Cancel
                                 </Button>
                             </DialogClose>
-                            <Button type="submit">Save changes</Button>
+                            <Button disabled={loading} type="submit">{loading && <Spinner className="text-black" />}Save</Button>
                         </DialogFooter>
                     </form>
                 </DialogContent>
