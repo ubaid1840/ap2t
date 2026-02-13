@@ -13,19 +13,48 @@ export async function GET(
     u.*,
     to_jsonb(c.*) AS profile,
 
-    /* Sessions */
+    /* Sessions with payment details */
     COALESCE(
-        jsonb_agg(DISTINCT sess) 
-        FILTER (WHERE sess.id IS NOT NULL),
+        jsonb_agg(DISTINCT sess_data)
+        FILTER (WHERE sess_data.id IS NOT NULL),
         '[]'
     ) AS session_data,
 
-    /* Payments */
+    /* Payments list */
     COALESCE(
-        jsonb_agg(DISTINCT pay) 
+        jsonb_agg(DISTINCT pay)
         FILTER (WHERE pay.id IS NOT NULL),
         '[]'
-    ) AS payment_data
+    ) AS payment_data,
+
+    /* ===== STATS ===== */
+
+    /* Total Revenue */
+    COALESCE(SUM(pay.amount) FILTER (WHERE pay.status = 'paid'), 0)
+        AS total_revenue,
+
+    /* This Month Revenue */
+    COALESCE(
+        SUM(pay.amount) FILTER (
+            WHERE pay.status = 'paid'
+            AND DATE_TRUNC('month', pay.created_at) = DATE_TRUNC('month', CURRENT_DATE)
+        ),
+        0
+    ) AS this_month_revenue,
+
+    /* Last Month Revenue */
+    COALESCE(
+        SUM(pay.amount) FILTER (
+            WHERE pay.status = 'paid'
+            AND DATE_TRUNC('month', pay.created_at) =
+                DATE_TRUNC('month', CURRENT_DATE - INTERVAL '1 month')
+        ),
+        0
+    ) AS last_month_revenue,
+
+    /* Average Session Price */
+    COALESCE(AVG(sess.price::numeric), 0)
+        AS average_price_per_session
 
 FROM users u
 
@@ -33,16 +62,36 @@ INNER JOIN coaches c
     ON c.user_id = u.id
 
 /* Sessions */
+LEFT JOIN LATERAL (
+    SELECT
+        s.*,
+
+        /* Attach payment details per session */
+        COALESCE(
+            jsonb_agg(p2) FILTER (WHERE p2.id IS NOT NULL),
+            '[]'
+        ) AS payment_detail
+
+    FROM sessions s
+    LEFT JOIN payments p2
+        ON p2.session_id = s.id
+
+    WHERE s.coach_id = u.id
+    GROUP BY s.id
+) sess_data ON TRUE
+
+/* Direct session reference for stats */
 LEFT JOIN sessions sess
     ON sess.coach_id = u.id
 
-/* Payments */
+/* Payments for stats */
 LEFT JOIN payments pay
     ON pay.session_id = sess.id
 
 WHERE u.id = $1
 
 GROUP BY u.id, c.id;
+
       `,
       [coach_id]
     );

@@ -1,33 +1,19 @@
 "use client";
-import AppCalendar from "@/components/app-calendar";
 import BackButton from "@/components/back-button";
 import CardStatus from "@/components/card-status";
 import LineChart from "@/components/charts/line-chart-dots";
-import {
-  COACH_REVENUE_TRED,
-  COACH_WEEKLY_EVENTS
-} from "@/components/coach-dashboard/constants";
 import { Event, WeeklySchedule } from "@/components/coach-dashboard/weekly-schedule";
-import { Button } from "@/components/ui/button";
+import EditCoachProfile from "@/components/coach/EditCoachProfile";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   type ChartConfig
 } from "@/components/ui/chart";
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogHeader,
-  DialogTitle
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
-import { Spinner } from "@/components/ui/spinner";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Textarea } from "@/components/ui/textarea";
 import { useIsMobile } from "@/hooks/use-mobile";
 import axios from "@/lib/axios";
 import { getYear, joinNames } from "@/lib/functions";
@@ -38,7 +24,6 @@ import {
   CircleCheckBigIcon,
   Clock,
   DollarSign,
-  Edit,
   Info,
   Mail,
   Phone,
@@ -49,9 +34,6 @@ import moment from "moment";
 import { useParams } from "next/navigation";
 import { ReactNode, useEffect, useState } from "react";
 import { IoCalendarClear } from "react-icons/io5";
-import { coachinfoType } from "../page";
-import EditCoachProfile from "@/components/coach/EditCoachProfile";
-import { Skeleton } from "@/components/ui/skeleton";
 
 
 export interface CoachResponse {
@@ -72,6 +54,10 @@ export interface CoachResponse {
 
   session_data: SessionData[];
   payment_data: PaymentData[];
+  this_month_revenue: string
+  last_month_revenue: string
+  average_price_per_session: string
+  total_revenue: string
 }
 
 export interface CoachProfile {
@@ -112,6 +98,17 @@ export interface SessionData {
   image: string;
 
   created_at: string;
+  payment_detail: {
+    amount : number
+    created_at : string
+    id: number
+    method: string | null
+    paid_at: string | Date | null
+    session_id: number
+    status: string
+    transaction_id: string | null
+    user_id: number
+  }[]
 }
 
 export interface PaymentData {
@@ -151,6 +148,7 @@ export default function Page() {
     setLoading(true)
     try {
       const response = await axios.get(`/admin/coaches/${id}`);
+      console.log(response.data)
       setData(response.data)
     } finally {
       setLoading(false)
@@ -188,7 +186,62 @@ export default function Page() {
 
   }
 
+  function CalculateRevenuePercentage(localData: CoachResponse | undefined) {
+    if (!localData) return 0
+    const thisMonth = Number(localData.this_month_revenue);
+    const lastMonth = Number(localData.last_month_revenue);
+
+    let percentageChange = 0;
+
+    if (lastMonth > 0) {
+      percentageChange = ((thisMonth - lastMonth) / lastMonth) * 100;
+    }
+    return percentageChange
+  }
+
+  function generateRevenueTrend(sessionData: SessionData[] | undefined) {
+    if (!sessionData) return
+    const now = moment();
+
+    // Create last 6 months structure
+    const months = Array.from({ length: 6 }, (_, i) => {
+      const m = moment(now).subtract(5 - i, "months");
+      return {
+        key: m.format("YYYY-MM"),
+        label: m.format("MMM"),
+        value: 0,
+      };
+    });
+
+    // Loop sessions
+    sessionData.forEach((session) => {
+      const payments = session.payment_detail || [];
+
+      payments.forEach((payment: any) => {
+        if (payment.status !== "paid") return;
+
+        const paymentMonth = moment(payment.created_at).format("YYYY-MM");
+
+        const monthObj = months.find((m) => m.key === paymentMonth);
+        if (monthObj) {
+          monthObj.value += Number(payment.amount);
+        }
+      });
+    });
+
+    return months.map((m) => ({
+      month: m.label,
+      value: m.value,
+    }));
+  }
+
+  const COACH_REVENUE_TREND = generateRevenueTrend(data?.session_data);
+
+  const percentageChange = CalculateRevenuePercentage(data)
+
   const statsData = calculateStats(data?.session_data, data?.payment_data)
+
+
 
 
   const localData = [
@@ -483,7 +536,7 @@ export default function Page() {
                   <DollarSign className="h-4 w-4 text-primary" />
                   <p className="text-sm text-ghost-text">Total Revenue</p>
                 </div>
-                <h1 className="text-xl">$12,350</h1>
+                <h1 className="text-xl">${data?.total_revenue}</h1>
                 <p className="text-sm text-ghost-text">All time earnings</p>
               </div>
               <div className="space-y-2 p-4 flex-1 bg-[#1A1A1A] rounded-[10px] border border-border">
@@ -491,16 +544,16 @@ export default function Page() {
                   <TrendingUp className="h-4 w-4 text-active-text" />
                   <p className="text-sm text-ghost-text">This Month</p>
                 </div>
-                <h1 className="text-xl">$1,850</h1>
-                <p className="text-xs text-active-text">+12% from last month</p>
+                <h1 className="text-xl">${data?.this_month_revenue}</h1>
+                <p className="text-xs text-active-text">{percentageChange}% from last month</p>
               </div>
               <div className="space-y-2 p-4 flex-1 bg-[#1A1A1A] rounded-[10px] border border-border">
                 <div className="flex gap-2">
                   <Calendar className="h-4 w-4 text-info-text" />
                   <p className="text-sm text-ghost-text">Avg per Session</p>
                 </div>
-                <h1 className="text-xl">$85</h1>
-                <p className="text-sm text-ghost-text">Based on 145 sessions</p>
+                <h1 className="text-xl">${Number(data?.average_price_per_session || 0).toFixed(0)}</h1>
+                <p className="text-sm text-ghost-text">Based on {data?.session_data?.length} sessions</p>
               </div>
             </div>
 
@@ -511,7 +564,7 @@ export default function Page() {
                 <div className="grid grid-cols-1">
                   <div className="h-70 ">
                     <LineChart
-                      data={COACH_REVENUE_TRED}
+                      data={COACH_REVENUE_TREND || []}
                       config={chartConfig}
                       xAxisKey="month"
                       tickFormatter={(value) => value.slice(0, 3)}
