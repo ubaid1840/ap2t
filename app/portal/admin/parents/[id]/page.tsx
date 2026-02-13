@@ -193,7 +193,13 @@ export default function Page() {
               </div>
             </div>
             {data && <div className="flex gap-4 flex-wrap">
-              <EditParents />
+              <EditParents parent_id={data?.parent?.id} data={{
+                first_name : data?.parent?.first_name,
+                last_name : data?.parent?.last_name,
+                phone_no : data?.parent?.phone_no,
+                location : data?.parent?.location
+                }}
+                onRefresh={fetchData}/>
               <Button>
                 <Send /> Send Reminder
               </Button>
