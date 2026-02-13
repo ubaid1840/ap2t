@@ -58,68 +58,98 @@ export async function GET(req: NextRequest) {
   }
 }
 
-export async function PATCH(
-  req: NextRequest
-) {
+export async function PATCH(req: NextRequest) {
   const data = await req.json();
+
   try {
-    const result = await pool.query(
-      `
-      UPDATE settings
-      SET
-      new_booking        = COALESCE($1, new_booking),
-      payment_receive    = COALESCE($2, payment_receive),
-      session_cancel     = COALESCE($3, session_cancel),
-      promotion_purchase = COALESCE($4, promotion_purchase),
-      email_notification = COALESCE($5, email_notification),
-      sms_notification   = COALESCE($6, sms_notification),
-      push_notification  = COALESCE($7, push_notification),
-      manage_users       = COALESCE($8, manage_users),
-      manage_players     = COALESCE($9, manage_players),
-      manage_sessions    = COALESCE($10, manage_sessions),
-      manage_payments    = COALESCE($11, manage_payments),
-      manage_promotions  = COALESCE($12, manage_promotions),
-      system_settings    = COALESCE($13, system_settings),
-      view_report        = COALESCE($14, view_report),
-      merchant_id        = COALESCE($15, merchant_id),
-      location_id        = COALESCE($16, location_id),
-      api_key            = COALESCE($17, api_key),
-      webhook_url        = COALESCE($18, webhook_url),
-      test_mode          = COALESCE($19, test_mode),
-      auto_sync_catalog  = COALESCE($20, auto_sync_catalog),
-      two_factor_auth    = COALESCE($21, two_factor_auth),
-      login_alert        = COALESCE($22, login_alert),
-      updated_at         = NOW()
-      WHERE user_id = $23
-      RETURNING *
-      `,
-      [
-        data.new_booking,
-        data.payment_receive,
-        data.session_cancel,
-        data.promotion_purchase,
-        data.email_notification,
-        data.sms_notification,
-        data.push_notification,
-        data.manage_users,
-        data.manage_players,
-        data.manage_sessions,
-        data.manage_payments,
-        data.manage_promotions,
-        data.system_settings,
-        data.view_report,
-        data.merchant_id,
-        data.location_id,
-        data.api_key,
-        data.webhook_url,
-        data.test_mode,
-        data.auto_sync_catalog,
-        data.two_factor_auth,
-        data.login_alert,
-        data.user_id,
-      ],
-    );
+    const isTestMode = !!data.mode;
+
+    
+    const merchantCol  = isTestMode ? "test_merchant_id" : "live_merchant_id";
+    const locationCol  = isTestMode ? "test_location_id" : "live_location_id";
+    const apiKeyCol    = isTestMode ? "test_api_key"     : "live_api_key";
+    const webhookCol   = isTestMode ? "test_webhook"     : "live_webhook";
+
+    const query = `
+      INSERT INTO settings (
+        user_id,
+        new_booking,
+        payment_receive,
+        session_cancel,
+        promotion_purchase,
+        email_notification,
+        sms_notification,
+        push_notification,
+        manage_users,
+        manage_players,
+        manage_sessions,
+        manage_payments,
+        manage_promotions,
+        system_settings,
+        view_report,
+        ${merchantCol},
+        ${locationCol},
+        ${apiKeyCol},
+        ${webhookCol},
+        mode
+      )
+      VALUES (
+        $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,
+        $11,$12,$13,$14,$15,$16,$17,$18,$19,$20
+      )
+
+      ON CONFLICT (user_id)
+      DO UPDATE SET
+        new_booking        = COALESCE(EXCLUDED.new_booking, settings.new_booking),
+        payment_receive    = COALESCE(EXCLUDED.payment_receive, settings.payment_receive),
+        session_cancel     = COALESCE(EXCLUDED.session_cancel, settings.session_cancel),
+        promotion_purchase = COALESCE(EXCLUDED.promotion_purchase, settings.promotion_purchase),
+        email_notification = COALESCE(EXCLUDED.email_notification, settings.email_notification),
+        sms_notification   = COALESCE(EXCLUDED.sms_notification, settings.sms_notification),
+        push_notification  = COALESCE(EXCLUDED.push_notification, settings.push_notification),
+        manage_users       = COALESCE(EXCLUDED.manage_users, settings.manage_users),
+        manage_players     = COALESCE(EXCLUDED.manage_players, settings.manage_players),
+        manage_sessions    = COALESCE(EXCLUDED.manage_sessions, settings.manage_sessions),
+        manage_payments    = COALESCE(EXCLUDED.manage_payments, settings.manage_payments),
+        manage_promotions  = COALESCE(EXCLUDED.manage_promotions, settings.manage_promotions),
+        system_settings    = COALESCE(EXCLUDED.system_settings, settings.system_settings),
+        view_report        = COALESCE(EXCLUDED.view_report, settings.view_report),
+        ${merchantCol}     = COALESCE(EXCLUDED.${merchantCol}, settings.${merchantCol}),
+        ${locationCol}     = COALESCE(EXCLUDED.${locationCol}, settings.${locationCol}),
+        ${apiKeyCol}       = COALESCE(EXCLUDED.${apiKeyCol}, settings.${apiKeyCol}),
+        ${webhookCol}      = COALESCE(EXCLUDED.${webhookCol}, settings.${webhookCol}),
+        mode               = COALESCE(EXCLUDED.mode, settings.mode)
+
+      RETURNING *;
+    `;
+
+    const values = [
+      data.user_id,
+      data.new_booking,
+      data.payment_receive,
+      data.session_cancel,
+      data.promotion_purchase,
+      data.email_notification,
+      data.sms_notification,
+      data.push_notification,
+      data.manage_users,
+      data.manage_players,
+      data.manage_sessions,
+      data.manage_payments,
+      data.manage_promotions,
+      data.system_settings,
+      data.view_report,
+      isTestMode ? data.test_merchant_id : data.live_merchant_id,
+      isTestMode ? data.test_location_id : data.live_location_id,
+      isTestMode ? data.test_api_key     : data.live_api_key,
+      isTestMode ? data.test_webhook     : data.live_webhook,
+      data.mode,
+    ];
+
+    const result = await pool.query(query, values);
+
     return NextResponse.json(result.rows[0]);
+
   } catch (error) {
     console.error("PATCH /api/settings error:", error);
     return NextResponse.json(
