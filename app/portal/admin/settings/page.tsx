@@ -19,6 +19,7 @@ import {
   DollarSign,
   Info,
   Loader2,
+  MapPin,
   MessageCircle,
   MessageSquare,
   Phone,
@@ -40,21 +41,23 @@ import { deleteObject, ref } from "firebase/storage";
 import { storage } from "@/lib/firebase";
 import { uploadProfileImage } from "@/lib/upload-profile-image";
 import getInitials from "@/components/parents/get-initials";
+import moment from "moment";
+import AppCalendar from "@/components/app-calendar";
 export default function Page() {
   const [loading, setLoading] = useState(false);
   const [savingChanges, setSavingChanges] = useState(false);
-  const [tab, setTab] = useState("Profile info")
-  const [profileImage,setProfileImage]=useState<string|null>()
+  const [tab, setTab] = useState("Profile info");
+  const [profileImage, setProfileImage] = useState<string | null>();
   const [uploading, setUploading] = useState(false);
-const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const [profileInfo, setProfileInfo] = useState({
     adminUser: "",
     email: "",
     phoneNo: "",
     role: "",
-    password: "",
-    blanck: "",
+    location: "",
+    birth_date: "",
   });
   const [user_id, setUser_id] = useState("");
   const { user } = useAuth();
@@ -174,21 +177,25 @@ const fileInputRef = useRef<HTMLInputElement | null>(null);
         setLoading(true);
 
         const res = await axios.get("/settings", {
-          params: { user_id: user.id }
+          params: { user_id: user.id },
         });
 
-        const result = res.data
+        const result = res.data;
+        console.log(result);
         setUser_id(result.user?.id);
         setProfileInfo({
-          adminUser: joinNames([result.user?.first_name , result.user?.last_name]) || "",
+          adminUser:
+            joinNames([result.user?.first_name, result.user?.last_name]) || "",
           email: result.user?.email || "",
           phoneNo: result.user?.phone_no || "",
           role: result.user?.role || "",
-          password: "",
-          blanck: "",
+          location: result.user?.location,
+          birth_date: result.user?.birth_date
+            ? moment(result.user.birth_date).format("YYYY-MM-DD")
+            : "",
         });
         setProfileImage(result.user?.picture || null);
-        console.log(result.user?.picture)
+        console.log(result.user?.picture);
 
         const settings = result.settings;
 
@@ -196,25 +203,33 @@ const fileInputRef = useRef<HTMLInputElement | null>(null);
           {
             title: "Merchant ID",
             type: "input",
-            value: settings.mode? settings?.test_merchant_id:settings?.live_merchant_id || "",
+            value: settings.mode
+              ? settings?.test_merchant_id
+              : settings?.live_merchant_id || "",
             placeholder: "MLSQ12345678",
           },
           {
             title: "Location ID",
             type: "input",
-            value: settings.mode ? settings?.test_location_id :settings?.live_location_id || "",
+            value: settings.mode
+              ? settings?.test_location_id
+              : settings?.live_location_id || "",
             placeholder: "L12345689",
           },
           {
             title: "API Key",
             type: "input",
-            value: settings.mode? settings?.test_api_key:settings?.live_api_key || "",
+            value: settings.mode
+              ? settings?.test_api_key
+              : settings?.live_api_key || "",
             placeholder: "**********",
           },
           {
             title: "Webhook URL",
             type: "input",
-            value: settings.mode? settings?.text_webhook:settings?.live_webhook || "",
+            value: settings.mode
+              ? settings?.text_webhook
+              : settings?.live_webhook || "",
             placeholder: "https:/ap2t.com/api/square/webhook",
           },
           {
@@ -308,56 +323,64 @@ const fileInputRef = useRef<HTMLInputElement | null>(null);
       user_id: user_id,
     };
 
-    if(squareIntigration[4].value===false){
-      payLoad.live_merchant_id= squareIntigration[0].value,
-      payLoad.live_location_id= squareIntigration[1].value,
-      payLoad.live_api_key= squareIntigration[2].value,
-      payLoad.live_webhook= squareIntigration[3].value,
-      payLoad.mode= squareIntigration[4].value
-    }else{
-      payLoad.test_merchant_id= squareIntigration[0].value,
-      payLoad.test_location_id= squareIntigration[1].value,
-      payLoad.test_api_key= squareIntigration[2].value,
-      payLoad.test_webhook= squareIntigration[3].value,
-      payLoad.mode= squareIntigration[4].value
+    if (squareIntigration[4].value === false) {
+      ((payLoad.live_merchant_id = squareIntigration[0].value),
+        (payLoad.live_location_id = squareIntigration[1].value),
+        (payLoad.live_api_key = squareIntigration[2].value),
+        (payLoad.live_webhook = squareIntigration[3].value),
+        (payLoad.mode = squareIntigration[4].value));
+    } else {
+      ((payLoad.test_merchant_id = squareIntigration[0].value),
+        (payLoad.test_location_id = squareIntigration[1].value),
+        (payLoad.test_api_key = squareIntigration[2].value),
+        (payLoad.test_webhook = squareIntigration[3].value),
+        (payLoad.mode = squareIntigration[4].value));
     }
 
     try {
       const res = await axios.patch(`/settings`, payLoad);
 
       const settings = res.data;
-       setSquareIntigration([
-          {
-            title: "Merchant ID",
-            type: "input",
-            value: settings.mode? settings?.test_merchant_id:settings?.live_merchant_id || "",
-            placeholder: "MLSQ12345678",
-          },
-          {
-            title: "Location ID",
-            type: "input",
-            value: settings.mode ? settings?.test_location_id :settings?.live_location_id || "",
-            placeholder: "L12345689",
-          },
-          {
-            title: "API Key",
-            type: "input",
-            value: settings.mode? settings?.test_api_key:settings?.live_api_key || "",
-            placeholder: "**********",
-          },
-          {
-            title: "Webhook URL",
-            type: "input",
-            value: settings.mode? settings?.test_webhook:settings?.live_webhook || "",
-            placeholder: "https:/ap2t.com/api/square/webhook",
-          },
-          {
-            title: "Test Mode",
-            type: "switch",
-            value: settings?.mode ?? false,
-            description: "Use Square sandbox for testing",
-          },
-        ]);
+      setSquareIntigration([
+        {
+          title: "Merchant ID",
+          type: "input",
+          value: settings.mode
+            ? settings?.test_merchant_id
+            : settings?.live_merchant_id || "",
+          placeholder: "MLSQ12345678",
+        },
+        {
+          title: "Location ID",
+          type: "input",
+          value: settings.mode
+            ? settings?.test_location_id
+            : settings?.live_location_id || "",
+          placeholder: "L12345689",
+        },
+        {
+          title: "API Key",
+          type: "input",
+          value: settings.mode
+            ? settings?.test_api_key
+            : settings?.live_api_key || "",
+          placeholder: "**********",
+        },
+        {
+          title: "Webhook URL",
+          type: "input",
+          value: settings.mode
+            ? settings?.test_webhook
+            : settings?.live_webhook || "",
+          placeholder: "https:/ap2t.com/api/square/webhook",
+        },
+        {
+          title: "Test Mode",
+          type: "switch",
+          value: settings?.mode ?? false,
+          description: "Use Square sandbox for testing",
+        },
+      ]);
 
       setSecurityInfo({
         twoFactorAuth: settings?.two_factor_auth ?? false,
@@ -411,67 +434,58 @@ const fileInputRef = useRef<HTMLInputElement | null>(null);
           icon: <Bell className="text-muted-foreground" size={20} />,
         },
       ]);
-
     } finally {
       setSavingChanges(false);
     }
   };
 
   const handleSelectFile = () => {
-  fileInputRef.current?.click();
-};
+    fileInputRef.current?.click();
+  };
 
-const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-  const file = e.target.files?.[0];
-  if (!file || !user?.id) return;
+  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !user?.id) return;
 
-  setUploading(true);
-  try {
-    const path = `ap2t/user/picture/${user.id}`;
+    setUploading(true);
+    try {
+      const path = `ap2t/user/picture/${user.id}.png`;
 
-    const res = await uploadProfileImage(file, path);
+      const res = await uploadProfileImage(file, path);
 
-    const imageUrl = await uploadProfileImage(file, path);
-
-setProfileImage(imageUrl);
-
-await axios.put("/settings/profileimage", {
-  user_id: user.id,
-  profile_image: imageUrl,
-});
-  } finally {
-    setUploading(false);
-  }
-};
-
-
+      await axios.put("/settings/profileimage", {
+        user_id: user.id,
+        profile_image: path,
+      });
+    } finally {
+      setUploading(false);
+    }
+  };
 
   const handleDeleteImage = async () => {
-  if (!user?.id) return;
+    if (!user?.id) return;
 
-  try {
-    const storageRef = ref(storage, `ap2t/user/picture/${user.id}`);
-    await deleteObject(storageRef);
+    try {
+      const storageRef = ref(storage, `ap2t/user/picture/${user.id}`);
+      await deleteObject(storageRef);
 
-    await axios.put("/settings/profileimage", {
-      user_id: user.id,
-      profile_image: null,
-    });
+      await axios.put("/settings/profileimage", {
+        user_id: user.id,
+        profile_image: null,
+      });
 
-    setProfileImage(null);
-  } catch (err) {
-    console.error("Delete failed", err);
-  }
-};
-
-
+      setProfileImage(null);
+    } catch (err) {
+      console.error("Delete failed", err);
+    }
+  };
 
   const isMobile = useIsMobile();
   return (
     <div className="flex flex-col w-full gap-4">
       <Header>
         <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
-          {tab !== "Profile info" &&
+          {tab !== "Profile info" && (
             <Button onClick={() => updateSettings()}>
               {savingChanges ? (
                 <>
@@ -485,7 +499,7 @@ await axios.put("/settings/profileimage", {
                 </>
               )}
             </Button>
-          }
+          )}
         </div>
       </Header>
       <Card className="bg-[#282828] p-0 overflow-hidden">
@@ -553,69 +567,69 @@ await axios.put("/settings/profileimage", {
               </div>
 
               <div className="flex items-center gap-8">
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={handleUpload}
+                />
 
-  <input
-    ref={fileInputRef}
-    type="file"
-    accept="image/*"
-    className="hidden"
-    onChange={handleUpload}
-  />
+                <div className="relative w-24 h-24">
+                  {profileImage ? (
+                    <img
+                      src={profileImage}
+                      className="w-full h-full rounded-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full rounded-full bg-[#1A1A1A] border border-border flex items-center justify-center text-lg font-semibold">
+                      {getInitials(
+                        joinNames([user?.first_name, user?.last_name]),
+                      )}
+                    </div>
+                  )}
 
-  <div className="relative w-24 h-24">
-    {profileImage ? (
-      <img
-        src={profileImage}
-        className="w-full h-full rounded-full object-cover"
-      />
-    ) : (
-      <div className="w-full h-full rounded-full bg-[#1A1A1A] border border-border flex items-center justify-center text-lg font-semibold">
-        {getInitials(joinNames([user?.first_name, user?.last_name]))}
-      </div>
-    )}
+                  <button
+                    onClick={handleSelectFile}
+                    className="absolute bottom-0 right-0 bg-primary p-2 rounded-full"
+                  >
+                    {uploading ? (
+                      <Loader2 size={14} className="animate-spin text-black" />
+                    ) : profileImage ? (
+                      <User size={14} className="text-black" />
+                    ) : (
+                      <Plus size={14} className="text-black" />
+                    )}
+                  </button>
+                </div>
 
-    <button
-      onClick={handleSelectFile}
-      className="absolute bottom-0 right-0 bg-primary p-2 rounded-full"
-    >
-      {uploading ? (
-        <Loader2 size={14} className="animate-spin text-black" />
-      ) : profileImage ? (
-        <User size={14} className="text-black" />
-      ) : (
-        <Plus size={14} className="text-black" />
-      )}
-    </button>
-  </div>
+                <div className="space-y-1">
+                  <h1 className="text-md font-semibold">
+                    {user?.first_name} {user?.last_name}
+                  </h1>
+                  <p className="text-sm text-muted-foreground">{user?.role}</p>
 
+                  <div className="flex gap-2">
+                    {profileImage && (
+                      <Button
+                        variant="link"
+                        className="p-0 font-normal"
+                        onClick={handleDeleteImage}
+                      >
+                        Delete
+                      </Button>
+                    )}
 
-  <div className="space-y-1">
-    <h1 className="text-md font-semibold">
-      {user?.first_name} {user?.last_name}
-    </h1>
-    <p className="text-sm text-muted-foreground">{user?.role}</p>
-
-    <div className="flex gap-2">
-      {profileImage && (
-        <Button
-          variant="link"
-          className="p-0 font-normal"
-          onClick={handleDeleteImage}
-        >
-          Delete
-        </Button>
-      )}
-
-      <Button
-        variant="link"
-        className="p-0 font-normal"
-        onClick={handleSelectFile}
-      >
-        Update
-      </Button>
-    </div>
-  </div>
-</div>
+                    <Button
+                      variant="link"
+                      className="p-0 font-normal"
+                      onClick={handleSelectFile}
+                    >
+                      Update
+                    </Button>
+                  </div>
+                </div>
+              </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <LocalInput
@@ -636,7 +650,7 @@ await axios.put("/settings/profileimage", {
                   title="Email"
                   Icon={<MessageSquare className="h-4 w-4 text-gray-400" />}
                   value={profileInfo.email}
-                  placeholder="admin@ap2t.com"
+                  placeholder="email@example.com"
                   onChange={(e) =>
                     setProfileInfo((prev) => ({
                       ...prev,
@@ -673,9 +687,9 @@ await axios.put("/settings/profileimage", {
                 />
 
                 <LocalInput
-                  title="Password"
-                  Icon={<FaUser className="h-4 w-4 text-gray-400" />}
-                  value={profileInfo.password}
+                  title="Location"
+                  Icon={<MapPin className="h-4 w-4 text-gray-400" />}
+                  value={profileInfo.location}
                   placeholder="********"
                   onChange={(e) =>
                     setProfileInfo((prev) => ({
@@ -684,19 +698,26 @@ await axios.put("/settings/profileimage", {
                     }))
                   }
                 />
-
-                <LocalInput
-                  title="Phone Number"
-                  Icon={<Phone className="h-4 w-4 text-gray-400" />}
-                  value={profileInfo.blanck}
-                  placeholder="+91 03490334"
-                  onChange={(e) =>
-                    setProfileInfo((prev) => ({
-                      ...prev,
-                      blanck: e,
+                <div className="space-y-2">
+                  <Label className="text-xs text-muted">
+                  Birth Date
+                </Label>
+                <AppCalendar
+                className="h-12"
+                  date={
+                    profileInfo.birth_date
+                      ? new Date(profileInfo.birth_date)
+                      : undefined
+                  }
+                  onChange={(date) =>
+                    setProfileInfo((prevState) => ({
+                      ...prevState,
+                      birth_date: date,
                     }))
                   }
                 />
+                </div>
+                
               </div>
             </TabsContent>
             <TabsContent value="Notification Preference" className="space-y-4">
@@ -777,35 +798,35 @@ await axios.put("/settings/profileimage", {
                     <Users className="text-gray-400" size={16} />
                     <h1 className="text-[#E5E7EB] text-sm">Manage Users</h1>
                   </div>
-                  <CardStatus value={"Enabled"}  />
+                  <CardStatus value={"Enabled"} />
                 </div>
                 <div className="flex justify-between bg-[#1A1A1A] border border-[#3A3A3A] rounded-[10px] p-4">
                   <div className="flex items-center gap-2">
                     <User className="text-gray-400 " size={16} />
                     <h1 className="text-[#E5E7EB] text-sm">Manage Players</h1>
                   </div>
-                  <CardStatus value={"Enabled"}  />
+                  <CardStatus value={"Enabled"} />
                 </div>
                 <div className="flex justify-between bg-[#1A1A1A] border border-[#3A3A3A] rounded-[10px] p-4">
                   <div className="flex items-center gap-2">
                     <Shield className="text-gray-400 " size={16} />
                     <h1 className="text-[#E5E7EB] text-sm">Manage Coaches </h1>
                   </div>
-                  <CardStatus value={"Enabled"}  />
+                  <CardStatus value={"Enabled"} />
                 </div>
                 <div className="flex justify-between bg-[#1A1A1A] border border-[#3A3A3A] rounded-[10px] p-4">
                   <div className="flex items-center gap-2">
                     <Calendar className="text-gray-400 " size={16} />
                     <h1 className="text-[#E5E7EB] text-sm">Manage Sessions</h1>
                   </div>
-                  <CardStatus value={"Enabled"}  />
+                  <CardStatus value={"Enabled"} />
                 </div>
                 <div className="flex justify-between bg-[#1A1A1A] border border-[#3A3A3A] rounded-[10px] p-4">
                   <div className="flex items-center gap-2">
                     <CreditCard className="text-gray-400" size={16} />
                     <h1 className="text-[#E5E7EB] text-sm">Manage Payments</h1>
                   </div>
-                  <CardStatus value={"Enabled"}  />
+                  <CardStatus value={"Enabled"} />
                 </div>
                 <div className="flex justify-between bg-[#1A1A1A] border border-[#3A3A3A] rounded-[10px] p-4">
                   <div className="flex items-center gap-2">
@@ -814,21 +835,21 @@ await axios.put("/settings/profileimage", {
                       Manage Promotions
                     </h1>
                   </div>
-                  <CardStatus value={"Enabled"}  />
+                  <CardStatus value={"Enabled"} />
                 </div>
                 <div className="flex justify-between bg-[#1A1A1A] border border-[#3A3A3A] rounded-[10px] p-4">
                   <div className="flex items-center gap-2">
                     <GearIcon className="text-gray-400 h-4 w-4" />
                     <h1 className="text-[#E5E7EB] text-sm">System Settings</h1>
                   </div>
-                  <CardStatus value={"Enabled"}  />
+                  <CardStatus value={"Enabled"} />
                 </div>
                 <div className="flex justify-between bg-[#1A1A1A] border border-[#3A3A3A] rounded-[10px] p-4">
                   <div className="flex items-center gap-2">
                     <GearIcon className="text-gray-400 h-4 w-4" />
                     <h1 className="text-[#E5E7EB] text-sm">View Reports</h1>
                   </div>
-                  <CardStatus value={"Enabled"}  />
+                  <CardStatus value={"Enabled"} />
                 </div>
               </div>
             </TabsContent>
@@ -916,7 +937,7 @@ await axios.put("/settings/profileimage", {
                   }
                 /> */}
 
-                {/* <LocalSwitch
+              {/* <LocalSwitch
                   title="Login Alert Notification"
                   description="Get notified when your account is accessed from a new device."
                   value={securityInfo.loginAlert}
@@ -1026,14 +1047,14 @@ const LocalInput = ({
   placeholder = "Type here...",
   value,
   onChange,
-  disabled = false
+  disabled = false,
 }: {
   placeholder: string;
   Icon?: ReactNode;
   title: string;
   value: string;
   onChange: (val: string) => void;
-  disabled?: boolean
+  disabled?: boolean;
 }) => {
   return (
     <div className="space-y-1">
