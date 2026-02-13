@@ -25,6 +25,8 @@ import AppCalendar from "../app-calendar";
 import axios from "@/lib/axios";
 import { splitFullName } from "@/lib/functions";
 import { Spinner } from "../ui/spinner";
+import SelectPosition from "./select-position";
+import SelectSkill from "./select-skill";
 
 export function CreatePlayer({ onRefresh }: { onRefresh: () => Promise<void> }) {
   const [open, setOpen] = useState(false);
@@ -172,21 +174,7 @@ export function CreatePlayer({ onRefresh }: { onRefresh: () => Promise<void> }) 
                   >
                     Position
                   </Label>
-                  <Select value={position} onValueChange={setPosition}>
-                    <SelectTrigger
-                      id="position"
-                      className="dark:bg-[#1A1A1A] w-full"
-                    >
-                      <SelectValue placeholder="Select position" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {positions.map((pos, i) => (
-                        <SelectItem key={i} value={pos}>
-                          {pos}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <SelectPosition value={position} onChange={setPosition} placeholder="Select position"/>
                 </div>
 
                 <div className="grid gap-2">
@@ -196,21 +184,7 @@ export function CreatePlayer({ onRefresh }: { onRefresh: () => Promise<void> }) 
                   >
                     Skill Level
                   </Label>
-                  <Select value={skillLevel} onValueChange={setSkillLevel}>
-                    <SelectTrigger
-                      id="skillLevel"
-                      className="dark:bg-[#1A1A1A] w-full"
-                    >
-                      <SelectValue placeholder="Select skill level" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {skillLevels.map((level, i) => (
-                        <SelectItem key={i} value={level}>
-                          {level}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <SelectSkill value={skillLevel} onChange={setSkillLevel} placeholder="Select skill"/>
                 </div>
               </div>
 

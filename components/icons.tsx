@@ -2,6 +2,7 @@ import {
   Check,
   Loader2,
   LogIn,
+  Settings2,
   Twitter,
   X
 } from 'lucide-react';
@@ -26,6 +27,7 @@ export const Icons: Record<string, IconType> = {
 payments : TbCreditCardFilled,
 reports : FaChartColumn,
 settings : IoMdSettings,
+settings2 : Settings2,
   login: LogIn,
   close: X,
   spinner: Loader2,

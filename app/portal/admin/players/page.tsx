@@ -1,6 +1,5 @@
 "use client"
 
-import { useAuth } from "@/contexts/auth-context"
 import PageTable from "@/components/app-table"
 import InputWithIcon from "@/components/input-with-icon"
 import { PLAYERS_COLUMNS } from "@/components/players/columns"
@@ -10,9 +9,10 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
+import { useAuth } from "@/contexts/auth-context"
 import axios from "@/lib/axios"
 import { joinNames } from "@/lib/functions"
-import { Download, Filter, Loader2 } from "lucide-react"
+import { Download, Filter } from "lucide-react"
 import moment from "moment"
 import { useEffect, useState } from "react"
 

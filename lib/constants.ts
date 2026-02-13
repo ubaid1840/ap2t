@@ -64,6 +64,13 @@ export const admin_nav_items = [
     
     shortcut: ['d', 'a', 's', 'h'],
   },
+   {
+    title: 'Configuration',
+    url: '/portal/admin/configuration',
+    icon: 'settings2',
+    
+    shortcut: ['d', 'a', 's', 'h'],
+  },
 ];
 
 

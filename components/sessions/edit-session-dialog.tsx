@@ -41,6 +41,7 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrig
 import { Spinner } from "../ui/spinner";
 import ConfirmationDialog from "../alert-dialog";
 import { TimePickerFixed } from "../time-picker-fixed";
+import SelectSessionType from "../players/select-session-type";
 
 const styles = {
   active:
@@ -115,7 +116,7 @@ export function EditSessionDialog({
       return;
     }
     setLoading(true);
-     const {coach_name, ...finalData} = session
+    const { coach_name, ...finalData } = session
     try {
       await axios.put(
         `/admin/sessions`,
@@ -199,17 +200,16 @@ export function EditSessionDialog({
                     <Label className="text-sm text-muted-foreground">
                       Session Type *
                     </Label>
-                    <Input
-                      name="sessionType"
-
+                    <SelectSessionType
                       required
                       value={session.session_type}
                       onChange={(e) =>
                         setSession((prev) => ({
                           ...prev,
-                          session_type: e.target.value,
+                          session_type: e,
                         }))
                       }
+                      placeholder="Select session type"
                     />
                   </div>
                   <div className="space-y-2">

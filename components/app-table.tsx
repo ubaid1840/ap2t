@@ -51,7 +51,8 @@ const PageTable = ({
   totalCustomerText,
   onRowClick = (a: any, b: any) => { },
   loading = false,
-  headerClassName = ""
+  headerClassName = "",
+  scrollAreaWidth=""
 }: any) => {
   // const [sorting, setSorting] = useState([]);
   // const [columnFilters, setColumnFilters] = useState([]);
@@ -115,7 +116,7 @@ const PageTable = ({
 
   return (
     <div className="flex flex-1 flex-col space-y-4">
-      <div className={`relative flex flex-1 flex-col ${open ? "w-[calc(100dvw-304px)]" : "w-[calc(100dvw-96px)]"} ${isMobile && "w-[calc(100vw-44px)]"} `}>
+      <div className={`relative flex flex-1 flex-col ${open ? "w-[calc(100dvw-304px)]" : "w-[calc(100dvw-96px)]"} ${isMobile && "w-[calc(100vw-44px)]"} ${scrollAreaWidth}`}>
         <div className={`flex rounded-md border md:overflow-auto ${headerClassName}`}>
           <ScrollArea className="overflow-x-auto flex flex-1">
             <Table className="relative w-full">

@@ -219,9 +219,11 @@ export default function SessionMainPage({id, back, back_title, type} : {id : num
     setLoadingStatus(status)
     setLoading(true);
     try {
-      const result = await axios.patch(`/admin/sessions/${id}/status`, {
+      await axios.put(`/admin/sessions/${id}`, {
         status,
+        id
       });
+      await fetchData()
     } finally {
       setLoading(false);
     }
@@ -267,13 +269,7 @@ export default function SessionMainPage({id, back, back_title, type} : {id : num
                 <span className="flex gap-2 text-xl items-center leading-none">
                   {data?.sessionName}
                 </span>
-                <CardStatus value={data?.status}/>
-                <Badge className="bg-info-bg text-info-text border border-info-text/32 h-6">
-                  <div className="flex gap-1 items-center">
-                    <Clock size={16} />
-                    <p>{data?.status}</p>
-                  </div>
-                </Badge>
+                <CardStatus value={data?.status} icon={true}/>
               </div>
               <EditSessionDialog
                 sessionId={id}
