@@ -49,14 +49,14 @@ export function AddParentDialog({ playerId, onSuccess }: AddParentDialogProps) {
   };
 
   const addParents = async (parent_id: number | null) => {
-
+    setAddingId(parent_id)
     try {
       await axios.post(`/admin/players/${playerId}/parent`, {
         parent_id: parent_id,
       });
+    }  finally {
       onSuccess();
       setOpen(false)
-    }  finally {
       setAddingId(null);
     }
   };
