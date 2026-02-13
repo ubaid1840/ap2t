@@ -1,6 +1,7 @@
 "use client"
 
 import PageTable from "@/components/app-table"
+import ExportExcel from "@/components/export-excel"
 import InputWithIcon from "@/components/input-with-icon"
 import { PLAYERS_COLUMNS } from "@/components/players/columns"
 import { CreatePlayer } from "@/components/players/create-player"
@@ -11,7 +12,7 @@ import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
 import { useAuth } from "@/contexts/auth-context"
 import axios from "@/lib/axios"
-import { joinNames } from "@/lib/functions"
+import { getYear, joinNames } from "@/lib/functions"
 import { Download, Filter } from "lucide-react"
 import moment from "moment"
 import { useEffect, useState } from "react"
@@ -20,13 +21,13 @@ export interface PlayerData {
     id: number | string;
     name: string;
     coach_name: string;
-    age: number | "N/A";
+    age: string ;
     position: string;
     phone: string | null;
     parent: string;
     last_session: string;
     last_session_date: string; 
-    attendance: number;
+    attendance: string;
     joining_date: string | Date | null; 
 }
 
@@ -53,13 +54,13 @@ export default function Page() {
                     id: p.id,
                     name: joinNames([p.first_name, p.last_name]),
                     coach_name: joinNames([p?.coach_first_name, p?.coach_last_name]),
-                    age: p.birth_date ? new Date().getFullYear() - new Date(p.birth_date).getFullYear() : "N/A",
+                    age: getYear(p.birth_date),
                     position: p.position || "N/A",
                     phone: p.phone_no,
                     parent: joinNames([p?.parent_first_name, p?.parent_last_name]),
                     last_session: p?.last_session || "N/A",
                     last_session_date: p?.last_session_date ? moment(new Date(p?.last_session_date)).format("YYYY-MM-DD") : "N/A",
-                    attendance: p?.attendance_percent || 0,
+                    attendance: String(p?.attendance_percent || 0),
                     joining_date: p.created_at
                 }));
                 setPlayers(mappedPlayers)
@@ -88,9 +89,16 @@ export default function Page() {
         <div className="flex flex-col w-full gap-6">
             <Header >
                 <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
-                    <Button variant={"outline"}>
-                        <Download /> Export
-                    </Button>
+                    <ExportExcel header={["Name", "Coach Name", "Age", "Position", "Parent Name", "Last Session", "Last Session Date", "Attendance"]} fileName="players_data.xlsx" data={players.map((item)=>[
+                               item?.name || "",
+                               item?.coach_name,
+                               item?.age,
+                               item?.position,
+                               item?.parent,
+                               item?.last_session,
+                               item?.last_session_date,
+                               item?.attendance
+                             ])}/>
 
                     <CreatePlayer onRefresh={async () => {
                         await fetchData()
