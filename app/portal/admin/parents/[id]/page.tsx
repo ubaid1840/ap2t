@@ -27,6 +27,7 @@ import {
   Mail,
   Phone,
   Send,
+  User,
   Users,
   UserX
 } from "lucide-react";
@@ -79,7 +80,7 @@ export interface LinkedChildren {
   birth_date: string;
   picture: string | null;
   total_sessions: number;
-  skill_level : string
+  skill_level: string
   next_session: ChildNextSession | null;
 }
 
@@ -97,6 +98,9 @@ export interface ParentSession {
   end_time: string;
   coach_first_name: string;
   coach_last_name: string;
+  price: string;
+  apply_promotion: boolean
+  promotion_price: string
   players: SessionPlayer[];
 }
 export interface SessionPlayer {
@@ -135,10 +139,21 @@ export default function Page() {
   const setStatus = async (status: string) => {
     setLoading(true);
     try {
-      const result = await axios.patch(`/admin/parents/${id}/status`, {
-        status,
+      const result = await axios.put(`/user`, {
+        id : id,
+        status : status,
       });
-      console.log(result);
+      setData((prevState) => {
+        if (!prevState) return prevState;
+
+        return {
+          ...prevState,
+          parent: {
+            ...prevState.parent,
+            status,
+          },
+        };
+      })
     } finally {
       setLoading(false);
     }
@@ -177,28 +192,47 @@ export default function Page() {
                 </span>
               </div>
             </div>
-            <div className="flex gap-4 flex-wrap">
+            {data && <div className="flex gap-4 flex-wrap">
               <EditParents />
               <Button>
                 <Send /> Send Reminder
               </Button>
-              <Button
-                variant={"destructive"}
-                onClick={() => setStatus("inactive")}
-              >
-                {loading ? (
-                  <>
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                    Disabling...
-                  </>
-                ) : (
-                  <>
-                    <UserX className="h-4 w-4" />
-                    Disable
-                  </>
-                )}
-              </Button>
-            </div>
+              {
+                data?.parent?.status === 'active' ?
+                  <Button
+                    variant={"destructive"}
+                    onClick={() => setStatus("inactive")}
+                  >
+                    {loading ? (
+                      <>
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        Disabling...
+                      </>
+                    ) : (
+                      <>
+                        <UserX className="h-4 w-4" />
+                        Disable
+                      </>
+                    )}
+                  </Button> :
+                  <Button
+
+                    onClick={() => setStatus("active")}
+                  >
+                    {loading ? (
+                      <>
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        Activating...
+                      </>
+                    ) : (
+                      <>
+                        <User className="h-4 w-4" />
+                        Activate
+                      </>
+                    )}
+                  </Button>
+              }
+            </div>}
           </div>
           <div className="mt-4 flex w-full justify-between flex-wrap gap-4">
             <HeaderCard
@@ -289,7 +323,7 @@ export default function Page() {
                 <Card key={item.user_id} className="rounded-[10px] bg-[#1A1A1A] border-[#3A3A3A] flex flex-1">
                   <CardContent className="space-y-4">
                     <div className="flex gap-4 items-center">
-                     <RenderAvatar fallback={joinNames([item.first_name, item.last_name])} img={item.picture}/>
+                      <RenderAvatar fallback={joinNames([item.first_name, item.last_name])} img={item.picture} />
                       <div>
                         <div className="text-lg text-white">{joinNames([item.first_name, item.last_name])}</div>
                         <div className="text-muted-foreground">
@@ -301,7 +335,7 @@ export default function Page() {
                     <div className="flex w-full justify-between">
                       <div className="text-white">Next Session:</div>
                       <div className="text-muted-foreground">
-                        {item?.next_session && `${moment(new Date(item?.next_session?.date)).format("YYYY-MM-DD")} ${item.next_session?.start_time}`} 
+                        {item?.next_session && `${moment(new Date(item?.next_session?.date)).format("YYYY-MM-DD")} ${item.next_session?.start_time}`}
                       </div>
                     </div>
 
@@ -317,32 +351,42 @@ export default function Page() {
           </TabsContent>
 
           <TabsContent value="history" className="space-y-4 p-2">
-            {BOOKING_DATA.map((item) => (
+            {data?.sessions && data?.sessions?.map((item) => (
               <div
-                key={item.id}
+                key={item.session_id}
                 className="bg-[#1A1A1A] w-full rounded-[8px] p-4 space-y-4"
               >
                 <div className="flex w-full justify-between items-start">
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">
-                      <span className="text-[#F3F4F6]">{item.title}</span>
-                      <CardStatusHistory text={item.status} />
+                      <span className="text-[#F3F4F6]">{item.name}</span>
+                      <CardStatus value={item.status} />
                     </div>
                     <div className="text-muted-foreground text-xs flex items-center gap-2">
-                      <Calendar size={14} /> {item.date} <Clock size={14} />{" "}
-                      {item.time}
+                      <Calendar size={14} /> {item.date && moment(new Date(item.date)).format("YYYY-MM-DD")} <Clock size={14} />{" "}
+                      {item.start_time} - {item.end_time}
                     </div>
                   </div>
-                  <div className="text-[#F3F4F6]">$95</div>
+                  <div className="text-[#F3F4F6]">${item?.apply_promotion ? item?.promotion_price : item?.price}</div>
                 </div>
 
                 <Separator className="my-2" />
 
                 <div className="grid grid-cols-2 text-[#F3F4F6] text-xs max-w-md">
-                  <span>Coach: {item.coach}</span>
-                  <span className="inline-flex">
-                    <Dot size={16} /> Child: {item.child}
-                  </span>
+                  <span>Coach: {joinNames([item.coach_first_name, item.coach_last_name])}</span>
+                  <div className="inline-flex items-start gap-1 flex-wrap">
+                    <Dot size={16} className="mt-[2px]" />
+                    <span className="font-medium">Child:</span>
+                    <span className="flex flex-wrap gap-1">
+                      {item?.players?.map((p, i) => (
+                        <span key={i}>
+                          {i > 0 && ", "}
+                          {joinNames([p.first_name, p.last_name])}
+                        </span>
+                      ))}
+                    </span>
+                  </div>
+
                 </div>
               </div>
             ))}
