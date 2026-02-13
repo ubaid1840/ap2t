@@ -60,7 +60,6 @@ export async function GET(req: NextRequest) {
 
 export async function PATCH(req: NextRequest) {
   const data = await req.json();
-  console.log(data)
   try {
     const isTestMode = !!data.mode;
 
