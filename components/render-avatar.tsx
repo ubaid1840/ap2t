@@ -5,7 +5,7 @@ import { GetProfileImage } from "@/lib/functions";
 import { Spinner } from "./ui/spinner";
 
 
-const RenderAvatar = ({ img = "", fallback = "NA" } : {img : string | undefined | null, fallback : string}) => {
+const RenderAvatar = ({ img = "", fallback = "NA", className = "", fallbackClassName = "" } : {img : string | undefined | null, fallback : string, className ?: string, fallbackClassName ?:string}) => {
 
     const [loading, setLoading] = useState(false)
     const [localImage, setLocalImage] = useState("")
@@ -26,9 +26,9 @@ const RenderAvatar = ({ img = "", fallback = "NA" } : {img : string | undefined 
 
     return (
         loading ? <Spinner /> :
-            <Avatar className="h-12 w-12">
+            <Avatar className={`h-12 w-12 ${className}`}>
                 <AvatarImage src={localImage} />
-                <AvatarFallback className="bg-primary text-black">
+                <AvatarFallback className={`bg-primary text-black ${fallbackClassName}`}>
                     {getInitials(fallback)}
                 </AvatarFallback>
             </Avatar>

@@ -20,6 +20,7 @@ type DBUser = {
   email: string;
   role: string;
   status: string;
+  picture : string
 };
 
 type AuthContextType = {

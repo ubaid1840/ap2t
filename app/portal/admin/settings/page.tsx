@@ -43,6 +43,7 @@ import { uploadProfileImage } from "@/lib/upload-profile-image";
 import getInitials from "@/components/parents/get-initials";
 import moment from "moment";
 import AppCalendar from "@/components/app-calendar";
+import RenderAvatar from "@/components/render-avatar";
 export default function Page() {
   const [loading, setLoading] = useState(false);
   const [savingChanges, setSavingChanges] = useState(false);
@@ -576,18 +577,7 @@ export default function Page() {
                 />
 
                 <div className="relative w-24 h-24">
-                  {profileImage ? (
-                    <img
-                      src={profileImage}
-                      className="w-full h-full rounded-full object-cover"
-                    />
-                  ) : (
-                    <div className="w-full h-full rounded-full bg-[#1A1A1A] border border-border flex items-center justify-center text-lg font-semibold">
-                      {getInitials(
-                        joinNames([user?.first_name, user?.last_name]),
-                      )}
-                    </div>
-                  )}
+                  <RenderAvatar img={user?.picture} fallback={joinNames([user?.first_name, user?.last_name])} className="w-full h-full" fallbackClassName="bg-[#1A1A1A] text-white" />
 
                   <button
                     onClick={handleSelectFile}
@@ -700,24 +690,24 @@ export default function Page() {
                 />
                 <div className="space-y-2">
                   <Label className="text-xs text-muted">
-                  Birth Date
-                </Label>
-                <AppCalendar
-                className="h-12"
-                  date={
-                    profileInfo.birth_date
-                      ? new Date(profileInfo.birth_date)
-                      : undefined
-                  }
-                  onChange={(date) =>
-                    setProfileInfo((prevState) => ({
-                      ...prevState,
-                      birth_date: date,
-                    }))
-                  }
-                />
+                    Birth Date
+                  </Label>
+                  <AppCalendar
+                    className="h-12"
+                    date={
+                      profileInfo.birth_date
+                        ? new Date(profileInfo.birth_date)
+                        : undefined
+                    }
+                    onChange={(date) =>
+                      setProfileInfo((prevState) => ({
+                        ...prevState,
+                        birth_date: date,
+                      }))
+                    }
+                  />
                 </div>
-                
+
               </div>
             </TabsContent>
             <TabsContent value="Notification Preference" className="space-y-4">
