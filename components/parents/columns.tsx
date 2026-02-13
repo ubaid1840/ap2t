@@ -130,10 +130,6 @@ export const PARENT_COLUMNS: ColumnDef<ParentData>[] = [
             </Button>
         ),
         cell: ({ row }) => {
-            const Valid = () => <CircleCheckBig size={14} />
-            const Expired = () => <Info size={14} />
-            const NoCard = () => <CircleX size={14} />
-            const Error = () => <Info size={14} />
             return (
                  <div className="w-25">
                 <CardStatus value={row.original.card_status} icon={true} />
@@ -171,7 +167,7 @@ export const PARENT_COLUMNS: ColumnDef<ParentData>[] = [
         header: () => <div className="text-[#99A1AF] text-[12px] tracking-wider dark:hover:bg-transparent dark:hover:text-white/50"
         >ACTIONS</div>,
         cell: ({ row }) => (
-            <Link href={`/admin/parents/${row.original.id}`}>
+            <Link href={`/portal/admin/parents/${row.original.id}`}>
                 <Button
                     onClick={(e) => {
                         e.stopPropagation();

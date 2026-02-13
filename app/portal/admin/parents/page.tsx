@@ -17,8 +17,8 @@ import { useEffect, useState } from "react";
 import moment from "moment";
 
 export default function Page() {
-  const [filter, setFilter] = useState(true);
-  const [parents, setParents] = useState();
+  const [filter, setFilter] = useState(false);
+  const [parents, setParents] = useState([]);
   const [loading, setLoading] = useState(false)
   const { user } = useAuth();
 
@@ -33,7 +33,7 @@ export default function Page() {
   async function fetchData() {
     const result = await axios.get("/admin/users?role=parent");
     const parentsmapped = result.data.map((p: any) => ({
-      id: p.parent_id,
+      id: p.id,
       name: `${p.first_name} ${p.last_name}`,
       joining_date: p.created_at
         ? moment(new Date(p.created_at)).format("YYYY-MM-DD")
@@ -55,7 +55,7 @@ export default function Page() {
 
   return (
     <div className="flex flex-col w-full gap-6">
-      <Header>
+      <Header totalParents ={parents.length}>
         <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
           <Button variant={"outline"}>
             <Download /> Export

@@ -5,39 +5,209 @@ export async function GET(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const { id: parentId } = await params; 
+  const { id: parentId } = await params;
+
   try {
-    const result = await pool.query(
+
+    /* -------------------------------------------------------
+       1️⃣ Parent Info
+    ------------------------------------------------------- */
+
+    const parentResult = await pool.query(
       `
       SELECT
-        p.id AS parent_id,
-        p.user_id,
-        u.first_name,
-        u.last_name,
-        u.email,
-        u.location,
-        u.status,
-        u.picture,
-        u.phone_no,
-        u.birth_date,
-        u.joining_date
-      FROM parents p
-      INNER JOIN users u ON u.id = p.user_id
-      WHERE p.id = $1
+      u.*,
+      to_json(p.*) AS profile
+      FROM users u
+      INNER JOIN parents p ON p.user_id = u.id
+      WHERE u.id = $1
       `,
       [parentId]
     );
 
-    if (result.rows.length === 0) {
-      return NextResponse.json(
-        { message: "Parent not found" },
-        { status: 404 }
-      );
+    if (!parentResult.rows.length) {
+      return NextResponse.json({ message: "Parent not found" }, { status: 404 });
     }
 
-    return NextResponse.json(result.rows[0]);
+    const parent = parentResult.rows[0];
+
+
+
+    /* -------------------------------------------------------
+       2️⃣ Linked Children
+    ------------------------------------------------------- */
+
+    const childrenResult = await pool.query(
+      `
+      SELECT
+        pl.id AS player_id,
+        pl.user_id,
+        pl.skill_level,
+        u.first_name,
+        u.last_name,
+        u.birth_date,
+        u.picture
+      FROM players pl
+      INNER JOIN users u ON u.id = pl.user_id
+      WHERE pl.parent_id = $1
+      `,
+      [parentId]
+    );
+
+    const children = childrenResult.rows;
+    const childUserIds = children.map(c => c.user_id);
+
+
+
+    /* -------------------------------------------------------
+       3️⃣ Sessions + Coach + Player Info
+    ------------------------------------------------------- */
+
+    let sessionRows: any[] = [];
+
+    if (childUserIds.length) {
+      const sessionsResult = await pool.query(
+        `
+        SELECT
+          s.id AS session_id,
+          s.name,
+          s.status,
+          s.date,
+          s.start_time,
+          s.end_time,
+
+          coach.first_name AS coach_first_name,
+          coach.last_name AS coach_last_name,
+
+          child.id AS child_id,
+          child.first_name AS child_first_name,
+          child.last_name AS child_last_name
+
+        FROM sessions s
+
+        INNER JOIN users coach ON coach.id = s.coach_id
+
+        INNER JOIN session_players sp ON sp.session_id = s.id
+        INNER JOIN users child ON child.id = sp.user_id
+
+        WHERE sp.user_id = ANY($1)
+        `,
+        [childUserIds]
+      );
+
+      sessionRows = sessionsResult.rows;
+    }
+
+
+
+    /* -------------------------------------------------------
+       4️⃣ Payments (Total Spent)
+    ------------------------------------------------------- */
+
+    let paymentTotal = 0;
+
+    if (childUserIds.length) {
+      const paymentResult = await pool.query(
+        `
+        SELECT COALESCE(SUM(amount), 0) AS total_spent
+        FROM payments
+        WHERE user_id = ANY($1) AND status = $2
+        `,
+        [childUserIds, "paid"]
+      );
+
+      paymentTotal = Number(paymentResult.rows[0].total_spent || 0);
+    }
+
+
+
+    /* -------------------------------------------------------
+       5️⃣ Prepare Sessions Grouped
+    ------------------------------------------------------- */
+
+    const sessionMap = new Map();
+
+    sessionRows.forEach(row => {
+
+      if (!sessionMap.has(row.session_id)) {
+        sessionMap.set(row.session_id, {
+          session_id : row.session_id,
+          name: row.name,
+          status: row.status,
+          date: row.date,
+          start_time: row.start_time,
+          end_time: row.end_time,
+          coach_first_name: row.coach_first_name,
+          coach_last_name: row.coach_last_name,
+          players: []
+        });
+      }
+
+      sessionMap.get(row.session_id).players.push({
+        first_name: row.child_first_name,
+        last_name: row.child_last_name
+      });
+    });
+
+    const sessions = Array.from(sessionMap.values());
+
+
+
+    /* -------------------------------------------------------
+       6️⃣ Upcoming Sessions Count
+    ------------------------------------------------------- */
+
+    const upcomingSessionsCount = sessions.filter(
+      s => s.status === "pending"
+    ).length;
+
+
+
+    /* -------------------------------------------------------
+       7️⃣ Child Stats (WITHOUT sessions array)
+    ------------------------------------------------------- */
+
+    const childrenWithStats = children.map(child => {
+
+      const childSessions = sessionRows.filter(
+        s => s.child_id === child.user_id
+      );
+
+      const nextSession = childSessions
+        .filter(s => new Date(s.date) >= new Date())
+        .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())[0];
+
+      return {
+        ...child,
+        total_sessions: childSessions.length,
+        next_session: nextSession
+          ? {
+              date: nextSession.date,
+              start_time: nextSession.start_time
+            }
+          : null
+      };
+    });
+
+
+
+    /* -------------------------------------------------------
+       8️⃣ Final Response
+    ------------------------------------------------------- */
+
+    return NextResponse.json({
+      parent,
+      stats: {
+        total_linked_children: children.length,
+        total_spent: paymentTotal,
+        upcoming_sessions: upcomingSessionsCount
+      },
+      linked_childrens: childrenWithStats,
+      sessions
+    });
+
   } catch (error) {
-    console.error("GET /api/parents/[id] error:", error);
+    console.error("GET Parent Detail Error:", error);
 
     return NextResponse.json(
       { message: "Internal Server Error" },
@@ -45,6 +215,8 @@ export async function GET(
     );
   }
 }
+
+
 
 export async function PUT(req: NextRequest) {
     try {

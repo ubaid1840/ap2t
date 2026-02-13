@@ -1,3 +1,7 @@
+
+import { getDownloadURL, ref } from "firebase/storage";
+import { storage } from "./firebase";
+
 export function splitFullName(fullName: string | null) {
   if (!fullName) return { first_name: "", last_name: "" }
   const parts = fullName.trim().split(/\s+/);
@@ -21,3 +25,16 @@ export function getYear(val: string) {
   return val ? new Date().getFullYear() - new Date(val).getFullYear() : "N/A"
 }
 
+
+
+export async function GetProfileImage(imgLink : string | null) {
+    if (!imgLink) return "";
+
+    try {
+        const url = await getDownloadURL(ref(storage, imgLink));
+        return url;
+    } catch (error) {
+        console.error("Error fetching profile image:", error);
+        return "";
+    }
+}

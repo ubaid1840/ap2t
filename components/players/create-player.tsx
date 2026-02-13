@@ -129,7 +129,7 @@ export function CreatePlayer({ onRefresh }: { onRefresh: () => Promise<void> }) 
                     htmlFor="email"
                     className="text-xs text-muted-foreground"
                   >
-                    email
+                    Email
                   </Label>
                   <Input
                     id="email"
@@ -210,7 +210,7 @@ export function CreatePlayer({ onRefresh }: { onRefresh: () => Promise<void> }) 
                   Cancel
                 </Button>
               </DialogClose>
-              <Button disabled={loading} type="submit"> {loading && <Spinner />}Add Player</Button>
+              <Button disabled={loading} type="submit"> {loading && <Spinner className="text-black"/>}Add Player</Button>
             </DialogFooter>
           </form>
         </DialogContent>

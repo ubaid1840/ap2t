@@ -2,20 +2,22 @@
 import BackButton from "@/components/back-button";
 import CardStatus from "@/components/card-status";
 import { ParentData } from "@/components/parents/columns";
-import { PARENT_DATA, PAYMENT_HISTORY } from "@/components/parents/constatns";
+import { PAYMENT_HISTORY } from "@/components/parents/constatns";
 import { EditParents } from "@/components/parents/edit-parents";
+import RenderAvatar from "@/components/render-avatar";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Scrollbar } from "@radix-ui/react-scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useAuth } from "@/contexts/auth-context";
 import { useIsMobile } from "@/hooks/use-mobile";
+import axios from "@/lib/axios";
+import { getYear, joinNames } from "@/lib/functions";
+import { Scrollbar } from "@radix-ui/react-scroll-area";
 import {
   Calendar,
-  Check,
-  CircleCheckBig,
   Clock,
   CreditCard,
   DollarSign,
@@ -26,51 +28,111 @@ import {
   Phone,
   Send,
   Users,
-  UserX,
+  UserX
 } from "lucide-react";
+import moment from "moment";
 import { useParams } from "next/navigation";
 import { ReactNode, useEffect, useState } from "react";
 import { IoIosPin } from "react-icons/io";
 import { IoCalendarClear } from "react-icons/io5";
-import axios from "@/lib/axios";
+
+export interface ParentDetailResponse {
+  parent: Parent;
+  stats: ParentStats;
+  linked_childrens: LinkedChildren[];
+  sessions: ParentSession[];
+}
+
+export interface Parent {
+  id: number;
+  first_name: string;
+  last_name: string;
+  email: string;
+  role: string;
+  status: string;
+  picture: string | null;
+  location: string | null;
+  phone_no: string | null;
+  joining_date: string | null;
+  birth_date: string | null;
+  created_at: string;
+  profile: ParentProfile;
+}
+
+export interface ParentProfile {
+  id: number;
+  user_id: number;
+  created_at: string;
+}
+
+export interface ParentStats {
+  total_linked_children: number;
+  total_spent: number;
+  upcoming_sessions: number;
+}
+
+export interface LinkedChildren {
+  player_id: number;
+  user_id: number;
+  first_name: string;
+  last_name: string;
+  birth_date: string;
+  picture: string | null;
+  total_sessions: number;
+  skill_level : string
+  next_session: ChildNextSession | null;
+}
+
+export interface ChildNextSession {
+  date: string;
+  start_time: string;
+}
+
+export interface ParentSession {
+  session_id: number;
+  name: string;
+  status: string;
+  date: string;
+  start_time: string;
+  end_time: string;
+  coach_first_name: string;
+  coach_last_name: string;
+  players: SessionPlayer[];
+}
+export interface SessionPlayer {
+  first_name: string;
+  last_name: string;
+}
+
+
+
 
 export default function Page() {
   const { id } = useParams();
-  const [data, setData] = useState<ParentData | undefined>();
+  const [data, setData] = useState<ParentDetailResponse | undefined>();
   const [tab, setTab] = useState("linked");
   const isMobile = useIsMobile();
   const [loading, setLoading] = useState(false);
+  const { user } = useAuth()
 
   useEffect(() => {
-    if (id) {
-      const fetchData = async () => {
-        try {
-          const result = await axios.get(`/admin/parents/${id}`);
-          const parent=result.data
-          const mappedParent: ParentData = {
-            id: parent.parent_id,
-            name: `${parent.first_name} ${parent.last_name}`, 
-            joining_date: parent.joining_date ? new Date(parent.joining_date).toISOString().split('T')[0] : "N/A",
-            email: parent.email,
-            number: parent.phone_no,
-            location: parent.location || "N/A",
-            children: parent.children_count || 0,
-            card_status: parent.card_status || "N/A", 
-            total_spent: parent.total_spent || 0,
-            last_spent: parent.last_spent || 0,
-            last_transaction_date: parent.last_transaction_date ? new Date(parent.last_transaction_date).toISOString().split('T')[0] : "N/A",
-          };
-          setData(mappedParent);
-          
-        } catch (error) {
-          console.log(error);
-        }
-      };
+    if (id && user?.id) {
       fetchData();
     }
-  }, [id]);
+  }, [id, user]);
 
-  const setStatus = async (status: "disabled") => {
+  const fetchData = async () => {
+    try {
+      const result = await axios.get(`/admin/parents/${id}`);
+      console.log(result.data)
+      setData(result.data)
+
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const setStatus = async (status: string) => {
     setLoading(true);
     try {
       const result = await axios.patch(`/admin/parents/${id}/status`, {
@@ -91,27 +153,27 @@ export default function Page() {
           <div className="w-full flex justify-between flex-wrap gap-4">
             <div className="flex flex-col gap-2">
               <span className="flex gap-2 text-xl items-center">
-                {data?.name}{" "}
+                {joinNames([data?.parent?.first_name, data?.parent?.last_name])}{" "}
                 <span>
                   <CardStatus
-                    value={data?.card_status || ""}
+                    value={data?.parent?.status || ""}
                     icon={true}
                   />
                 </span>
               </span>
               <div className="text-[#D1D5DC] text-xs flex flex-col gap-2">
                 <span className="inline-flex gap-2 ">
-                  <Mail size={14} /> {data?.email}
+                  <Mail size={14} /> {data?.parent?.email}
                 </span>
                 <span className="inline-flex gap-2">
-                  <Phone size={14} /> {data?.number}
+                  <Phone size={14} /> {data?.parent?.phone_no}
                 </span>
                 <span className="inline-flex gap-2">
-                  <IoIosPin size={14} /> {data?.location}
+                  <IoIosPin size={14} /> {data?.parent?.location}
                 </span>
                 <span className="inline-flex gap-2">
                   <IoCalendarClear size={14} /> Member since{" "}
-                  {data?.joining_date}
+                  {data?.parent?.created_at && moment(new Date(data.parent.created_at)).format("YYYY-MM-DD")}
                 </span>
               </div>
             </div>
@@ -122,7 +184,7 @@ export default function Page() {
               </Button>
               <Button
                 variant={"destructive"}
-                onClick={() => setStatus("disabled")}
+                onClick={() => setStatus("inactive")}
               >
                 {loading ? (
                   <>
@@ -140,7 +202,7 @@ export default function Page() {
           </div>
           <div className="mt-4 flex w-full justify-between flex-wrap gap-4">
             <HeaderCard
-              title={String(data?.children)}
+              title={String(data?.stats?.total_linked_children || 0)}
               description="Linked Children"
               icon={
                 <div className="rounded-[8px] flex w-10 h-10 items-center justify-center bg-success-bg">
@@ -150,7 +212,7 @@ export default function Page() {
             />
 
             <HeaderCard
-              title={`$${String(data?.total_spent)}`}
+              title={String(data?.stats?.total_spent || 0)}
               description="Total Spent"
               icon={
                 <div className="rounded-[8px] flex w-10 h-10 items-center justify-center bg-info-bg">
@@ -170,7 +232,7 @@ export default function Page() {
             />
 
             <HeaderCard
-              title={"4"}
+              title={String(data?.stats?.upcoming_sessions || 0)}
               description="Upcoming Session"
               icon={
                 <div className="rounded-[8px] flex w-10 h-10 items-center justify-center bg-other-bg">
@@ -223,69 +285,34 @@ export default function Page() {
 
           <TabsContent value="linked">
             <div className="flex w-full justify-between gap-4 p-2 flex-wrap">
-              <Card className="rounded-[10px] bg-[#1A1A1A] border-[#3A3A3A] flex flex-1">
-                <CardContent className="space-y-4">
-                  <div className="flex gap-4 items-center">
-                    <Avatar>
-                      <AvatarImage
-                        src="https://github.com/shadcn.png"
-                        alt="@shadcn"
-                      />
-                      <AvatarFallback>CH</AvatarFallback>
-                    </Avatar>
-                    <div>
-                      <div className="text-lg text-white">Emma JohnSon</div>
-                      <div className="text-muted-foreground">
-                        Age 12 - Intermediate
+              {data?.linked_childrens && data?.linked_childrens?.map((item) => (
+                <Card key={item.user_id} className="rounded-[10px] bg-[#1A1A1A] border-[#3A3A3A] flex flex-1">
+                  <CardContent className="space-y-4">
+                    <div className="flex gap-4 items-center">
+                     <RenderAvatar fallback={joinNames([item.first_name, item.last_name])} img={item.picture}/>
+                      <div>
+                        <div className="text-lg text-white">{joinNames([item.first_name, item.last_name])}</div>
+                        <div className="text-muted-foreground">
+                          Age {getYear(item.birth_date)} - {item.skill_level}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                  <Separator />
-                  <div className="flex w-full justify-between">
-                    <div className="text-white">Next Session:</div>
-                    <div className="text-muted-foreground">
-                      2025-12-18 10:00 AM
-                    </div>
-                  </div>
-
-                  <div className="flex w-full justify-between">
-                    <div className="text-white">Total Sessions:</div>
-                    <div className="text-muted-foreground">24</div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="rounded-[10px] bg-[#1A1A1A] border-[#3A3A3A] flex flex-1">
-                <CardContent className="space-y-4">
-                  <div className="flex gap-4 items-center">
-                    <Avatar>
-                      <AvatarImage
-                        src="https://github.com/shadcn.png"
-                        alt="@shadcn"
-                      />
-                      <AvatarFallback>CH</AvatarFallback>
-                    </Avatar>
-                    <div>
-                      <div className="text-lg text-white">Lucas Johnson</div>
+                    <Separator />
+                    <div className="flex w-full justify-between">
+                      <div className="text-white">Next Session:</div>
                       <div className="text-muted-foreground">
-                        Age 8 - Beginner
+                        {item?.next_session && `${moment(new Date(item?.next_session?.date)).format("YYYY-MM-DD")} ${item.next_session?.start_time}`} 
                       </div>
                     </div>
-                  </div>
-                  <Separator />
-                  <div className="flex w-full justify-between">
-                    <div className="text-white">Next Session:</div>
-                    <div className="text-muted-foreground">
-                      2025-12-18 10:00 AM
-                    </div>
-                  </div>
 
-                  <div className="flex w-full justify-between">
-                    <div className="text-white">Total Sessions:</div>
-                    <div className="text-muted-foreground">12</div>
-                  </div>
-                </CardContent>
-              </Card>
+                    <div className="flex w-full justify-between">
+                      <div className="text-white">Total Sessions:</div>
+                      <div className="text-muted-foreground">{item.total_sessions}</div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+
             </div>
           </TabsContent>
 

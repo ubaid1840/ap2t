@@ -299,7 +299,7 @@ export default function MainPlayerPage({
                 </span>
               </div>
             </div>
-            {data && <EditInfo player_id={id} data={data} onRefresh={fetchData}/> }
+            {data && <EditInfo player_id={id} data={data} onRefresh={fetchData} />}
           </div>
           <div className="mt-4 flex w-full justify-between flex-wrap gap-2">
             <HeaderCard
@@ -427,21 +427,23 @@ export default function MainPlayerPage({
             </>
           )}
 
-          <Card className="bg-alternative-bg p-3 border-alternative-text/30">
-            <CardContent className="p-0">
-              <div className="flex gap-4 items-start">
-                <Info size={14} className="text-alternative-text" />
-                <div className="font-normal space-y-1">
-                  <Label className="text-alternative-text text-[14px] leading-none">
-                    Medical Notes
-                  </Label>
-                  <p className="text-[#D1D5DC] text-xs">
-                    {data?.profile?.medical_notes}
-                  </p>
+          {data?.profile?.medical_notes &&
+            <Card className="bg-alternative-bg p-3 border-alternative-text/30">
+              <CardContent className="p-0">
+                <div className="flex gap-4 items-start">
+                  <Info size={14} className="text-alternative-text" />
+                  <div className="font-normal space-y-1">
+                    <Label className="text-alternative-text text-[14px] leading-none">
+                      Medical Notes
+                    </Label>
+                    <p className="text-[#D1D5DC] text-xs">
+                      {data?.profile?.medical_notes}
+                    </p>
+                  </div>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          }
         </CardContent>
       </Card>
 
