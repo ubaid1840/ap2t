@@ -7,9 +7,13 @@ import { DASHBOARD_SESSIONS } from "./constants"
 import { useState, useEffect } from "react"
 import axios from "@/lib/axios"
 import Link from "next/link"
+import { useSidebar } from "../ui/sidebar"
+import { useIsMobile } from "@/hooks/use-mobile"
 export function UpcomingSessions() {
   const [sessions, setSessions] = useState([]);
   const [loading, setLoading] = useState(true);
+  const {open} = useSidebar()
+  const isMobile = useIsMobile()
 
   useEffect(() => {
     const fetchData = async () => {
@@ -65,6 +69,8 @@ export function UpcomingSessions() {
           onRowClick={() => {
 
           }}
+          scrollAreaWidth={`${open ? "w-[calc(100dvw-306px)]" : "w-[calc(100dvw-96px)]"} ${isMobile && "w-[calc(100vw-44px)]"}`}
+
         />
         <div className="flex justify-end py-4 px-2 bg-[#1A1A1A]">
             <Link href="/admin/sessions">

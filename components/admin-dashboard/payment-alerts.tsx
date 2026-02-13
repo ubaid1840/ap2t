@@ -17,8 +17,8 @@ export function PaymentAlerts() {
 
       </CardHeader>
 
-      <CardContent >
-        <ScrollArea className="h-100">
+      <CardContent className="flex-1">
+        <ScrollArea className="flex flex-1">
           <div className="space-y-4">
             {alerts.map((alert, index) => (
               <Card
@@ -37,7 +37,7 @@ export function PaymentAlerts() {
                       </Badge>
                     </div>
                   </div>
-                  <div className="flex gap-2">
+                  <div className="flex flex-wrap gap-4">
                     <Button className="bg-active-bg text-active-text">
                       <CircleCheckBig />    Approve
                     </Button>

@@ -49,7 +49,13 @@ export function DashboardOverview() {
 
             <div className="flex justify-between gap-4 flex-wrap">
                 {localData.map((item, index) => (
-                    <Card key={index} className="rounded-[10px] bg-[#252525] border-[#3A3A3A] flex-1">
+                    <Card key={index} className="rounded-[10px] 
+        bg-[#252525] 
+        border-[#3A3A3A] 
+        
+        w-full
+        sm:w-[calc(50%-8px)]
+        lg:flex-1">
                         <CardContent className="space-y-4">
                             <div className="flex justify-between">
                                 <div className={`rounded-[8px] flex w-10 h-10 items-center justify-center bg-${item.type}-bg text-${item.type}-text`}>{item.Icon}</div>

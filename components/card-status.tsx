@@ -31,7 +31,8 @@ export const IconType = {
     "no_card": <CircleX size={14} />,
     error: <Info size={14} />,
     attended: <CircleCheckBig size={14} />,
-    connected: <GoDotFill size={14} />
+    connected: <GoDotFill size={14} />,
+    completed: <CircleCheckBig size={14} />,
 }
 
 interface CardStatusProps {

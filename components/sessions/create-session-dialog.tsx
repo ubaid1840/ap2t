@@ -28,6 +28,7 @@ import {
 } from "../ui/select";
 import { AssignCoachDialog } from "./assign-coach-dialog";
 import { TimePickerFixed } from "../time-picker-fixed";
+import SelectSessionType from "../players/select-session-type";
 
 export type SessionType = {
   name: string,
@@ -134,18 +135,13 @@ export function CreateSessionDialog({ onRefresh }: { onRefresh: () => Promise<vo
                     <Label className="text-sm text-muted-foreground">
                       Session Type *
                     </Label>
-                    <Input
-                      name="sessionType"
-
-                      required
-                      value={session.session_type}
+                    <SelectSessionType required={true} placeholder="Select session type"  value={session.session_type}
                       onChange={(e) =>
                         setSession((prev) => ({
                           ...prev,
-                          session_type: e.target.value,
+                          session_type: e,
                         }))
-                      }
-                    />
+                      }/>
                   </div>
                   <div className="space-y-2">
                     <Label className="text-sm text-muted-foreground">

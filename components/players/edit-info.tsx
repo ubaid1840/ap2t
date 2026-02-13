@@ -26,16 +26,18 @@ import axios from "@/lib/axios";
 import { useParams } from "next/navigation";
 import { PlayerResponse } from "./main-player-page";
 import { Spinner } from "../ui/spinner";
+import SelectPosition from "./select-position";
+import SelectSkill from "./select-skill";
 
 type DataProps = {
-    first_name: string,
-    last_name: string,
-    phone_no: string,
-    position: string,
-    skillLevel: string,
-    medicalNotes: string,
-    birth_date: null | Date
-  
+  first_name: string,
+  last_name: string,
+  phone_no: string,
+  position: string,
+  skillLevel: string,
+  medicalNotes: string,
+  birth_date: null | Date
+
 }
 
 export function EditInfo({ player_id, data, onRefresh }: { player_id: number | undefined, data: PlayerResponse, onRefresh: () => Promise<void> }) {
@@ -62,10 +64,10 @@ export function EditInfo({ player_id, data, onRefresh }: { player_id: number | u
       setLocalData({
         first_name: data?.first_name || "",
         last_name: data?.last_name || "",
-        birth_date: data?.birth_date  || null,
-        phone_no: data?.phone_no  || "",
-        position: data?.profile?.position  || "",
-        skillLevel: data?.profile?.skill_level || "" ,
+        birth_date: data?.birth_date || null,
+        phone_no: data?.phone_no || "",
+        position: data?.profile?.position || "",
+        skillLevel: data?.profile?.skill_level || "",
         medicalNotes: data?.profile?.medical_notes || "",
       })
 
@@ -79,14 +81,14 @@ export function EditInfo({ player_id, data, onRefresh }: { player_id: number | u
     try {
 
       await axios.put(`/user`, {
-        id : player_id,
+        id: player_id,
         first_name: localData.first_name,
         last_name: localData.last_name,
         phone_no: localData.phone_no,
         birth_date: localData.birth_date,
       });
       await axios.put(`/admin/players/${player_id}`, {
-         id : player_id,
+        id: player_id,
         position: localData.position,
         skill_level: localData.skillLevel,
         medical_notes: localData.medicalNotes,
@@ -101,8 +103,8 @@ export function EditInfo({ player_id, data, onRefresh }: { player_id: number | u
     }
   }
 
-  function handleChange (key : string, value : string){
-    setLocalData((prevState)=>({...prevState, [key] : value}))
+  function handleChange(key: string, value: string) {
+    setLocalData((prevState) => ({ ...prevState, [key]: value }))
   }
   return (
     <>
@@ -138,8 +140,8 @@ export function EditInfo({ player_id, data, onRefresh }: { player_id: number | u
                     placeholder="Pedro"
                     required
                     className="dark:bg-[#1A1A1A]"
-                      value={localData.first_name}
-                    onChange={(e)=> handleChange("first_name",e.target.value)}
+                    value={localData.first_name}
+                    onChange={(e) => handleChange("first_name", e.target.value)}
                   />
                 </div>
                 <div className="grid gap-2">
@@ -156,11 +158,11 @@ export function EditInfo({ player_id, data, onRefresh }: { player_id: number | u
                     required
                     className="dark:bg-[#1A1A1A]"
                     value={localData.last_name}
-                    onChange={(e)=> handleChange("last_name",e.target.value)}
+                    onChange={(e) => handleChange("last_name", e.target.value)}
                   />
                 </div>
               </div>
-             
+
               <div className="grid grid-cols-2 gap-4">
                 <div className="grid gap-2">
                   <Label
@@ -169,7 +171,7 @@ export function EditInfo({ player_id, data, onRefresh }: { player_id: number | u
                   >
                     Date of Birth
                   </Label>
-                  <AppCalendar date={localData.birth_date} onChange={(d)=> handleChange("birth_date", d)} />
+                  <AppCalendar date={localData.birth_date} onChange={(d) => handleChange("birth_date", d)} />
                 </div>
 
                 <div className="grid gap-2">
@@ -185,8 +187,8 @@ export function EditInfo({ player_id, data, onRefresh }: { player_id: number | u
                     placeholder="+1 2983 39843"
                     required
                     className="dark:bg-[#1A1A1A]"
-                      value={localData.phone_no}
-                    onChange={(e)=> handleChange("phone_no",e.target.value)}
+                    value={localData.phone_no}
+                    onChange={(e) => handleChange("phone_no", e.target.value)}
                   />
                 </div>
 
@@ -198,21 +200,7 @@ export function EditInfo({ player_id, data, onRefresh }: { player_id: number | u
                   >
                     Position
                   </Label>
-                  <Select value={localData.position} onValueChange={(val)=>handleChange("position", val)}>
-                    <SelectTrigger
-                      id="position"
-                      className="dark:bg-[#1A1A1A] w-full"
-                    >
-                      <SelectValue placeholder="Select position" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {positions.map((pos, i) => (
-                        <SelectItem key={i} value={pos}>
-                          {pos}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <SelectPosition placeholder="Select position" value={localData.position} onChange={(val) => handleChange("position", val)} />
                 </div>
 
                 <div className="grid gap-2">
@@ -222,21 +210,7 @@ export function EditInfo({ player_id, data, onRefresh }: { player_id: number | u
                   >
                     Skill Level
                   </Label>
-                  <Select value={localData.skillLevel} onValueChange={(val)=>handleChange("skillLevel", val)}>
-                    <SelectTrigger
-                      id="skillLevel"
-                      className="dark:bg-[#1A1A1A] w-full"
-                    >
-                      <SelectValue placeholder="Select skill level" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {skillLevels.map((level, i) => (
-                        <SelectItem key={i} value={level}>
-                          {level}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <SelectSkill value={localData.skillLevel} onChange={(val) => handleChange("skillLevel", val)} placeholder="Select skill level" />
                 </div>
               </div>
 
@@ -252,8 +226,8 @@ export function EditInfo({ player_id, data, onRefresh }: { player_id: number | u
                   name="medicalNotes"
                   placeholder="Enter medical notes or observations..."
                   className="dark:bg-[#1A1A1A] h-30"
-                     value={localData.medicalNotes}
-                    onChange={(e)=> handleChange("medicalNotes",e.target.value)}
+                  value={localData.medicalNotes}
+                  onChange={(e) => handleChange("medicalNotes", e.target.value)}
                 />
               </div>
             </div>

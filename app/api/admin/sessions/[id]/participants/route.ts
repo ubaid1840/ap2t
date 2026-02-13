@@ -28,7 +28,17 @@ export async function POST(
       );
     }
 
-    const result = await pool.query(
+    const amountQuery = await pool.query(`SELECT price, apply_promotion, promotion_price from sessions WHERE id = $1 LIMIT 1`, [session_id])
+    let amount = 0
+    const amountQueryResult = amountQuery.rows[0] ?? null
+
+    if (!amountQueryResult) {
+      return NextResponse.json({ message: "Session not found" }, { status: 400 })
+    }
+
+    amount = amountQueryResult?.apply_promotion ? amountQueryResult?.promotion_price : amountQueryResult?.price
+
+    await pool.query(
       `INSERT INTO session_players
       (session_id, user_id)
       VALUES
@@ -37,14 +47,23 @@ export async function POST(
       [session_id, player_id]
     );
 
+    await pool.query(
+      `INSERT INTO payments
+      (session_id, user_id, amount, status)
+      VALUES
+      ($1, $2, $3, $4)
+      RETURNING *;`,
+      [session_id, player_id, amount, "pending"]
+    );
+
     return NextResponse.json(
-      { success: true, item: result.rows[0] },
+      { message: "Done" },
       { status: 201 }
     );
   } catch (error: any) {
     console.error("POST /api/admin/sessions/[id]/participants error:", error);
     return NextResponse.json(
-      { success: false, error: error.message },
+      { message: error?.message || "Server error" },
       { status: 500 }
     );
   }
@@ -57,7 +76,7 @@ export async function GET(
   const { id: session_id } = await params;
   try {
     const result = await pool.query(
-  `
+      `
   SELECT
     sp.created_at,
     p.user_id AS player_id,
@@ -86,8 +105,8 @@ export async function GET(
 
   WHERE sp.session_id = $1
   `,
-  [session_id]
-);
+      [session_id]
+    );
 
 
 
