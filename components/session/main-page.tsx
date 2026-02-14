@@ -40,6 +40,7 @@ import {
   Check,
   CheckCircle,
   CircleAlert,
+  CircleCheckBig,
   CircleX,
   Clock,
   DollarSign,
@@ -82,7 +83,7 @@ type noteType = {
   important: boolean;
 }
 
-export default function SessionMainPage({id, back, back_title, type} : {id : number, back : string, back_title : string, type : string}) {
+export default function SessionMainPage({ id, back, back_title, type }: { id: number, back: string, back_title: string, type: string }) {
   const [data, setData] = useState<SessionDataType>();
   const [rawSessionData, setRawSessionData] = useState<any>(null);
   const [tab, setTab] = useState("Participants");
@@ -127,7 +128,7 @@ export default function SessionMainPage({id, back, back_title, type} : {id : num
           coachName: joinNames([d.coach_first_name, d.coach_last_name]),
           status: d.status,
           price: d.price,
-          promotion_price : d.promotion_price,
+          promotion_price: d.promotion_price,
           max_players: d.max_players,
           location: d.location
         } as any);
@@ -157,10 +158,10 @@ export default function SessionMainPage({id, back, back_title, type} : {id : num
   const fetchNotes = async () => {
     try {
       const result = await axios.get(`/admin/sessions/${id}/note`)
-      
+
       const notesMapped = result.data?.map((note: any) => (
         {
-          name:joinNames([note.writer_first_name, note.writer_last_name]),
+          name: joinNames([note.writer_first_name, note.writer_last_name]),
           content: note.note || "no content",
           created_at: moment(new Date(note.created_at)).format("YYYY-MM-DD"),
           id: note.id,
@@ -175,7 +176,7 @@ export default function SessionMainPage({id, back, back_title, type} : {id : num
   }
 
   useEffect(() => {
-    const res = calculatePaymentStats(participants, payments, type === "session" ? Number(data?.price || 0): Number(data?.promotion_price || 0))
+    const res = calculatePaymentStats(participants, payments, type === "session" ? Number(data?.price || 0) : Number(data?.promotion_price || 0))
     setPaymentStats({ paid_amount: res.totalPaid, pending_amount: res.totalPending, total_revenue: res.totalAmount })
   }, [participants, payments, data])
 
@@ -215,19 +216,6 @@ export default function SessionMainPage({id, back, back_title, type} : {id : num
     };
   }
 
-  const setStatus = async (status: "completed" | "comped" | "cancelled") => {
-    setLoadingStatus(status)
-    setLoading(true);
-    try {
-      await axios.put(`/admin/sessions/${id}`, {
-        status,
-        id
-      });
-      await fetchData()
-    } finally {
-      setLoading(false);
-    }
-  };
 
 
   const stats = [
@@ -269,7 +257,7 @@ export default function SessionMainPage({id, back, back_title, type} : {id : num
                 <span className="flex gap-2 text-xl items-center leading-none">
                   {data?.sessionName}
                 </span>
-                <CardStatus value={data?.status} icon={true}/>
+                <CardStatus value={data?.status} icon={true} />
               </div>
               <EditSessionDialog
                 sessionId={id}
@@ -324,7 +312,7 @@ export default function SessionMainPage({id, back, back_title, type} : {id : num
                   key={index}
                   className="rounded-[10px] bg-[#1A1A1A] border-[#3A3A3A] flex-1 p-0"
                 >
-                  <CardContent className="space-y-4 p-0 p-4">
+                  <CardContent className="space-y-4 p-4">
                     <div className="flex gap-4 items-center">
                       <div className={`text-${item.type}-text`}>
                         {item.icon}
@@ -341,70 +329,9 @@ export default function SessionMainPage({id, back, back_title, type} : {id : num
           </div>
           <Separator className="my-4" />
 
-          <div className="flex px-6 gap-2 flex-wrap">
-            <Button
-              variant={"outline"}
-              className="dark:bg-active-bg flex gap-2 text-active-text border dark:border-active-text/32"
-              onClick={() => {
-                setStatus("completed")
-              }
-
-              }
-            >
-              {loading && loadingStatus === "completed" ? (
-                <>
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                  Marking...
-                </>
-              ) : (
-                <>
-                  <Check className="h-4 w-4" />
-                  Mark as Completed
-                </>
-              )}
-            </Button>
-            <Button
-              variant={"outline"}
-              className="dark:bg-warning-bg flex gap-2 text-warning-text border dark:border-warning-text/32"
-              onClick={() => {
-
-                setStatus("comped")
-              }}
-            >
-              {loading && loadingStatus === "comped" ? (
-                <>
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                  Marking...
-                </>
-              ) : (
-                <>
-                  <Check className="h-4 w-4" />
-                  Mark as Comped
-                </>
-              )}
-            </Button>
-            <Button
-              variant={"outline"}
-              className="dark:bg-danger-bg flex gap-2 text-danger-text border dark:border-danger-text/32"
-              onClick={() => {
-
-                setStatus("cancelled")
-
-              }}
-            >
-              {loading && loadingStatus === "cancelled" ? (
-                <>
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                  Marking...
-                </>
-              ) : (
-                <>
-                  <Check className="h-4 w-4" />
-                  Mark as Cancelled
-                </>
-              )}
-            </Button>
-          </div>
+          {data && data?.status === "upcoming" &&
+            <Markbuttons id={id} onRefresh={fetchData} />
+          }
         </CardContent>
       </Card>
 
@@ -448,7 +375,7 @@ export default function SessionMainPage({id, back, back_title, type} : {id : num
           <Separator />
 
           <TabsContent value="Participants" className="space-y-4 p-4">
-            {data?.status==="upcoming" &&<AddParticipantDialog sessionId={Number(id)} onSuccess={fetchParticipants} />}
+            {data?.status === "upcoming" && <AddParticipantDialog sessionId={Number(id)} onSuccess={fetchParticipants} />}
             {participants.map((participent: any, i) => (
               <Card key={i} className="bg-[#1A1A1A] border border-border">
                 <CardContent className="space-y-2">
@@ -456,7 +383,7 @@ export default function SessionMainPage({id, back, back_title, type} : {id : num
                     <h1>{participent.first_name} {participent.last_name}</h1>
                     <CardStatus
                       value={participent?.status}
-                     
+
                     />
                   </div>
 
@@ -573,6 +500,66 @@ export default function SessionMainPage({id, back, back_title, type} : {id : num
       </div>
     </div>
   );
+}
+
+const Markbuttons = ({ id, onRefresh }: { id: number, onRefresh: () => Promise<void> }) => {
+  const [loadingStatus, setLoadingStatus] = useState("")
+  const markList = ["completed", "comped", "cancelled"]
+
+  const designType = {
+    completed: {
+      design: "flex gap-2 dark:bg-active-bg text-active-text dark:border dark:border-active-text/32",
+      icon: <CircleCheckBig />
+    },
+    comped: {
+      design: "flex gap-2 dark:bg-warning-bg text-warning-text dark:border dark:border-warning-text/32",
+      icon: <CircleCheckBig />
+    },
+    cancelled: {
+      design: "flex gap-2 dark:bg-danger-bg text-danger-text dark:border dark:border-danger-text/32",
+      icon: <CircleX />
+    },
+  }
+
+  async function handleUpdateStatus(val: string) {
+    if (!id) return
+    setLoadingStatus(val)
+    try {
+      await axios.put(`/admin/sessions/${id}`, {
+        status: val,
+        id
+      });
+      await onRefresh()
+    } finally {
+      setLoadingStatus("")
+    }
+  }
+  return (
+    <div className="flex px-6 gap-2 flex-wrap">
+      {markList.map((item) => (
+        <Button
+          key={item}
+          variant={"outline"}
+          className={designType[item as keyof typeof designType].design}
+          onClick={() => {
+            handleUpdateStatus(item)
+          }}
+        >
+          {loadingStatus === "completed" ? (
+            <>
+              <Loader2 className="h-4 w-4 animate-spin" />
+              Marking...
+            </>
+          ) : (
+            <>
+              {designType[item as keyof typeof designType].icon}
+              Mark as {item?.charAt(0)?.toUpperCase() + item?.slice(1)}
+            </>
+          )}
+        </Button>
+      ))}
+    </div>
+  )
 }
 
 const AttendanceMarking = ({ player_id, onRefresh, session_id }: { player_id: number, session_id: number, onRefresh: () => Promise<void> }) => {

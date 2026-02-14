@@ -4,7 +4,7 @@ import { ColumnDef } from "@tanstack/react-table";
 import { ArrowUpDown, Ban, Check, CheckCircle, CircleX, Eye, FileText, RefreshCcw, Send, X } from "lucide-react";
 import Link from "next/link";
 import getInitials from "../parents/get-initials";
-import CardStatus from "../card-status";
+import CardStatus, { typeClasses } from "../card-status";
 import { Dialog, DialogContent, DialogTrigger } from "../ui/dialog";
 import { ViewDialog } from "./view-dialog";
 import { CompedDialog } from "./comped-dialog";
@@ -202,14 +202,16 @@ export const PAYMENT_COLUMNS: ColumnDef<PaymentData>[] = [
         <ArrowUpDown />
       </Button>
     ),
-    cell: ({ row }) => (
+    cell: ({ row }) => {
+      const status = row.getValue("status")
+      return(
       <div className="w-24">
         <CardStatus
-          value={row.getValue("status")}
+          value={status as keyof typeof typeClasses}
         
         />
       </div>
-    ),
+    )},
   },
 
   {
