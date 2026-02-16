@@ -117,7 +117,7 @@ const CreateCoach = ({ onRefresh }: { onRefresh: () => Promise<void> }) => {
                       onChange={(e) =>
                         setCoach((prev) => ({
                           ...prev,
-                          email: e.target.value,
+                          email: e.target.value.trim().toLowerCase(),
                         }))
                       }
                     />

@@ -144,7 +144,7 @@ export function CreateParent({ onRefresh }: { onRefresh: () => Promise<void> }) 
                   onChange={(e) =>
                     setParent((prev) => ({
                       ...prev,
-                      email: e.target.value,
+                      email: e.target.value.trim().toLowerCase(),
                     }))
                   }
                 />
