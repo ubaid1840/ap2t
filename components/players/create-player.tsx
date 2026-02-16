@@ -52,7 +52,7 @@ export function CreatePlayer({
       first_name: formData.get("first_name"),
       last_name: formData.get("last_name"),
       dob: date,
-      email: formData.get("email"),
+      email: formData.get("email")?.toString().trim().toLowerCase(),
       phone_no: formData.get("phone_no"),
       position,
       skillLevel,

@@ -213,7 +213,7 @@ export default function SignUpForm({
                 onChange={(e) =>
                   setPlayerData((prev) => ({
                     ...prev,
-                    email: e.target.value,
+                    email: e.target.value.trim().toLowerCase(),
                   }))
                 }
               />
@@ -343,7 +343,7 @@ export default function SignUpForm({
                 onChange={(e) =>
                   setParentData((prev) => ({
                     ...prev,
-                    email: e.target.value,
+                    email: e.target.value.trim().toLowerCase(),
                   }))
                 }
               />

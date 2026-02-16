@@ -51,7 +51,7 @@ export default function LoginForm({ onClickSignup }: { onClickSignup: () => void
           onChange={(e) =>
             setLoginData((prev) => ({
               ...prev,
-              email: e.target.value,
+              email: e.target.value.trim().toLowerCase(),
             }))
           }
         />
