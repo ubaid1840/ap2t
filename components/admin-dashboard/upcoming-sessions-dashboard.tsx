@@ -6,7 +6,8 @@ import { Button } from "../ui/button"
 import { Card, CardContent, CardHeader } from "../ui/card"
 import { useSidebar } from "../ui/sidebar"
 import { DASHBOARD_SESSIONS_COLUMNS } from "./columns"
-export function UpcomingSessions({sessions} : any) {
+import { SessionRecord } from "@/app/portal/admin/dashboard/page"
+export function UpcomingSessions({sessions} : {sessions : SessionRecord[]}) {
   const {open} = useSidebar()
   const isMobile = useIsMobile()
 
