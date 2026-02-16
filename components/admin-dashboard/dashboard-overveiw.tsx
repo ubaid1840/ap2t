@@ -2,41 +2,45 @@ import { Badge } from "@/components/ui/badge"
 import { Card, CardContent } from "@/components/ui/card"
 import { Calendar, DollarSign, Info, User } from "lucide-react"
 
-const localData = [{
+
+
+export function DashboardOverview({ data }: any) {
+
+
+    const localData = [{
     Icon: <User />,
     title: "Today's Check-ins",
-    description: "147",
-    value: '+12',
+    description: data?.totalCheckIns || 0,
+    value: data?.checkInsDifference || 0,
     type: "success",
-    going: "active"
+    going: data?.checkInsDifference || 0 >= 0 ? "active" : "danger"
 },
 {
     Icon: <DollarSign />,
     title: "Today's Revenue",
-    description: "$3,487",
-    value: '+8%',
+    description: data?.totalRevenue || 0,
+    value: `${data?.revenueChangePercentage || 0}%`,
     type: "active",
-    going: "active"
+    going: data?.revenueChangePercentage || 0 >= 0 ? "active" : "danger"
 },
 {
     Icon: <Info />,
     title: "Pending Payments",
-    description: "23",
-    value: '-5%',
+    description: data?.pendingToday || 0,
+    value: `${data?.pendingChangePercentage || 0}%`,
     type: "warning",
-    going: "danger"
+    going: data?.pendingChangePercentage || 0 >= 0 ? "active" : "danger"
 },
 {
     Icon: <Calendar />,
     title: "Upcoming Sessions",
-    description: "89",
-    value: '+3%',
+    description: data?.upcomingToday || 0,
+     value: `${data?.upcomingChangePercentage || 0}%`,
     type: "other",
-    going: "active"
+    going: data?.upcomingChangePercentage || 0 >= 0 ? "active" : "danger"
 }
 ]
 
-export function DashboardOverview() {
     return (
         <div className="flex flex-col gap-3">
             <div >

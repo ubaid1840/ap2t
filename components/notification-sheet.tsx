@@ -41,7 +41,7 @@ export default function NotificationSheet() {
 
                 <div className="flex w-full gap-4 justify-between px-6 py-4">
                     <Button variant={"outline"} className="flex flex-1">Mark All as Read</Button>
-                    <Button className="flex flex-1 "><GearIcon /> Templates</Button>
+                    {/* <Button className="flex flex-1 "><GearIcon /> Templates</Button> */}
                 </div>
 
               

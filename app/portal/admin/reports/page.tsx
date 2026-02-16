@@ -3,15 +3,16 @@ import PageTable from "@/components/app-table";
 import { BarChart } from "@/components/charts/bar-chart";
 import LineChart from "@/components/charts/line-chart-dots";
 import PieChart from "@/components/charts/pie-chart";
+import { PLAYER_ATTENDANCE_DATA_COLUMNS, ZIP_REVENUE_DATA_COLUMNS } from "@/components/settings/columns";
+import { MONTHLY_SESSIONS_CONFIG, MONTHLY_SESSIONS_DATA, PLAYER_ATTENDANCE_DATA, SESSION_TYPE_CHART_CONFIG, SESSION_TYPE_PIE_DATA, ZIP_REVENUE_DATA } from "@/components/settings/constants";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useSidebar } from "@/components/ui/sidebar";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { COACH_CHECKINS_DATA } from "@/lib/constants";
-import { ColumnDef } from "@tanstack/react-table";
 import {
-  ArrowUpDown,
   ChartColumn,
   DollarSign,
   Download,
@@ -21,13 +22,12 @@ import {
   MapPin,
   TrendingUp
 } from "lucide-react";
-import { Progress } from "@/components/ui/progress"
 import { ReactNode, useState } from "react";
-import { PLAYER_ATTENDANCE_DATA_COLUMNS, ZIP_REVENUE_DATA_COLUMNS } from "@/components/settings/columns";
-import { MONTHLY_SESSIONS_CONFIG, MONTHLY_SESSIONS_DATA, PLAYER_ATTENDANCE_DATA, SESSION_TYPE_CHART_CONFIG, SESSION_TYPE_PIE_DATA, ZIP_REVENUE_DATA } from "@/components/settings/constants";
 export default function Page() {
 
   const [filter, setFilter] = useState(true)
+  const {open} = useSidebar()
+  const isMobile = useIsMobile()
 
   const data = [
     {
@@ -238,6 +238,7 @@ export default function Page() {
             onRowClick={() => {
 
             }}
+            scrollAreaWidth={`${open ? "w-[calc(100dvw-306px)]" : "w-[calc(100dvw-96px)]"} ${isMobile && "w-[calc(100vw-44px)]"}`}
           />
 
         </CardContent>
@@ -273,6 +274,8 @@ export default function Page() {
             onRowClick={() => {
 
             }}
+             scrollAreaWidth={`${open ? "w-[calc(100dvw-306px)]" : "w-[calc(100dvw-96px)]"} ${isMobile && "w-[calc(100vw-44px)]"}`}
+      
           />
 
         </CardContent>
