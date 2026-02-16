@@ -3,6 +3,7 @@ import BackButton from "@/components/back-button";
 import CardStatus from "@/components/card-status";
 import { PAYMENT_HISTORY } from "@/components/parents/constatns";
 import { EditParents } from "@/components/parents/edit-parents";
+import { LinkChildrenDialog } from "@/components/parents/link-children";
 import RenderAvatar from "@/components/render-avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -35,6 +36,7 @@ import { useParams } from "next/navigation";
 import { ReactNode, useEffect, useState } from "react";
 import { IoIosPin } from "react-icons/io";
 import { IoCalendarClear } from "react-icons/io5";
+import { CreatePlayer } from "@/components/players/create-player";
 
 export interface ParentDetailResponse {
   parent: Parent;
@@ -111,7 +113,7 @@ export interface SessionPlayer {
 
 
 export default function Page() {
-  const { id } = useParams();
+  const { id }  = useParams();
   const [data, setData] = useState<ParentDetailResponse | undefined>();
   const [tab, setTab] = useState("linked");
   const isMobile = useIsMobile();
@@ -337,6 +339,11 @@ export default function Page() {
           <Separator />
 
           <TabsContent value="linked">
+            <div className="flex gap-4 p-4 justify-end">
+              <LinkChildrenDialog parent_id={id} onSuccess={fetchData}/>
+            <CreatePlayer parent_id={id} onRefresh={fetchData}/>
+            </div>
+            
             <div className="flex w-full justify-between gap-4 p-2 flex-wrap">
               {data?.linked_childrens && data?.linked_childrens?.map((item) => (
                 <Card key={item.user_id} className="rounded-[10px] bg-[#1A1A1A] border-[#3A3A3A] flex flex-1">

@@ -23,12 +23,14 @@ import {
   DollarSign,
   Gift,
   Info,
+  Loader2,
   Mail,
   MapPin,
   MessageSquare,
   Phone,
   TrendingUp,
-  User
+  User,
+  UserX
 } from "lucide-react";
 import moment from "moment";
 import Link from "next/link";
@@ -171,10 +173,32 @@ export default function MainPlayerPage({
   const { user } = useAuth();
   const isMobile = useIsMobile();
   const [loading, setLoading] = useState(true);
+  const [statusLoading,setStatusLoading]=useState(false)
 
   useEffect(() => {
     if (user?.id && id) fetchData();
   }, [id, user]);
+
+  const setStatus = async (status: string) => {
+      setStatusLoading(true);
+      try {
+        const result = await axios.put(`/user`, {
+          id: id,
+          status: status,
+        });
+        setData((prevState) => {
+          if (!prevState) return prevState;
+  
+          return {
+            ...prevState,
+              status,
+          
+          };
+        })
+      } finally {
+        setStatusLoading(false);
+      }
+    };
 
   const fetchData = async () => {
     if (!id) return;
@@ -186,6 +210,8 @@ export default function MainPlayerPage({
       setLoading(false);
     }
   };
+
+  
 
  
   function pendingString() {
@@ -272,7 +298,43 @@ export default function MainPlayerPage({
                 </span>
               </div>
             </div>
-            {data && <EditInfo player_id={id} data={data} onRefresh={fetchData} />}
+            <div className=" flex gap-4">
+            {
+                data?.status === 'active' ?
+                  <Button
+                    variant={"destructive"}
+                    onClick={() => setStatus("inactive")}
+                  >
+                    {statusLoading ? (
+                      <>
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        Disabling...
+                      </>
+                    ) : (
+                      <>
+                        <UserX className="h-4 w-4" />
+                        Disable
+                      </>
+                    )}
+                  </Button> :
+                  <Button
+
+                    onClick={() => setStatus("active")}
+                  >
+                    {statusLoading ? (
+                      <>
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        Activating...
+                      </>
+                    ) : (
+                      <>
+                        <User className="h-4 w-4" />
+                        Activate
+                      </>
+                    )}
+                  </Button>
+              }
+            {data && <EditInfo player_id={id} data={data} onRefresh={fetchData} />}</div>
           </div>
           <div className="mt-4 flex w-full justify-between flex-wrap gap-2">
             <HeaderCard
