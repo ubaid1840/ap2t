@@ -1,10 +1,11 @@
+import { DashboardStats } from "@/app/portal/admin/dashboard/page"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent } from "@/components/ui/card"
 import { Calendar, DollarSign, Info, User } from "lucide-react"
 
 
 
-export function DashboardOverview({ data }: any) {
+export function DashboardOverview({ data }: {data : DashboardStats | undefined}) {
 
 
     const localData = [{

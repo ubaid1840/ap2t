@@ -1,16 +1,11 @@
 import { BarChart } from "@/components/charts/bar-chart";
 import { Card, CardContent, CardHeader } from "../ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
+import { AttendanceRecord } from "@/app/portal/admin/dashboard/page";
 
-type DataProp = {
-  id: number
-  session_id: number
-  user_id: number
-  status: string
-  created_at: Date
-}
 
-export function DailyCheckins({ data }: { data: DataProp[] }) {
+
+export function DailyCheckins({ data }: { data: AttendanceRecord[] }) {
 
 
 function getHourLabel(date: Date) {
