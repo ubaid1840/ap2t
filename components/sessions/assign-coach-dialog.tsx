@@ -20,7 +20,7 @@ import { Spinner } from "../ui/spinner";
 
 interface AssignCoachDialogProps {
   onSelect: (coach: { id: number; first_name: string; last_name: string }) => void;
-  already: boolean
+  already?: boolean
 }
 
 interface Coach {
@@ -31,7 +31,7 @@ interface Coach {
   picture: string;
 }
 
-export function AssignCoachDialog({ onSelect, already }: AssignCoachDialogProps) {
+export function AssignCoachDialog({ onSelect, already = false }: AssignCoachDialogProps) {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [results, setResults] = useState<Coach[]>([]);

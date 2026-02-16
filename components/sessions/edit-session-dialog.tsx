@@ -272,7 +272,7 @@ export function EditSessionDialog({
                     </Label>
                     <AppCalendar
                       className="h-9"
-                      date={session.end_date ? new Date(session.date) : undefined}
+                      date={session.end_date ? new Date(session.end_date) : undefined}
                       onChange={(date) =>
                         setSession((prevState) => ({
                           ...prevState,
