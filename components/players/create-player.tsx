@@ -28,7 +28,15 @@ import { Spinner } from "../ui/spinner";
 import SelectPosition from "./select-position";
 import SelectSkill from "./select-skill";
 
-export function CreatePlayer({ onRefresh }: { onRefresh: () => Promise<void> }) {
+type CreatePlayerProps = {
+  parent_id?: number | null;
+  onRefresh?: () => Promise<void>;
+};
+
+export function CreatePlayer({
+  parent_id = null,
+  onRefresh = async () => {},
+}: CreatePlayerProps) {
   const [open, setOpen] = useState(false);
   const [position, setPosition] = useState("");
   const [skillLevel, setSkillLevel] = useState("");
@@ -62,6 +70,7 @@ export function CreatePlayer({ onRefresh }: { onRefresh: () => Promise<void> }) 
         phone_no: values.phone_no,
         birth_date: values.dob,
         role: "player",
+        parent_id:parent_id,
         position: values.position,
         skill_level: values.skillLevel,
         medical_notes: values.medicalNotes,
