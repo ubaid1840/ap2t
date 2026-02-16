@@ -224,6 +224,7 @@ export function EditSessionDialog({
                         </p>
                       )}
                       <AssignCoachDialog
+                      already = {!!session?.coach_id}
                         onSelect={(coach) =>
                           setSession((prev) => ({
                             ...prev,

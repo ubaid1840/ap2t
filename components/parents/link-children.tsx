@@ -13,7 +13,7 @@ import { useEffect, useState } from "react";
 import { Spinner } from "../ui/spinner";
 
 interface LinkChildrenDialogProps {
-  parent_id: number;
+  parent_id: number | null | undefined | string;
   onSuccess: () => void;
 }
 
@@ -73,7 +73,7 @@ export function LinkChildrenDialog({ parent_id, onSuccess }: LinkChildrenDialogP
     }}>
       <DialogTrigger asChild>
         <Button>
-          <Plus className="mr-2 h-4 w-4" />
+          <Plus  />
           Link Children
         </Button>
       </DialogTrigger>

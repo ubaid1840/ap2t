@@ -2,74 +2,127 @@
 import PageTable from "@/components/app-table";
 import InputWithIcon from "@/components/input-with-icon";
 import { PAYMENT_COLUMNS } from "@/components/payment/payment-columns";
-import { PAYMENT_DATA } from "@/components/payment/payment-data";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { useAuth } from "@/contexts/auth-context";
+import axios from "@/lib/axios";
 import {
   Clock,
   CreditCard,
   DollarSign,
   File,
   Filter,
-  OctagonAlert,
+  OctagonAlert
 } from "lucide-react";
 import { ReactNode, useEffect, useState } from "react";
 import { GoDotFill } from "react-icons/go";
-import axios from "@/lib/axios";
 
-const localData = [
-  {
-    Icon: <DollarSign />,
-    title: "Total Revenue",
-    description: "$120.00",
-    type: "active",
-    going: "active",
-  },
-  {
-    Icon: <Clock />,
-    title: "Pending",
-    description: "2",
-    type: "warning",
-    going: "warning",
-  },
-  {
-    Icon: <OctagonAlert />,
-    title: "Failed",
-    description: "1",
-    type: "danger",
-    going: "danger",
-  },
-  {
-    Icon: <File />,
-    title: "comped",
-    description: "1",
-    type: "other",
-    going: "active",
-  },
-];
+export interface PaymentsSummaryResponse {
+  totalRevenue: number;
+  totalPending: number;
+  totalFailed: number;
+  totalComped: number;
+  paymentsData: PaymentItem[];
+}
 
-const allFilters = ["All", "Completed", "Pending", "Failed", "Comped", "Voided"]
+
+export interface PaymentItem {
+  id: number;
+  transaction_id: string | null;
+  user_id: number;
+  session_id: number;
+  amount: string;
+  method: string | null;
+  status: "pending" | "paid" | "failed" | "comped" | "completed";
+  paid_at: string | null;
+  created_at: string;
+
+
+  session_name: string | null;
+
+
+  player_user_id: number | null;
+  player_first_name: string | null;
+  player_last_name: string | null;
+  player_picture: string | null;
+  player_name: string;
+
+
+  parent_id: number | null;
+  parent_first_name: string | null;
+  parent_last_name: string | null;
+  parent_name: string;
+}
+
+
+
+const allFilters = ["All", "Completed", "Pending", "Failed", "Comped"]
 
 export default function Page() {
+  const [loading, setLoading] = useState(false)
+  const [search, setSearch] = useState("")
+  const { user } = useAuth()
   const [filter, setFilter] = useState<
-    "All" | "Completed" | "Pending" | "Failed" | "Comped" | "Voided"
+    "All" | "Completed" | "Pending" | "Failed" | "Comped"
   >("All");
 
-  const [payments,setPayments]=useState()
+  const [payments, setPayments] = useState<PaymentsSummaryResponse | undefined>()
+
+  const localData = [
+    {
+      Icon: <DollarSign />,
+      title: "Total Revenue",
+      description: `$${payments?.totalRevenue || 0}`,
+      type: "active",
+      going: "active",
+    },
+    {
+      Icon: <Clock />,
+      title: "Pending",
+      description: payments?.totalPending || 0,
+      type: "warning",
+      going: "warning",
+    },
+    {
+      Icon: <OctagonAlert />,
+      title: "Failed",
+      description: payments?.totalFailed || 0,
+      type: "danger",
+      going: "danger",
+    },
+    {
+      Icon: <File />,
+      title: "Comped",
+      description: payments?.totalComped || 0,
+      type: "other",
+      going: "active",
+    },
+  ];
+
   useEffect(() => {
-    const fetchData = async () => {
+    if (user?.id)
+      fetchData();
+  }, [user]);
+
+  async function fetchData() {
+    try {
+      setLoading(true)
       const result = await axios.get("/admin/payments");
       setPayments(result.data);
-    };
-    fetchData();
-  }, []);
-
-  const filteredData = PAYMENT_DATA.filter((data) => {
-    if (filter === "All") {
-      return data
+    } finally {
+      setLoading(false)
     }
-    return data.status === filter
-  })
+  };
+
+  const filteredData = payments?.paymentsData ? payments.paymentsData?.filter((item) => {
+    if (filter === "All") {
+      return item
+    }
+    return item.status === filter.toLocaleLowerCase()
+  }).filter((item) => {
+    const searchAll = `${item.player_name} ${item.parent_name} ${item.session_name}`
+    if (searchAll?.toLocaleLowerCase()?.includes(search?.toLocaleLowerCase())) return item
+  }) : []
 
   return (
     <div className="flex flex-col w-full gap-4">
@@ -131,8 +184,10 @@ export default function Page() {
 
         <div className="w-full sm:flex-1">
           <InputWithIcon
+            value={search}
             placeholder="Search by parent, player, or transaction ID..."
             className="w-full"
+            onChange={(e) => setSearch(e.target.value)}
           />
         </div>
 
@@ -165,7 +220,7 @@ export default function Page() {
 
 
       <PageTable
-
+        loading={loading}
         columns={PAYMENT_COLUMNS}
         data={filteredData}
         onRowClick={() => {

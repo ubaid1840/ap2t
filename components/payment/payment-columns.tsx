@@ -8,6 +8,9 @@ import CardStatus, { typeClasses } from "../card-status";
 import { Dialog, DialogContent, DialogTrigger } from "../ui/dialog";
 import { ViewDialog } from "./view-dialog";
 import { CompedDialog } from "./comped-dialog";
+import moment from "moment";
+import RenderAvatar from "../render-avatar";
+import { PaymentItem } from "@/app/portal/admin/payments/page";
 
 
 export type PaymentData = {
@@ -25,33 +28,10 @@ export type PaymentData = {
   id: number;
 };
 
-type CardStatusType =
-  | "success"
-  | "warning"
-  | "danger"
-  | "info"
-  | "active"
-  | "other"
-  | "ghost"
-  | "alternative";
 
-
-
-const paymentStatusMap: Record<
-  PaymentData["status"],
-  CardStatusType
-> = {
-  Completed: "active",
-  Pending: "alternative",
-  Failed: "danger",
-  Comped: "info",
-  Voided: "ghost",
-};
-
-
-export const PAYMENT_COLUMNS: ColumnDef<PaymentData>[] = [
+export const PAYMENT_COLUMNS: ColumnDef<PaymentItem>[] = [
   {
-    accessorKey: "transactionId",
+    accessorKey: "transaction_id",
     header: ({ column }) => (
       <Button
         variant="ghost"
@@ -66,11 +46,11 @@ export const PAYMENT_COLUMNS: ColumnDef<PaymentData>[] = [
     cell: ({ row }) => (
       <div className="space-y-1">
         <div className="text-[#D1D5DC] ">
-          {row.getValue("transactionId")}
+          {row.getValue("transaction_id") || "N/A"}
         </div>
         <div className="text-xs text-active-text flex items-center gap-1">
           <CheckCircle size={14} />
-          {row.original.transactionNote}
+          Duplicate Checked
         </div>
       </div>
     ),
@@ -79,7 +59,7 @@ export const PAYMENT_COLUMNS: ColumnDef<PaymentData>[] = [
   {
 
 
-    accessorKey: "parentName",
+    accessorKey: "player_name",
     header: ({ column }) => (
       <Button
         variant="ghost"
@@ -87,22 +67,18 @@ export const PAYMENT_COLUMNS: ColumnDef<PaymentData>[] = [
 
         onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
       >
-        PARENT / PLAYER
+        PLAYER / PARENT
         <ArrowUpDown />
       </Button>
     ),
     cell: ({ row }) => (
       <div className="flex gap-2 items-center">
-        <Avatar>
-          <AvatarFallback className="bg-primary text-black">
-            {getInitials(row.original.parentName)}
-          </AvatarFallback>
-        </Avatar>
+       <RenderAvatar className="h-8 w-8" img={row.original.player_picture} fallback={getInitials(row.original.player_name)}/>
 
         <div>
-          <div className="text-[#D1D5DC]">{row.getValue("parentName")}</div>
+          <div className="text-[#D1D5DC]">{row.getValue("player_name")}</div>
           <div className="text-xs text-muted-foreground">
-            {row.original.playerName}
+            {row.original.parent_name}
           </div>
         </div>
       </div>
@@ -110,7 +86,7 @@ export const PAYMENT_COLUMNS: ColumnDef<PaymentData>[] = [
   },
 
   {
-    accessorKey: "session",
+    accessorKey: "session_name",
     header: ({ column }) => (
       <Button
         variant="ghost"
@@ -123,7 +99,7 @@ export const PAYMENT_COLUMNS: ColumnDef<PaymentData>[] = [
       </Button>
     ),
     cell: ({ row }) => (
-      <div className="text-[#D1D5DC]">{row.getValue("session")}</div>
+      <div className="text-[#D1D5DC]">{row.getValue("session_name")}</div>
     ),
   },
 
@@ -147,7 +123,7 @@ export const PAYMENT_COLUMNS: ColumnDef<PaymentData>[] = [
   },
 
   {
-    accessorKey: "methodType",
+    accessorKey: "method",
     header: ({ column }) => (
       <Button
         variant="ghost"
@@ -160,16 +136,16 @@ export const PAYMENT_COLUMNS: ColumnDef<PaymentData>[] = [
     ),
     cell: ({ row }) => (
       <div className="space-y-1">
-        <div className="text-[#D1D5DC]">{row.getValue("methodType")}</div>
-        <div className="text-xs text-muted-foreground">
+        <div className="text-[#D1D5DC]">{row.getValue("method") || "N/A"}</div>
+        {/* <div className="text-xs text-muted-foreground">
           {row.original.methodDetail}
-        </div>
+        </div> */}
       </div>
     ),
   },
 
   {
-    accessorKey: "date",
+    accessorKey: "created_at",
     header: ({ column }) => (
       <Button
         variant="ghost"
@@ -182,9 +158,9 @@ export const PAYMENT_COLUMNS: ColumnDef<PaymentData>[] = [
     ),
     cell: ({ row }) => (
       <div className="space-y-1">
-        <div className="text-[#D1D5DC]">{row.getValue("date")}</div>
+        <div className="text-[#D1D5DC]">{row.original.created_at && moment(new Date(row.original.created_at)).format("YYYY-MM-DD")}</div>
         <div className="text-xs text-muted-foreground">
-          {row.original.time}
+          {row.original.created_at && moment(new Date(row.original.created_at)).format("hh:mm A")}
         </div>
       </div>
     ),
@@ -208,7 +184,6 @@ export const PAYMENT_COLUMNS: ColumnDef<PaymentData>[] = [
       <div className="w-24">
         <CardStatus
           value={status as keyof typeof typeClasses}
-        
         />
       </div>
     )},
@@ -234,7 +209,7 @@ export const PAYMENT_COLUMNS: ColumnDef<PaymentData>[] = [
             <ViewDialog data={row.original} />
           </Dialog>
 
-          {status === "Completed" &&
+          {status === "completed" &&
             <>
               <Button className="text-muted-foreground hover:dark:bg-primary hover:dark:text-black" size="icon" variant="ghost">
                 <CircleX size={16} />
@@ -244,7 +219,7 @@ export const PAYMENT_COLUMNS: ColumnDef<PaymentData>[] = [
               </Button>
             </>}
 
-          {status === "Failed" &&
+          {status === "failed" &&
             <>
               <Button className="text-muted-foreground hover:dark:bg-primary hover:dark:text-black" size="icon" variant="ghost">
 
@@ -256,7 +231,7 @@ export const PAYMENT_COLUMNS: ColumnDef<PaymentData>[] = [
               </Button>
             </>}
 
-          {status === "Pending" && (
+          {status === "pending" && (
             <>
               <Dialog>
                 <DialogTrigger asChild>

@@ -15,9 +15,10 @@ import {
   SelectValue,
 } from "../ui/select";
 import { Textarea } from "../ui/textarea";
+import { PaymentItem } from "@/app/portal/admin/payments/page";
 
 type CompedDialogProps = {
-  data: PaymentData;
+  data: PaymentItem;
 };
 
 export function CompedDialog({ data }: CompedDialogProps) {
@@ -36,15 +37,15 @@ export function CompedDialog({ data }: CompedDialogProps) {
           <div className="bg-[#1A1A1A] border border-border rounded-[10px] space-y-2 p-6">
             <div className="flex justify-between">
               <p className="text-ghost-text">Parent:</p>
-              <h1 className="text-[#E5E7EB]">{data.parentName}</h1>
+              <h1 className="text-[#E5E7EB]">{data.parent_name}</h1>
             </div>
             <div className="flex justify-between">
               <p className="text-ghost-text">Player:</p>
-              <h1 className="text-[#E5E7EB]">{data.playerName}</h1>
+              <h1 className="text-[#E5E7EB]">{data.player_name}</h1>
             </div>
             <div className="flex justify-between">
               <p className="text-ghost-text">Session::</p>
-              <h1 className="text-[#E5E7EB]">{data.session}</h1>
+              <h1 className="text-[#E5E7EB]">{data.session_name}</h1>
             </div>
             <div className="flex justify-between">
               <p className="text-ghost-text">Amount:</p>

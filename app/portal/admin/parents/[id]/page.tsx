@@ -340,8 +340,8 @@ export default function Page() {
 
           <TabsContent value="linked">
             <div className="flex gap-4 p-4 justify-end">
-              <LinkChildrenDialog parent_id={id} onSuccess={fetchData}/>
-            <CreatePlayer parent_id={id} onRefresh={fetchData}/>
+              <LinkChildrenDialog parent_id={id as string} onSuccess={fetchData}/>
+            <CreatePlayer parent_id={id as string} onRefresh={fetchData}/>
             </div>
             
             <div className="flex w-full justify-between gap-4 p-2 flex-wrap">

@@ -73,7 +73,7 @@ export function AddParentDialog({ playerId, onSuccess }: AddParentDialogProps) {
     }}>
       <DialogTrigger asChild>
         <Button>
-          <Plus className="mr-2 h-4 w-4" />
+          <Plus />
           Link Parent
         </Button>
       </DialogTrigger>

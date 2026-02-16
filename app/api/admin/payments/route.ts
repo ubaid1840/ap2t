@@ -1,55 +1,64 @@
 import pool from "@/lib/db";
+import { GetProfileImage, joinNames } from "@/lib/functions";
 import { NextResponse } from "next/server";
 
 export async function GET() {
   try {
-    const result = await pool.query(
+
+    const paymentsRes = await pool.query(
       `
-      SELECT
-    pay.id AS payment_id,
-    pay.transaction_id,
-    pay.amount,
-    pay.method,
-    pay.status,
-    pay.paid_at,
-    pay.created_at,
-    
-
-    payer.id AS payer_id,
-    payer.first_name AS payer_first_name,
-    payer.last_name AS payer_last_name,
-    payer.role AS payer_role,
-    payer.email AS payer_email,
-    
-
-    pl.id AS player_id,
-    pl.user_id AS player_user_id,
-    
-
-    sess.id AS session_id,
-    sess.name AS session_name,
-    sess.start_time,
-    sess.end_time,
-    sess.location
-
-FROM payments pay
-
-JOIN users payer ON payer.id = pay.payer_id
-
-LEFT JOIN players pl ON pl.id = pay.player_id
-
-LEFT JOIN sessions sess ON sess.id = pay.session_id
-
-
+      SELECT 
+        p.*,
+        s.name AS session_name,
+        u.id AS player_user_id,
+        u.first_name AS player_first_name,
+        u.last_name AS player_last_name,
+        u.picture AS player_picture,
+        pl.parent_id,
+        parent_u.first_name AS parent_first_name,
+        parent_u.last_name AS parent_last_name
+      FROM payments p
+      LEFT JOIN sessions s ON p.session_id = s.id
+      LEFT JOIN users u ON p.user_id = u.id
+      LEFT JOIN players pl ON u.id = pl.user_id
+      LEFT JOIN users parent_u ON pl.parent_id = parent_u.id
+      ORDER BY p.created_at DESC
       `
     );
 
-    return NextResponse.json(result.rows);
-  } catch (error) {
-    console.error("GET /api/admin/payments error:", error);
+     const paymentsData = await Promise.all(
+      paymentsRes.rows.map(async (row: any) => {
+        let playerPictureUrl = await GetProfileImage(row.player_picture);
+        return {
+          ...row,
+          player_picture: playerPictureUrl,
+          player_name: joinNames([row.player_first_name, row.player_last_name]),
+          parent_name: joinNames([row.parent_first_name, row.parent_last_name]),
+        };
+      })
+    );
 
+    const totalRevenue = paymentsData.filter((item) => item.status === 'paid').reduce(
+      (sum, item) => sum + Number(item.amount || 0),
+      0
+    );
+    const totalPending = paymentsData.filter((item) => item.status !== 'paid').length
+    const totalComped = paymentsData.filter((item) => item.status == 'comped').length
+    const totalFailed = paymentsData.filter((item) => item.status == 'failed').length
+
+   
+
+    return NextResponse.json({
+      totalRevenue,
+      totalPending,
+      totalFailed,
+      totalComped,
+      paymentsData,
+    });
+  } catch (error: any) {
+    console.error(error);
     return NextResponse.json(
-      { message: "Internal Server Error" },
+      { message: error.message || "Server error" },
       { status: 500 }
     );
   }

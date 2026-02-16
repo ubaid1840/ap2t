@@ -1,20 +1,24 @@
-import { useEffect, useState } from "react";
+import { memo, useEffect, useState } from "react";
 import getInitials from "./parents/get-initials";
 import { Avatar, AvatarImage, AvatarFallback } from "./ui/avatar";
 import { GetProfileImage } from "@/lib/functions";
 import { Spinner } from "./ui/spinner";
 
 
-const RenderAvatar = ({ img = "", fallback = "NA", className = "", fallbackClassName = "" } : {img : string | undefined | null, fallback : string, className ?: string, fallbackClassName ?:string}) => {
-
+const RenderAvatar = ({ img = "", fallback = "NA", className = "", fallbackClassName = "" }: { img: string | undefined | null, fallback: string, className?: string, fallbackClassName?: string }) => {
     const [loading, setLoading] = useState(false)
     const [localImage, setLocalImage] = useState("")
 
     useEffect(() => {
         async function fetchImage() {
             setLoading(true)
-            const imgResult = await GetProfileImage(img);
-            setLocalImage(imgResult);
+            if (img?.startsWith("http")) {
+                setLocalImage(img)
+            } else {
+                const imgResult = await GetProfileImage(img);
+                setLocalImage(imgResult);
+            }
+
             setLoading(false)
         }
 
@@ -35,4 +39,4 @@ const RenderAvatar = ({ img = "", fallback = "NA", className = "", fallbackClass
     )
 }
 
-export default RenderAvatar
+export default memo(RenderAvatar)

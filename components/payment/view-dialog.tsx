@@ -13,6 +13,8 @@ import { PaymentData } from "./payment-columns";
 import CardStatus from "../card-status";
 import { GoDotFill } from "react-icons/go";
 import { Button } from "../ui/button";
+import { PaymentItem } from "@/app/portal/admin/payments/page";
+import moment from "moment";
 
 type ViewDialogProps = {
   data: PaymentData;
@@ -36,7 +38,7 @@ const paymentStatusMap: Record<PaymentData["status"], CardStatusType> = {
   Voided: "ghost",
 };
 
-export function ViewDialog({ data }: ViewDialogProps) {
+export function ViewDialog({ data } : {data : PaymentItem}) {
   return (
     <DialogContent className="bg-[#252525] border border-border p-0 sm:max-w-4xl">
       <DialogHeader className="border-b border-border p-4">
@@ -44,7 +46,7 @@ export function ViewDialog({ data }: ViewDialogProps) {
           Payment Details
         </DialogTitle>
         <p className="text-sm text-ghost-text">Transaction</p>
-        <p className="text-sm text-ghost-text">{data.transactionId}</p>
+        <p className="text-sm text-ghost-text">{data.transaction_id}</p>
       </DialogHeader>
       <ScrollArea className="h-[70dvh]">
         <div className="px-6 py-2 space-y-4">
@@ -77,35 +79,35 @@ export function ViewDialog({ data }: ViewDialogProps) {
                   <User />
                   <h1>Parent/Guardian</h1>
                 </div>
-                <h1 className="text-[#E5E7EB]">{data.parentName}</h1>
+                <h1 className="text-[#E5E7EB]">{data.parent_name}</h1>
               </div>
               <div className="bg-[#1A1A1A] border border-border rounded-[10px] flex justify-between p-4">
                 <div className="flex gap-2 text-[#99A1AF]">
                   <User />
                   <h1>Player</h1>
                 </div>
-                <h1 className="text-[#E5E7EB]">{data.playerName}</h1>
+                <h1 className="text-[#E5E7EB]">{data.player_name}</h1>
               </div>
               <div className="bg-[#1A1A1A] border border-border rounded-[10px] flex justify-between p-4">
                 <div className="flex gap-2 text-[#99A1AF]">
                   <File />
                   <h1>Session</h1>
                 </div>
-                <h1 className="text-[#E5E7EB]">{data.session}</h1>
+                <h1 className="text-[#E5E7EB]">{data.session_name}</h1>
               </div>
               <div className="bg-[#1A1A1A] border border-border rounded-[10px] flex justify-between p-4">
                 <div className="flex gap-2 text-[#99A1AF]">
                   <Calendar />
                   <h1>Date</h1>
                 </div>
-                <h1 className="text-[#E5E7EB]">{data.date}</h1>
+                <h1 className="text-[#E5E7EB]">{data.created_at && moment(new Date(data.created_at)).format("YYYY-MM-DD")}</h1>
               </div>
               <div className="bg-[#1A1A1A] border border-border rounded-[10px] flex justify-between p-4">
                 <div className="flex gap-2 text-[#99A1AF]">
                   <Clock />
                   <h1>Time</h1>
                 </div>
-                <h1 className="text-[#E5E7EB]">{data.time}</h1>
+                <h1 className="text-[#E5E7EB]">{data.created_at && moment(new Date(data.created_at)).format("hh:mm A")}</h1>
               </div>
             </div>
           </div>
@@ -116,12 +118,12 @@ export function ViewDialog({ data }: ViewDialogProps) {
                 <div className="bg-info-bg text-info-text p-2 rounded-[10px]">
                   <CreditCard />
                 </div>
-                <div className="space-y-1">
-                  <h1 className="text-[#E5E7EB]">{data.methodType}</h1>
-                  <p className="text-xs text-[#99A1AF]">{data.methodDetail}</p>
+                <div className="space-y-0">
+                  <h1 className="text-[#E5E7EB]">{data.method || "N/A"}</h1>
+                  {/* <p className="text-xs text-[#99A1AF]">{data.methodDetail}</p> */}
                 </div>
               </div>
-              <div className="space-y-1">
+              <div className="space-y-0">
                 <p className="text-xs text-ghost-text">Processed via</p>
                 <h1 className="text-[#E5E7EB]">Square</h1>
               </div>

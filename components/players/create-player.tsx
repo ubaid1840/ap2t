@@ -29,7 +29,7 @@ import SelectPosition from "./select-position";
 import SelectSkill from "./select-skill";
 
 type CreatePlayerProps = {
-  parent_id?: number | null;
+  parent_id?: number | null | undefined | string;
   onRefresh?: () => Promise<void>;
 };
 
@@ -41,8 +41,6 @@ export function CreatePlayer({
   const [position, setPosition] = useState("");
   const [skillLevel, setSkillLevel] = useState("");
   const [date, setDate] = useState(undefined);
-  const positions = ["Forward", "Defender", "GoalKeeper"];
-  const skillLevels = ["Beginner", "Intermediate", "Advanced", "Expert"];
   const [loading, setLoading] = useState(false)
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
