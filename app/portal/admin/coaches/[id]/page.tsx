@@ -99,8 +99,8 @@ export interface SessionData {
 
   created_at: string;
   payment_detail: {
-    amount : number
-    created_at : string
+    amount: number
+    created_at: string
     id: number
     method: string | null
     paid_at: string | Date | null
@@ -128,7 +128,7 @@ export default function Page() {
   const [data, setData] = useState<CoachResponse>();
   const [tab, setTab] = useState("Details");
   const [loading, setLoading] = useState(true)
-
+  const [sessionTypes, setSessionTypes] = useState([])
   const isMobile = useIsMobile();
 
   const chartConfig = {
@@ -141,6 +141,7 @@ export default function Page() {
   useEffect(() => {
     if (id) {
       fetchData()
+      fetchSessionTypes()
     }
   }, [id]);
 
@@ -148,8 +149,17 @@ export default function Page() {
     setLoading(true)
     try {
       const response = await axios.get(`/admin/coaches/${id}`);
-      console.log(response.data)
       setData(response.data)
+    } finally {
+      setLoading(false)
+    }
+  };
+
+  const fetchSessionTypes = async () => {
+    setLoading(true)
+    try {
+      const response = await axios.get(`/admin/configuration?session_types=true`);
+      setSessionTypes(response.data)
     } finally {
       setLoading(false)
     }
@@ -157,92 +167,11 @@ export default function Page() {
 
 
 
-  function calculateStats(sessions: SessionData[] | undefined, payments: PaymentData[] | undefined) {
-    let totalSessions = 0
-    let totalCompleted = 0
-    let totalUpcoming = 0
-    let averageRating = 0
-    let totalRevenue = 0
-    if (sessions) {
-
-      totalSessions = sessions.length
-      totalCompleted = sessions.filter((item) => item.status === 'completed').length
-      totalUpcoming = sessions.filter((item) => item.status === 'upcoming').length
-
-
-    }
-    if (payments) {
-      const filteredPayments = payments.filter((item) => item.status === 'paid')
-      totalRevenue = filteredPayments.reduce(
-        (sum, item) => sum + Number(item.amount || 0),
-        0
-      );
-    }
-    return (
-      {
-        totalSessions, totalCompleted, totalRevenue, totalUpcoming, averageRating
-      }
-    )
-
-  }
-
-  function CalculateRevenuePercentage(localData: CoachResponse | undefined) {
-    if (!localData) return 0
-    const thisMonth = Number(localData.this_month_revenue);
-    const lastMonth = Number(localData.last_month_revenue);
-
-    let percentageChange = 0;
-
-    if (lastMonth > 0) {
-      percentageChange = ((thisMonth - lastMonth) / lastMonth) * 100;
-    }
-    return percentageChange
-  }
-
-  function generateRevenueTrend(sessionData: SessionData[] | undefined) {
-    if (!sessionData) return
-    const now = moment();
-
-    // Create last 6 months structure
-    const months = Array.from({ length: 6 }, (_, i) => {
-      const m = moment(now).subtract(5 - i, "months");
-      return {
-        key: m.format("YYYY-MM"),
-        label: m.format("MMM"),
-        value: 0,
-      };
-    });
-
-    // Loop sessions
-    sessionData.forEach((session) => {
-      const payments = session.payment_detail || [];
-
-      payments.forEach((payment: any) => {
-        if (payment.status !== "paid") return;
-
-        const paymentMonth = moment(payment.created_at).format("YYYY-MM");
-
-        const monthObj = months.find((m) => m.key === paymentMonth);
-        if (monthObj) {
-          monthObj.value += Number(payment.amount);
-        }
-      });
-    });
-
-    return months.map((m) => ({
-      month: m.label,
-      value: m.value,
-    }));
-  }
 
   const COACH_REVENUE_TREND = generateRevenueTrend(data?.session_data);
-
   const percentageChange = CalculateRevenuePercentage(data)
-
   const statsData = calculateStats(data?.session_data, data?.payment_data)
-
-
-
+  const COACH_REVENUE_SESSION_TYPES = generateRevenueBySessionTypes(data?.session_data, sessionTypes)
 
   const localData = [
     {
@@ -584,47 +513,27 @@ export default function Page() {
                 Revenue by Session Type
               </h1>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="bg-[#1A1A1A] border border-border rounded-[10px] p-4 space-y-2">
-                  <div className="flex justify-between">
-                    <p className="text-sm text-muted-foreground">
-                      Private Sessions
-                    </p>
-                    <h1>$4,750</h1>
-                  </div>
-                  <Progress
-                    value={50}
-                    valueClassName="bg-success-text"
-                    className="bg-[#3A3A3A]"
-                  />
-                </div>
 
-                <div className="bg-[#1A1A1A] border border-border rounded-[10px] p-4 space-y-2">
-                  <div className="flex justify-between">
-                    <p className="text-sm text-muted-foreground">
-                      Group Sessions
-                    </p>
-                    <h1>$5,200</h1>
-                  </div>
-                  <Progress
-                    value={13}
-                    valueClassName="bg-info-text"
-                    className="bg-[#3A3A3A]"
-                  />
-                </div>
+                {COACH_REVENUE_SESSION_TYPES.map((item) => (
+                  <div
+                    key={item.type}
+                    className="bg-[#1A1A1A] border border-border rounded-[10px] p-4 space-y-2"
+                  >
+                    <div className="flex justify-between">
+                      <p className="text-sm text-muted-foreground">
+                        {item.type}
+                      </p>
+                      <h1>${item.revenue.toLocaleString()}</h1>
+                    </div>
 
-                <div className="bg-[#1A1A1A] border border-border rounded-[10px] p-4 space-y-2">
-                  <div className="flex justify-between">
-                    <p className="text-sm text-muted-foreground">
-                      Advanced Training
-                    </p>
-                    <h1>$2,400</h1>
+                    <Progress
+                      value={item.percentage}
+                      valueClassName={item.color}
+                      className="bg-[#3A3A3A]"
+                    />
                   </div>
-                  <Progress
-                    value={53}
-                    valueClassName="bg-active-text"
-                    className="bg-[#3A3A3A]"
-                  />
-                </div>
+                ))}
+
               </div>
             </div>
           </TabsContent>
@@ -659,3 +568,144 @@ const HeaderCard = ({
     </Card>
   );
 };
+
+
+function calculateStats(sessions: SessionData[] | undefined, payments: PaymentData[] | undefined) {
+  let totalSessions = 0
+  let totalCompleted = 0
+  let totalUpcoming = 0
+  let averageRating = 0
+  let totalRevenue = 0
+  if (sessions) {
+
+    totalSessions = sessions.length
+    totalCompleted = sessions.filter((item) => item.status === 'completed').length
+    totalUpcoming = sessions.filter((item) => item.status === 'upcoming').length
+
+
+  }
+  if (payments) {
+    const filteredPayments = payments.filter((item) => item.status === 'paid')
+    totalRevenue = filteredPayments.reduce(
+      (sum, item) => sum + Number(item.amount || 0),
+      0
+    );
+  }
+  return (
+    {
+      totalSessions, totalCompleted, totalRevenue, totalUpcoming, averageRating
+    }
+  )
+
+}
+
+function CalculateRevenuePercentage(localData: CoachResponse | undefined) {
+  if (!localData) return 0
+  const thisMonth = Number(localData.this_month_revenue);
+  const lastMonth = Number(localData.last_month_revenue);
+
+  let percentageChange = 0;
+
+  if (lastMonth > 0) {
+    percentageChange = ((thisMonth - lastMonth) / lastMonth) * 100;
+  }
+  return percentageChange
+}
+
+function generateRevenueTrend(sessionData: SessionData[] | undefined) {
+  if (!sessionData) return
+  const now = moment();
+
+
+  const months = Array.from({ length: 6 }, (_, i) => {
+    const m = moment(now).subtract(5 - i, "months");
+    return {
+      key: m.format("YYYY-MM"),
+      label: m.format("MMM"),
+      value: 0,
+    };
+  });
+
+
+  sessionData.forEach((session) => {
+    const payments = session.payment_detail || [];
+
+    payments.forEach((payment: any) => {
+      if (payment.status !== "paid") return;
+
+      const paymentMonth = moment(payment.created_at).format("YYYY-MM");
+
+      const monthObj = months.find((m) => m.key === paymentMonth);
+      if (monthObj) {
+        monthObj.value += Number(payment.amount);
+      }
+    });
+  });
+
+  return months.map((m) => ({
+    month: m.label,
+    value: m.value,
+  }));
+}
+
+
+function generateRevenueBySessionTypes(
+  sessionData: SessionData[] | undefined,
+  sessionTypes: string[]
+) {
+  if (!sessionData) return [];
+
+
+  const revenueMap: Record<string, number> = {};
+  sessionTypes.forEach((type) => {
+    revenueMap[type] = 0;
+  });
+
+
+  sessionData.forEach((session) => {
+    const payments = session.payment_detail || [];
+
+    payments.forEach((payment: any) => {
+      if (payment.status !== "paid") return;
+
+      const type = session.session_type;
+      if (type && revenueMap[type] !== undefined) {
+        revenueMap[type] += Number(payment.amount);
+      }
+    });
+  });
+
+
+  const totalRevenue = Object.values(revenueMap).reduce(
+    (sum, val) => sum + val,
+    0
+  );
+
+
+  const colors = [
+    "bg-success-text",
+    "bg-info-text",
+    "bg-active-text",
+    "bg-warning-text",
+    "bg-destructive",
+    "bg-primary",
+    "bg-secondary",
+    "bg-purple-500",
+    "bg-pink-500",
+    "bg-indigo-500",
+  ];
+
+  return sessionTypes.map((type, index) => {
+    const revenue = revenueMap[type];
+
+    return {
+      type,
+      revenue,
+      color: colors[index % colors.length],
+      percentage: totalRevenue
+        ? Math.round((revenue / totalRevenue) * 100)
+        : 0,
+    };
+  });
+}
+

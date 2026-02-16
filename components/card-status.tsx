@@ -22,6 +22,8 @@ export const typeClasses = {
     inactive: "bg-ghost-bg text-ghost-text border-ghost-text/32",
     enabled:"bg-success-bg text-success-text border-success-text/32",
     disabled:"bg-warning-bg text-warning-text border-warning-text/32",
+    connected : "bg-alternative-bg text-alternative-text border-alternative-text/32",
+    disconnected : "bg-warning-bg text-warning-text border-warning-text/32"
 }
 
 export const IconType = {
@@ -34,6 +36,7 @@ export const IconType = {
     attended: <CircleCheckBig size={14} />,
     connected: <GoDotFill size={14} />,
     completed: <CircleCheckBig size={14} />,
+    disconnected : <CircleX size={14} />
 }
 
 interface CardStatusProps {

@@ -44,7 +44,7 @@ export async function PUT(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
     try {
-        const { email, password: u_pass, position, skill_level, medical_notes, career_start, bio, ...data } = await req.json();
+        const { email, password: u_pass, position, skill_level, medical_notes, career_start, bio, parent_id = null, ...data } = await req.json();
 
 
 
@@ -66,12 +66,15 @@ export async function POST(req: NextRequest) {
             if (error.code === "auth/email-already-exists") {
                 console.warn(`Email ${email} already exists, continuing...`);
             } else {
-
                 throw error;
             }
         }
 
+        const checkEmail = await pool.query(`SELECT id from users WHERE email = $1`, [email])
 
+        if (checkEmail.rows.length > 0) {
+            return NextResponse.json({ message: "Email already exists" }, { status: 400 })
+        }
 
         const fields = Object.keys({ ...data, email });
         const values = Object.values({ ...data, email });
@@ -95,15 +98,16 @@ export async function POST(req: NextRequest) {
             await pool.query(
                 `
             INSERT INTO players 
-            (user_id,position,medical_notes,skill_level)
+            (user_id,position,medical_notes,skill_level, parent_id)
             VALUES
-            ($1,$2,$3,$4)
+            ($1,$2,$3,$4, $5)
             `,
                 [
                     user.id,
                     position,
                     medical_notes,
-                    skill_level
+                    skill_level,
+                    parent_id
                 ]
             )
         } else if (role === 'coach') {

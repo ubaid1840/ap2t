@@ -3,6 +3,19 @@ import { getDownloadURL, ref } from "firebase/storage";
 import { storage } from "./firebase";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
+import Cryptr from 'cryptr'
+
+const cryptr = new Cryptr(process.env.NEXT_PUBLIC_ENCRYPTION_KEY || "1234");
+
+export const EncryptString = (data : string) => {
+    const encryptedString = cryptr.encrypt(data);
+    return encryptedString
+}
+
+export const DecryptString = (data : string) => {
+    const decryptedString = cryptr.decrypt(data);
+    return decryptedString
+}
 
 export function splitFullName(fullName: string | null) {
   if (!fullName) return { first_name: "", last_name: "" }

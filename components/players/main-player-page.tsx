@@ -187,112 +187,7 @@ export default function MainPlayerPage({
     }
   };
 
-  function calculateTotalPendingPayments(sessions: SessionData[] | undefined) {
-    if (!sessions) return 0;
-
-    return sessions.reduce((count, session) => {
-      const isPending =
-        !session.payment_detail || session.payment_detail.status === "pending";
-
-      return isPending ? count + 1 : count;
-    }, 0);
-  }
-
-  function calculateTotalCompedPayments(sessions: SessionData[] | undefined) {
-    if (!sessions) return 0;
-
-    return sessions.reduce((count, session) => {
-      const isComped = session?.payment_detail?.status === "comped";
-
-      return isComped ? count + 1 : count;
-    }, 0);
-  }
-
-  function calculatePendingStats(sessions: SessionData[] | undefined) {
-    if (!sessions) return 0;
-    return sessions.reduce((total, session) => {
-      const isPending =
-        !session.payment_detail || session.payment_detail.status === "pending";
-
-      if (!isPending) return total;
-      const amount =
-        session.apply_promotion && session.promotion_price
-          ? Number(session.promotion_price)
-          : Number(session.price);
-
-      return total + amount;
-    }, 0);
-  }
-
-  function calculateAttendancePercentage(sessions: SessionData[] | undefined) {
-    if (!sessions) return 0
-
-    const completedSessions = sessions.filter(s => s.status === "completed");
-
-    if (completedSessions.length === 0) return 0;
-
-
-    const presentCount = completedSessions.reduce((acc, session) => {
-
-      const attendanceRecords = session.attendance_detail || [];
-      const isPresent = attendanceRecords.some(
-        (a: any) => a.status === "present"
-      );
-      return acc + (isPresent ? 1 : 0);
-    }, 0);
-
-
-    return (presentCount / completedSessions.length) * 100;
-  }
-
-
-  function generate12WeekCheckins(sessions: SessionData[] | undefined) {
-    if (!sessions) return []
-    const now = moment();
-
-    const validSessions = sessions.filter((session) => {
-      if (session.status !== "completed") return false;
-
-      const attendance = session.attendance_detail || [];
-      return attendance.some((a: any) => a.status === "present");
-    });
-
-
-    const weekMap: Record<string, number> = {};
-
-    validSessions.forEach((session) => {
-      const weekKey = moment(session.date).startOf("week").format("YYYY-MM-DD");
-
-      weekMap[weekKey] = (weekMap[weekKey] || 0) + 1;
-    });
-
-    let weeksArray = Object.entries(weekMap)
-      .sort(([a], [b]) => moment(a).diff(moment(b)))
-      .map(([week, count]) => ({
-        week,
-        checkins: count,
-      }));
-
-    if (weeksArray.length > 12) {
-      weeksArray = weeksArray.slice(-12);
-    }
-
-    return weeksArray.map((w, index) => ({
-      time: `W${index + 1}`,
-      checkins: w.checkins,
-    }));
-  }
-
-  const CHECKINS_12WEEKS_DATA = generate12WeekCheckins(data?.sessions_data);
-
-
-  const attendancePercent = calculateAttendancePercentage(data?.sessions_data);
-  const totalPendingCount = calculateTotalPendingPayments(data?.sessions_data);
-  const totalCompedCount = calculateTotalCompedPayments(data?.sessions_data);
-  const totalSessionsCount = data?.sessions_data?.length
-    ? data?.sessions_data.length
-    : 0;
-
+ 
   function pendingString() {
     const totalPendingCount = calculateTotalPendingPayments(
       data?.sessions_data,
@@ -303,6 +198,20 @@ export default function MainPlayerPage({
       return `${totalPendingCount} session${totalPendingCount > 1 ? "s" : ""} pending payment${totalPendingCount > 1 ? "s" : ""} totalling $${totalPendingValue}`;
     } else null;
   }
+
+
+  const CHECKINS_12WEEKS_DATA = generate12WeekCheckins(data?.sessions_data);
+
+
+  const attendancePercent = calculateAttendancePercentage(data?.sessions_data);
+  const totalAttended = calculateTotalAttendedSessions(data?.sessions_data)
+  const totalPendingCount = calculateTotalPendingPayments(data?.sessions_data);
+  const totalCompedCount = calculateTotalCompedPayments(data?.sessions_data);
+  const totalSessionsCount = data?.sessions_data?.length
+    ? data?.sessions_data.length
+    : 0;
+
+ 
 
 
 
@@ -387,7 +296,7 @@ export default function MainPlayerPage({
             />
 
             <HeaderCard
-              title={"22"}
+              title={String(totalAttended)}
               description="Attended"
               icon={
                 <div className="rounded-[8px] flex w-8 h-8 items-center justify-center bg-active-bg">
@@ -789,3 +698,122 @@ const HeaderCard = ({
     </Card>
   );
 };
+
+
+ function calculateTotalPendingPayments(sessions: SessionData[] | undefined) {
+    if (!sessions) return 0;
+
+    return sessions.reduce((count, session) => {
+      const isPending =
+        !session.payment_detail || session.payment_detail.status === "pending";
+
+      return isPending ? count + 1 : count;
+    }, 0);
+  }
+
+  function calculateTotalCompedPayments(sessions: SessionData[] | undefined) {
+    if (!sessions) return 0;
+
+    return sessions.reduce((count, session) => {
+      const isComped = session?.payment_detail?.status === "comped";
+
+      return isComped ? count + 1 : count;
+    }, 0);
+  }
+
+  function calculatePendingStats(sessions: SessionData[] | undefined) {
+    if (!sessions) return 0;
+    return sessions.reduce((total, session) => {
+      const isPending =
+        !session.payment_detail || session.payment_detail.status === "pending";
+
+      if (!isPending) return total;
+      const amount =
+        session.apply_promotion && session.promotion_price
+          ? Number(session.promotion_price)
+          : Number(session.price);
+
+      return total + amount;
+    }, 0);
+  }
+
+  function calculateAttendancePercentage(sessions: SessionData[] | undefined) {
+    if (!sessions) return 0
+
+    const completedSessions = sessions.filter(s => s.status === "completed");
+
+    if (completedSessions.length === 0) return 0;
+
+
+    const presentCount = completedSessions.reduce((acc, session) => {
+
+      const attendanceRecords = session.attendance_detail || [];
+      const isPresent = attendanceRecords.some(
+        (a: any) => a.status === "present"
+      );
+      return acc + (isPresent ? 1 : 0);
+    }, 0);
+
+
+    return (presentCount / completedSessions.length) * 100;
+  }
+
+  function calculateTotalAttendedSessions(
+  sessions: SessionData[] | undefined
+) {
+  if (!sessions) return 0;
+
+  const completedSessions = sessions.filter(
+    s => s.status === "completed"
+  );
+
+  return completedSessions.reduce((count, session) => {
+    const attendanceRecords = session.attendance_detail || [];
+
+    const hasPresent = attendanceRecords.some(
+      (a: any) => a.status === "present"
+    );
+
+    return hasPresent ? count + 1 : count;
+  }, 0);
+}
+
+ 
+
+
+  function generate12WeekCheckins(sessions: SessionData[] | undefined) {
+    if (!sessions) return []
+    const now = moment();
+
+    const validSessions = sessions.filter((session) => {
+      if (session.status !== "completed") return false;
+
+      const attendance = session.attendance_detail || [];
+      return attendance.some((a: any) => a.status === "present");
+    });
+
+
+    const weekMap: Record<string, number> = {};
+
+    validSessions.forEach((session) => {
+      const weekKey = moment(session.date).startOf("week").format("YYYY-MM-DD");
+
+      weekMap[weekKey] = (weekMap[weekKey] || 0) + 1;
+    });
+
+    let weeksArray = Object.entries(weekMap)
+      .sort(([a], [b]) => moment(a).diff(moment(b)))
+      .map(([week, count]) => ({
+        week,
+        checkins: count,
+      }));
+
+    if (weeksArray.length > 12) {
+      weeksArray = weeksArray.slice(-12);
+    }
+
+    return weeksArray.map((w, index) => ({
+      time: `W${index + 1}`,
+      checkins: w.checkins,
+    }));
+  }
