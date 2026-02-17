@@ -4,14 +4,16 @@ import { BarChart } from "@/components/charts/bar-chart";
 import LineChart from "@/components/charts/line-chart-dots";
 import PieChart from "@/components/charts/pie-chart";
 import { PLAYER_ATTENDANCE_DATA_COLUMNS, ZIP_REVENUE_DATA_COLUMNS } from "@/components/settings/columns";
-import { MONTHLY_SESSIONS_CONFIG, MONTHLY_SESSIONS_DATA, PLAYER_ATTENDANCE_DATA, SESSION_TYPE_CHART_CONFIG, SESSION_TYPE_PIE_DATA, ZIP_REVENUE_DATA } from "@/components/settings/constants";
+import { MONTHLY_SESSIONS_CONFIG, SESSION_TYPE_CHART_CONFIG, ZIP_REVENUE_DATA } from "@/components/settings/constants";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useSidebar } from "@/components/ui/sidebar";
+import { useAuth } from "@/contexts/auth-context";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { COACH_CHECKINS_DATA } from "@/lib/constants";
+import axios from "@/lib/axios";
+
 import {
   ChartColumn,
   DollarSign,
@@ -22,45 +24,125 @@ import {
   MapPin,
   TrendingUp
 } from "lucide-react";
-import { ReactNode, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
+
+
+// ----------------------------
+// Totals Section
+// ----------------------------
+export type Totals = {
+  totalRevenue: number;      // sum of all paid payments
+  totalSessions: number;     // total sessions
+  totalPending: number;      // total payments with status 'pending'
+  totalComped: number;       // total payments with status 'comped'
+  averageAttendance: number; // average attendance percentage across all sessions
+};
+
+// ----------------------------
+// Revenue By Coach
+// ----------------------------
+export type RevenueByCoachItem = {
+  coach: string;  // e.g., "Coach Ali"
+  value: number;  // revenue sum
+};
+
+// ----------------------------
+// Sessions by Type
+// ----------------------------
+export type SessionTypeItem = {
+  name: string;   // e.g., "Private Session"
+  value: number;  // count of sessions of this type
+  fill: string;   // chart color variable
+};
+
+// ----------------------------
+// Monthly Revenue Trend
+// ----------------------------
+export type MonthlyRevenueItem = {
+  month: string;  // e.g., "July"
+  value: number;  // revenue sum for the month
+};
+
+// ----------------------------
+// Player Attendance Data
+// ----------------------------
+export type PlayerAttendanceItem = {
+  id: number;           // unique ID assigned in the response
+  name: string;         // player's full name
+  sessions: number;     // total sessions enrolled
+  attended: number;     // sessions attended
+  missed: number;       // sessions missed
+  attendance_rate: number; // attendance percentage
+};
+
+// ----------------------------
+// Full Response Type
+// ----------------------------
+export type DashboardDataResponse = {
+  totals: Totals;
+  revenueByCoach: RevenueByCoachItem[];
+  sessionTypeData: SessionTypeItem[];
+  monthlyRevenueTrend: MonthlyRevenueItem[];
+  playerAttendanceData: PlayerAttendanceItem[];
+};
+
+
 export default function Page() {
 
   const [filter, setFilter] = useState(true)
-  const {open} = useSidebar()
+  const { open } = useSidebar()
   const isMobile = useIsMobile()
+
+  const [reports, setReports] = useState<DashboardDataResponse | undefined>()
+  const { user } = useAuth()
+
+  useEffect(() => {
+    if (user) fetchData()
+  }, [user])
+
+  async function fetchData() {
+
+    try {
+      const response = await axios.get("/admin/report")
+      console.log(response.data)
+      setReports(response.data)
+    } catch (error) {
+
+    }
+  }
 
   const data = [
     {
       title: "Total Revenue",
-      value: "$52,710",
+      value: `$${reports?.totals?.totalRevenue || 0}`,
       Icon: (props: LucideProps) => <DollarSign  {...props} />,
       color: "active"
     },
 
     {
       title: "Total Sessions",
-      value: "666",
+      value: reports?.totals?.totalSessions || 0,
       Icon: (props: LucideProps) => <ChartColumn  {...props} />,
       color: "info"
     },
 
     {
       title: "Outstanding",
-      value: "23",
+      value: reports?.totals?.totalPending || 0,
       Icon: (props: LucideProps) => <FileText  {...props} />,
       color: "warning"
     },
 
     {
       title: "Comped",
-      value: "8",
+      value: reports?.totals?.totalComped || 0,
       Icon: (props: LucideProps) => <FileText  {...props} />,
       color: "other"
     },
 
     {
       title: "Avg Attendance",
-      value: "93%",
+      value: `${reports?.totals?.averageAttendance || 0}%`,
       Icon: (props: LucideProps) => <TrendingUp  {...props} />,
       color: "success"
     },
@@ -80,7 +162,7 @@ export default function Page() {
 
       <div className="mt-4 flex w-full flex-wrap gap-4 justify-center">
         {data.map((item, i) => (
-          <HeaderCard key={i} title={item.value} description={item.title}
+          <HeaderCard key={i} title={String(item.value)} description={item.title}
             icon={
               <div className={`rounded-[8px] flex w-7 h-7 items-center justify-center bg-${item.color}-bg  border-${item.color}-text/32`}>
                 <item.Icon className={`text-${item.color}-text`} size={16} />
@@ -153,7 +235,7 @@ export default function Page() {
               <Button variant={"outline"} size={"icon-sm"} className="h-6 w-6 rounded-sm text-[10px] text-muted-foreground"><Download /></Button>
             </div>
 
-            <BarChart chartData={COACH_CHECKINS_DATA} xaxis="coach" yaxis="value" />
+            <BarChart chartData={reports?.revenueByCoach || []} xaxis="coach" yaxis="value" />
 
           </CardContent>
         </Card>
@@ -173,7 +255,7 @@ export default function Page() {
 
             <div className="h-70">
               <PieChart
-                data={SESSION_TYPE_PIE_DATA}
+                data={reports?.sessionTypeData || []}
                 config={SESSION_TYPE_CHART_CONFIG} />
             </div>
           </CardContent>
@@ -194,7 +276,7 @@ export default function Page() {
           <div className="grid grid-cols-1">
             <div className="h-70">
               <LineChart
-                data={MONTHLY_SESSIONS_DATA}
+                data={reports?.monthlyRevenueTrend || []}
                 config={MONTHLY_SESSIONS_CONFIG}
                 xAxisKey="month"
 
@@ -234,7 +316,7 @@ export default function Page() {
           <PageTable
             headerClassName={"rounded-none"}
             columns={PLAYER_ATTENDANCE_DATA_COLUMNS}
-            data={PLAYER_ATTENDANCE_DATA}
+            data={reports?.playerAttendanceData || []}
             onRowClick={() => {
 
             }}
@@ -274,8 +356,8 @@ export default function Page() {
             onRowClick={() => {
 
             }}
-             scrollAreaWidth={`${open ? "w-[calc(100dvw-306px)]" : "w-[calc(100dvw-96px)]"} ${isMobile && "w-[calc(100vw-44px)]"}`}
-      
+            scrollAreaWidth={`${open ? "w-[calc(100dvw-306px)]" : "w-[calc(100dvw-96px)]"} ${isMobile && "w-[calc(100vw-44px)]"}`}
+
           />
 
         </CardContent>
