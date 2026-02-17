@@ -132,6 +132,7 @@ const CreateCoach = ({ onRefresh }: { onRefresh: () => Promise<void> }) => {
                       name="zip_code"
                       placeholder="54000"
                       value={coach.zip_code}
+                      required
                       onChange={(e) =>
                         setCoach((prev) => ({
                           ...prev,
