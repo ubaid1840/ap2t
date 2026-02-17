@@ -30,7 +30,7 @@ import {
   Phone,
   TrendingUp,
   User,
-  UserX
+  UserX,
 } from "lucide-react";
 import moment from "moment";
 import Link from "next/link";
@@ -164,45 +164,46 @@ export interface NoteWithCoach {
 export default function MainPlayerPage({
   id,
   back,
+  admin = false,
 }: {
   id: number | undefined;
   back?: ReactNode;
+  admin?: boolean;
 }) {
   const [data, setData] = useState<PlayerResponse | undefined>();
   const [tab, setTab] = useState("Session History");
   const { user } = useAuth();
   const isMobile = useIsMobile();
   const [loading, setLoading] = useState(true);
-  const [statusLoading,setStatusLoading]=useState(false)
+  const [statusLoading, setStatusLoading] = useState(false);
 
   useEffect(() => {
     if (user?.id && id) fetchData();
   }, [id, user]);
 
   const setStatus = async (status: string) => {
-      setStatusLoading(true);
-      try {
-        const result = await axios.put(`/user`, {
-          id: id,
-          status: status,
-        });
-        setData((prevState) => {
-          if (!prevState) return prevState;
-  
-          return {
-            ...prevState,
-              status,
-          
-          };
-        })
-      } finally {
-        setStatusLoading(false);
-      }
-    };
+    setStatusLoading(true);
+    try {
+      const result = await axios.put(`/user`, {
+        id: id,
+        status: status,
+      });
+      setData((prevState) => {
+        if (!prevState) return prevState;
+
+        return {
+          ...prevState,
+          status,
+        };
+      });
+    } finally {
+      setStatusLoading(false);
+    }
+  };
 
   const fetchData = async () => {
     if (!id) return;
-    setLoading(true)
+    setLoading(true);
     try {
       const result = await axios.get(`/admin/players/${id}`);
       setData(result.data);
@@ -211,9 +212,6 @@ export default function MainPlayerPage({
     }
   };
 
-  
-
- 
   function pendingString() {
     const totalPendingCount = calculateTotalPendingPayments(
       data?.sessions_data,
@@ -225,21 +223,15 @@ export default function MainPlayerPage({
     } else null;
   }
 
-
   const CHECKINS_12WEEKS_DATA = generate12WeekCheckins(data?.sessions_data);
 
-
   const attendancePercent = calculateAttendancePercentage(data?.sessions_data);
-  const totalAttended = calculateTotalAttendedSessions(data?.sessions_data)
+  const totalAttended = calculateTotalAttendedSessions(data?.sessions_data);
   const totalPendingCount = calculateTotalPendingPayments(data?.sessions_data);
   const totalCompedCount = calculateTotalCompedPayments(data?.sessions_data);
   const totalSessionsCount = data?.sessions_data?.length
     ? data?.sessions_data.length
     : 0;
-
- 
-
-
 
   if (loading) {
     return (
@@ -249,9 +241,8 @@ export default function MainPlayerPage({
         <Skeleton className="h-[150px] w-full bg-secondary rounded-sm" />
         <Skeleton className="h-[100px] w-full bg-secondary rounded-sm" />
         <Skeleton className="h-[200px] w-full bg-secondary rounded-sm" />
-
       </div>
-    )
+    );
   }
 
   return (
@@ -274,8 +265,7 @@ export default function MainPlayerPage({
               >
                 <span className="inline-flex gap-2 ">
                   <Calendar size={14} />
-                  Age{" "}
-                  {getYear(data?.birth_date)}
+                  Age {getYear(data?.birth_date)}
                 </span>
 
                 <span className="inline-flex gap-2">
@@ -286,9 +276,9 @@ export default function MainPlayerPage({
                   Parent:{" "}
                   {data?.parent_id
                     ? joinNames([
-                      data?.attach_parent?.first_name,
-                      data?.attach_parent?.last_name,
-                    ])
+                        data?.attach_parent?.first_name,
+                        data?.attach_parent?.last_name,
+                      ])
                     : "N/A"}
                 </span>
                 <span className="inline-flex gap-2">
@@ -299,10 +289,10 @@ export default function MainPlayerPage({
               </div>
             </div>
             <div className=" flex gap-4">
-            {
-                data?.status === 'active' ?
+              {admin &&
+                (data?.status === "active" ? (
                   <Button
-                    variant={"destructive"}
+                    variant="destructive"
                     onClick={() => setStatus("inactive")}
                   >
                     {statusLoading ? (
@@ -316,11 +306,9 @@ export default function MainPlayerPage({
                         Disable
                       </>
                     )}
-                  </Button> :
-                  <Button
-
-                    onClick={() => setStatus("active")}
-                  >
+                  </Button>
+                ) : (
+                  <Button onClick={() => setStatus("active")}>
                     {statusLoading ? (
                       <>
                         <Loader2 className="h-4 w-4 animate-spin" />
@@ -333,8 +321,12 @@ export default function MainPlayerPage({
                       </>
                     )}
                   </Button>
-              }
-            {data && <EditInfo player_id={id} data={data} onRefresh={fetchData} />}</div>
+                ))}
+
+              {data && (
+                <EditInfo player_id={id} data={data} onRefresh={fetchData} />
+              )}
+            </div>
           </div>
           <div className="mt-4 flex w-full justify-between flex-wrap gap-2">
             <HeaderCard
@@ -399,9 +391,12 @@ export default function MainPlayerPage({
             <>
               <div className="w-full flex justify-between">
                 <p className="text-[18px] text-white">Linked Parent</p>
-                <Link target="blank" href={`/portal/admin/parents/${data?.parent_id}`}>
+                {admin&&<Link
+                  target="blank"
+                  href={`/portal/admin/parents/${data?.parent_id}`}
+                >
                   <Button>View Parent Profile</Button>
-                </Link>
+                </Link>}
               </div>
 
               <div className="flex gap-4">
@@ -462,7 +457,7 @@ export default function MainPlayerPage({
             </>
           )}
 
-          {data?.profile?.medical_notes &&
+          {data?.profile?.medical_notes && (
             <Card className="bg-alternative-bg p-3 border-alternative-text/30">
               <CardContent className="p-0">
                 <div className="flex gap-4 items-start">
@@ -478,7 +473,7 @@ export default function MainPlayerPage({
                 </div>
               </CardContent>
             </Card>
-          }
+          )}
         </CardContent>
       </Card>
 
@@ -682,7 +677,7 @@ export default function MainPlayerPage({
                   3 notes from coaches
                 </p>
               </div>
-              <AddCoachNotes player_id={id} onRefresh={fetchData}/>
+              {admin&&<AddCoachNotes player_id={id} onRefresh={fetchData} />}
             </div>
 
             {data?.all_notes &&
@@ -761,121 +756,109 @@ const HeaderCard = ({
   );
 };
 
-
- function calculateTotalPendingPayments(sessions: SessionData[] | undefined) {
-    if (!sessions) return 0;
-
-    return sessions.reduce((count, session) => {
-      const isPending =
-        !session.payment_detail || session.payment_detail.status === "pending";
-
-      return isPending ? count + 1 : count;
-    }, 0);
-  }
-
-  function calculateTotalCompedPayments(sessions: SessionData[] | undefined) {
-    if (!sessions) return 0;
-
-    return sessions.reduce((count, session) => {
-      const isComped = session?.payment_detail?.status === "comped";
-
-      return isComped ? count + 1 : count;
-    }, 0);
-  }
-
-  function calculatePendingStats(sessions: SessionData[] | undefined) {
-    if (!sessions) return 0;
-    return sessions.reduce((total, session) => {
-      const isPending =
-        !session.payment_detail || session.payment_detail.status === "pending";
-
-      if (!isPending) return total;
-      const amount =
-        session.apply_promotion && session.promotion_price
-          ? Number(session.promotion_price)
-          : Number(session.price);
-
-      return total + amount;
-    }, 0);
-  }
-
-  function calculateAttendancePercentage(sessions: SessionData[] | undefined) {
-    if (!sessions) return 0
-
-    const completedSessions = sessions.filter(s => s.status === "completed");
-
-    if (completedSessions.length === 0) return 0;
-
-
-    const presentCount = completedSessions.reduce((acc, session) => {
-
-      const attendanceRecords = session.attendance_detail || [];
-      const isPresent = attendanceRecords.some(
-        (a: any) => a.status === "present"
-      );
-      return acc + (isPresent ? 1 : 0);
-    }, 0);
-
-
-    return (presentCount / completedSessions.length) * 100;
-  }
-
-  function calculateTotalAttendedSessions(
-  sessions: SessionData[] | undefined
-) {
+function calculateTotalPendingPayments(sessions: SessionData[] | undefined) {
   if (!sessions) return 0;
 
-  const completedSessions = sessions.filter(
-    s => s.status === "completed"
-  );
+  return sessions.reduce((count, session) => {
+    const isPending =
+      !session.payment_detail || session.payment_detail.status === "pending";
+
+    return isPending ? count + 1 : count;
+  }, 0);
+}
+
+function calculateTotalCompedPayments(sessions: SessionData[] | undefined) {
+  if (!sessions) return 0;
+
+  return sessions.reduce((count, session) => {
+    const isComped = session?.payment_detail?.status === "comped";
+
+    return isComped ? count + 1 : count;
+  }, 0);
+}
+
+function calculatePendingStats(sessions: SessionData[] | undefined) {
+  if (!sessions) return 0;
+  return sessions.reduce((total, session) => {
+    const isPending =
+      !session.payment_detail || session.payment_detail.status === "pending";
+
+    if (!isPending) return total;
+    const amount =
+      session.apply_promotion && session.promotion_price
+        ? Number(session.promotion_price)
+        : Number(session.price);
+
+    return total + amount;
+  }, 0);
+}
+
+function calculateAttendancePercentage(sessions: SessionData[] | undefined) {
+  if (!sessions) return 0;
+
+  const completedSessions = sessions.filter((s) => s.status === "completed");
+
+  if (completedSessions.length === 0) return 0;
+
+  const presentCount = completedSessions.reduce((acc, session) => {
+    const attendanceRecords = session.attendance_detail || [];
+    const isPresent = attendanceRecords.some(
+      (a: any) => a.status === "present",
+    );
+    return acc + (isPresent ? 1 : 0);
+  }, 0);
+
+  return (presentCount / completedSessions.length) * 100;
+}
+
+function calculateTotalAttendedSessions(sessions: SessionData[] | undefined) {
+  if (!sessions) return 0;
+
+  const completedSessions = sessions.filter((s) => s.status === "completed");
 
   return completedSessions.reduce((count, session) => {
     const attendanceRecords = session.attendance_detail || [];
 
     const hasPresent = attendanceRecords.some(
-      (a: any) => a.status === "present"
+      (a: any) => a.status === "present",
     );
 
     return hasPresent ? count + 1 : count;
   }, 0);
 }
 
- 
+function generate12WeekCheckins(sessions: SessionData[] | undefined) {
+  if (!sessions) return [];
+  const now = moment();
 
+  const validSessions = sessions.filter((session) => {
+    if (session.status !== "completed") return false;
 
-  function generate12WeekCheckins(sessions: SessionData[] | undefined) {
-    if (!sessions) return []
-    const now = moment();
+    const attendance = session.attendance_detail || [];
+    return attendance.some((a: any) => a.status === "present");
+  });
 
-    const validSessions = sessions.filter((session) => {
-      if (session.status !== "completed") return false;
+  const weekMap: Record<string, number> = {};
 
-      const attendance = session.attendance_detail || [];
-      return attendance.some((a: any) => a.status === "present");
-    });
+  validSessions.forEach((session) => {
+    const weekKey = moment(session.date).startOf("week").format("YYYY-MM-DD");
 
+    weekMap[weekKey] = (weekMap[weekKey] || 0) + 1;
+  });
 
-    const weekMap: Record<string, number> = {};
-
-    validSessions.forEach((session) => {
-      const weekKey = moment(session.date).startOf("week").format("YYYY-MM-DD");
-
-      weekMap[weekKey] = (weekMap[weekKey] || 0) + 1;
-    });
-
-    let weeksArray = Object.entries(weekMap)
-      .sort(([a], [b]) => moment(a).diff(moment(b)))
-      .map(([week, count]) => ({
-        week,
-        checkins: count,
-      }));
-
-    if (weeksArray.length > 12) {
-      weeksArray = weeksArray.slice(-12);
-    }
-
-    return weeksArray.map((w, index) => ({
-      time: `W${index + 1}`,
-      checkins: w.checkins,
+  let weeksArray = Object.entries(weekMap)
+    .sort(([a], [b]) => moment(a).diff(moment(b)))
+    .map(([week, count]) => ({
+      week,
+      checkins: count,
     }));
+
+  if (weeksArray.length > 12) {
+    weeksArray = weeksArray.slice(-12);
   }
+
+  return weeksArray.map((w, index) => ({
+    time: `W${index + 1}`,
+    checkins: w.checkins,
+  }));
+}

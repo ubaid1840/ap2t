@@ -73,6 +73,56 @@ export const admin_nav_items = [
   },
 ];
 
+export const parent_nav_items = [
+
+  {
+    title: 'Dashboard',
+    url: '/portal/parent/dashboard',
+    icon: 'dashboard',
+   
+    shortcut: ['d', 'a', 's', 'h'],
+  },
+  {
+    title: 'Sessions',
+    url: '/portal/parent/sessions',
+    icon: 'sessions',
+    
+    shortcut: ['d', 'a', 's', 'h'],
+  },
+    {
+    title: 'Settings',
+    url: '/portal/parent/settings',
+    icon: 'settings',
+    
+    shortcut: ['d', 'a', 's', 'h'],
+  },
+];
+
+export const player_nav_items = [
+
+  {
+    title: 'Dashboard',
+    url: '/portal/player/dashboard',
+    icon: 'dashboard',
+   
+    shortcut: ['d', 'a', 's', 'h'],
+  },
+  {
+    title: 'Sessions',
+    url: '/portal/player/sessions',
+    icon: 'sessions',
+    
+    shortcut: ['d', 'a', 's', 'h'],
+  },
+    {
+    title: 'Settings',
+    url: '/portal/player/settings',
+    icon: 'settings',
+    
+    shortcut: ['d', 'a', 's', 'h'],
+  },
+];
+
 
 export const REVENUE_BY_COACH = [
   { time: "W1", checkins: 42 },
