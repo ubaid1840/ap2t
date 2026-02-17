@@ -50,12 +50,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         try {
           const res = await axios.get(`/userdetail?email=${fbUser.email}`);
           setUser(res.data);
-          const role = res.data?.role
-          if (!role) {
-            await handleLogout()
-          } else if (!pathname.startsWith(`/portal/${role}`)) {
-            router.replace(`/portal/${role}`);
-          }
+          // const role = res.data?.role
+          // if (!role) {
+          //   await handleLogout()
+          // } else if (!pathname.startsWith(`/portal/${role}`)) {
+          //   router.replace(`/portal/${role}`);
+          // }
         } catch (err) {
           setUser(null);
           signOut(auth)

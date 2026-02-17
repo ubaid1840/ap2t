@@ -9,7 +9,7 @@ export default function Page() {
     const {id} = useParams()
 
     return (
-        <MainPlayerPage id={Number(id) || undefined} back = {
+        <MainPlayerPage admin={true} id={Number(id) || undefined} back = {
              <BackButton title="Back To Players" route="/portal/admin/players" />
         }/>
     )
