@@ -7,6 +7,6 @@ import { useAuth } from "@/contexts/auth-context";
 export default function Page(){
     const {user}=useAuth()
     return(
-        <MainCoachPage id={Number(user?.id)} />
+        <MainCoachPage id={user?.id} />
     )
 }

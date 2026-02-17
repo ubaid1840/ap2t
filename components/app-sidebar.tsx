@@ -14,13 +14,14 @@ import {
 
 import { Icons } from "@/components/icons";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { admin_nav_items } from "@/lib/constants";
+import { admin_nav_items, coach_nav_items, parent_nav_items, player_nav_items } from "@/lib/constants";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Button } from "./ui/button";
 import { ScrollArea, ScrollBar } from "./ui/scroll-area";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/auth-context";
+import { useEffect, useState } from "react";
 
 
 export const company = {
@@ -34,7 +35,25 @@ export default function AppSidebar() {
 
   const isMobile = useIsMobile();
   const { toggleSidebar, state } = useSidebar();
-  const {nav_items} = useAuth()
+  const [navItems, setNavItems] = useState<any[]>([])
+
+  useEffect(() => {
+    if (pathname.startsWith("/portal/admin")) {
+      setNavItems([...admin_nav_items])
+    }
+
+    if (pathname.startsWith("/portal/parent")) {
+      setNavItems([...parent_nav_items])
+    }
+
+    if (pathname.startsWith("/portal/player")) {
+      setNavItems([...player_nav_items])
+    }
+
+    if (pathname.startsWith("/portal/coach")) {
+      setNavItems([...coach_nav_items])
+    }
+  }, [pathname])
 
   return (
     <Sidebar collapsible="icon">
@@ -49,7 +68,7 @@ export default function AppSidebar() {
                 className="w-full h-full "
               />
               :
-                <img
+              <img
                 src={company.favicon}
                 alt="AP2T LOGO"
                 className="w-full h-full "
@@ -64,7 +83,7 @@ export default function AppSidebar() {
           <SidebarGroup>
             <SidebarMenu>
               {
-                nav_items.map((item, index: number) => {
+                navItems.map((item, index: number) => {
                   const Icon = item.icon ? Icons[item.icon] : Icons.gitHub;
                   return (
                     <SidebarMenuItem key={item.title}>

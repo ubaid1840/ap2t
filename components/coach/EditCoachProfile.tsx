@@ -19,7 +19,7 @@ import {
     Edit
 } from "lucide-react";
 import { useEffect, useState } from "react";
-const EditCoachProfile = ({ id, data, onRefresh }: { id: number | undefined, data: any, onRefresh: () => Promise<void> }) => {
+const EditCoachProfile = ({ id, data, onRefresh }: { id: string | undefined, data: any, onRefresh: () => Promise<void> }) => {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false)
   const [specialityInput, setSpecialityInput] = useState("")
@@ -44,8 +44,8 @@ const EditCoachProfile = ({ id, data, onRefresh }: { id: number | undefined, dat
         phone: data?.phone_no,
         career_start: data?.profile?.career_start,
         bio: data?.profile?.bio,
-        specialities: data?.profile?.specialities,
-        certifications: data?.profile?.certifications,
+        specialities: data?.profile?.specialities || [],
+        certifications: data?.profile?.certifications || [],
         zip_code : data?.zip_code || ""
       })
     }
