@@ -132,7 +132,6 @@ export default function MainCoachPage({
   back?: ReactNode;
   admin?: boolean;
 }) {
-  const { id } = useParams();
   const [data, setData] = useState<CoachResponse>();
   const [tab, setTab] = useState("Details");
   const [loading, setLoading] = useState(true)
@@ -260,7 +259,7 @@ export default function MainCoachPage({
 
   return (
     <div className="flex flex-col w-full gap-6">
-      <BackButton title="Back to coaches" route="/portal/admin/coaches" />
+    {back}
 
       <Card className="w-full rounded-[12px] bg-[#252525]">
         <CardContent className="space-y-4">
