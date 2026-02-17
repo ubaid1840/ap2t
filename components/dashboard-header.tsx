@@ -22,6 +22,7 @@ import { useRouter } from "nextjs-toploader/app";
 import { ScrollArea } from "./ui/scroll-area";
 import { useDebounce } from "@/hooks/use-debounce";
 import { Spinner } from "./ui/spinner";
+import { usePathname } from "next/navigation";
 
 interface PopupItem {
   id: string | number;
@@ -33,6 +34,8 @@ interface PopupItem {
 export default function DashboardHeader({ trigger }: { trigger?: ReactNode }) {
 
   const { user } = useAuth()
+  const pathname = usePathname()
+  const showPopup = pathname?.includes("admin")
 
   const logout = async () => {
     try {
@@ -49,7 +52,7 @@ export default function DashboardHeader({ trigger }: { trigger?: ReactNode }) {
       <div className="w-full flex justify-between flex-wrap items-center">
         <div className="flex gap-4 items-center">
           {trigger}
-          <PopupSearch />
+          {showPopup && <PopupSearch />}
         </div>
         <div className="flex gap-4 items-center">
           {/* <NotificationSheet /> */}
