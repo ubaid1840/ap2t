@@ -11,7 +11,7 @@ export default function Page() {
       admin={true}
       id={Number(id)}
       back={
-        <BackButton title="Back To coaches" route="/portal/admin/coaches" />
+        <BackButton title="Back to coaches" route="/portal/admin/coaches" />
       }
     />
   );

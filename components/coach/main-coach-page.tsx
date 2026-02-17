@@ -34,6 +34,7 @@ import moment from "moment";
 import { useParams } from "next/navigation";
 import { ReactNode, useEffect, useState } from "react";
 import { IoCalendarClear } from "react-icons/io5";
+import { Button } from "../ui/button";
 
 
 export interface CoachResponse {
@@ -431,6 +432,11 @@ export default function MainCoachPage({
           </TabsContent>
 
           <TabsContent value="Sessions" className="space-y-2 p-4">
+            {!admin&&<div className="flex w-full justify-end">
+                <Button>
+                    Add New Session
+                </Button>
+            </div>}
             <h1 className="text-lg text-[#F3F4F6]">All Sessions</h1>
             <div className="space-y-4 pt-2">
               {data?.session_data && data?.session_data?.map((session, i) => {

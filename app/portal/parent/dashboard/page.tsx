@@ -7,6 +7,6 @@ export default function Page() {
      const {user} = useAuth()
 
     return (
-        <MainParentPage id={Number(2)}/>
+        <MainParentPage id={Number(user?.id)}/>
     )
 }

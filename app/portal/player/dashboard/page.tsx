@@ -7,9 +7,9 @@ import { useAuth } from "@/contexts/auth-context"
 
 export default function Page() {
      const {user} = useAuth()
-    console.log(user?.id)
+
     return (
-        <MainPlayerPage id={Number(5)}/>
+        <MainPlayerPage id={Number(user?.id)}/>
     )
 }
 
