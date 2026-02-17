@@ -12,6 +12,7 @@ import { usePathname } from "next/navigation";
 import { useRouter } from 'nextjs-toploader/app'
 import { toast } from "sonner";
 import { handleLogout } from "@/lib/logout";
+import { admin_nav_items, parent_nav_items, player_nav_items } from "@/lib/constants";
 
 type DBUser = {
   id: string;
@@ -27,12 +28,14 @@ type AuthContextType = {
   firebaseUser: FirebaseUser | null;
   user: DBUser | null;
   loading: boolean;
+  nav_items : any[]
 };
 
 const AuthContext = createContext<AuthContextType>({
   firebaseUser: null,
   user: null,
   loading: true,
+  nav_items : []
 });
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
@@ -40,6 +43,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<DBUser | null>(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
+  const [nav_items, setNav_items] = useState<any[]>([])
   const pathname = usePathname();
 
   useEffect(() => {
@@ -50,12 +54,24 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         try {
           const res = await axios.get(`/userdetail?email=${fbUser.email}`);
           setUser(res.data);
-          // const role = res.data?.role
-          // if (!role) {
-          //   await handleLogout()
-          // } else if (!pathname.startsWith(`/portal/${role}`)) {
-          //   router.replace(`/portal/${role}`);
-          // }
+          if(res.data.role === 'admin'){
+            setNav_items([...admin_nav_items])
+          }
+
+          if(res.data.role === 'paremt'){
+            setNav_items([...parent_nav_items])
+          }
+
+          if(res.data.role === 'player'){
+            setNav_items([...player_nav_items])
+          }
+
+          const role = res.data?.role
+          if (!role) {
+            await handleLogout()
+          } else if (!pathname.startsWith(`/portal/${role}`)) {
+            router.replace(`/portal/${role}`);
+          }
         } catch (err) {
           setUser(null);
           signOut(auth)
@@ -71,7 +87,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ firebaseUser, user, loading }}>
+    <AuthContext.Provider value={{ firebaseUser, user, loading, nav_items }}>
       {children}
     </AuthContext.Provider>
   );

@@ -20,6 +20,7 @@ import { usePathname } from "next/navigation";
 import { Button } from "./ui/button";
 import { ScrollArea, ScrollBar } from "./ui/scroll-area";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/contexts/auth-context";
 
 
 export const company = {
@@ -33,7 +34,7 @@ export default function AppSidebar() {
 
   const isMobile = useIsMobile();
   const { toggleSidebar, state } = useSidebar();
-
+  const {nav_items} = useAuth()
 
   return (
     <Sidebar collapsible="icon">
@@ -63,7 +64,7 @@ export default function AppSidebar() {
           <SidebarGroup>
             <SidebarMenu>
               {
-                admin_nav_items.map((item, index: number) => {
+                nav_items.map((item, index: number) => {
                   const Icon = item.icon ? Icons[item.icon] : Icons.gitHub;
                   return (
                     <SidebarMenuItem key={item.title}>
