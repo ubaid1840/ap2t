@@ -47,6 +47,7 @@ export interface PlayerResponse {
   email: string;
   role: string;
   status: string;
+  zip_code : string
   picture: string | null;
   location: string | null;
   phone_no: string;

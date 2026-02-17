@@ -51,6 +51,7 @@ export interface Parent {
   email: string;
   role: string;
   status: string;
+  zip_code : string
   picture: string | null;
   location: string | null;
   phone_no: string | null;
@@ -108,15 +109,12 @@ export interface SessionPlayer {
   last_name: string;
 }
 
-
-
-
 export default function MainParentPage({
   id,
   back,
   admin=false
 }: {
-  id: number | undefined;
+  id: string | number | undefined;
   back?: ReactNode;
   admin?: boolean;
 }) {
@@ -218,7 +216,8 @@ export default function MainParentPage({
                 first_name: data?.parent?.first_name,
                 last_name: data?.parent?.last_name,
                 phone_no: data?.parent?.phone_no,
-                location: data?.parent?.location
+                location: data?.parent?.location,
+                zip_code : data?.parent?.zip_code || ""
               }}
                 onRefresh={fetchData} />
              {admin && (

@@ -5,11 +5,11 @@ import MainParentPage from "@/components/parents/main-parent-page";
 import { useParams } from "next/navigation";
 
 export default function Page() {
-  const {id}=useParams()
-  return(
-    <MainParentPage admin={true} id={Number(id) || undefined} back = {
-                 <BackButton title="Back To Parents" route="/portal/admin/parents" />
-            }/>
+  const { id } = useParams()
+  return (
+    <MainParentPage admin={true} id={id as string} back={
+      <BackButton title="Back To Parents" route="/portal/admin/parents" />
+    } />
   )
 
 };

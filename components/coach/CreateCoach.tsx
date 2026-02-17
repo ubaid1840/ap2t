@@ -26,6 +26,7 @@ const CreateCoach = ({ onRefresh }: { onRefresh: () => Promise<void> }) => {
     phone: "",
     career_start: "",
     bio: "",
+    zip_code : ""
   });
 
   const addCoach = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -40,6 +41,7 @@ const CreateCoach = ({ onRefresh }: { onRefresh: () => Promise<void> }) => {
         phone_no: coach.phone,
         career_start: coach.career_start,
         bio: coach.bio,
+        zip_code : coach.zip_code,
         role: "coach"
       })
 
@@ -76,7 +78,7 @@ const CreateCoach = ({ onRefresh }: { onRefresh: () => Promise<void> }) => {
                     <Input
                       name="first_name"
                       placeholder="Coach Martinez"
-                      className="!bg-[#1A1A1A] !border-[#3A3A3A] !text-[#E5E7EB] !p-5"
+                      
                       required
                       value={coach.first_name}
                       onChange={(e) =>
@@ -94,24 +96,25 @@ const CreateCoach = ({ onRefresh }: { onRefresh: () => Promise<void> }) => {
                     <Input
                       name="last_name"
                       placeholder="Coach Martinez"
-                      className="!bg-[#1A1A1A] !border-[#3A3A3A] !text-[#E5E7EB] !p-5"
+                      
                       required
                       value={coach.last_name}
                       onChange={(e) =>
                         setCoach((prev) => ({
                           ...prev,
-                          fullname: e.target.value,
+                          last_name: e.target.value,
                         }))
                       }
                     />
                   </div>
                 </div>
+                   <div className="grid grid-cols-2 gap-2">
                   <div className="space-y-2">
                     <Label className="text-sm text-[#99A1AF]">Email</Label>
                     <Input
                       name="email"
                       placeholder="martinez@ap2t.com"
-                      className="!bg-[#1A1A1A] !border-[#3A3A3A] !text-[#E5E7EB] !p-5"
+                  
                       required
                       value={coach.email}
                       onChange={(e) =>
@@ -122,13 +125,29 @@ const CreateCoach = ({ onRefresh }: { onRefresh: () => Promise<void> }) => {
                       }
                     />
                   </div>
+
+                  <div className="space-y-2">
+                    <Label className="text-sm text-[#99A1AF]">Zip Code</Label>
+                    <Input
+                      name="zip_code"
+                      placeholder="54000"
+                      value={coach.zip_code}
+                      onChange={(e) =>
+                        setCoach((prev) => ({
+                          ...prev,
+                          zip_code: e.target.value.trim().toLowerCase(),
+                        }))
+                      }
+                    />
+                  </div>
+                  </div>
                 <div className="grid grid-cols-2 gap-2">
                   <div className="space-y-2">
                     <Label className="text-sm text-[#99A1AF]">Phone</Label>
                     <Input
                       name="phone"
                       placeholder="(555) 123-4567"
-                      className="!bg-[#1A1A1A] !border-[#3A3A3A] !text-[#E5E7EB] !p-5"
+                      
                       required
                       value={coach.phone}
                       onChange={(e) =>
@@ -144,7 +163,6 @@ const CreateCoach = ({ onRefresh }: { onRefresh: () => Promise<void> }) => {
                       Start of Career
                     </Label>
                     <AppCalendar
-                      className="h-11"
                       date={coach.career_start ? new Date(coach.career_start) : undefined}
                       onChange={(date) =>
                         setCoach((prevState) => ({

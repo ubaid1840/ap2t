@@ -37,6 +37,7 @@ type DataProps = {
   skillLevel: string,
   medicalNotes: string,
   birth_date: null | Date
+  zip_code : string
 
 }
 
@@ -56,7 +57,8 @@ export function EditInfo({ player_id, data, onRefresh }: { player_id: number | u
     position: "",
     skillLevel: "",
     medicalNotes: "",
-    birth_date: null
+    birth_date: null,
+    zip_code : ""
   })
 
   useEffect(() => {
@@ -69,6 +71,7 @@ export function EditInfo({ player_id, data, onRefresh }: { player_id: number | u
         position: data?.profile?.position || "",
         skillLevel: data?.profile?.skill_level || "",
         medicalNotes: data?.profile?.medical_notes || "",
+        zip_code : data?.zip_code || ""
       })
 
     }
@@ -86,6 +89,7 @@ export function EditInfo({ player_id, data, onRefresh }: { player_id: number | u
         last_name: localData.last_name,
         phone_no: localData.phone_no,
         birth_date: localData.birth_date,
+        zip_code : localData.zip_code
       });
       await axios.put(`/admin/players/${player_id}`, {
         id: player_id,
@@ -213,6 +217,24 @@ export function EditInfo({ player_id, data, onRefresh }: { player_id: number | u
                   <SelectSkill value={localData.skillLevel} onChange={(val) => handleChange("skillLevel", val)} placeholder="Select skill level" />
                 </div>
               </div>
+
+               <div className="grid gap-2">
+                  <Label
+                    htmlFor="zip_code"
+                    className="text-xs text-muted-foreground"
+                  >
+                    Zip Code
+                  </Label>
+                  <Input
+                    id="zip_code"
+                    name="zip_code"
+                    placeholder="54000"
+                    required
+                    className="dark:bg-[#1A1A1A]"
+                    value={localData.zip_code}
+                    onChange={(e) => handleChange("zip_code", e.target.value)}
+                  />
+                </div>
 
               <div className="grid gap-2">
                 <Label

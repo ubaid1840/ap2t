@@ -30,6 +30,7 @@ type DataProp = {
     last_name: string
     phone_no: string | null
     location: string | null
+    zip_code : string | null
 
 }
 
@@ -122,6 +123,18 @@ export function EditParents({ parent_id, data, onRefresh }: EditParentsProps) {
                                     className="dark:bg-black"
                                     value={localData?.phone_no || ""}
                                     onChange={(e) => handleChange("phone_no", e.target.value)}
+                                />
+                            </div>
+
+                              <div className="grid gap-2">
+                                <Label htmlFor="zip_code" className="text-xs text-muted-foreground">Zip Code</Label>
+                                <Input
+                                    id="zip_code"
+                                    name="zip_code"
+                                    placeholder="54000"
+                                    className="dark:bg-black"
+                                    value={localData?.zip_code || ""}
+                                    onChange={(e) => handleChange("zip_code", e.target.value)}
                                 />
                             </div>
 

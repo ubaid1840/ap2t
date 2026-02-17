@@ -19,7 +19,7 @@ import {
     Edit
 } from "lucide-react";
 import { useEffect, useState } from "react";
-const EditCoachProfile = ({ id, data, onRefresh }: { id: string, data: any, onRefresh: () => Promise<void> }) => {
+const EditCoachProfile = ({ id, data, onRefresh }: { id: number | undefined, data: any, onRefresh: () => Promise<void> }) => {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false)
   const [specialityInput, setSpecialityInput] = useState("")
@@ -31,6 +31,7 @@ const EditCoachProfile = ({ id, data, onRefresh }: { id: string, data: any, onRe
     phone: "",
     career_start: "",
     bio: "",
+    zip_code : "",
     specialities: [],
     certifications: []
   });
@@ -44,20 +45,22 @@ const EditCoachProfile = ({ id, data, onRefresh }: { id: string, data: any, onRe
         career_start: data?.profile?.career_start,
         bio: data?.profile?.bio,
         specialities: data?.profile?.specialities,
-        certifications: data?.profile?.certifications
+        certifications: data?.profile?.certifications,
+        zip_code : data?.zip_code || ""
       })
     }
   }, [data])
 
   const changeCoach = async (e: React.FormEvent) => {
     e.preventDefault();
-
+    setLoading(true)
     try {
       await axios.put(`/user`, {
         id: id,
         first_name: coach?.first_name,
         last_name: coach?.last_name,
         phone_no: coach?.phone,
+        zip_code : coach?.zip_code
       })
       await axios.put(`/admin/coaches/${id}`, {
         id: id,
@@ -221,6 +224,26 @@ const EditCoachProfile = ({ id, data, onRefresh }: { id: string, data: any, onRe
                   </div>
                 </div>
 
+                 <div className="space-y-2">
+                    <Label className="text-sm text-[#99A1AF]">
+                      Zip Code
+                    </Label>
+                    <Input
+                      name="zip_code"
+                      placeholder="54000"
+
+                      required
+                      value={coach.zip_code}
+                      onChange={(e) =>
+                        setCoach((prev) => ({
+                          ...prev,
+                          zip_code: e.target.value,
+                        }))
+                      }
+                    />
+                  </div>
+
+
                 <div className="space-y-2">
                   <Label className="text-sm text-[#99A1AF]">
                     Biography
@@ -303,14 +326,13 @@ const EditCoachProfile = ({ id, data, onRefresh }: { id: string, data: any, onRe
             <Separator />
             <div className="p-4">
               <div className="flex gap-4 flex-wrap">
-                <DialogClose className="text-[13px] font-medium leading-none h-10 px-4 py-2 bg-black text-white border-border rounded-md hover:opacity-70 cursor-pointer flex flex-1 items-center justify-center">
+                <DialogClose className="text-[13px] font-medium leading-none px-4 py-2 bg-black text-white border-border rounded-md hover:opacity-70 cursor-pointer flex flex-1 items-center justify-center">
                   Cancel
                 </DialogClose>
                 <Button
                   disabled={loading}
                   type="submit"
                   className="flex-1 text-[13px]"
-                  size={"lg"}
                 >
                   {loading && <Spinner />} Save
                 </Button>

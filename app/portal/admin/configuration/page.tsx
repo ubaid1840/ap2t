@@ -16,6 +16,7 @@ interface Configuration {
   session_types: string[]
   position_list: string[]
   skill_level_list: string[]
+  comped_category_list : string[]
 }
 
 export default function Page() {
@@ -71,6 +72,8 @@ export default function Page() {
         }
       />
 
+
+
       <ArrayEditor
         title="Position List"
         values={config.position_list}
@@ -86,6 +89,15 @@ export default function Page() {
           setConfig({ ...config, skill_level_list: arr })
         }
       />
+
+      <ArrayEditor
+        title="Comped Categories"
+        values={config.comped_category_list}
+        onChange={(arr) =>
+          setConfig({ ...config, comped_category_list: arr })
+        }
+      />
+
       </>}
     </div>
   )
@@ -108,7 +120,7 @@ interface ArrayEditorProps {
 }
 
 export function ArrayEditor({ title, values, onChange }: ArrayEditorProps) {
-  const [collapsed, setCollapsed] = useState(false)
+  const [collapsed, setCollapsed] = useState(true)
   const [newValue, setNewValue] = useState("")
 
   const updateItem = (index: number, value: string) => {

@@ -30,6 +30,7 @@ export function CreateParent({ onRefresh }: { onRefresh: () => Promise<void> }) 
     email: "",
     phone: "",
     address: "",
+    zip_code : ""
   });
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -43,6 +44,7 @@ export function CreateParent({ onRefresh }: { onRefresh: () => Promise<void> }) 
           email: parent.email,
           phone_no: parent.phone,
           location: parent.address,
+          zip_code : parent.zip_code,
           role: "parent"
         }
       )
@@ -64,6 +66,7 @@ export function CreateParent({ onRefresh }: { onRefresh: () => Promise<void> }) 
       email: "",
       phone: "",
       address: "",
+      zip_code : ""
     });
 
   }
@@ -168,6 +171,28 @@ export function CreateParent({ onRefresh }: { onRefresh: () => Promise<void> }) 
                     setParent((prev) => ({
                       ...prev,
                       phone: e.target.value,
+                    }))
+                  }
+                />
+              </div>
+
+               <div className="grid gap-2">
+                <Label
+                  htmlFor="address"
+                  className="text-xs text-muted-foreground"
+                >
+                  Zip Code
+                </Label>
+                <Input
+                  id="zip_code"
+                  name="zip_code"
+                  placeholder="54000"
+                  className="dark:bg-black"
+                  value={parent.zip_code}
+                  onChange={(e) =>
+                    setParent((prev) => ({
+                      ...prev,
+                      zip_code: e.target.value,
                     }))
                   }
                 />

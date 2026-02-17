@@ -256,6 +256,7 @@ export default function MainCoachPage({
     )
   }
 
+  console.log(data)
 
   return (
     <div className="flex flex-col w-full gap-6">
@@ -288,7 +289,7 @@ export default function MainCoachPage({
               </div>
             </div>
             <div className="flex gap-4 flex-wrap">
-              <EditCoachProfile id={id as string} onRefresh={async () => await fetchData()} data={data} />
+              <EditCoachProfile id={id} onRefresh={async () => await fetchData()} data={data} />
             </div>
           </div>
 
