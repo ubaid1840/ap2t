@@ -3,9 +3,7 @@ import pool from "@/lib/db";
 
 export async function GET() {
   try {
-    /* ---------------------------------------------------
-       1️⃣ BASIC TOTALS
-    --------------------------------------------------- */
+   
 
     const [
       revenueRes,
@@ -24,9 +22,7 @@ export async function GET() {
     const totalPending = Number(pendingRes.rows[0].total);
     const totalComped = Number(compedRes.rows[0].total);
 
-    /* ---------------------------------------------------
-       2️⃣ AVERAGE ATTENDANCE
-    --------------------------------------------------- */
+   
 
     const attendanceRes = await pool.query(`
       SELECT session_id, status
@@ -54,9 +50,7 @@ export async function GET() {
           )
         : 0;
 
-    /* ---------------------------------------------------
-       3️⃣ REVENUE BY COACH
-    --------------------------------------------------- */
+   
 
     const coachRevenueRes = await pool.query(`
       SELECT 
@@ -82,46 +76,39 @@ export async function GET() {
       ([coach, value]) => ({ coach, value })
     );
 
-    /* ---------------------------------------------------
-       4️⃣ SESSIONS BY TYPE
-    --------------------------------------------------- */
+   
 
-    // 1️⃣ Fetch session types from configuration
+    
 const sessionTypeConfigRes = await pool.query(`
   SELECT session_types FROM configurations LIMIT 1
 `);
 
 const sessionTypes: string[] = sessionTypeConfigRes.rows[0]?.session_types || [];
 
-// 2️⃣ Fetch all sessions with their types
+
 const sessionsTypeRes = await pool.query(`
   SELECT session_type FROM sessions
 `);
 
-// 3️⃣ Count sessions per type
+
 const sessionTypeCountMap: Record<string, number> = {};
 
-// Initialize all types to 0 first
+
 sessionTypes.forEach((t) => (sessionTypeCountMap[t] = 0));
 
-// Count actual sessions
+
 sessionsTypeRes.rows.forEach((row) => {
   if (row.session_type && sessionTypeCountMap[row.session_type] !== undefined) {
     sessionTypeCountMap[row.session_type]++;
   }
 });
 
-// 4️⃣ Map into chart data with default 0 for missing
 const sessionTypeData = sessionTypes.map((type, idx) => ({
   name: type,
-  value: sessionTypeCountMap[type] || 0, // ensures missing types are 0
+  value: sessionTypeCountMap[type] || 0, 
   fill: `var(--chart-${idx + 1})`,
 }));
-
-
-    /* ---------------------------------------------------
-       5️⃣ MONTHLY REVENUE TREND (LAST 6 MONTHS)
-    --------------------------------------------------- */
+   
 
     const monthlyRevenueRes = await pool.query(`
       SELECT 
@@ -139,9 +126,7 @@ const sessionTypeData = sessionTypes.map((type, idx) => ({
       value: Number(row.total),
     }));
 
-    /* ---------------------------------------------------
-       6️⃣ PLAYER ATTENDANCE DATA
-    --------------------------------------------------- */
+   
 
     const playerAttendanceRes = await pool.query(`
       SELECT 
@@ -181,9 +166,7 @@ const sessionTypeData = sessionTypes.map((type, idx) => ({
       })
     );
 
-    /* ---------------------------------------------------
-       FINAL RESPONSE
-    --------------------------------------------------- */
+   
 
     return NextResponse.json({
       totals: {

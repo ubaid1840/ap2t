@@ -89,9 +89,6 @@ export default function SessionMainPage({ id, back, back_title, type }: { id: nu
   const [tab, setTab] = useState("Participants");
   const isMobile = useIsMobile();
   const [loading, setLoading] = useState(false);
-  const [loadingStatus, setLoadingStatus] = useState<
-    "completed" | "comped" | "cancelled" | null
-  >(null);
 
   const [participants, setParticipants] = useState<any[]>([]);
   const [payments, setPayments] = useState<any[]>([]);
@@ -119,6 +116,7 @@ export default function SessionMainPage({ id, back, back_title, type }: { id: nu
 
       if (result.data) {
         const d = result.data;
+        console.log(d)
         setRawSessionData(d);
         setData({
           id: d.id,
@@ -130,7 +128,8 @@ export default function SessionMainPage({ id, back, back_title, type }: { id: nu
           price: d.price,
           promotion_price: d.promotion_price,
           max_players: d.max_players,
-          location: d.location
+          location: d.location,
+          comped: d.comped
         } as any);
       }
     } finally {
@@ -258,6 +257,7 @@ export default function SessionMainPage({ id, back, back_title, type }: { id: nu
                   {data?.sessionName}
                 </span>
                 <CardStatus value={data?.status} icon={true} />
+                {data?.comped && <CardStatus value={"comped"} icon={true} />}
               </div>
               <EditSessionDialog
                 sessionId={id}
@@ -330,7 +330,14 @@ export default function SessionMainPage({ id, back, back_title, type }: { id: nu
           <Separator className="my-4" />
 
           {data && data?.status === "upcoming" &&
-            <Markbuttons id={id} onRefresh={fetchData} />
+            <Markbuttons id={id} onRefresh={async () => {
+              await fetchData()
+              await fetchParticipants()
+            }} />
+          }
+
+          {data && !data?.comped &&
+            <MarkComped id={id} onRefresh={fetchData} />
           }
         </CardContent>
       </Card>
@@ -381,10 +388,10 @@ export default function SessionMainPage({ id, back, back_title, type }: { id: nu
                 <CardContent className="space-y-2">
                   <div className="flex gap-2 items-center">
                     <h1>{participent.first_name} {participent.last_name}</h1>
-                    <CardStatus
+                    {data?.status === 'upcoming' && < CardStatus
                       value={participent?.status}
-
                     />
+                    }
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -410,7 +417,7 @@ export default function SessionMainPage({ id, back, back_title, type }: { id: nu
                   </div>
 
                   <Separator />
-                  {participent?.status === "pending" && <AttendanceMarking player_id={participent.player_id} session_id={Number(id)} onRefresh={async () => {
+                  {participent?.status === "pending" && data?.status === 'upcoming' && <AttendanceMarking player_id={participent.player_id} session_id={Number(id)} onRefresh={async () => {
                     await fetchParticipants()
                   }} />
                   }
@@ -504,15 +511,11 @@ export default function SessionMainPage({ id, back, back_title, type }: { id: nu
 
 const Markbuttons = ({ id, onRefresh }: { id: number, onRefresh: () => Promise<void> }) => {
   const [loadingStatus, setLoadingStatus] = useState("")
-  const markList = ["completed", "comped", "cancelled"]
+  const markList = ["completed", "cancelled"]
 
   const designType = {
     completed: {
       design: "flex gap-2 dark:bg-active-bg text-active-text dark:border dark:border-active-text/32",
-      icon: <CircleCheckBig />
-    },
-    comped: {
-      design: "flex gap-2 dark:bg-warning-bg text-warning-text dark:border dark:border-warning-text/32",
       icon: <CircleCheckBig />
     },
     cancelled: {
@@ -561,6 +564,48 @@ const Markbuttons = ({ id, onRefresh }: { id: number, onRefresh: () => Promise<v
     </div>
   )
 }
+
+const MarkComped = ({ id, onRefresh }: { id: number, onRefresh: () => Promise<void> }) => {
+  const [loadingStatus, setLoadingStatus] = useState(false)
+  async function handleUpdateStatus() {
+    if (!id) return
+    setLoadingStatus(true)
+    try {
+      await axios.put(`/admin/sessions/${id}`, {
+        comped: true,
+        id
+      });
+      await onRefresh()
+    } finally {
+      setLoadingStatus(false)
+    }
+  }
+  return (
+    <div className="flex px-6 gap-2 flex-wrap">
+      <Button
+
+        variant={"outline"}
+        className={"flex gap-2 dark:bg-warning-bg text-warning-text dark:border dark:border-warning-text/32"}
+        onClick={() => {
+          handleUpdateStatus()
+        }}
+      >
+        {loadingStatus ? (
+          <>
+            <Spinner />
+            Marking...
+          </>
+        ) : (
+          <>
+            <CircleCheckBig />
+            Mark as Comped
+          </>
+        )}
+      </Button>
+    </div>
+  )
+}
+
 
 const AttendanceMarking = ({ player_id, onRefresh, session_id }: { player_id: number, session_id: number, onRefresh: () => Promise<void> }) => {
 

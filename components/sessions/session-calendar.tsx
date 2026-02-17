@@ -5,11 +5,11 @@ import "./calenderstyle.css";
 
 export default function SessionCalendar({ sessions = [] }: { sessions?: any[] }) {
   const events = sessions.map(session => {
-    // robust parsing using rawDate if available, or fallback
+    
     let date = session.date;
     const dateToParse = session.rawDate || session.date;
     
-    // Ensure we get YYYY-MM-DD format
+    
     try {
         const d = new Date(dateToParse);
         if (!isNaN(d.getTime())) {
@@ -24,10 +24,12 @@ export default function SessionCalendar({ sessions = [] }: { sessions?: any[] })
     if (status === 'completed' || status === 'paid' || status === 'active') type = 'active';
     else if (status === 'cancelled') type = 'danger';
     else if (status === 'pending') type = 'warning';
+    else if (status === 'upcoming') type = 'info'
 
     return {
         id: session.id,
         title: session.sessionName,
+        sessionType : session.type,
         date: date,
         time: session.time.split(' - ')[0],
         type: type as any
