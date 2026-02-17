@@ -23,6 +23,8 @@ import { ScrollArea } from "./ui/scroll-area";
 import { useDebounce } from "@/hooks/use-debounce";
 import { Spinner } from "./ui/spinner";
 import { usePathname } from "next/navigation";
+import RenderAvatar from "./render-avatar";
+import { joinNames } from "@/lib/functions";
 
 interface PopupItem {
   id: string | number;
@@ -63,12 +65,7 @@ export default function DashboardHeader({ trigger }: { trigger?: ReactNode }) {
               {user?.email}
             </p>
           </div>
-          <Avatar>
-            <AvatarImage src="" alt="@shadcn" />
-            <AvatarFallback className="bg-primary text-black">
-              AU
-            </AvatarFallback>
-          </Avatar>
+           <RenderAvatar fallback={joinNames([user?.first_name, user?.last_name])} img={user?.picture} />
 
           <DropdownMenu>
             <DropdownMenuTrigger>
