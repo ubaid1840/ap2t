@@ -35,7 +35,6 @@ import {
   Phone,
   Plus,
   Shield,
-  Trash,
   User,
   Users
 } from "lucide-react";
@@ -419,7 +418,7 @@ export default function Page() {
     try {
       setConnectionLoading(true)
 
-      const query =  `?mode=${squareIntegration.mode}&token=${EncryptString(squareIntegration.credentials[squareIntegration.mode].apiKey) }`
+      const query = `?mode=${squareIntegration.mode}&token=${EncryptString(squareIntegration.credentials[squareIntegration.mode].apiKey)}`
       await axios.get(`/square/test${query}`)
       setConnected(true)
     } catch (error) {
@@ -440,7 +439,7 @@ export default function Page() {
           <Button disabled={savingChanges} onClick={() => updateSettings()}>
             {savingChanges ? (
               <>
-                <Loader2 className="h-4 w-4 animate-spin" />
+                <Spinner className="text-black" />
                 Saving...
               </>
             ) : (
@@ -881,7 +880,7 @@ export default function Page() {
                 </div>
                 <div className="space-x-4 mt-8">
                   <Button disabled={connectionLoading} onClick={handleTestConnection} variant={"outline"} className="leading-none">
-                 <CircleCheckBig />   {connectionLoading ? "Testing..." :  "Test Connection"}
+                    <CircleCheckBig />   {connectionLoading ? "Testing..." : "Test Connection"}
                   </Button>
                   {/* <Button className="bg-danger-bg text-danger-text border-danger-text/32 border hover:bg-danger-bg/50">
                     <Trash /> Disconnect

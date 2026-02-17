@@ -8,13 +8,14 @@ import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useDebounce } from "@/hooks/use-debounce";
 import axios from "@/lib/axios";
-import { Loader2, Plus, Search } from "lucide-react";
+import { Plus, Search } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Spinner } from "../ui/spinner";
 
 interface AddParticipantDialogProps {
   sessionId: number;
-  onSuccess: () => void;
+  onSuccess: () => Promise<void>;
+  parent_id?: string | null | undefined | number
 }
 
 interface Player {
@@ -25,7 +26,7 @@ interface Player {
   picture: string;
 }
 
-export function AddParticipantDialog({ sessionId, onSuccess }: AddParticipantDialogProps) {
+export function AddParticipantDialog({ sessionId, onSuccess, parent_id = null }: AddParticipantDialogProps) {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [results, setResults] = useState<Player[]>([]);
@@ -41,7 +42,11 @@ export function AddParticipantDialog({ sessionId, onSuccess }: AddParticipantDia
   const fetchPlayers = async () => {
     setLoading(true);
     try {
-      const response = await axios.get(`/admin/players/search`);
+      let query = `/admin/players/search`
+      if (parent_id) {
+        query = `/parent/${parent_id}/players/search`
+      }
+      const response = await axios.get(query);
       setResults(response.data);
     } finally {
       setLoading(false);
@@ -55,9 +60,9 @@ export function AddParticipantDialog({ sessionId, onSuccess }: AddParticipantDia
       await axios.post(`/admin/sessions/${sessionId}/participants`, {
         player_id: playerId,
       });
-      onSuccess();
+      await onSuccess();
       setOpen(false)
-    }  finally {
+    } finally {
       setAddingId(null);
     }
   };
@@ -74,7 +79,7 @@ export function AddParticipantDialog({ sessionId, onSuccess }: AddParticipantDia
     }}>
       <DialogTrigger asChild>
         <Button>
-          <Plus  />
+          <Plus />
           Add Participant
         </Button>
       </DialogTrigger>
@@ -129,7 +134,7 @@ export function AddParticipantDialog({ sessionId, onSuccess }: AddParticipantDia
                       disabled={addingId === player.id}
                     >
                       {addingId === player.id ? (
-                        <Loader2 className="h-4 w-4 animate-spin" />
+                        <Spinner className="text-black" />
                       ) : (
                         <Plus className="h-4 w-4" />
                       )}

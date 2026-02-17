@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useDebounce } from "@/hooks/use-debounce";
 import axios from "@/lib/axios";
-import { Loader2, Plus, Search } from "lucide-react";
+import { Plus, Search } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Spinner } from "../ui/spinner";
 
@@ -54,7 +54,7 @@ export function AddParentDialog({ playerId, onSuccess }: AddParentDialogProps) {
       await axios.post(`/admin/players/${playerId}/parent`, {
         parent_id: parent_id,
       });
-    }  finally {
+    } finally {
       onSuccess();
       setOpen(false)
       setAddingId(null);
@@ -128,7 +128,7 @@ export function AddParentDialog({ playerId, onSuccess }: AddParentDialogProps) {
                       disabled={addingId === parent.id}
                     >
                       {addingId === parent.id ? (
-                        <Loader2 className="h-4 w-4 animate-spin" />
+                        <Spinner className="text-black" />
                       ) : (
                         <Plus className="h-4 w-4" />
                       )}

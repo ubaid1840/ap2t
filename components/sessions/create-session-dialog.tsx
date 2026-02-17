@@ -1,9 +1,10 @@
 "use client";
 import axios from "@/lib/axios";
-import { Calendar, DollarSign, Loader2, MapPin, Plus, Tag, Users } from "lucide-react";
+import { Calendar, MapPin, Plus, Tag, Users } from "lucide-react";
 import { useEffect, useState } from "react";
 import AppCalendar from "../app-calendar";
-import { TimePicker } from "../time-picker";
+import SelectSessionType from "../players/select-session-type";
+import { TimePickerFixed } from "../time-picker-fixed";
 import { Button } from "../ui/button";
 import {
   Dialog,
@@ -15,8 +16,6 @@ import {
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { ScrollArea } from "../ui/scroll-area";
-import { Separator } from "../ui/separator";
-import { Textarea } from "../ui/textarea";
 import {
   Select,
   SelectContent,
@@ -26,9 +25,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
+import { Separator } from "../ui/separator";
+import { Spinner } from "../ui/spinner";
+import { Textarea } from "../ui/textarea";
 import { AssignCoachDialog } from "./assign-coach-dialog";
-import { TimePickerFixed } from "../time-picker-fixed";
-import SelectSessionType from "../players/select-session-type";
 
 export type SessionType = {
   name: string,
@@ -37,7 +37,7 @@ export type SessionType = {
   coach_id: number | null,
   coach_name?: string
   location: string,
-  date: string,
+  date: undefined,
   start_time: string,
   end_time: string,
   price: number | string,
@@ -45,9 +45,9 @@ export type SessionType = {
   apply_promotion: boolean,
   promotion_price?: number | string
   image?: string
-  end_date: string
-  promotion_start: string | null
-  promotion_end: string | null
+  end_date: undefined
+  promotion_start: string | undefined
+  promotion_end: string | undefined
 
 }
 
@@ -60,7 +60,7 @@ export function CreateSessionDialog({ onRefresh, coach_id = null, coach_name = n
     session_type: "",
     coach_id: null,
     location: "",
-    date: "",
+    date: undefined,
     start_time: "",
     end_time: "",
     price: 0,
@@ -68,9 +68,9 @@ export function CreateSessionDialog({ onRefresh, coach_id = null, coach_name = n
     apply_promotion: false,
     promotion_price: 0,
     image: "",
-    end_date: "",
-    promotion_start: "",
-    promotion_end: ""
+    end_date: undefined,
+    promotion_start: undefined,
+    promotion_end: undefined
   });
 
   useEffect(() => {
@@ -518,7 +518,7 @@ export function CreateSessionDialog({ onRefresh, coach_id = null, coach_name = n
                 >
                   {loading ? (
                     <span className="flex items-center gap-2">
-                      <Loader2 className="h-4 w-4 animate-spin" />
+                      <Spinner className="text-black"/>
                       Creating...
                     </span>
                   ) : (

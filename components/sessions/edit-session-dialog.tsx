@@ -43,14 +43,6 @@ import ConfirmationDialog from "../alert-dialog";
 import { TimePickerFixed } from "../time-picker-fixed";
 import SelectSessionType from "../players/select-session-type";
 
-const styles = {
-  active:
-    "bg-active-bg text-active-text border border-active-text/32 dark:bg-active-bg dark:text-active-text dark:border dark:border-active-text/32 ",
-  warning:
-    "bg-warning-bg text-warning-text border border-warning-text/32 dark:bg-warning-bg dark:text-warning-text dark:border dark:border-warning-text/32 ",
-  danger:
-    "bg-danger-bg text-danger-text border border-danger-text/32 dark:bg-danger-bg dark:text-danger-text dark:border dark:border-danger-text/32 ",
-};
 
 interface EditSessionDialogProps {
   sessionId?: number;
@@ -77,7 +69,7 @@ export function EditSessionDialog({
     session_type: "",
     coach_id: null,
     location: "",
-    date: "",
+    date: undefined,
     start_time: "",
     end_time: "",
     price: 0,
@@ -85,10 +77,10 @@ export function EditSessionDialog({
     apply_promotion: false,
     promotion_price: 0,
     image: "",
-    end_date: "",
+    end_date: undefined,
     coach_name: "",
-    promotion_start: "",
-    promotion_end: ""
+    promotion_start: undefined,
+    promotion_end: undefined
   });
 
   useEffect(() => {
@@ -99,7 +91,7 @@ export function EditSessionDialog({
         session_type: sessionData.session_type,
         coach_id: sessionData.coach_id,
         location: sessionData.location,
-        date: sessionData.date,
+        date: sessionData.date || undefined,
         start_time: sessionData.start_time,
         end_time: sessionData.end_time,
         price: Number(sessionData.price),
@@ -107,10 +99,10 @@ export function EditSessionDialog({
         apply_promotion: sessionData.apply_promotion,
         promotion_price: Number(sessionData.promotion_price),
         image: sessionData.image,
-        end_date: sessionData.end_date,
+        end_date: sessionData.end_date || undefined,
         coach_name: `${sessionData?.coach_first_name} ${sessionData?.coach_last_name}`,
-        promotion_start: sessionData.promotion_start,
-        promotion_end: sessionData.promotion_end
+        promotion_start: sessionData.promotion_start || undefined,
+        promotion_end: sessionData.promotion_end || undefined
       });
     }
   }, [open, sessionData]);

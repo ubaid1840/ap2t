@@ -3,6 +3,7 @@ import CardStatus from "@/components/card-status";
 import { PAYMENT_HISTORY } from "@/components/parents/constatns";
 import { EditParents } from "@/components/parents/edit-parents";
 import { LinkChildrenDialog } from "@/components/parents/link-children";
+import { CreatePlayer } from "@/components/players/create-player";
 import RenderAvatar from "@/components/render-avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -22,7 +23,6 @@ import {
   DollarSign,
   Dot,
   Download,
-  Loader2,
   Mail,
   Phone,
   Send,
@@ -31,11 +31,10 @@ import {
   UserX
 } from "lucide-react";
 import moment from "moment";
-import { useParams } from "next/navigation";
 import { ReactNode, useEffect, useState } from "react";
 import { IoIosPin } from "react-icons/io";
 import { IoCalendarClear } from "react-icons/io5";
-import { CreatePlayer } from "@/components/players/create-player";
+import { Spinner } from "../ui/spinner";
 
 export interface ParentDetailResponse {
   parent: Parent;
@@ -51,7 +50,7 @@ export interface Parent {
   email: string;
   role: string;
   status: string;
-  zip_code : string
+  zip_code: string
   picture: string | null;
   location: string | null;
   phone_no: string | null;
@@ -112,7 +111,7 @@ export interface SessionPlayer {
 export default function MainParentPage({
   id,
   back,
-  admin=false
+  admin = false
 }: {
   id: string | number | undefined;
   back?: ReactNode;
@@ -217,49 +216,49 @@ export default function MainParentPage({
                 last_name: data?.parent?.last_name,
                 phone_no: data?.parent?.phone_no,
                 location: data?.parent?.location,
-                zip_code : data?.parent?.zip_code || ""
+                zip_code: data?.parent?.zip_code || ""
               }}
                 onRefresh={fetchData} />
-             {admin && (
-  <>
-    <Button>
-      <Send /> Send Reminder
-    </Button>
+              {admin && (
+                <>
+                  <Button>
+                    <Send /> Send Reminder
+                  </Button>
 
-    {data?.parent?.status === "active" ? (
-      <Button
-        variant="destructive"
-        onClick={() => setStatus("inactive")}
-      >
-        {loading ? (
-          <>
-            <Loader2 className="h-4 w-4 animate-spin" />
-            Disabling...
-          </>
-        ) : (
-          <>
-            <UserX className="h-4 w-4" />
-            Disable
-          </>
-        )}
-      </Button>
-    ) : (
-      <Button onClick={() => setStatus("active")}>
-        {loading ? (
-          <>
-            <Loader2 className="h-4 w-4 animate-spin" />
-            Activating...
-          </>
-        ) : (
-          <>
-            <User className="h-4 w-4" />
-            Activate
-          </>
-        )}
-      </Button>
-    )}
-  </>
-)}
+                  {data?.parent?.status === "active" ? (
+                    <Button
+                      variant="destructive"
+                      onClick={() => setStatus("inactive")}
+                    >
+                      {loading ? (
+                        <>
+                          <Spinner className="text-black" />
+                          Disabling...
+                        </>
+                      ) : (
+                        <>
+                          <UserX className="h-4 w-4" />
+                          Disable
+                        </>
+                      )}
+                    </Button>
+                  ) : (
+                    <Button onClick={() => setStatus("active")}>
+                      {loading ? (
+                        <>
+                          <Spinner className="text-black" />
+                          Activating...
+                        </>
+                      ) : (
+                        <>
+                          <User className="h-4 w-4" />
+                          Activate
+                        </>
+                      )}
+                    </Button>
+                  )}
+                </>
+              )}
 
             </div>}
           </div>
@@ -348,10 +347,10 @@ export default function MainParentPage({
 
           <TabsContent value="linked">
             <div className="flex gap-4 p-4 justify-end">
-              <LinkChildrenDialog parent_id={id as string} onSuccess={fetchData}/>
-            <CreatePlayer parent_id={id as string} onRefresh={fetchData}/>
+              <LinkChildrenDialog parent_id={id as string} onSuccess={fetchData} />
+              <CreatePlayer parent_id={id as string} onRefresh={fetchData} />
             </div>
-            
+
             <div className="flex w-full justify-between gap-4 p-2 flex-wrap">
               {data?.linked_childrens && data?.linked_childrens?.map((item) => (
                 <Card key={item.user_id} className="rounded-[10px] bg-[#1A1A1A] border-[#3A3A3A] flex flex-1">

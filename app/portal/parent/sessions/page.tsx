@@ -18,10 +18,7 @@ export type SessionProps = {
 }
 
 export default function Page() {
-  const [filter, setFilter] = useState(false);
-  const [tab, setTab] = useState("table");
   const [sessions, setSessions] = useState<SessionProps[]>([]);
-  const [search, setSearch] = useState({ main: "", coach: "", type: "" })
   const [loading, setLoading] = useState(true);
   const { user } = useAuth()
 
@@ -32,8 +29,10 @@ export default function Page() {
 
   const fetchData = async () => {
     try {
-      const result = await axios.get(`/player/${user?.id}/sessions`);
+      setLoading(true)
+      const result = await axios.get(`/parent/${user?.id}/sessions`);
       if (result.data) {
+        console.log(result.data)
         const mappedSessions = result.data.map((s: any) => ({
           id: s.id,
           sessionName: s.name,
@@ -61,7 +60,7 @@ export default function Page() {
         {null}
       </Header>
 
-      <SessionCalendar player_id={user?.id} sessions={sessions} onSuccess={fetchData} />
+      <SessionCalendar parent_id={user?.id} sessions={sessions} onSuccess={fetchData} />
 
 
     </div>

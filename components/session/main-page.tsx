@@ -1,5 +1,4 @@
 "use client";
-import { useAuth } from "@/contexts/auth-context";
 import BackButton from "@/components/back-button";
 import CardStatus from "@/components/card-status";
 import { AddParticipantDialog } from "@/components/sessions/add-participant-dialog";
@@ -30,14 +29,16 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
+import { Spinner } from "@/components/ui/spinner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
+import { useAuth } from "@/contexts/auth-context";
 import { useIsMobile } from "@/hooks/use-mobile";
 import axios from "@/lib/axios";
+import { joinNames } from "@/lib/functions";
 import { Scrollbar } from "@radix-ui/react-scroll-area";
 import {
   Calendar,
-  Check,
   CheckCircle,
   CircleAlert,
   CircleCheckBig,
@@ -53,11 +54,8 @@ import {
   User,
   Users
 } from "lucide-react";
-import { useParams } from "next/navigation";
-import { useEffect, useState } from "react";
-import { joinNames } from "@/lib/functions";
 import moment from "moment";
-import { Spinner } from "@/components/ui/spinner";
+import { useEffect, useState } from "react";
 
 type CardStatusType =
   | "success"

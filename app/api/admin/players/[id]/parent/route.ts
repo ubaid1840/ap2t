@@ -10,14 +10,14 @@ export async function POST(
   try {
     const { parent_id } = await req.json();
 
-    console.log(parent_id,player_id)
-
     if (!player_id) {
       return NextResponse.json(
         { message: "Player id is required" },
         { status: 400 }
       );
     }
+
+    
 
     await pool.query(
       `

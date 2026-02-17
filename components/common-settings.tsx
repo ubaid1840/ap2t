@@ -11,6 +11,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Spinner } from "@/components/ui/spinner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "@/contexts/auth-context";
+import { useDebounce } from "@/hooks/use-debounce";
 import { useIsMobile } from "@/hooks/use-mobile";
 import axios from "@/lib/axios";
 import { auth, storage } from "@/lib/firebase";
@@ -33,24 +34,6 @@ import { FaFloppyDisk } from "react-icons/fa6";
 import { toast } from "sonner";
 
 
-type SquareMode = "test" | "live";
-
-type SquareCredentials = {
-    merchantId: string;
-    locationId: string;
-    apiKey: string;
-};
-
-type SquareIntegrationState = {
-    mode: SquareMode;
-    credentials: {
-        test: SquareCredentials;
-        live: SquareCredentials;
-    };
-};
-
-type SquareFieldKey = keyof SquareCredentials;
-
 export default function CommonSettings() {
 
     const [loading, setLoading] = useState(false);
@@ -60,8 +43,6 @@ export default function CommonSettings() {
     const [profileImage, setProfileImage] = useState<string | null>();
     const [uploading, setUploading] = useState(false);
     const fileInputRef = useRef<HTMLInputElement | null>(null);
-    const [connected, setConnected] = useState(false)
-    const [connectionLoading, setConnectionLoading] = useState(false)
     const [profileInfo, setProfileInfo] = useState({
         first_name: "",
         last_name: "",
@@ -80,11 +61,12 @@ export default function CommonSettings() {
         confirmNewPass: "",
     });
 
+    const debouncedUserId = useDebounce(user?.id, 300);
 
     useEffect(() => {
-
+        if (!debouncedUserId) return;
         fetchData();
-    }, [user]);
+    }, [debouncedUserId]);
 
     const fetchData = async () => {
         if (!user?.id) return;
@@ -114,6 +96,7 @@ export default function CommonSettings() {
             setLoading(false);
         }
     };
+
 
     const updateSettings = async () => {
         setSavingChanges(true);
@@ -148,6 +131,7 @@ export default function CommonSettings() {
                 id: user.id,
                 picture: path,
             });
+            setProfileImage(path);
         } finally {
             setUploading(false);
         }
@@ -214,7 +198,7 @@ export default function CommonSettings() {
                     <Button disabled={savingChanges} onClick={() => updateSettings()}>
                         {savingChanges ? (
                             <>
-                                <Loader2 className="h-4 w-4 animate-spin" />
+                                <Spinner className="text-black" />
                                 Saving...
                             </>
                         ) : (
@@ -275,7 +259,7 @@ export default function CommonSettings() {
                                     />
 
                                     <div className="relative w-24 h-24">
-                                        <RenderAvatar img={user?.picture} fallback={joinNames([user?.first_name, user?.last_name])} className="w-full h-full bg-[#1A1A1A]" fallbackClassName="bg-[#1A1A1A] text-white" />
+                                        <RenderAvatar img={profileImage} fallback={joinNames([user?.first_name, user?.last_name])} className="w-full h-full bg-[#1A1A1A]" fallbackClassName="bg-[#1A1A1A] text-white" />
 
                                         <button
                                             onClick={handleSelectFile}

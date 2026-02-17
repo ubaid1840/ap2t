@@ -1,18 +1,21 @@
 import { useIsMobile } from '@/hooks/use-mobile'
+import axios from '@/lib/axios'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import moment from 'moment'
 import { useMemo, useState } from 'react'
+import { AddParticipantDialog } from '../sessions/add-participant-dialog'
 import { Button } from '../ui/button'
 import { Card, CardContent } from '../ui/card'
 import { Dialog, DialogClose, DialogContent, DialogHeader, DialogTitle } from '../ui/dialog'
 import { ScrollArea, ScrollBar } from '../ui/scroll-area'
+import { Spinner } from '../ui/spinner'
 import { CalendarEvent } from './calendar-data'
 
-export default function CustomCalendar({ events = [] }: { events?: CalendarEvent[] }) {
+export default function CustomCalendar({ events = [], player_id = null, onSuccess, parent_id = null }: { events?: CalendarEvent[], player_id: string | null | undefined, onSuccess: () => Promise<void>, parent_id : string | null | undefined | number }) {
     const [currentMonth, setCurrentMonth] = useState(moment())
     const [selectedEvent, setSelectedEvent] = useState<CalendarEvent[]>([])
     const startOfMonth = currentMonth.clone().startOf('month')
-    const endOfMonth = currentMonth.clone().endOf('month')    
+    const endOfMonth = currentMonth.clone().endOf('month')
     const calendarStart = startOfMonth.clone().startOf('week')
     const calendarEnd = endOfMonth.clone().endOf('week')
     const isMobile = useIsMobile()
@@ -98,7 +101,7 @@ export default function CustomCalendar({ events = [] }: { events?: CalendarEvent
                                 const isCurrentMonth =
                                     day.month() === currentMonth.month()
 
-                                const isToday = day.isSame(moment(), 'day') 
+                                const isToday = day.isSame(moment(), 'day')
                                 const events = getEventsForDay(day)
                                 const visibleEvents = events.slice(0, 2)
                                 const overflowCount = events.length - visibleEvents.length
@@ -126,7 +129,7 @@ export default function CustomCalendar({ events = [] }: { events?: CalendarEvent
                   `}
                                     >
                                         <CardContent className="p-2 space-y-1">
-                                         
+
                                             <div
                                                 className={`
                         text-xs font-medium
@@ -136,7 +139,7 @@ export default function CustomCalendar({ events = [] }: { events?: CalendarEvent
                                                 {day.date()}
                                             </div>
 
-                                           
+
                                             <div className="space-y-1">
                                                 {visibleEvents.map((event) => {
                                                     const styles = EVENT_STYLES[event.type]
@@ -179,76 +182,114 @@ export default function CustomCalendar({ events = [] }: { events?: CalendarEvent
                 </ScrollArea>
             </div>
 
-            <EventDetail events={selectedEvent} open={selectedEvent.length > 0} onOpenChange={()=> setSelectedEvent([])}/>
+            <EventDetail onSuccess={onSuccess}  parent_id={parent_id} player_id={player_id} events={selectedEvent} open={selectedEvent.length > 0} onOpenChange={() => setSelectedEvent([])} />
         </div>
     )
 }
 
 const EventDetail = ({
-  open,
-  onOpenChange,
-  events,
+    open,
+    onOpenChange,
+    events,
+    player_id = null,
+    parent_id = null,
+    onSuccess
 }: {
-  events: CalendarEvent[];
-  open: boolean;
-  onOpenChange: () => void;
+    events: CalendarEvent[];
+    open: boolean;
+    onOpenChange: () => void;
+    player_id: string | null | undefined,
+    onSuccess: () => Promise<void>,
+    parent_id : string | null | undefined | number
 }) => {
-  return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="bg-[#252525] border border-[#3A3A3A] sm:max-w-4xl p-0">
-        <DialogHeader className="border-b border-[#3A3A3A] p-4">
-          <DialogTitle className="text-[#F3F4F6] font-semibold text-lg">
-            Event details
-          </DialogTitle>
-        </DialogHeader>
+    return (
+        <Dialog open={open} onOpenChange={onOpenChange}>
+            <DialogContent className="bg-[#252525] border border-[#3A3A3A] sm:max-w-4xl p-0">
+                <DialogHeader className="border-b border-[#3A3A3A] p-4">
+                    <DialogTitle className="text-[#F3F4F6] font-semibold text-lg">
+                        Event details
+                    </DialogTitle>
+                </DialogHeader>
 
-        <ScrollArea className="h-[70dvh] px-4 py-3">
-          <div className="space-y-3">
-            {events.length === 0 && (
-              <div className="text-sm text-muted-foreground text-center py-10">
-                No events found
-              </div>
-            )}
+                <ScrollArea className="h-[70dvh] px-4 py-3">
+                    <div className="space-y-3">
+                        {events.length === 0 && (
+                            <div className="text-sm text-muted-foreground text-center py-10">
+                                No events found
+                            </div>
+                        )}
 
-            {events.map((event) => (
-              <div
-                key={event.id}
-                className="rounded-lg border border-[#3A3A3A] bg-[#1E1E1E] p-4 flex items-center justify-between hover:bg-[#242424] transition"
-              >
-                <div className="space-y-1">
-                  <h3 className="text-sm font-semibold text-white">
-                    {event.title}
-                  </h3>
+                        {events.map((event) => (
+                            <div
+                                key={event.id}
+                                className="rounded-lg border border-[#3A3A3A] bg-[#1E1E1E] p-4 flex flex-col justify-between hover:bg-[#242424] transition gap-2"
+                            >
+                                <div className='flex items-center justify-between'>
+                                    <div className="space-y-1">
+                                        <h3 className="text-sm font-semibold text-white">
+                                            {event.title}
+                                        </h3>
 
-                  <div className="text-xs text-muted-foreground flex gap-3">
-                    <span>{event.date}</span>
-                    <span>•</span>
-                    <span>{event.time}</span>
-                  </div>
+                                        <div className="text-xs text-muted-foreground flex gap-3">
+                                            <span>{event.date}</span>
+                                            <span>•</span>
+                                            <span>{event.time}</span>
+                                        </div>
+                                    </div>
+
+                                    <span
+                                        className={`text-xs px-2 py-1 rounded-md font-medium capitalize bg-green-500/10 text-green-400`}
+                                    >
+                                        {event.sessionType}
+                                    </span>
+                                </div>
+
+                                {player_id && <ParticipateButton player_id={player_id} session_id={event.id} onSuccess={async () => {
+                                    await onSuccess()   
+                                    onOpenChange()
+                                }} />}
+
+                                {parent_id && <AddParticipantDialog parent_id={parent_id} sessionId={Number(event.id)} onSuccess={async () => {
+                                    await onSuccess()   
+                                    onOpenChange()
+                                }}/>}
+                            </div>
+                        ))}
+                    </div>
+                </ScrollArea>
+
+                <div className="p-2 space-y-1 border-t border-[#3A3A3A]">
+                    <div className="flex gap-4">
+                        <DialogClose className="text-[13px] font-medium leading-none h-10 px-4 py-2 bg-black text-white border-border rounded-md hover:opacity-70 cursor-pointer flex flex-1 items-center justify-center">
+                            Cancel
+                        </DialogClose>
+                    </div>
                 </div>
-
-                <span
-                  className={`text-xs px-2 py-1 rounded-md font-medium capitalize bg-green-500/10 text-green-400`}
-                >
-                  {event.sessionType}
-                </span>
-              </div>
-            ))}
-          </div>
-        </ScrollArea>
-
-        <div className="p-2 space-y-1 border-t border-[#3A3A3A]">
-          <div className="flex gap-4">
-            <DialogClose className="text-[13px] font-medium leading-none h-10 px-4 py-2 bg-black text-white border-border rounded-md hover:opacity-70 cursor-pointer flex flex-1 items-center justify-center">
-              Cancel
-            </DialogClose>
-          </div>
-        </div>
-      </DialogContent>
-    </Dialog>
-  );
+            </DialogContent>
+        </Dialog>
+    );
 };
 
+const ParticipateButton = ({ player_id, session_id, onSuccess }: { player_id: string | null | undefined, session_id: string, onSuccess: () => Promise<void> }) => {
+    const [loading, setLoading] = useState(false)
+
+    async function handleEnroll() {
+
+        try {
+            setLoading(true)
+            await axios.post(`/admin/sessions/${session_id}/participants`, {
+                player_id: player_id,
+            });
+            await onSuccess();
+
+        } finally {
+            setLoading(false);
+        }
+    }
+    return (
+        <Button onClick={handleEnroll} disabled={loading}>{loading && <Spinner className='text-black' />}Participate</Button>
+    )
+}
 
 const EVENT_STYLES = {
     active: {
