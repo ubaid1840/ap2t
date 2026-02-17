@@ -83,13 +83,13 @@ type noteType = {
   important: boolean;
 }
 
-export default function SessionMainPage({ id, back, back_title, type }: { id: number, back: string, back_title: string, type: string }) {
+export default function SessionMainPage({ id, back, back_title, type, admin = false }: { id: number, back: string, back_title: string, type: string, admin ?: boolean }) {
   const [data, setData] = useState<SessionDataType>();
   const [rawSessionData, setRawSessionData] = useState<any>(null);
   const [tab, setTab] = useState("Participants");
   const isMobile = useIsMobile();
   const [loading, setLoading] = useState(false);
-
+  const {user} = useAuth()
   const [participants, setParticipants] = useState<any[]>([]);
   const [payments, setPayments] = useState<any[]>([]);
   const [notes, setNotes] = useState([])
@@ -260,6 +260,7 @@ export default function SessionMainPage({ id, back, back_title, type }: { id: nu
                 {data?.comped && <CardStatus value={"comped"} icon={true} />}
               </div>
               <EditSessionDialog
+              coach_id={admin ? null : user?.id}
                 sessionId={id}
                 sessionData={rawSessionData}
                 onSuccess={fetchData}

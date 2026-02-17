@@ -3,7 +3,7 @@ import PageTable from "@/components/app-table";
 import InputWithIcon from "@/components/input-with-icon";
 import { CreateSessionDialog } from "@/components/sessions/create-session-dialog";
 import SessionCalendar from "@/components/sessions/session-calendar";
-import { SESSION_COLUMNS } from "@/components/sessions/session-column";
+import { SESSION_COLUMNS, SESSION_COLUMNS_COACH } from "@/components/sessions/session-column";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -41,7 +41,7 @@ export default function Page() {
 
   const fetchData = async () => {
     try {
-      const result = await axios.get("/admin/sessions");
+      const result = await axios.get(`/coach/${user?.id}/sessions`);
       if (result.data) {
         const mappedSessions = result.data.map((s: any) => ({
           id: s.id,
@@ -103,7 +103,7 @@ export default function Page() {
                 <Calendar /> Calendar
               </Button>
             </div>
-            <CreateSessionDialog onRefresh={async () => {
+            <CreateSessionDialog coach_id={user?.id} coach_name={joinNames([user?.first_name, user?.last_name])} onRefresh={async () => {
               await fetchData()
             }} />
           </div>
@@ -155,7 +155,7 @@ export default function Page() {
         <PageTable
           loading={loading}
           headerClassName={"rounded-4xl"}
-          columns={SESSION_COLUMNS}
+          columns={SESSION_COLUMNS_COACH}
           data={filteredData || []}
           onRowClick={() => { }}
         />

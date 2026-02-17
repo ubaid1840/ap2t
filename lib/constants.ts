@@ -123,31 +123,30 @@ export const player_nav_items = [
   },
 ];
 
+export const coach_nav_items = [
 
-export const REVENUE_BY_COACH = [
-  { time: "W1", checkins: 42 },
-  { time: "W2", checkins: 55 },
-  { time: "W3", checkins: 38 },
-  { time: "W4", checkins: 61 },
-  { time: "W5", checkins: 49 },
-  { time: "W6", checkins: 72 },
-  { time: "W7", checkins: 65 },
-  { time: "W8", checkins: 58 },
-  { time: "W9", checkins: 47 },
-  { time: "W10", checkins: 70 },
-  { time: "W11", checkins: 52 },
-  { time: "W12", checkins: 60 },
-]
-
-export const COACH_CHECKINS_DATA = [
-  { coach: "Coach Ali", value: 7200 },
-  { coach: "Coach Ahmed", value: 8450 },
-  { coach: "Coach Usman", value: 9100 },
-  { coach: "Coach Bilal", value: 10400 },
-  { coach: "Coach Hassan", value: 11850 },
-  { coach: "Coach Adeel", value: 13200 },
-  { coach: "Coach Farhan", value: 13900 },
-]
+  {
+    title: 'Dashboard',
+    url: '/portal/coach/dashboard',
+    icon: 'dashboard',
+   
+    shortcut: ['d', 'a', 's', 'h'],
+  },
+  {
+    title: 'Sessions',
+    url: '/portal/coach/sessions',
+    icon: 'sessions',
+    
+    shortcut: ['d', 'a', 's', 'h'],
+  },
+    {
+    title: 'Settings',
+    url: '/portal/coach/settings',
+    icon: 'settings',
+    
+    shortcut: ['d', 'a', 's', 'h'],
+  },
+];
 
 export const BASE_URL = "/api"
 

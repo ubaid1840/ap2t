@@ -51,7 +51,7 @@ export type SessionType = {
 
 }
 
-export function CreateSessionDialog({ onRefresh }: { onRefresh: () => Promise<void> }) {
+export function CreateSessionDialog({ onRefresh, coach_id = null, coach_name = null }: { coach_name: string | null, coach_id?: string | null, onRefresh: () => Promise<void> }) {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [session, setSession] = useState<SessionType>({
@@ -72,6 +72,12 @@ export function CreateSessionDialog({ onRefresh }: { onRefresh: () => Promise<vo
     promotion_start: "",
     promotion_end: ""
   });
+
+  useEffect(() => {
+    if (coach_id) {
+      setSession((prevState) => ({ ...prevState, coach_id: Number(coach_id), coach_name: coach_name || "" }))
+    }
+  }, [coach_id])
 
 
   const createSession = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -158,15 +164,17 @@ export function CreateSessionDialog({ onRefresh }: { onRefresh: () => Promise<vo
                           Selected Coach: {session.coach_name}
                         </p>
                       )}
-                      <AssignCoachDialog
-                        onSelect={(coach) =>
-                          setSession((prev) => ({
-                            ...prev,
-                            coach_id: coach.id,
-                            coach_name: `${coach.first_name} ${coach.last_name}`,
-                          }))
-                        }
-                      />
+                      {!coach_id &&
+                        <AssignCoachDialog
+                          onSelect={(coach) =>
+                            setSession((prev) => ({
+                              ...prev,
+                              coach_id: coach.id,
+                              coach_name: `${coach.first_name} ${coach.last_name}`,
+                            }))
+                          }
+                        />
+                      }
 
                     </div>
 

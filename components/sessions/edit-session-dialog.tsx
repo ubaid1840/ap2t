@@ -56,12 +56,14 @@ interface EditSessionDialogProps {
   sessionId?: number;
   sessionData?: SessionType & { coach_first_name?: string, coach_last_name?: string };
   onSuccess?: () => void;
+  coach_id?: string | null,
 }
 
 export function EditSessionDialog({
   sessionId,
   sessionData,
   onSuccess,
+  coach_id = null,
 }: EditSessionDialogProps) {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -227,16 +229,18 @@ export function EditSessionDialog({
                           Selected Coach: {session.coach_name}
                         </p>
                       )}
-                      <AssignCoachDialog
-                        already={!!session?.coach_id}
-                        onSelect={(coach) =>
-                          setSession((prev) => ({
-                            ...prev,
-                            coach_id: coach.id,
-                            coach_name: `${coach.first_name} ${coach.last_name}`,
-                          }))
-                        }
-                      />
+                      {!coach_id &&
+                        <AssignCoachDialog
+                          already={!!session?.coach_id}
+                          onSelect={(coach) =>
+                            setSession((prev) => ({
+                              ...prev,
+                              coach_id: coach.id,
+                              coach_name: `${coach.first_name} ${coach.last_name}`,
+                            }))
+                          }
+                        />
+                      }
 
                     </div>
 
@@ -475,7 +479,7 @@ export function EditSessionDialog({
                       }
                     </div>
 
-                     <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-2">
                         <Label className="text-sm text-muted-foreground">
                           Promotion Start Date *

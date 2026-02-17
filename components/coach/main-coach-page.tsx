@@ -126,10 +126,10 @@ export interface PaymentData {
 
 export default function MainCoachPage({
   id,
-  back,
+  back = null,
   admin=false
 }: {
-  id: number | undefined;
+  id: string | undefined;
   back?: ReactNode;
   admin?: boolean;
 }) {
@@ -249,15 +249,13 @@ export default function MainCoachPage({
   if (loading) {
     return (
       <div className="flex flex-col w-full gap-6">
-        <BackButton title="Back to coaches" route="/portal/admin/coaches" />
+    {back}
         <Skeleton className="h-[200px] w-full bg-secondary rounded-sm" />
         <Skeleton className="h-[300px] w-full bg-secondary rounded-sm" />
 
       </div>
     )
   }
-
-  console.log(data)
 
   return (
     <div className="flex flex-col w-full gap-6">

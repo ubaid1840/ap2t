@@ -9,7 +9,7 @@ export default function Page() {
   return (
     <MainCoachPage
       admin={true}
-      id={Number(id)}
+      id={id as string}
       back={
         <BackButton title="Back to coaches" route="/portal/admin/coaches" />
       }
