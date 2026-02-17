@@ -16,11 +16,22 @@ import { useAuth } from "@/contexts/auth-context";
 import moment from "moment";
 import { joinNames } from "@/lib/functions";
 
+export type SessionProps = {
+  id: number,
+  sessionName: string,
+  type: string,
+  date: string,
+  time: string,
+  coachName: string,
+  price: string | number,
+  status: string
+}
+
 export default function Page() {
   const [filter, setFilter] = useState(false);
   const [tab, setTab] = useState("table");
-  const [sessions, setSessions] = useState([]);
-
+  const [sessions, setSessions] = useState<SessionProps[]>([]);
+  const [search, setSearch] = useState({ main: "", coach: "", type: "" })
   const [loading, setLoading] = useState(true);
   const { user } = useAuth()
 
@@ -51,6 +62,23 @@ export default function Page() {
       setLoading(false);
     }
   };
+
+  function handleChangeSearch(key: string, val: string) {
+    setSearch((prev) => ({ ...prev, [key]: val }))
+  }
+
+  const filteredData = sessions.filter((item) => {
+
+    const sessionSearch = item?.sessionName?.toLowerCase()
+    const coachSearch = `${item?.coachName}`.toLowerCase()
+    const typeSearch = item?.type?.toLowerCase()
+
+    const matchSessions = search.main ? sessionSearch.includes(search.main.toLocaleLowerCase()) : true
+
+    const matchesCoach = search.coach ? coachSearch.includes(search.coach.toLowerCase()) : true;
+    const matchesType = search.type ? typeSearch.includes(search.type.toLowerCase()) : true;
+    return matchSessions && matchesCoach && matchesType;
+  });
 
 
   return (
@@ -86,7 +114,7 @@ export default function Page() {
       <div className="flex flex-col gap-4 rounded-[14px] bg-#252525 border border-[#3A3A3A] p-4 bg-[#252525]">
         <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 items-center">
           <div className="w-full">
-            <InputWithIcon placeholder="Search by player name, parent or position..." />
+            <InputWithIcon value={search.main} onChange={(e) => handleChangeSearch("main", e.target.value)} placeholder="Search by session..." />
           </div>
 
           <Button onClick={() => setFilter(!filter)}>
@@ -101,14 +129,14 @@ export default function Page() {
                 <Label className="text-muted-foreground font-normal">
                   Coach
                 </Label>
-                <Input className="rounded-[8px] dark:bg-black" />
+                <Input value={search.coach} onChange={(e) => handleChangeSearch("coach", e.target.value)} className="rounded-[8px] dark:bg-black" />
               </div>
 
               <div className="flex flex-1 flex-col gap-2">
                 <Label className="text-muted-foreground font-normal">
                   Session Type
                 </Label>
-                <Input className="rounded-[8px] dark:bg-black" />
+                <Input value={search.type} onChange={(e) => handleChangeSearch("type", e.target.value)} className="rounded-[8px] dark:bg-black" />
               </div>
 
               {/* <div className="flex flex-1 flex-col gap-2">
@@ -122,25 +150,25 @@ export default function Page() {
         )}
       </div>
 
-     
-        
-          {tab === "table" && (
-            <PageTable
-            loading={loading}
-              headerClassName={"rounded-4xl"}
-              columns={SESSION_COLUMNS}
-              data={sessions || []}
-              onRowClick={() => { }}
-            />
-          )}
-          {tab === "calendar" && <SessionCalendar sessions={sessions} />}
-        
-   
+
+
+      {tab === "table" && (
+        <PageTable
+          loading={loading}
+          headerClassName={"rounded-4xl"}
+          columns={SESSION_COLUMNS}
+          data={filteredData || []}
+          onRowClick={() => { }}
+        />
+      )}
+      {tab === "calendar" && <SessionCalendar sessions={sessions} />}
+
+
     </div>
   );
 }
 
-const Header = ({ children, session_length }: { children: ReactNode, session_length : number | undefined }) => {
+const Header = ({ children, session_length }: { children: ReactNode, session_length: number | undefined }) => {
   return (
     <div className="flex w-full gap-4 justify-between flex-wrap items-center">
       <div className="space-y-2">
@@ -149,7 +177,7 @@ const Header = ({ children, session_length }: { children: ReactNode, session_len
           <span>{session_length} of {session_length} sessions </span>
           <span className="text-warning-text inline-flex">
             {" "}
-            <Dot size={16} /> 1 pending payments
+            {/* <Dot size={16} /> 1 pending payments */}
           </span>
         </span>
       </div>

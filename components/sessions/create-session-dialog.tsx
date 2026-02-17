@@ -46,6 +46,8 @@ export type SessionType = {
   promotion_price?: number | string
   image?: string
   end_date: string
+  promotion_start: string | null
+  promotion_end: string | null
 
 }
 
@@ -66,7 +68,9 @@ export function CreateSessionDialog({ onRefresh }: { onRefresh: () => Promise<vo
     apply_promotion: false,
     promotion_price: 0,
     image: "",
-    end_date: ""
+    end_date: "",
+    promotion_start: "",
+    promotion_end: ""
   });
 
 
@@ -135,13 +139,13 @@ export function CreateSessionDialog({ onRefresh }: { onRefresh: () => Promise<vo
                     <Label className="text-sm text-muted-foreground">
                       Session Type *
                     </Label>
-                    <SelectSessionType required={true} placeholder="Select session type"  value={session.session_type}
+                    <SelectSessionType required={true} placeholder="Select session type" value={session.session_type}
                       onChange={(e) =>
                         setSession((prev) => ({
                           ...prev,
                           session_type: e,
                         }))
-                      }/>
+                      } />
                   </div>
                   <div className="space-y-2">
                     <Label className="text-sm text-muted-foreground">
@@ -399,6 +403,41 @@ export function CreateSessionDialog({ onRefresh }: { onRefresh: () => Promise<vo
                         <div className="w-full h-50" />
 
                       }
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label className="text-sm text-muted-foreground">
+                          Promotion Start Date *
+                        </Label>
+                        <AppCalendar
+                          className="h-9"
+                          date={session.promotion_start ? new Date(session.promotion_start) : undefined}
+                          onChange={(date) =>
+                            setSession((prevState) => ({
+                              ...prevState,
+                              promotion_start: date,
+                            }))
+                          }
+                          required
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label className="text-sm text-muted-foreground">
+                          Promotion End Date *
+                        </Label>
+                        <AppCalendar
+                          className="h-9"
+                          date={session.promotion_end ? new Date(session.promotion_end) : undefined}
+                          onChange={(date) =>
+                            setSession((prevState) => ({
+                              ...prevState,
+                              promotion_end: date,
+                            }))
+                          }
+                          required
+                        />
+                      </div>
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">

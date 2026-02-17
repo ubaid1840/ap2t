@@ -1,19 +1,18 @@
-import React, { useMemo, useState } from 'react'
-import moment from 'moment'
-import { CALENDAR_DATA, CalendarEvent } from './calendar-data'
-import { Card, CardContent } from '../ui/card'
-import { Button } from '../ui/button'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
-import { ScrollArea, ScrollBar } from '../ui/scroll-area'
 import { useIsMobile } from '@/hooks/use-mobile'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
+import moment from 'moment'
+import { useMemo, useState } from 'react'
+import { Button } from '../ui/button'
+import { Card, CardContent } from '../ui/card'
+import { Dialog, DialogClose, DialogContent, DialogHeader, DialogTitle } from '../ui/dialog'
+import { ScrollArea, ScrollBar } from '../ui/scroll-area'
+import { CalendarEvent } from './calendar-data'
 
-export default function CustomCalendar({ events = CALENDAR_DATA }: { events?: CalendarEvent[] }) {
+export default function CustomCalendar({ events = [] }: { events?: CalendarEvent[] }) {
     const [currentMonth, setCurrentMonth] = useState(moment())
-
+    const [selectedEvent, setSelectedEvent] = useState<CalendarEvent[]>([])
     const startOfMonth = currentMonth.clone().startOf('month')
-    const endOfMonth = currentMonth.clone().endOf('month')
-
-    // Sunday-based calendar grid
+    const endOfMonth = currentMonth.clone().endOf('month')    
     const calendarStart = startOfMonth.clone().startOf('week')
     const calendarEnd = endOfMonth.clone().endOf('week')
     const isMobile = useIsMobile()
@@ -38,6 +37,7 @@ export default function CustomCalendar({ events = CALENDAR_DATA }: { events?: Ca
     const handleDayClick = (day: moment.Moment) => {
         const events = getEventsForDay(day)
         console.log(day.format('YYYY-MM-DD'), events)
+        setSelectedEvent(events)
     }
 
     return (
@@ -98,7 +98,7 @@ export default function CustomCalendar({ events = CALENDAR_DATA }: { events?: Ca
                                 const isCurrentMonth =
                                     day.month() === currentMonth.month()
 
-                                const isToday = day.isSame(moment(), 'day') // ✅ FLAG
+                                const isToday = day.isSame(moment(), 'day') 
                                 const events = getEventsForDay(day)
                                 const visibleEvents = events.slice(0, 2)
                                 const overflowCount = events.length - visibleEvents.length
@@ -178,9 +178,77 @@ export default function CustomCalendar({ events = CALENDAR_DATA }: { events?: Ca
                     <ScrollBar orientation="horizontal" />
                 </ScrollArea>
             </div>
+
+            <EventDetail events={selectedEvent} open={selectedEvent.length > 0} onOpenChange={()=> setSelectedEvent([])}/>
         </div>
     )
 }
+
+const EventDetail = ({
+  open,
+  onOpenChange,
+  events,
+}: {
+  events: CalendarEvent[];
+  open: boolean;
+  onOpenChange: () => void;
+}) => {
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="bg-[#252525] border border-[#3A3A3A] sm:max-w-4xl p-0">
+        <DialogHeader className="border-b border-[#3A3A3A] p-4">
+          <DialogTitle className="text-[#F3F4F6] font-semibold text-lg">
+            Event details
+          </DialogTitle>
+        </DialogHeader>
+
+        <ScrollArea className="h-[70dvh] px-4 py-3">
+          <div className="space-y-3">
+            {events.length === 0 && (
+              <div className="text-sm text-muted-foreground text-center py-10">
+                No events found
+              </div>
+            )}
+
+            {events.map((event) => (
+              <div
+                key={event.id}
+                className="rounded-lg border border-[#3A3A3A] bg-[#1E1E1E] p-4 flex items-center justify-between hover:bg-[#242424] transition"
+              >
+                <div className="space-y-1">
+                  <h3 className="text-sm font-semibold text-white">
+                    {event.title}
+                  </h3>
+
+                  <div className="text-xs text-muted-foreground flex gap-3">
+                    <span>{event.date}</span>
+                    <span>•</span>
+                    <span>{event.time}</span>
+                  </div>
+                </div>
+
+                <span
+                  className={`text-xs px-2 py-1 rounded-md font-medium capitalize bg-green-500/10 text-green-400`}
+                >
+                  {event.sessionType}
+                </span>
+              </div>
+            ))}
+          </div>
+        </ScrollArea>
+
+        <div className="p-2 space-y-1 border-t border-[#3A3A3A]">
+          <div className="flex gap-4">
+            <DialogClose className="text-[13px] font-medium leading-none h-10 px-4 py-2 bg-black text-white border-border rounded-md hover:opacity-70 cursor-pointer flex flex-1 items-center justify-center">
+              Cancel
+            </DialogClose>
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
 
 const EVENT_STYLES = {
     active: {

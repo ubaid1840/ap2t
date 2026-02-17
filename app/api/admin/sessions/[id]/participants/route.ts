@@ -116,7 +116,7 @@ export async function GET(
   LEFT JOIN attendance a 
     ON a.session_id = sp.session_id 
     AND a.user_id = sp.user_id
-    AND DATE(a.created_at) = CURRENT_DATE   -- 👈 Only today's attendance
+    AND DATE(a.created_at) = CURRENT_DATE
 
   WHERE sp.session_id = $1
   `,

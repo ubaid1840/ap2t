@@ -36,7 +36,8 @@ export const IconType = {
     attended: <CircleCheckBig size={14} />,
     connected: <GoDotFill size={14} />,
     completed: <CircleCheckBig size={14} />,
-    disconnected : <CircleX size={14} />
+    disconnected : <CircleX size={14} />,
+    comped : <CircleCheckBig size={14}/>
 }
 
 interface CardStatusProps {

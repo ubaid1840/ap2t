@@ -84,7 +84,9 @@ export function EditSessionDialog({
     promotion_price: 0,
     image: "",
     end_date: "",
-    coach_name: ""
+    coach_name: "",
+    promotion_start: "",
+    promotion_end: ""
   });
 
   useEffect(() => {
@@ -104,7 +106,9 @@ export function EditSessionDialog({
         promotion_price: Number(sessionData.promotion_price),
         image: sessionData.image,
         end_date: sessionData.end_date,
-        coach_name: `${sessionData?.coach_first_name} ${sessionData?.coach_last_name}`
+        coach_name: `${sessionData?.coach_first_name} ${sessionData?.coach_last_name}`,
+        promotion_start: sessionData.promotion_start,
+        promotion_end: sessionData.promotion_end
       });
     }
   }, [open, sessionData]);
@@ -224,7 +228,7 @@ export function EditSessionDialog({
                         </p>
                       )}
                       <AssignCoachDialog
-                      already = {!!session?.coach_id}
+                        already={!!session?.coach_id}
                         onSelect={(coach) =>
                           setSession((prev) => ({
                             ...prev,
@@ -469,6 +473,41 @@ export function EditSessionDialog({
                         <div className="w-full h-50" />
 
                       }
+                    </div>
+
+                     <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label className="text-sm text-muted-foreground">
+                          Promotion Start Date *
+                        </Label>
+                        <AppCalendar
+                          className="h-9"
+                          date={session.promotion_start ? new Date(session.promotion_start) : undefined}
+                          onChange={(date) =>
+                            setSession((prevState) => ({
+                              ...prevState,
+                              promotion_start: date,
+                            }))
+                          }
+                          required
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label className="text-sm text-muted-foreground">
+                          Promotion End Date *
+                        </Label>
+                        <AppCalendar
+                          className="h-9"
+                          date={session.promotion_end ? new Date(session.promotion_end) : undefined}
+                          onChange={(date) =>
+                            setSession((prevState) => ({
+                              ...prevState,
+                              promotion_end: date,
+                            }))
+                          }
+                          required
+                        />
+                      </div>
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
