@@ -87,7 +87,7 @@ export default function Page() {
     return (
 
         <div className="flex flex-col w-full gap-6">
-            <Header >
+            <Header length={players.length}>
                 <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
                     <ExportExcel header={["Name", "Coach Name", "Age", "Position", "Parent Name", "Last Session", "Last Session Date", "Attendance"]} fileName="players_data.xlsx" data={players.map((item)=>[
                                item?.name || "",

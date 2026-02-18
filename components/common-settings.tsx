@@ -61,7 +61,7 @@ export default function CommonSettings() {
         confirmNewPass: "",
     });
 
-    const debouncedUserId = useDebounce(user?.id, 300);
+    const debouncedUserId = useDebounce(user?.id, 1000);
 
     useEffect(() => {
         if (!debouncedUserId) return;
@@ -69,12 +69,12 @@ export default function CommonSettings() {
     }, [debouncedUserId]);
 
     const fetchData = async () => {
-        if (!user?.id) return;
+        if (!debouncedUserId) return;
 
         try {
             setLoading(true);
 
-            const res = await axios.get(`/settings?user_id=${user.id}`);
+            const res = await axios.get(`/settings?user_id=${debouncedUserId}`);
             const result = res.data;
 
             setProfileInfo({

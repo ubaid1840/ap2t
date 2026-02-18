@@ -47,7 +47,7 @@ export interface PlayerResponse {
   email: string;
   role: string;
   status: string;
-  zip_code : string
+  zip_code: string
   picture: string | null;
   location: string | null;
   phone_no: string;
@@ -277,9 +277,9 @@ export default function MainPlayerPage({
                   Parent:{" "}
                   {data?.parent_id
                     ? joinNames([
-                        data?.attach_parent?.first_name,
-                        data?.attach_parent?.last_name,
-                      ])
+                      data?.attach_parent?.first_name,
+                      data?.attach_parent?.last_name,
+                    ])
                     : "N/A"}
                 </span>
                 <span className="inline-flex gap-2">
@@ -392,7 +392,7 @@ export default function MainPlayerPage({
             <>
               <div className="w-full flex justify-between">
                 <p className="text-[18px] text-white">Linked Parent</p>
-                {admin&&<Link
+                {admin && <Link
                   target="blank"
                   href={`/portal/admin/parents/${data?.parent_id}`}
                 >
@@ -675,10 +675,11 @@ export default function MainPlayerPage({
               <div>
                 <p>Coach Feedback & Notes</p>
                 <p className="text-muted-foreground text-xs">
-                  3 notes from coaches
+                  {data?.all_notes &&
+                    data?.all_notes.length > 0 && `${data?.all_notes.length} notes from coaches`}
                 </p>
               </div>
-              {admin&&<AddCoachNotes player_id={id} onRefresh={fetchData} />}
+              {admin && <AddCoachNotes player_id={id} onRefresh={fetchData} />}
             </div>
 
             {data?.all_notes &&

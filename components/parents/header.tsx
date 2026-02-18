@@ -8,7 +8,7 @@ const Header = ({ children, totalParents }: { children: ReactNode, totalParents 
                 <p className="text-xl">Parent Management</p>
                 <span className="text-xs text-muted-foreground flex items-center">
                     <span>{totalParents} of {totalParents} parents{' '}</span>
-                    <span className="text-alternative-text inline-flex"> <Dot size={16} /> 3 with payment issues</span>
+                    {/* <span className="text-alternative-text inline-flex"> <Dot size={16} /> 3 with payment issues</span> */}
                 </span>
             </div>
 

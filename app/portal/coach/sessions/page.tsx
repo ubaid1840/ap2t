@@ -52,7 +52,8 @@ export default function Page() {
           time: `${s.start_time} - ${s.end_time}`,
           coachName: joinNames([s.coach_first_name, s.coach_last_name]),
           price: s.price,
-          status: s?.status || 'upcoming'
+          status: s?.status || 'upcoming',
+          end_date: s?.end_date ? moment(new Date(s.end_date)).format("YYYY-MM-DD") : null
         }));
         setSessions(mappedSessions);
       }

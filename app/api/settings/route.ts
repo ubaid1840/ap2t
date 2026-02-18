@@ -10,7 +10,7 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    const userResult = await pool.query(`SELECT * FROM users WHERE id = $1`, [
+    const userResult = await pool.query(`SELECT id FROM users WHERE id = $1`, [
       userid,
     ]);
 
@@ -27,15 +27,9 @@ export async function GET(req: NextRequest) {
 
 
     if (settingsResult.rows.length === 0) {
-      await pool.query(
-        `INSERT INTO settings (user_id) VALUES ($1)`,
+     settingsResult = await pool.query(
+        `INSERT INTO settings (user_id) VALUES ($1) RETURNING *`,
         [userid]
-      );
-      
-
-      settingsResult = await pool.query(
-        `SELECT * FROM settings WHERE user_id = $1`,
-        [userid],
       );
     }
 

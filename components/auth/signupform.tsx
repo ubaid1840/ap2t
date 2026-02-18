@@ -121,8 +121,6 @@ export default function SignUpForm({
         email = parentData.email
         password = parentData.password
       }
-
-      await axios.post("/user", { ...payload.player, parent_id });
       await signInWithEmailAndPassword(auth, email, password)
 
     } catch (error: any) {

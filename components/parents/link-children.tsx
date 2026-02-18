@@ -170,7 +170,7 @@ export function LinkChildrenDialog({ parent_id, onSuccess }: LinkChildrenDialogP
           <AlertDialogHeader>
             <AlertDialogTitle>Parent Already exists</AlertDialogTitle>
             <AlertDialogDescription>
-              This player already already has a parent linked to it. Would you still like to continue?
+              This player already has a parent linked to it. Would you still like to continue?
             </AlertDialogDescription>
           </AlertDialogHeader>
 
