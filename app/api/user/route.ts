@@ -43,90 +43,125 @@ export async function PUT(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
+    await pool.query("BEGIN");
     try {
-        const { email, password: u_pass, position, skill_level, medical_notes, career_start, bio, parent_id = null, ...data } = await req.json();
+        const searchParams = req.nextUrl.searchParams
+        const special = searchParams.get("special") === "true"
 
+        if (special) {
+            const { player, parent } = await req.json();
+            let parent_id: number | null = null;
 
+            try {
+                if (parent) {
+                    parent_id = await createUserWithFirebase(pool, admin, parent);
 
-        if (!data || Object.keys(data).length === 0 || !email) {
+                    await pool.query(
+                        `INSERT INTO parents (user_id) VALUES ($1)`,
+                        [parent_id]
+                    );
+                }
 
-            return NextResponse.json({ message: "Required parameters missing" }, { status: 400 });
-        }
+                const player_id = await createUserWithFirebase(pool, admin, player);
 
-        let password = "12345678"
+                await pool.query(
+                    `INSERT INTO players (user_id, position, medical_notes, skill_level, parent_id)
+           VALUES ($1, '', '', '', $2)`,
+                    [player_id, parent_id]
+                );
 
-        if (u_pass) {
-            password = u_pass
-        }
-
-
-        try {
-            await admin.auth().createUser({ email, password });
-        } catch (error: any) {
-            if (error.code === "auth/email-already-exists") {
-                console.warn(`Email ${email} already exists, continuing...`);
-            } else {
-                throw error;
+                await pool.query("COMMIT");
+                return NextResponse.json({ message: "User added successfully" });
+            } catch (err) {
+                await pool.query("ROLLBACK");
+                throw err;
             }
-        }
+        } else {
+            const { email, password: u_pass, position = "", skill_level = "", medical_notes = "", career_start = null, bio = "", parent_id = null, ...data } = await req.json();
 
-        const checkEmail = await pool.query(`SELECT id from users WHERE email = $1`, [email])
+            if (!data || Object.keys(data).length === 0 || !email) {
+                await pool.query("ROLLBACK");
+                return NextResponse.json({ message: "Required parameters missing" }, { status: 400 });
+            }
 
-        if (checkEmail.rows.length > 0) {
-            return NextResponse.json({ message: "Email already exists" }, { status: 400 })
-        }
+            const checkEmail = await pool.query(`SELECT id from users WHERE email = $1`, [email])
 
-        const fields = Object.keys({ ...data, email });
-        const values = Object.values({ ...data, email });
-        const placeholders = fields.map((_, i) => `$${i + 1}`).join(", ");
+            if (checkEmail.rows.length > 0) {
+                await pool.query("ROLLBACK");
+                return NextResponse.json({ message: "Email already exists" }, { status: 400 })
+            }
 
-        const userResult = await pool.query(
-            `INSERT INTO users (${fields.join(",")})
+
+            const password = u_pass || "12345678";
+
+            try {
+                await admin.auth().createUser({ email, password });
+            } catch (error: any) {
+                if (error.code === "auth/email-already-exists") {
+                    console.warn(`Email ${email} already exists, continuing...`);
+                } else {
+                    throw error;
+                }
+            }
+
+
+
+            const fields = Object.keys({ ...data, email });
+            const values = Object.values({ ...data, email });
+            const placeholders = fields.map((_, i) => `$${i + 1}`).join(", ");
+
+            const userResult = await pool.query(
+                `INSERT INTO users (${fields.join(",")})
        VALUES (${placeholders})
        RETURNING id`,
-            values
-        );
-
-        const user = userResult.rows[0];
-        const { role } = data
-        if (role === 'parent') {
-            await pool.query(
-                `INSERT INTO parents (user_id) VALUES ($1) RETURNING *`,
-                [user.id]
+                values
             );
-        } else if (role === 'player') {
-            await pool.query(
-                `
+
+            const user = userResult.rows[0];
+            const { role } = data
+            if (role === 'parent') {
+                await pool.query(
+                    `INSERT INTO parents (user_id) VALUES ($1)`,
+                    [user.id]
+                );
+            } else if (role === 'player') {
+                await pool.query(
+                    `
             INSERT INTO players 
             (user_id,position,medical_notes,skill_level, parent_id)
             VALUES
-            ($1,$2,$3,$4, $5)
+            ($1,$2,$3,$4,$5)
             `,
-                [
-                    user.id,
-                    position,
-                    medical_notes,
-                    skill_level,
-                    parent_id
-                ]
-            )
-        } else if (role === 'coach') {
-            await pool.query(
-                `
+                    [
+                        user.id,
+                        position,
+                        medical_notes,
+                        skill_level,
+                        parent_id
+                    ]
+                )
+            } else if (role === 'coach') {
+                await pool.query(
+                    `
             INSERT INTO coaches 
             (user_id,bio,rating,career_start)
             VALUES
             ($1,$2,$3,$4)
             `,
-                [user.id, bio, 5, career_start],
+                    [user.id, bio, 5, career_start],
+                );
+            }
+
+            await pool.query("COMMIT");
+
+            return NextResponse.json(
+                { message: "Data saved" },
+                { status: 201 }
             );
         }
 
-        return NextResponse.json(
-            { message: "Data inserted" },
-            { status: 201 }
-        );
     } catch (error: any) {
+        await pool.query("ROLLBACK");
         console.log("POST /api/parent error:", error);
         return NextResponse.json(
             { message: error?.message || "Server error" },
@@ -134,3 +169,49 @@ export async function POST(req: NextRequest) {
         );
     }
 }
+
+
+async function createUserWithFirebase(
+    pool: any,
+    admin: any,
+    data: any
+) {
+    const { password, email, ...rest } = data;
+
+    if (!email) throw new Error("Email required");
+
+    const exists = await pool.query(
+        `SELECT id FROM users WHERE email = $1`,
+        [email]
+    );
+
+    if (exists.rows.length > 0) {
+        throw new Error("Email already exists");
+    }
+
+    try {
+        await admin.auth().createUser({ email, password });
+    } catch (error: any) {
+        if (error.code === "auth/email-already-exists") {
+            console.warn(`Email ${email} already exists, continuing...`);
+        } else {
+            throw error;
+        }
+    }
+
+    const fields = Object.keys({ ...rest, email });
+    const values = Object.values({ ...rest, email });
+    const placeholders = fields.map((_, i) => `$${i + 1}`).join(",");
+
+    const res = await pool.query(
+        `INSERT INTO users (${fields.join(",")})
+     VALUES (${placeholders})
+     RETURNING id`,
+        values
+    );
+
+    return res.rows[0].id;
+}
+
+
+export const revalidate = 0

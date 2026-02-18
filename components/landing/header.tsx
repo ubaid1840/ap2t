@@ -5,13 +5,15 @@ import { Button } from "../ui/button";
 import { HiOutlineMenu, HiOutlineX } from "react-icons/hi";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
+import { LogIn } from "lucide-react";
 
 const links = [
   { name: "HOME", href: "/home" },
   { name: "ABOUT US", href: "/about" },
   { name: "IN-HOUSE PROGRAMS", href: "/inhouseprograms" },
   { name: "CAMPS & CLINICS", href: "/camps&clinics" },
-  { name: "GALLERY", href: "/gallery" }
+  { name: "GALLERY", href: "/gallery" },
+  { name: "STORE", href: "#" }
 ];
 
 export default function Header() {
@@ -52,11 +54,16 @@ export default function Header() {
 
             {/* Buttons */}
             <div className="flex gap-2">
-              <Button className="rounded-full bg-[#CBFD0026] text-primary hover:bg-primary hover:text-secondary w-20">
+              {/* <Button className="rounded-full bg-[#CBFD0026] text-primary hover:bg-primary hover:text-secondary w-20">
                 Store
-              </Button>
+              </Button> */}
               <Link href={"/contact"} className="w-25">
-                <Button className="rounded-full w-full">Contact</Button>
+                <Button className="bg-[#CBFD0026] text-primary hover:bg-primary hover:text-secondary rounded-full w-full">Contact</Button>
+              </Link>
+              <Link href={"/portal/auth"} >
+                <Button className="rounded-full" >
+                  Portal <LogIn />
+                </Button>
               </Link>
             </div>
           </div>
@@ -109,13 +116,16 @@ export default function Header() {
 
             {/* Buttons */}
             <div className="mt-auto flex flex-col gap-3">
-              <Button className="rounded-full bg-[#CBFD0026] text-primary hover:bg-primary hover:text-secondary">
-                Store
-              </Button>
               <Link onClick={() => setDrawerOpen(false)} href={"/contact"} className="w-full">
-                <Button className="w-full">Contact</Button>
+                <Button className="bg-[#CBFD0026] text-primary hover:bg-primary hover:text-secondary w-full">Contact</Button>
+              </Link>
+              <Link onClick={() => setDrawerOpen(false)} href={"/portal/auth"} className="w-full" >
+                <Button className="w-full" >
+                  Portal <LogIn />
+                </Button>
               </Link>
             </div>
+
           </div>
         </div>
       )}

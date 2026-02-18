@@ -125,6 +125,7 @@ export default function MainParentPage({
   const [dataLoading, setDataLoading] = useState(true)
   const { user } = useAuth()
 
+  
   useEffect(() => {
     if (id && user?.id) {
       fetchData();

@@ -22,14 +22,16 @@ import { useRouter } from "next/navigation";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "@/lib/firebase";
 import { Separator } from "../ui/separator";
+import { toast } from "sonner";
+import { Spinner } from "../ui/spinner";
 
 export default function SignUpForm({
   onClickLogin,
 }: {
   onClickLogin: () => void;
 }) {
-  const router = useRouter();
-  const [underAged,setUnderAged]=useState(false)
+  const [underAged, setUnderAged] = useState(false)
+  const [loading, setLoading] = useState(false)
   const [playerData, setPlayerData] = useState({
     first_name: "",
     last_name: "",
@@ -40,7 +42,7 @@ export default function SignUpForm({
     confirm_password: "",
   });
 
-  const [parentData,setParentData]=useState({
+  const [parentData, setParentData] = useState({
     first_name: "",
     last_name: "",
     birth_date: "",
@@ -61,60 +63,72 @@ export default function SignUpForm({
   const [waiverData, setWaiverData] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
 
-  useEffect((()=>{
-    const age=new Date().getFullYear() - new Date(playerData.birth_date).getFullYear()
-    if(age<18){
+  useEffect((() => {
+    const age = new Date().getFullYear() - new Date(playerData.birth_date).getFullYear()
+    if (age < 18) {
       setUnderAged(true)
     }
-    else{
+    else {
       setUnderAged(false)
     }
-  }),[playerData.birth_date])
+  }), [playerData.birth_date])
 
   const signUp = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!playerData.email || !playerData.password) return;
     if (playerData.password !== playerData.confirm_password) return;
-    if(underAged){
-      if(!parentData.email||!parentData.password)return;
-      if(parentData.password!== parentData.confirm_password) return
+    if (underAged) {
+      if (!parentData.email || !parentData.password) return;
+      if (parentData.password !== parentData.confirm_password) return
     }
     if (!waiverData) return;
 
-    const payload={
 
-        player:{first_name: playerData.first_name,
+    const payload = {
+      player: {
+        first_name: playerData.first_name,
         last_name: playerData.last_name,
         email: playerData.email,
         password: playerData.password,
         birth_date: playerData.birth_date,
         location: playerData.location,
-        role: "player"},
-        underAged:underAged,
-        parent:{}
-      
+        role: "player"
+      },
+      parent: {}
+
     }
-  if (underAged) {
-  payload.parent = {
-    first_name: parentData.first_name,
-    last_name: parentData.last_name,
-    email: parentData.email,
-    password: parentData.password,
-    birth_date: parentData.birth_date,
-    location: parentData.location,
-    role: "parent",
-  };
-}
-    
+    if (underAged) {
+      payload.parent = {
+        first_name: parentData.first_name,
+        last_name: parentData.last_name,
+        email: parentData.email,
+        password: parentData.password,
+        birth_date: parentData.birth_date,
+        location: parentData.location,
+        role: "parent",
+      };
+    }
+
     try {
-      const res = await axios.post("/user", payload);
-      if (res.status === 200) {
-        const { email } = res.data;
-        await signInWithEmailAndPassword(auth, email, playerData.password);
+      setLoading(true)
+      let parent_id = null
+      let email = playerData.email
+      let password = playerData.password
+
+      await axios.post("/user?special=true", payload);
+      if (underAged && payload?.parent) {
+        email = parentData.email
+        password = parentData.password
       }
-    } catch (error) {
-      console.error("signup error:", error);
+
+      await axios.post("/user", { ...payload.player, parent_id });
+      await signInWithEmailAndPassword(auth, email, password)
+
+    } catch (error: any) {
+      toast.error(error?.message)
+    } finally {
+      setLoading(false)
     }
   };
 
@@ -253,136 +267,135 @@ export default function SignUpForm({
                 />
               </div>
             </div>
-            <Separator/>
-            {underAged &&(
+            <Separator />
+            {underAged && (
               <>
-              <div className="border-b border-[#282828] pb-3">
-              <h2 className="text-sm font-medium">Parent Information</h2>
-            </div>
+                <div className="border-b border-[#282828] pb-3">
+                  <h2 className="text-sm font-medium">Parent Information</h2>
+                </div>
 
-            <div className="flex gap-4">
-              <div className="flex-1">
-                <Label className="text-sm">First Name *</Label>
-                <Input
-                  required
-                  type="text"
-                  placeholder="First Name"
-                  className="w-full px-4"
-                  value={parentData.first_name}
-                  onChange={(e) =>
-                    setParentData((prev) => ({
-                      ...prev,
-                      first_name: e.target.value,
-                    }))
-                  }
-                />
-              </div>
-              <div className="flex-1">
-                <Label className="text-sm">Last Name *</Label>
-                <Input
-                  required
-                  type="text"
-                  placeholder="Last Name"
-                  className="w-full px-4"
-                  value={parentData.last_name}
-                  onChange={(e) =>
-                    setParentData((prev) => ({
-                      ...prev,
-                      last_name: e.target.value,
-                    }))
-                  }
-                />
-              </div>
-            </div>
+                <div className="flex gap-4">
+                  <div className="flex-1">
+                    <Label className="text-sm">First Name *</Label>
+                    <Input
+                      required
+                      type="text"
+                      placeholder="First Name"
+                      className="w-full px-4"
+                      value={parentData.first_name}
+                      onChange={(e) =>
+                        setParentData((prev) => ({
+                          ...prev,
+                          first_name: e.target.value,
+                        }))
+                      }
+                    />
+                  </div>
+                  <div className="flex-1">
+                    <Label className="text-sm">Last Name *</Label>
+                    <Input
+                      required
+                      type="text"
+                      placeholder="Last Name"
+                      className="w-full px-4"
+                      value={parentData.last_name}
+                      onChange={(e) =>
+                        setParentData((prev) => ({
+                          ...prev,
+                          last_name: e.target.value,
+                        }))
+                      }
+                    />
+                  </div>
+                </div>
 
-            <div className="flex gap-4">
-              <div className="flex-1">
-                <Label className="text-sm">Birth Date *</Label>
-                <AppCalendar
-                  className="h-11"
-                  date={
-                    parentData.birth_date
-                      ? new Date(parentData.birth_date)
-                      : undefined
-                  }
-                  onChange={(date) =>
-                    setParentData((prevState) => ({
-                      ...prevState,
-                      birth_date: date,
-                    }))
-                  }
-                  required
-                />
-              </div>
-              <div className="flex-1">
-                <Label className="text-sm">Town / City *</Label>
-                <Input
-                  required
-                  type="text"
-                  placeholder="New York"
-                  className="w-full px-4"
-                  value={parentData.location}
-                  onChange={(e) =>
-                    setParentData((prev) => ({
-                      ...prev,
-                      location: e.target.value,
-                    }))
-                  }
-                />
-              </div>
-            </div>
+                <div className="flex gap-4">
+                  <div className="flex-1">
+                    <Label className="text-sm">Birth Date *</Label>
+                    <AppCalendar
+                      date={
+                        parentData.birth_date
+                          ? new Date(parentData.birth_date)
+                          : undefined
+                      }
+                      onChange={(date) =>
+                        setParentData((prevState) => ({
+                          ...prevState,
+                          birth_date: date,
+                        }))
+                      }
+                      required
+                    />
+                  </div>
+                  <div className="flex-1">
+                    <Label className="text-sm">Town / City *</Label>
+                    <Input
+                      required
+                      type="text"
+                      placeholder="New York"
+                      className="w-full px-4"
+                      value={parentData.location}
+                      onChange={(e) =>
+                        setParentData((prev) => ({
+                          ...prev,
+                          location: e.target.value,
+                        }))
+                      }
+                    />
+                  </div>
+                </div>
 
-            <div>
-              <Label className="text-sm">Email *</Label>
-              <Input
-                required
-                type="email"
-                placeholder="johnsmith@gmail.com"
-                className="w-full px-4"
-                value={parentData.email}
-                onChange={(e) =>
-                  setParentData((prev) => ({
-                    ...prev,
-                    email: e.target.value.trim().toLowerCase(),
-                  }))
-                }
-              />
-            </div>
+                <div>
+                  <Label className="text-sm">Email *</Label>
+                  <Input
+                    required
+                    type="email"
+                    placeholder="johnsmith@gmail.com"
+                    className="w-full px-4"
+                    value={parentData.email}
+                    onChange={(e) =>
+                      setParentData((prev) => ({
+                        ...prev,
+                        email: e.target.value.trim().toLowerCase(),
+                      }))
+                    }
+                  />
+                </div>
 
-            <div className="flex gap-4">
-              <div className="flex-1">
-                <Label className="text-sm">Password *</Label>
-                <Input
-                  required
-                  type="password"
-                  placeholder="••••••••"
-                  className="w-full px-4"
-                  value={parentData.password}
-                  onChange={(e) =>
-                    setParentData((prev) => ({
-                      ...prev,
-                      password: e.target.value,
-                    }))
-                  }
-                />
-              </div>
-              <div className="flex-1">
-                <Label className="text-sm">Confirm Password *</Label>
-                <Input
-                  required
-                  type="password"
-                  placeholder="••••••••"
-                  className="w-full px-4"
-                  value={parentData.confirm_password}
-                  onChange={(e) =>
-                    setParentData((prev) => ({
-                      ...prev,
-                      confirm_password: e.target.value,
-                    }))
-                  }
-                />
-              </div>
-            </div>
+                <div className="flex gap-4">
+                  <div className="flex-1">
+                    <Label className="text-sm">Password *</Label>
+                    <Input
+                      required
+                      type="password"
+                      placeholder="••••••••"
+                      className="w-full px-4"
+                      value={parentData.password}
+                      onChange={(e) =>
+                        setParentData((prev) => ({
+                          ...prev,
+                          password: e.target.value,
+                        }))
+                      }
+                    />
+                  </div>
+                  <div className="flex-1">
+                    <Label className="text-sm">Confirm Password *</Label>
+                    <Input
+                      required
+                      type="password"
+                      placeholder="••••••••"
+                      className="w-full px-4"
+                      value={parentData.confirm_password}
+                      onChange={(e) =>
+                        setParentData((prev) => ({
+                          ...prev,
+                          confirm_password: e.target.value,
+                        }))
+                      }
+                    />
+                  </div>
+                </div>
               </>
             )
 
@@ -390,13 +403,19 @@ export default function SignUpForm({
 
             <div className="flex gap-4">
               <Button
-                onClick={() => setCurrentStep(1)}
+                onClick={(e) => {
+                  e.preventDefault()
+                  setCurrentStep(1)
+                }}
                 className="flex-1 bg-primary text-secondary"
               >
                 Continue
               </Button>
               <Button
-                onClick={() => onClickLogin()}
+                onClick={(e) => {
+                  e.preventDefault()
+                  onClickLogin()
+                }}
                 className="flex-1 bg-secondary text-white"
               >
                 Login
@@ -503,7 +522,7 @@ export default function SignUpForm({
                 onClick={() => setCurrentStep(0)}
                 className="flex-1 bg-secondary text-white"
               >
-                back
+                Back
               </Button>
               <Button
                 onClick={() => setCurrentStep(2)}
@@ -577,7 +596,8 @@ export default function SignUpForm({
 
             <div className="flex gap-4">
               <Button
-                onClick={() => {
+                onClick={(e) => {
+                  e.preventDefault();
                   setCurrentStep(1);
                 }}
                 className="flex-1 bg-secondary text-white"
@@ -592,7 +612,7 @@ export default function SignUpForm({
                 }}
                 className="flex-1 bg-primary text-secondary"
               >
-                Sign up
+                {loading && <Spinner className="text-black" />}  Sign up
               </Button>
             </div>
           </div>
@@ -615,7 +635,7 @@ export default function SignUpForm({
 
       <Stepper
         value={currentStep}
-        onValueChange={() => {}}
+        onValueChange={() => { }}
         className="space-y-8 w-full "
       >
         <StepperNav>
