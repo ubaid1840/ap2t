@@ -1,7 +1,7 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { ColumnDef } from "@tanstack/react-table";
-import { ArrowUpDown, CircleCheckBig, CircleX, Eye, Info, Mail, Phone, Users } from "lucide-react";
+import { ArrowUpDown, CircleCheckBig, CircleX, Eye, Hash, Info, Mail, Phone, Users } from "lucide-react";
 import Link from "next/link";
 import { IoIosPin } from "react-icons/io";
 import getInitials from "./get-initials";
@@ -20,6 +20,7 @@ export interface ParentData {
     total_spent: number;
     last_spent: number;
     last_transaction_date: string;
+    zip_code:string
 }
 
 export const PARENT_COLUMNS: ColumnDef<ParentData>[] = [
@@ -94,6 +95,25 @@ export const PARENT_COLUMNS: ColumnDef<ParentData>[] = [
         cell: ({ row }) => (
             <div className="text-[#D1D5DC] flex items-center gap-2">
                 <IoIosPin size={14} /> {row.original.location}
+            </div>
+        ),
+    },
+    {
+        accessorKey: "zip_code",
+        header: ({ column }) => (
+            <Button
+                variant="ghost"
+                className="text-[#99A1AF] text-[12px] tracking-wider dark:hover:bg-transparent dark:hover:text-white/50"
+
+                onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+            >
+                ZIP CODE
+                <ArrowUpDown />
+            </Button>
+        ),
+        cell: ({ row }) => (
+            <div className="text-[#D1D5DC] flex items-center gap-2">
+                <Hash size={14} /> {row.original.zip_code}
             </div>
         ),
     },

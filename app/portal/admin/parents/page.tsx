@@ -22,7 +22,7 @@ import { useDebounce } from "@/hooks/use-debounce";
 export interface ParentData {
   id: number | string;
   name: string;
-  joining_date: string; // formatted as "YYYY-MM-DD" or "N/A"
+  joining_date: string; 
   email: string;
   number: string | null;
   location: string;
@@ -30,7 +30,8 @@ export interface ParentData {
   card_status: string;
   total_spent: string;
   last_spent: string;
-  last_transaction_date: string; // formatted as "YYYY-MM-DD" or "N/A"
+  last_transaction_date: string; 
+  zip_code:string;
 }
 
 export default function Page() {
@@ -38,7 +39,11 @@ export default function Page() {
   const [parents, setParents] = useState<ParentData[] | []>([]);
   const [loading, setLoading] = useState(false)
   const [search, setSearch] = useState("")
-  const debouncedSearch = useDebounce(search, 300)
+  const [paymentStatusSearch,setPaymentStatusSearch]=useState("")
+  const [zipCodeSearch,setZipCodeSearch] =useState("")
+  const debouncedSearch = useDebounce(search, 300);
+// const debouncedPayment = useDebounce(paymentStatusSearch, 300);
+const debouncedZip = useDebounce(zipCodeSearch, 300);
   const { user } = useAuth();
 
   useEffect(() => {
@@ -67,15 +72,28 @@ export default function Page() {
       last_transaction_date: p.last_transaction_date
         ? moment(new Date(p.last_transaction_date)).format("YYYY-MM-DD")
         : "N/A",
+        zip_code:p.zip_code
     }));
     setParents(parentsmapped);
     setLoading(false)
   };
 
-  const filteredData = parents.filter((item)=>{
-    const localSearch = `${item.name} ${item.email} ${item.number}`.toLocaleLowerCase()
-    if(localSearch.includes(debouncedSearch?.toLocaleLowerCase())) return item
-  })
+ const filteredData = parents.filter((item) => {
+  const text = `${item.name} ${item.email} ${item.number}`.toLowerCase();
+  // const payment = `${item.payment_status ?? ""}`.toLowerCase();
+  const zip = `${item.zip_code ?? ""}`.toLowerCase();
+
+  const matchesSearch =
+    !debouncedSearch || text.includes(debouncedSearch.toLowerCase());
+
+  // const matchesPayment =
+  //   !debouncedPayment || payment.includes(debouncedPayment.toLowerCase());
+
+  const matchesZip =
+    !debouncedZip || zip.includes(debouncedZip.toLowerCase());
+
+  return matchesSearch && matchesZip;
+});
 
   return (
     <div className="flex flex-col w-full gap-6">
@@ -115,17 +133,16 @@ export default function Page() {
           <div className="flex flex-col w-full gap-4">
             <Separator />
             <div className="flex flex-col sm:flex-row w-full gap-4">
-              <div className="flex flex-1 flex-col gap-2">
+              {/* <div className="flex flex-1 flex-col gap-2">
                 <Label className="text-muted-foreground">Payment Status</Label>
-                <Input className="rounded-[8px] dark:bg-black" />
-              </div>
+                <InputWithIcon value={paymentStatusSearch} onChange={(e)=> setPaymentStatusSearch(e.target.value)} placeholder="Search By Payment Status..." />
+
+              </div> */}
 
               <div className="flex flex-1 flex-col gap-2">
                 <Label className="text-muted-foreground">Zip Code</Label>
-                <Input
-                  placeholder="Filter by zip code..."
-                  className="rounded-[8px] dark:bg-black"
-                />
+                <InputWithIcon value={zipCodeSearch} onChange={(e)=> setZipCodeSearch(e.target.value)} placeholder="Search By Zip Code..." />
+
               </div>
             </div>
           </div>
