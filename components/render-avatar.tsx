@@ -30,7 +30,7 @@ const RenderAvatar = ({ img = "", fallback = "NA", className = "", fallbackClass
 
     return (
         loading ? <Spinner /> :
-            <Avatar className={`h-12 w-12 ${className}`}>
+            <Avatar className={`h-10 w-10 ${className}`}>
                 <AvatarImage className="object-cover" src={localImage} />
                 <AvatarFallback className={`bg-primary text-black ${fallbackClassName}`}>
                     {getInitials(fallback)}
