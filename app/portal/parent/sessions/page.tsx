@@ -32,7 +32,14 @@ export default function Page() {
   const fetchData = async () => {
     try {
       setLoading(true)
-      const result = await axios.get(`/parent/${user?.id}/sessions`);
+       const month = currentMonth
+  ? currentMonth.format("YYYY-MM")
+  : null;
+      const result = await axios.get(`/parent/${user?.id}/sessions`, 
+         {
+    params: { month }
+  }
+      );
       if (result.data) {
         console.log(result.data)
         const mappedSessions = result.data.map((s: any) => ({

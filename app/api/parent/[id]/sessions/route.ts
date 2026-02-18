@@ -6,6 +6,7 @@ export async function GET(
     { params }: { params: { id: string } }
 ) {
     const { id } = await params;
+     const month  = req.nextUrl.searchParams.get("month")
 
 
     try {
@@ -50,12 +51,22 @@ export async function GET(
       JOIN users u ON u.id = p.user_id
     ) c
       ON c.user_id = sp.user_id
+       WHERE
+    s.date >= DATE_TRUNC(
+      'month',
+      COALESCE($2::timestamptz, NOW())
+    )
+    AND s.date < DATE_TRUNC(
+      'month',
+      COALESCE($2::timestamptz, NOW())
+    ) + INTERVAL '1 month'
+  
     GROUP BY s.id, u.first_name, u.last_name
-    ORDER BY s.start_time ASC
+    ORDER BY s.date ASC
   `;
 
         const result = await pool.query(query, [
-            childrenIds.length ? childrenIds : [null]
+            childrenIds.length ? childrenIds : [null],  month ? `${month}-01T00:00:00Z` : null
         ]);
 
         return NextResponse.json(result.rows, { status: 200 });

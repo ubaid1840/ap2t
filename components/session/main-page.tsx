@@ -328,7 +328,7 @@ export default function SessionMainPage({ id, back, back_title, type, admin = fa
           </div>
           <Separator className="my-4" />
 
-           <div className="flex gap-2 flex-wrap">
+           <div className="flex gap-2 flex-wrap px-6">
 
           {data && data?.status === "upcoming" &&
             <Markbuttons id={id} onRefresh={async () => {
@@ -540,7 +540,7 @@ const Markbuttons = ({ id, onRefresh }: { id: number, onRefresh: () => Promise<v
     }
   }
   return (
-    <div className="flex px-6 gap-2 flex-wrap">
+    <div className="flex gap-2 flex-wrap">
       {markList.map((item) => (
         <Button
           key={item}
@@ -583,7 +583,7 @@ const MarkComped = ({ id, onRefresh }: { id: number, onRefresh: () => Promise<vo
     }
   }
   return (
-    <div className="flex px-6 gap-2 flex-wrap">
+    <div className="flex gap-2 flex-wrap">
       <Button
 
         variant={"outline"}
