@@ -13,7 +13,7 @@ export async function GET() {
     ] = await Promise.all([
       pool.query(`SELECT COALESCE(SUM(amount),0) AS total FROM payments WHERE status='paid'`),
       pool.query(`SELECT COUNT(*) AS total FROM sessions`),
-      pool.query(`SELECT COUNT(*) AS total FROM payments WHERE status='pending'`),
+      pool.query(`SELECT COUNT(*) AS total FROM payments WHERE status!=ANY($1::text[])`, [["paid", "comped"]]),
       pool.query(`SELECT COUNT(*) AS total FROM payments WHERE status='comped'`),
     ]);
 
@@ -166,6 +166,21 @@ const sessionTypeData = sessionTypes.map((type, idx) => ({
       })
     );
 
+  const zipcodeQuery = await pool.query(`
+  SELECT
+    u.zip_code,
+    COUNT(DISTINCT u.id)        AS total_users,
+    COALESCE(SUM(p.amount), 0)  AS total_revenue,
+    COALESCE(AVG(p.amount), 0)  AS avg_revenue
+  FROM users u
+  LEFT JOIN payments p
+    ON p.user_id = u.id
+  WHERE u.zip_code IS NOT NULL
+    AND u.zip_code <> ''
+  GROUP BY u.zip_code
+  ORDER BY u.zip_code
+`);
+
    
 
     return NextResponse.json({
@@ -180,6 +195,7 @@ const sessionTypeData = sessionTypes.map((type, idx) => ({
       sessionTypeData,
       monthlyRevenueTrend,
       playerAttendanceData,
+      zipcodeData : zipcodeQuery.rows
     });
   } catch (error: any) {
     console.error(error);

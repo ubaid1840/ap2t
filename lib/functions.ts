@@ -101,3 +101,36 @@ export function formatTimeWithAmPm(time: string): string {
   const hourFormatted = hour.toString().padStart(2, "0")
   return `${hourFormatted}:${minute} ${ampm}`
 }
+
+type SheetConfig = {
+  sheetName: string;
+  headers: string[];
+  rows: (string | number)[][];
+};
+
+export const exportDashboardToExcel = async (
+  sheets: SheetConfig[],
+  fileName = "dashboard-report.xlsx"
+) => {
+  if (!sheets.length) throw new Error("No sheets to export");
+
+  const workbook = XLSX.utils.book_new();
+
+  sheets.forEach(({ sheetName, headers, rows }) => {
+    const worksheetData = [headers, ...rows];
+    const worksheet = XLSX.utils.aoa_to_sheet(worksheetData);
+    XLSX.utils.book_append_sheet(workbook, worksheet, sheetName);
+  });
+
+  const excelBuffer = XLSX.write(workbook, {
+    bookType: "xlsx",
+    type: "array",
+  });
+
+  const blob = new Blob([excelBuffer], {
+    type: "application/octet-stream",
+  });
+
+  saveAs(blob, fileName);
+};
+

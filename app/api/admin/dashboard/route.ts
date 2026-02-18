@@ -1,13 +1,14 @@
 import pool from "@/lib/db";
 import { joinNames } from "@/lib/functions";
+import moment from "moment";
 import { NextResponse } from "next/server";
 
 
 
 export async function GET() {
   try {
-    // -------------------------------
-    // 1️⃣ Attendance today
+    
+    
     const attendanceTodayRes = await pool.query(
       `SELECT COUNT(*) AS total_check_ins
        FROM attendance
@@ -26,53 +27,49 @@ export async function GET() {
 
     const checkInsDifference = totalCheckIns - yesterdayCheckIns;
 
-    // -------------------------------
-    // 2️⃣ Revenue today (status = paid)
-    // -------------------------------
-// Revenue today (sum of amount)
-const revenueTodayRes = await pool.query(
-  `SELECT COALESCE(SUM(amount), 0) AS total_revenue
+    
+    const revenueTodayRes = await pool.query(
+      `SELECT COALESCE(SUM(amount), 0) AS total_revenue
    FROM payments
-   WHERE status = 'paid'
+   WHERE status = ANY($1::text[])
      AND paid_at IS NOT NULL
-     AND DATE(paid_at AT TIME ZONE 'UTC') = CURRENT_DATE`
-);
-const totalRevenue = Number(revenueTodayRes.rows[0]?.total_revenue || 0);
+     AND DATE(paid_at AT TIME ZONE 'UTC') = CURRENT_DATE`, [["paid", "comped"]]
+    );
+    const totalRevenue = Number(revenueTodayRes.rows[0]?.total_revenue || 0);
 
-// Revenue yesterday
-const revenueYesterdayRes = await pool.query(
-  `SELECT COALESCE(SUM(amount), 0) AS total_revenue
+    const revenueYesterdayRes = await pool.query(
+      `SELECT COALESCE(SUM(amount), 0) AS total_revenue
    FROM payments
-   WHERE status = 'paid'
+   WHERE status = ANY($1::text[])
      AND paid_at IS NOT NULL
-     AND DATE(paid_at AT TIME ZONE 'UTC') = CURRENT_DATE - INTERVAL '1 day'`
-);
-const yesterdayRevenue = Number(revenueYesterdayRes.rows[0]?.total_revenue || 0);
+     AND DATE(paid_at AT TIME ZONE 'UTC') = CURRENT_DATE - INTERVAL '1 day'`, [["paid", "comped"]]
+    );
+    const yesterdayRevenue = Number(revenueYesterdayRes.rows[0]?.total_revenue || 0);
 
-// Percentage change
-const revenueChangePercentage =
-  yesterdayRevenue === 0
-    ? totalRevenue > 0
-      ? 100
-      : 0
-    : ((totalRevenue - yesterdayRevenue) / yesterdayRevenue) * 100;
+    
+    const revenueChangePercentage =
+      yesterdayRevenue === 0
+        ? totalRevenue > 0
+          ? 100
+          : 0
+        : ((totalRevenue - yesterdayRevenue) / yesterdayRevenue) * 100;
 
 
-    // -------------------------------
-    // 3️⃣ Pending payments today
+    
+    
     const pendingTodayRes = await pool.query(
       `SELECT COUNT(*) AS pending_count
        FROM payments
-       WHERE status != 'paid'
-         AND DATE(created_at AT TIME ZONE 'UTC') = CURRENT_DATE`
+       WHERE status != ANY($1::text[])
+         AND DATE(created_at AT TIME ZONE 'UTC') = CURRENT_DATE`, [["paid", "comped"]]
     );
     const pendingToday = Number(pendingTodayRes.rows[0]?.pending_count || 0);
 
     const pendingYesterdayRes = await pool.query(
       `SELECT COUNT(*) AS pending_count
        FROM payments
-       WHERE status != 'paid'
-         AND DATE(created_at AT TIME ZONE 'UTC') = CURRENT_DATE - INTERVAL '1 day'`
+       WHERE status != ANY($1::text[])
+         AND DATE(created_at AT TIME ZONE 'UTC') = CURRENT_DATE - INTERVAL '1 day'`, [["paid", "comped"]]
     );
     const pendingYesterday = Number(pendingYesterdayRes.rows[0]?.pending_count || 0);
 
@@ -83,58 +80,55 @@ const revenueChangePercentage =
           : 0
         : ((pendingToday - pendingYesterday) / pendingYesterday) * 100;
 
-    // -------------------------------
-    // 4️⃣ Upcoming sessions today
-   const upcomingTodayRes = await pool.query(
-  `SELECT COUNT(*) AS upcoming_count
-   FROM sessions
-   WHERE status = 'upcoming'`
-);
-const upcomingToday = Number(upcomingTodayRes.rows[0]?.upcoming_count || 0);
+        const sessionsDataRes = await pool.query(
+      `SELECT s.id, s.session_type, s.name, s.start_time, s.end_time, s.coach_id, s.status, s.date, s.end_date,
+              u.first_name AS coach_first_name,
+              u.last_name AS coach_last_name
+       FROM sessions s
+       LEFT JOIN users u ON s.coach_id = u.id
+       WHERE s.status = ANY($1 :: text[])`, [["upcoming", "ongoing"]]
+    );
+      const today = moment()
+     const yesterday = moment().subtract(1, "day");
 
-// Total upcoming sessions as of yesterday
-const upcomingYesterdayRes = await pool.query(
-  `SELECT COUNT(*) AS upcoming_count
-   FROM sessions
-   WHERE status = 'upcoming'
-     AND DATE(created_at AT TIME ZONE 'UTC') <= CURRENT_DATE - INTERVAL '1 day'`
-);
-const upcomingYesterday = Number(upcomingYesterdayRes.rows[0]?.upcoming_count || 0);
+    const upcomingYesterday = sessionsDataRes.rows.filter((item)=>{
+      const start = moment(new Date(item.date))
+      const end = moment(new Date(item.end_date))
+      if (yesterday.isSameOrAfter(start, 'day') && yesterday.isSameOrBefore(end, 'day')) return true
+    }).length
 
-// Percentage change
-const upcomingChangePercentage =
-  upcomingYesterday === 0
-    ? upcomingToday > 0
-      ? 100
-      : 0
-    : ((upcomingToday - upcomingYesterday) / upcomingYesterday) * 100;
+    const upcomingToday = sessionsDataRes.rows.filter((item)=>{
+      const start = moment(new Date(item.date))
+      const end = moment(new Date(item.end_date))
+      if (today.isSameOrAfter(start, 'day') && today.isSameOrBefore(end, 'day')) return true
+    }).length
 
-    // -------------------------------
-    // 5️⃣ Attendance data (all present)
+     const upcomingChangePercentage =
+      upcomingYesterday === 0
+        ? upcomingToday > 0
+          ? 100
+          : 0
+        : ((upcomingToday - upcomingYesterday) / upcomingYesterday) * 100;
+
+    const sessionsData = sessionsDataRes.rows.map((s: any) => ({
+      ...s,
+      coach_name: joinNames([s.coach_first_name, s.coach_last_name]),
+    })).filter((item) => {
+    
+      const start = moment(new Date(item.date))
+      const end = moment(new Date(item.end_date))
+      if (today.isSameOrAfter(start, 'day') && today.isSameOrBefore(end, 'day')) return true
+    })
+
+    
+    
     const attendanceDataRes = await pool.query(
       `SELECT *
        FROM attendance
        WHERE status = 'present'`
     );
     const attendanceData = attendanceDataRes.rows;
-
-    // -------------------------------
-    // 6️⃣ Upcoming sessions data with coach names
-    const sessionsDataRes = await pool.query(
-      `SELECT s.id, s.session_type, s.name, s.start_time, s.end_time, s.coach_id, s.status,
-              u.first_name AS coach_first_name,
-              u.last_name AS coach_last_name
-       FROM sessions s
-       LEFT JOIN users u ON s.coach_id = u.id
-       WHERE s.status = 'upcoming'`
-    );
-
-    const sessionsData = sessionsDataRes.rows.map((s: any) => ({
-      ...s,
-      coach_name: joinNames([s.coach_first_name, s.coach_last_name]),
-    }));
-
-    // -------------------------------
+    
     return NextResponse.json({
       totalCheckIns,
       checkInsDifference,

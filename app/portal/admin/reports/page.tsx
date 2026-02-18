@@ -4,15 +4,17 @@ import { BarChart } from "@/components/charts/bar-chart";
 import LineChart from "@/components/charts/line-chart-dots";
 import PieChart from "@/components/charts/pie-chart";
 import { PLAYER_ATTENDANCE_DATA_COLUMNS, ZIP_REVENUE_DATA_COLUMNS } from "@/components/settings/columns";
-import { MONTHLY_SESSIONS_CONFIG, SESSION_TYPE_CHART_CONFIG, ZIP_REVENUE_DATA } from "@/components/settings/constants";
+import { MONTHLY_SESSIONS_CONFIG, SESSION_TYPE_CHART_CONFIG } from "@/components/settings/constants";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useSidebar } from "@/components/ui/sidebar";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/contexts/auth-context";
 import { useIsMobile } from "@/hooks/use-mobile";
 import axios from "@/lib/axios";
+import { exportDashboardToExcel, exportToExcel } from "@/lib/functions";
 
 import {
   ChartColumn,
@@ -75,6 +77,13 @@ export type PlayerAttendanceItem = {
   attendance_rate: number; // attendance percentage
 };
 
+export type ZipcodeItem = {
+  avg_revenue: string
+  total_revenue: string
+  total_users: string
+  zip_code: string
+}
+
 // ----------------------------
 // Full Response Type
 // ----------------------------
@@ -84,15 +93,16 @@ export type DashboardDataResponse = {
   sessionTypeData: SessionTypeItem[];
   monthlyRevenueTrend: MonthlyRevenueItem[];
   playerAttendanceData: PlayerAttendanceItem[];
+  zipcodeData: ZipcodeItem[]
 };
 
 
 export default function Page() {
 
-  const [filter, setFilter] = useState(true)
+  const [filter, setFilter] = useState(false)
   const { open } = useSidebar()
   const isMobile = useIsMobile()
-
+  const [loading, setLoading] = useState(true)
   const [reports, setReports] = useState<DashboardDataResponse | undefined>()
   const { user } = useAuth()
 
@@ -101,13 +111,12 @@ export default function Page() {
   }, [user])
 
   async function fetchData() {
-
+    setLoading(true)
     try {
       const response = await axios.get("/admin/report")
-      console.log(response.data)
       setReports(response.data)
-    } catch (error) {
-
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -149,11 +158,112 @@ export default function Page() {
 
   ]
 
+  const totalsSheet = {
+    sheetName: "Overview",
+    headers: ["Metric", "Value"],
+    rows: [
+      ["Total Revenue", reports?.totals.totalRevenue ?? 0],
+      ["Total Sessions", reports?.totals.totalSessions ?? 0],
+      ["Pending Payments", reports?.totals.totalPending ?? 0],
+      ["Comped Payments", reports?.totals.totalComped ?? 0],
+      ["Avg Attendance (%)", reports?.totals.averageAttendance ?? 0],
+    ],
+  };
+
+  const revenueByCoachSheet = {
+    sheetName: "Revenue by Coach",
+    headers: ["Coach", "Revenue"],
+    rows:
+      reports?.revenueByCoach.map((r) => [
+        r.coach,
+        String(r.value),
+      ]) ?? [],
+  };
+
+  const sessionTypesSheet = {
+    sheetName: "Session Types",
+    headers: ["Session Type", "Count"],
+    rows:
+      reports?.sessionTypeData.map((s) => [
+        s.name,
+        String(s.value),
+      ]) ?? [],
+  };
+
+  const monthlyRevenueSheet = {
+    sheetName: "Monthly Revenue",
+    headers: ["Month", "Revenue"],
+    rows:
+      reports?.monthlyRevenueTrend.map((m) => [
+        m.month,
+        String(m.value),
+      ]) ?? [],
+  };
+  const playerAttendanceSheet = {
+    sheetName: "Player Attendance",
+    headers: [
+      "Player",
+      "Total Sessions",
+      "Attended",
+      "Missed",
+      "Attendance %",
+    ],
+    rows:
+      reports?.playerAttendanceData.map((p) => [
+        p.name,
+        String(p.sessions),
+        String(p.attended),
+        String(p.missed),
+        String(p.attendance_rate),
+      ]) ?? [],
+  };
+
+  const zipcodeSheet = {
+    sheetName: "Zip Code Analytics",
+    headers: [
+      "Zip Code",
+      "Total Users",
+      "Total Revenue",
+      "Avg Revenue",
+    ],
+    rows:
+      reports?.zipcodeData.map((z) => [
+        z.zip_code,
+        z.total_users,
+        z.total_revenue,
+        String(Number(z.avg_revenue).toFixed(0)),
+      ]) ?? [],
+  };
+
+  if (loading) {
+    return (
+      <div className="flex flex-col w-full gap-4">
+        <Header>
+          {null}
+        </Header>
+
+        <DashboardLoader />
+      </div>
+    )
+  }
+
   return (
     <div className="flex flex-col w-full gap-4">
       <Header>
         <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
-          <Button >
+          <Button onClick={() => {
+            exportDashboardToExcel(
+              [
+                totalsSheet,
+                revenueByCoachSheet,
+                sessionTypesSheet,
+                monthlyRevenueSheet,
+                playerAttendanceSheet,
+                zipcodeSheet,
+              ],
+              "dashboard-report.xlsx"
+            )
+          }}>
             <Download /> Export All Data
           </Button>
         </div>
@@ -169,17 +279,17 @@ export default function Page() {
               </div>} />
         ))}
       </div>
+      {filter &&
+        <Card>
+          <CardContent className="space-y-4">
 
-      <Card>
-        <CardContent className="space-y-4">
-
-          <div className="text-sm flex gap-2 items-center">
-            <Filter className="text-primary" size={16} /> Filters
-          </div>
+            <div className="text-sm flex gap-2 items-center">
+              <Filter className="text-primary" size={16} /> Filters
+            </div>
 
 
 
-          {filter &&
+
             <div className="flex flex-col w-full gap-4">
 
 
@@ -217,10 +327,11 @@ export default function Page() {
                 </div>
 
               </div>
-            </div>}
+            </div>
 
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      }
 
       <div className="grid sm:grid-cols-2 grid-cols-1 gap-4">
         <Card>
@@ -232,7 +343,9 @@ export default function Page() {
                 <p className="text-sm">Revenue by Coach</p>
                 <p className="text-xs text-muted-foreground">Total earnings per coach</p>
               </div>
-              <Button variant={"outline"} size={"icon-sm"} className="h-6 w-6 rounded-sm text-[10px] text-muted-foreground"><Download /></Button>
+              <Button onClick={() => {
+                exportToExcel(revenueByCoachSheet.headers, revenueByCoachSheet.rows, revenueByCoachSheet.sheetName + ".xlsx")
+              }} variant={"outline"} size={"icon-sm"} className="h-6 w-6 rounded-sm text-[10px] text-muted-foreground"><Download /></Button>
             </div>
 
             <BarChart chartData={reports?.revenueByCoach || []} xaxis="coach" yaxis="value" />
@@ -249,7 +362,9 @@ export default function Page() {
                 <p className="text-sm">Session by Type</p>
                 <p className="text-xs text-muted-foreground">Distribution on session types</p>
               </div>
-              <Button variant={"outline"} size={"icon-sm"} className="h-6 w-6 rounded-sm text-[10px] text-muted-foreground"><Download /></Button>
+              <Button onClick={() => {
+                exportToExcel(sessionTypesSheet.headers, sessionTypesSheet.rows, sessionTypesSheet.sheetName + ".xlsx")
+              }} variant={"outline"} size={"icon-sm"} className="h-6 w-6 rounded-sm text-[10px] text-muted-foreground"><Download /></Button>
             </div>
 
 
@@ -271,7 +386,9 @@ export default function Page() {
               <p className="text-sm">Monthly Revenue Trend</p>
               <p className="text-xs text-muted-foreground">Revenue growth over time</p>
             </div>
-            <Button variant={"outline"} size={"icon-sm"} className="h-6 w-6 rounded-sm text-[10px] text-muted-foreground"><Download /></Button>
+            <Button onClick={() => {
+              exportToExcel(monthlyRevenueSheet.headers, monthlyRevenueSheet.rows, monthlyRevenueSheet.sheetName + ".xlsx")
+            }} variant={"outline"} size={"icon-sm"} className="h-6 w-6 rounded-sm text-[10px] text-muted-foreground"><Download /></Button>
           </div>
           <div className="grid grid-cols-1">
             <div className="h-70">
@@ -293,7 +410,7 @@ export default function Page() {
       </Card>
 
 
-      <Card className="bg-[#252525] flex flex-col h-full p-0 border border-[#3A3A3A] overflow-hidden">
+      <Card className="bg-[#252525] flex flex-col h-full p-0 border border-[#3A3A3A] ">
 
         <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-6 pb-0 gap-4 sm:gap-0">
 
@@ -304,7 +421,9 @@ export default function Page() {
             </p>
           </div>
 
-          <Button variant={"outline"}>
+          <Button onClick={() => {
+            exportToExcel(playerAttendanceSheet.headers, playerAttendanceSheet.rows, playerAttendanceSheet.sheetName + ".xlsx")
+          }} variant={"outline"}>
             <Download /> Export
           </Button>
 
@@ -314,7 +433,7 @@ export default function Page() {
         <CardContent className="p-0">
 
           <PageTable
-            headerClassName={"rounded-none"}
+            headerClassName={"rounded-none border-none"}
             columns={PLAYER_ATTENDANCE_DATA_COLUMNS}
             data={reports?.playerAttendanceData || []}
             onRowClick={() => {
@@ -329,7 +448,7 @@ export default function Page() {
       </Card>
 
 
-      <Card className="bg-[#252525] flex flex-col h-full p-0 border border-[#3A3A3A] overflow-hidden">
+      <Card className="bg-[#252525] flex flex-col h-full p-0 border border-[#3A3A3A]">
 
         <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-6 pb-0 gap-4 sm:gap-0">
 
@@ -340,7 +459,9 @@ export default function Page() {
             </p>
           </div>
 
-          <Button variant={"outline"}>
+          <Button onClick={() => {
+            exportToExcel(zipcodeSheet.headers, zipcodeSheet.rows, zipcodeSheet.sheetName + ".xlsx")
+          }} variant={"outline"}>
             <Download /> Export
           </Button>
 
@@ -350,14 +471,13 @@ export default function Page() {
         <CardContent className="p-0">
 
           <PageTable
-            headerClassName={"rounded-none"}
+            headerClassName={"rounded-none border-none"}
             columns={ZIP_REVENUE_DATA_COLUMNS}
-            data={ZIP_REVENUE_DATA}
+            data={reports?.zipcodeData?.map((item, i) => ({ ...item, id: i })) || []}
             onRowClick={() => {
 
             }}
             scrollAreaWidth={`${open ? "w-[calc(100dvw-306px)]" : "w-[calc(100dvw-96px)]"} ${isMobile && "w-[calc(100vw-44px)]"}`}
-
           />
 
         </CardContent>
@@ -410,6 +530,39 @@ const HeaderCard = ({ title = "", description = "", icon = null }: { title: stri
     </Card>
   )
 }
+
+
+export function DashboardLoader() {
+  return (
+    <div className="flex flex-col w-full gap-4">
+
+
+
+      <div className="mt-4 flex w-full flex-wrap gap-4 justify-center">
+        {Array.from({ length: 5 }).map((_, i) => (
+          <Skeleton key={i} className="h-[100px] flex flex-1 bg-secondary rounded-sm" />
+
+        ))}
+      </div>
+
+
+
+      <div className="grid sm:grid-cols-2 grid-cols-1 gap-4">
+        {Array.from({ length: 2 }).map((_, i) => (
+          <Skeleton key={i} className="h-[300px] flex flex-1 bg-secondary rounded-sm" />
+        ))}
+      </div>
+
+      <Skeleton className="h-[300px] flex flex-1 bg-secondary rounded-sm" />
+      <Skeleton className="h-[300px] flex w-full bg-secondary rounded-sm" />
+      <Skeleton className="h-[300px] flex w-full bg-secondary rounded-sm" />
+      <Skeleton className="h-[300px] flex w-full bg-secondary rounded-sm" />
+
+
+    </div>
+  );
+}
+
 
 
 
