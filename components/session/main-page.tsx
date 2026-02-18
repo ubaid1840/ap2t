@@ -104,7 +104,7 @@ export default function SessionMainPage({ id, back, back_title, admin = false }:
           time: `${d.start_time} - ${d.end_time}`,
           coachName: joinNames([d.coach_first_name, d.coach_last_name]),
           status: d.status,
-          price: d?.apply_promotion ?  d.promotion_price : d.price,
+          price: d?.apply_promotion ? d.promotion_price : d.price,
           promotion_price: d.promotion_price,
           max_players: d.max_players,
           location: d.location,
@@ -154,14 +154,13 @@ export default function SessionMainPage({ id, back, back_title, admin = false }:
   }
 
   useEffect(() => {
-    const res = calculatePaymentStats(participants, payments, Number(data?.price || 0))
+    const res = calculatePaymentStats(participants, payments)
     setPaymentStats({ paid_amount: res.totalPaid, pending_amount: res.totalPending, total_revenue: res.totalAmount })
   }, [participants, payments, data])
 
   function calculatePaymentStats(
     participants: any[],
     payments: any[],
-    price: number = 0
   ) {
     let totalAmount = 0;
     let totalPaid = 0;
@@ -172,19 +171,14 @@ export default function SessionMainPage({ id, back, back_title, admin = false }:
 
     participants.forEach(participant => {
       const payment = paymentMap.get(participant.player_id);
-
-      totalAmount += Number(price || 0);
-
       if (payment) {
-        if (payment.status === "paid") {
-          totalPaid += Number(price || 0);
-        } else {
-          totalPending += Number(price || 0);
+        if (payment.status === "paid" || payment.status === 'comped') {
+          totalPaid += Number(payment?.amount || 0);
+        } else if (payment.status === 'pending') {
+          totalPending += Number(payment?.amount || 0);
         }
-      } else {
-
-        totalPending += Number(price || 0);
-      }
+        totalAmount += Number(payment?.amount || 0);
+      } 
     });
 
     return {
@@ -376,7 +370,10 @@ export default function SessionMainPage({ id, back, back_title, admin = false }:
           <Separator />
 
           <TabsContent value="Participants" className="space-y-4 p-4">
-            {data?.status === "upcoming" && <AddParticipantDialog sessionId={Number(id)} onSuccess={fetchParticipants} />}
+            {data?.status === "upcoming" && <AddParticipantDialog sessionId={Number(id)} onSuccess={async () => {
+              await fetchParticipants()
+              await fetchPayments()
+            }} />}
             {participants.map((participent: any, i) => (
               <Card key={i} className="bg-[#1A1A1A] border border-border">
                 <CardContent className="space-y-2">
@@ -411,7 +408,7 @@ export default function SessionMainPage({ id, back, back_title, admin = false }:
                   </div>
 
                   <Separator />
-                  {participent?.status === "pending" && data?.status === 'upcoming' && <AttendanceMarking player_id={participent.player_id} session_id={Number(id)} onRefresh={async () => {
+                  {participent?.status === "pending" && data?.status === 'ongoing' && <AttendanceMarking player_id={participent.player_id} session_id={Number(id)} onRefresh={async () => {
                     await fetchParticipants()
                   }} />
                   }
