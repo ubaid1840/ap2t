@@ -328,6 +328,8 @@ export default function SessionMainPage({ id, back, back_title, type, admin = fa
           </div>
           <Separator className="my-4" />
 
+           <div className="flex gap-2 flex-wrap">
+
           {data && data?.status === "upcoming" &&
             <Markbuttons id={id} onRefresh={async () => {
               await fetchData()
@@ -338,6 +340,7 @@ export default function SessionMainPage({ id, back, back_title, type, admin = fa
           {data && !data?.comped &&
             <MarkComped id={id} onRefresh={fetchData} />
           }
+          </div>
         </CardContent>
       </Card>
 

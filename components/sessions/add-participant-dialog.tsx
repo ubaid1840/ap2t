@@ -11,6 +11,8 @@ import axios from "@/lib/axios";
 import { Plus, Search } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Spinner } from "../ui/spinner";
+import RenderAvatar from "../render-avatar";
+import { joinNames } from "@/lib/functions";
 
 interface AddParticipantDialogProps {
   sessionId: number;
@@ -115,10 +117,7 @@ export function AddParticipantDialog({ sessionId, onSuccess, parent_id = null }:
                     className="flex items-center justify-between p-3 rounded-lg bg-[#1A1A1A] border border-[#3A3A3A]"
                   >
                     <div className="flex items-center gap-3">
-                      <Avatar className="h-8 w-8">
-                        <AvatarImage src={player.picture} />
-                        <AvatarFallback>{player.first_name[0]}{player.last_name[0]}</AvatarFallback>
-                      </Avatar>
+                      <RenderAvatar fallback={joinNames([player.first_name, player.last_name])} img={player?.picture} className="h-8 w-8" />
                       <div>
                         <p className="text-sm font-medium text-[#E5E7EB]">
                           {player.first_name} {player.last_name}
@@ -134,7 +133,7 @@ export function AddParticipantDialog({ sessionId, onSuccess, parent_id = null }:
                       disabled={addingId === player.id}
                     >
                       {addingId === player.id ? (
-                        <Spinner className="text-black" />
+                        <Spinner className="text-white" />
                       ) : (
                         <Plus className="h-4 w-4" />
                       )}

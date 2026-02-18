@@ -356,7 +356,7 @@ export default function MainParentPage({
                 <Card key={item.user_id} className="rounded-[10px] bg-[#1A1A1A] border-[#3A3A3A] flex flex-1">
                   <CardContent className="space-y-4">
                     <div className="flex gap-4 items-center">
-                      <RenderAvatar fallback={joinNames([item.first_name, item.last_name])} img={item.picture} />
+                      <RenderAvatar className="h-12 w-12" fallback={joinNames([item.first_name, item.last_name])} img={item.picture} />
                       <div>
                         <div className="text-lg text-white">{joinNames([item.first_name, item.last_name])}</div>
                         <div className="text-muted-foreground">

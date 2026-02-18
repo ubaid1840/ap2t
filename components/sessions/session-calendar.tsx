@@ -1,9 +1,20 @@
 "use client";
 
+import { Moment } from "moment";
 import CustomCalendar from "../calendar/custom-calendar";
 import "./calenderstyle.css";
 
-export default function SessionCalendar({ sessions = [], player_id = null, onSuccess, parent_id = null }: { sessions?: any[], player_id?: string | null | undefined, onSuccess?: () => Promise<void>, parent_id ?: string | null | undefined | number }) {
+type SessionCalendarProps = { 
+  sessions?: any[], 
+  player_id?: string | null | undefined, 
+  onSuccess?: () => Promise<void>, 
+  parent_id?: string | null | undefined | number, 
+  loading?: boolean, 
+  currentMonth: Moment, 
+  setCurrentMonth: (item: any) => void 
+}
+
+export default function SessionCalendar({ currentMonth, setCurrentMonth, sessions = [], player_id = null, onSuccess, parent_id = null, loading }: SessionCalendarProps) {
   const events = sessions.map(session => {
 
     let date = session.date;
@@ -28,17 +39,20 @@ export default function SessionCalendar({ sessions = [], player_id = null, onSuc
 
     return {
       id: session.id,
+      status,
       title: session.sessionName,
       sessionType: session.type,
       date: date,
       time: session.time.split(' - ')[0],
-      type: type as any
+      type: type as any,
+      children: session?.children,
+      enrolled: session?.enrolled
     }
   });
 
   return (
     <div className="bg-[#252525] p-4 rounded-[10px]">
-      <CustomCalendar parent_id={parent_id} events={events} player_id={player_id} onSuccess={async () => {
+      <CustomCalendar currentMonth={currentMonth} setCurrentMonth={setCurrentMonth} loading={loading} parent_id={parent_id} events={events} player_id={player_id} onSuccess={async () => {
         await onSuccess?.()
       }} />
     </div>

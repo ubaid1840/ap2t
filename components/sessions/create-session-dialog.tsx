@@ -51,7 +51,7 @@ export type SessionType = {
 
 }
 
-export function CreateSessionDialog({ onRefresh, coach_id = null, coach_name = null }: { coach_name: string | null, coach_id?: string | null, onRefresh: () => Promise<void> }) {
+export function CreateSessionDialog({ onRefresh, coach_id = null, coach_name = null }: { coach_name?: string | null, coach_id?: string | null, onRefresh: () => Promise<void> }) {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [session, setSession] = useState<SessionType>({

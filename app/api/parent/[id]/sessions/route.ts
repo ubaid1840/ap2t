@@ -8,66 +8,62 @@ export async function GET(
     const { id } = await params;
 
 
-
     try {
-
         const childrenQuery = await pool.query(
             `
-  SELECT user_id
-  FROM players
-  WHERE parent_id = $1
-  `,
+    SELECT p.user_id, u.first_name, u.last_name
+    FROM players p
+    JOIN users u ON u.id = p.user_id
+    WHERE p.parent_id = $1
+    `,
             [id]
         );
 
-        const childrenIds = childrenQuery.rows.map(r => r.user_id);
+        const children = childrenQuery.rows;
 
-        if (childrenIds.length === 0) {
-            const allSessions = await pool.query(
-                `
+        const childrenIds = children.map(c => c.user_id);
+
+        const query = `
     SELECT
       s.*,
       u.first_name AS coach_first_name,
-      u.last_name  AS coach_last_name
+      u.last_name  AS coach_last_name,
+      COALESCE(
+        JSON_AGG(
+          DISTINCT JSONB_BUILD_OBJECT(
+            'user_id', c.user_id,
+            'first_name', c.first_name,
+            'last_name', c.last_name
+          )
+        ) FILTER (WHERE c.user_id IS NOT NULL),
+        '[]'
+      ) AS children
     FROM sessions s
-    LEFT JOIN users u ON u.id = s.coach_id
-    WHERE s.status = $1
-    `,
-                ["upcoming"]
-            );
-
-            return NextResponse.json(allSessions.rows, { status: 200 });
-        }
-
-        const query = `
-  SELECT
-    s.*,
-    u.first_name AS coach_first_name,
-    u.last_name  AS coach_last_name
-  FROM sessions s
-  LEFT JOIN users u ON u.id = s.coach_id
-  LEFT JOIN session_players sp
-    ON sp.session_id = s.id
-   AND sp.user_id = ANY($1)
-  WHERE s.status = $2
-  GROUP BY s.id, u.first_name, u.last_name
-  HAVING COUNT(sp.user_id) < $3
-`;
+    LEFT JOIN users u 
+      ON u.id = s.coach_id
+    LEFT JOIN session_players sp
+      ON sp.session_id = s.id
+      AND sp.user_id = ANY($1)
+    LEFT JOIN (
+      SELECT p.user_id, u.first_name, u.last_name
+      FROM players p
+      JOIN users u ON u.id = p.user_id
+    ) c
+      ON c.user_id = sp.user_id
+    GROUP BY s.id, u.first_name, u.last_name
+    ORDER BY s.start_time ASC
+  `;
 
         const result = await pool.query(query, [
-            childrenIds,
-            "upcoming",
-            childrenIds.length
+            childrenIds.length ? childrenIds : [null]
         ]);
 
         return NextResponse.json(result.rows, { status: 200 });
 
-
-
-    } catch (error) {
-        console.error("GET /api/admin/sessions error:", error);
+    } catch (error: any) {
+        console.error(error);
         return NextResponse.json(
-            { message: "Internal Server Error" },
+            { message: error?.message || "Something went wrong" },
             { status: 500 }
         );
     }

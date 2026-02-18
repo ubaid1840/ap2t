@@ -12,7 +12,7 @@ import { useAuth } from "@/contexts/auth-context";
 import axios from "@/lib/axios";
 import { joinNames } from "@/lib/functions";
 import { Calendar, Filter, List } from "lucide-react";
-import moment from "moment";
+import moment, { Moment } from "moment";
 import { ReactNode, useEffect, useState } from "react";
 
 export type SessionProps = {
@@ -32,6 +32,7 @@ export default function Page() {
   const [sessions, setSessions] = useState<SessionProps[]>([]);
   const [search, setSearch] = useState({ main: "", coach: "", type: "" })
   const [loading, setLoading] = useState(true);
+   const [currentMonth, setCurrentMonth] = useState<Moment>(moment())
   const { user } = useAuth()
 
   useEffect(() => {
@@ -160,7 +161,7 @@ export default function Page() {
           onRowClick={() => { }}
         />
       )}
-      {tab === "calendar" && <SessionCalendar sessions={sessions} />}
+      {tab === "calendar" && <SessionCalendar sessions={sessions} currentMonth={currentMonth} setCurrentMonth={setCurrentMonth}/>}
 
 
     </div>

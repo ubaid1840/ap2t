@@ -12,6 +12,7 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
     u.first_name,
     u.email, 
     u.last_name, 
+    u.picture,
     u.role 
     FROM users u 
     INNER JOIN players p ON p.user_id = u.id

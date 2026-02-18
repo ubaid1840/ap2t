@@ -50,7 +50,7 @@ export default function DashboardHeader({ trigger }: { trigger?: ReactNode }) {
 
 
   return (
-    <div className="flex flex-1 w-full h-full py-3 px-4">
+    <div className="flex flex-1 w-full h-full px-4">
       <div className="w-full flex justify-between flex-wrap items-center">
         <div className="flex gap-4 items-center">
           {trigger}
@@ -65,7 +65,7 @@ export default function DashboardHeader({ trigger }: { trigger?: ReactNode }) {
               {user?.email}
             </p>
           </div>
-           <RenderAvatar fallback={joinNames([user?.first_name, user?.last_name])} img={user?.picture} />
+           <RenderAvatar fallback={joinNames([user?.first_name, user?.last_name])} img={user?.picture}/>
 
           <DropdownMenu>
             <DropdownMenuTrigger>

@@ -148,6 +148,29 @@ export const coach_nav_items = [
   },
 ];
 
+export const EVENT_STYLES = {
+    active: {
+        bg: 'bg-active-bg',
+        text: 'text-active-text',
+        border: 'border-active-text/32',
+    },
+    info: {
+        bg: 'bg-info-bg',
+        text: 'text-info-text',
+        border: 'border-info-text/32',
+    },
+    warning: {
+        bg: 'bg-warning-bg',
+        text: 'text-warning-text',
+        border: 'border-warning-text/32',
+    },
+    danger: {
+        bg: 'bg-danger-bg',
+        text: 'text-danger-text',
+        border: 'border-danger-text/32',
+    },
+}
+
 export const BASE_URL = "/api"
 
 

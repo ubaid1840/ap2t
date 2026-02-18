@@ -1,9 +1,10 @@
 "use client";
 import SessionCalendar from "@/components/sessions/session-calendar";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/contexts/auth-context";
 import axios from "@/lib/axios";
 import { joinNames } from "@/lib/functions";
-import moment from "moment";
+import moment, { Moment } from "moment";
 import { ReactNode, useEffect, useState } from "react";
 
 export type SessionProps = {
@@ -20,12 +21,13 @@ export type SessionProps = {
 export default function Page() {
   const [sessions, setSessions] = useState<SessionProps[]>([]);
   const [loading, setLoading] = useState(true);
+  const [currentMonth, setCurrentMonth] = useState<Moment>(moment())
   const { user } = useAuth()
 
   useEffect(() => {
     if (user?.id)
       fetchData();
-  }, [user]);
+  }, [user, currentMonth]);
 
   const fetchData = async () => {
     try {
@@ -41,7 +43,8 @@ export default function Page() {
           time: `${s.start_time} - ${s.end_time}`,
           coachName: joinNames([s.coach_first_name, s.coach_last_name]),
           price: s.price,
-          status: s?.status || 'upcoming'
+          status: s?.status || 'upcoming',
+          children: s?.children || []
         }));
         setSessions(mappedSessions);
       }
@@ -60,8 +63,7 @@ export default function Page() {
         {null}
       </Header>
 
-      <SessionCalendar parent_id={user?.id} sessions={sessions} onSuccess={fetchData} />
-
+      <SessionCalendar loading={loading} currentMonth={currentMonth} setCurrentMonth={setCurrentMonth} parent_id={user?.id} sessions={sessions} onSuccess={fetchData} />
 
     </div>
   );

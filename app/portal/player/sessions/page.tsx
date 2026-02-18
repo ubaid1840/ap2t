@@ -1,9 +1,10 @@
 "use client";
 import SessionCalendar from "@/components/sessions/session-calendar";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/contexts/auth-context";
 import axios from "@/lib/axios";
 import { joinNames } from "@/lib/functions";
-import moment from "moment";
+import moment, { Moment } from "moment";
 import { ReactNode, useEffect, useState } from "react";
 
 export type SessionProps = {
@@ -18,22 +19,30 @@ export type SessionProps = {
 }
 
 export default function Page() {
-  const [filter, setFilter] = useState(false);
-  const [tab, setTab] = useState("table");
+ 
   const [sessions, setSessions] = useState<SessionProps[]>([]);
-  const [search, setSearch] = useState({ main: "", coach: "", type: "" })
   const [loading, setLoading] = useState(true);
+  const [currentMonth, setCurrentMonth] = useState<Moment>(moment())
   const { user } = useAuth()
 
   useEffect(() => {
     if (user?.id)
       fetchData();
-  }, [user]);
+  }, [user, currentMonth]);
 
   const fetchData = async () => {
+    setLoading(true)
+    const month = currentMonth
+  ? currentMonth.format("YYYY-MM")
+  : null;
     try {
-      const result = await axios.get(`/player/${user?.id}/sessions`);
+      const result = await axios.get(`/player/${user?.id}/sessions`, 
+         {
+    params: { month }
+  }
+      );
       if (result.data) {
+        console.log(result.data)
         const mappedSessions = result.data.map((s: any) => ({
           id: s.id,
           sessionName: s.name,
@@ -42,7 +51,8 @@ export default function Page() {
           time: `${s.start_time} - ${s.end_time}`,
           coachName: joinNames([s.coach_first_name, s.coach_last_name]),
           price: s.price,
-          status: s?.status || 'upcoming'
+          status: s?.status || 'upcoming',
+          enrolled : s?.enrolled
         }));
         setSessions(mappedSessions);
       }
@@ -60,10 +70,7 @@ export default function Page() {
       <Header session_length={sessions.length}>
         {null}
       </Header>
-
-      <SessionCalendar player_id={user?.id} sessions={sessions} onSuccess={fetchData} />
-
-
+        <SessionCalendar currentMonth={currentMonth} setCurrentMonth={setCurrentMonth} player_id={user?.id} sessions={sessions} onSuccess={fetchData} loading={loading}/>
     </div>
   );
 }
