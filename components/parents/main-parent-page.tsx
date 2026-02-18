@@ -24,6 +24,7 @@ import {
   Dot,
   Download,
   Mail,
+  MapPin,
   Phone,
   Send,
   User,
@@ -203,6 +204,9 @@ export default function MainParentPage({
                 </span>
                 <span className="inline-flex gap-2">
                   <IoIosPin size={14} /> {data?.parent?.location}
+                </span>
+                <span className="inline-flex gap-2">
+                  <MapPin size={14} /> {data?.parent?.zip_code}
                 </span>
                 <span className="inline-flex gap-2">
                   <IoCalendarClear size={14} /> Member since{" "}

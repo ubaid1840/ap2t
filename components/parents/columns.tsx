@@ -1,7 +1,7 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { ColumnDef } from "@tanstack/react-table";
-import { ArrowUpDown, CircleCheckBig, CircleX, Eye, Hash, Info, Mail, Phone, Users } from "lucide-react";
+import { ArrowUpDown, CircleCheckBig, CircleX, Eye, Hash, Info, Mail, MapPin, Phone, Users } from "lucide-react";
 import Link from "next/link";
 import { IoIosPin } from "react-icons/io";
 import getInitials from "./get-initials";
@@ -113,7 +113,7 @@ export const PARENT_COLUMNS: ColumnDef<ParentData>[] = [
         ),
         cell: ({ row }) => (
             <div className="text-[#D1D5DC] flex items-center gap-2">
-                <Hash size={14} /> {row.original.zip_code}
+                <MapPin size={14} /> {row.original.zip_code}
             </div>
         ),
     },

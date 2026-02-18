@@ -39,7 +39,7 @@ export default function Page() {
   const [parents, setParents] = useState<ParentData[] | []>([]);
   const [loading, setLoading] = useState(false)
   const [search, setSearch] = useState("")
-  const [paymentStatusSearch,setPaymentStatusSearch]=useState("")
+  // const [paymentStatusSearch,setPaymentStatusSearch]=useState("")
   const [zipCodeSearch,setZipCodeSearch] =useState("")
   const debouncedSearch = useDebounce(search, 300);
 // const debouncedPayment = useDebounce(paymentStatusSearch, 300);
