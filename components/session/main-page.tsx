@@ -257,12 +257,21 @@ export default function SessionMainPage({ id, back, back_title, type, admin = fa
                 <CardStatus value={data?.status} icon={true} />
                 {data?.comped && <CardStatus value={"comped"} icon={true} />}
               </div>
+              <div className="flex gap-4">
+                
+            {data && data?.status === "upcoming" &&
+            <StartSessionNow id={id} onRefresh={async () => {
+              await fetchData()
+            }} />
+          }
+
               <EditSessionDialog
               coach_id={admin ? null : user?.id}
                 sessionId={id}
                 sessionData={rawSessionData}
                 onSuccess={fetchData}
               />
+              </div>
             </div>
             <p className="text-sm text-muted-foreground">
               Advanced skills training session focusing on ball handling,
@@ -601,6 +610,45 @@ const MarkComped = ({ id, onRefresh }: { id: number, onRefresh: () => Promise<vo
           <>
             <CircleCheckBig />
             Mark as Comped
+          </>
+        )}
+      </Button>
+    </div>
+  )
+}
+
+const StartSessionNow = ({ id, onRefresh }: { id: number, onRefresh: () => Promise<void> }) => {
+  const [loadingStatus, setLoadingStatus] = useState(false)
+  async function handleUpdateStatus() {
+    if (!id) return
+    setLoadingStatus(true)
+    try {
+      await axios.put(`/admin/sessions/${id}`, {
+        status: "ongoing",
+        date: new Date().toISOString(),
+        id
+      });
+      await onRefresh()
+    } finally {
+      setLoadingStatus(false)
+    }
+  }
+  return (
+    <div className="flex gap-2 flex-wrap">
+      <Button
+        onClick={() => {
+          handleUpdateStatus()
+        }}
+      >
+        {loadingStatus ? (
+          <>
+            <Spinner />
+            starting...
+          </>
+        ) : (
+          <>
+            <CircleCheckBig />
+            Start Session Now
           </>
         )}
       </Button>
