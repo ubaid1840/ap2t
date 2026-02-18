@@ -37,11 +37,6 @@ export async function GET(req: NextRequest) {
 
         const sessionQueryParams = [...userValues]
 
-        console.log(userQuery)
-        console.log(userQueryParams)
-        console.log(sessionQuery)
-        console.log(sessionQueryParams)
-
         const usersRes = await pool.query(
             userQuery,
             userQueryParams

@@ -4,7 +4,10 @@ import {
   Calendar,
   Check,
   CircleAlert,
+  DollarSign,
+  Eye,
   Gift,
+  Image,
   Info,
   Loader2,
   MapPin,
@@ -42,6 +45,7 @@ import { Spinner } from "../ui/spinner";
 import ConfirmationDialog from "../alert-dialog";
 import { TimePickerFixed } from "../time-picker-fixed";
 import SelectSessionType from "../players/select-session-type";
+import { Checkbox } from "../ui/checkbox";
 
 
 interface EditSessionDialogProps {
@@ -49,6 +53,7 @@ interface EditSessionDialogProps {
   sessionData?: SessionType & { coach_first_name?: string, coach_last_name?: string };
   onSuccess?: () => void;
   coach_id?: string | null,
+  promotion?: boolean
 }
 
 export function EditSessionDialog({
@@ -56,6 +61,7 @@ export function EditSessionDialog({
   sessionData,
   onSuccess,
   coach_id = null,
+  promotion = false
 }: EditSessionDialogProps) {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -80,7 +86,8 @@ export function EditSessionDialog({
     end_date: undefined,
     coach_name: "",
     promotion_start: undefined,
-    promotion_end: undefined
+    promotion_end: undefined,
+    show_storefront: false
   });
 
   useEffect(() => {
@@ -102,7 +109,8 @@ export function EditSessionDialog({
         end_date: sessionData.end_date || undefined,
         coach_name: `${sessionData?.coach_first_name} ${sessionData?.coach_last_name}`,
         promotion_start: sessionData.promotion_start || undefined,
-        promotion_end: sessionData.promotion_end || undefined
+        promotion_end: sessionData.promotion_end || undefined,
+        show_storefront: sessionData?.show_storefront
       });
     }
   }, [open, sessionData]);
@@ -146,7 +154,12 @@ export function EditSessionDialog({
       setDeleteLoading(false)
       setSelectedSession(null)
       setOpen(false);
-      router.push("/portal/admin/sessions");
+      if (promotion) {
+        router.replace("/portal/admin/promotions");
+      } else {
+        router.replace("/portal/admin/sessions");
+      }
+
     } finally {
       setDeleteLoading(false);
     }
@@ -155,17 +168,14 @@ export function EditSessionDialog({
   return (
     <>
       <Button onClick={() => setOpen(!open)} variant={"outline"}>
-        <SquarePen className="w-5 h-5" /> Edit
+        <SquarePen className="w-5 h-5" />{!promotion && "Edit"}
       </Button>
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="bg-[#252525] border border-[#3A3A3A] sm:max-w-4xl p-0 gap-0">
           <DialogHeader className="border-b border-[#3A3A3A] p-4">
             <DialogTitle className="text-[#F3F4F6] font-semibold text-lg">
-              Edit Session
+              Edit {promotion ? "Promotion" : "Session"}
             </DialogTitle>
-            <p className="text-[#99A1AF]">
-              Update session details • Only fill fields you want to change
-            </p>
           </DialogHeader>
           <form onSubmit={editSession}>
             <ScrollArea className=" py-1 space-y-4 px-2 h-[70vh]">
@@ -188,6 +198,24 @@ export function EditSessionDialog({
                       setSession((prev) => ({
                         ...prev,
                         name: e.target.value,
+                      }))
+                    }
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label className="text-sm text-muted-foreground">
+                    Description *
+                  </Label>
+                  <Textarea
+                    name="description"
+                    placeholder="Add any additional details about this session..."
+                    className="min-h-26"
+                    value={session.description}
+                    onChange={(e) =>
+                      setSession((prev) => ({
+                        ...prev,
+                        description: e.target.value,
                       }))
                     }
                   />
@@ -438,6 +466,12 @@ export function EditSessionDialog({
 
                 {session?.apply_promotion &&
                   <>
+                    <div className="flex gap-2 text-md items-center">
+                      <Image className="text-primary" size={16} />
+                      <h1 className="text-[#F3F4F6]">
+                        Promotional Flyer
+                      </h1>
+                    </div>
                     <div className="space-y-2">
                       <Label className="text-sm text-muted-foreground">
                         Image URL *
@@ -471,10 +505,17 @@ export function EditSessionDialog({
                       }
                     </div>
 
+                    <div className="flex gap-2 text-md items-center">
+                      <Calendar className="text-primary" size={16} />
+                      <h1 className="text-[#F3F4F6]">
+                        Promotion Duration
+                      </h1>
+                    </div>
+
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-2">
                         <Label className="text-sm text-muted-foreground">
-                          Promotion Start Date *
+                          Start Date *
                         </Label>
                         <AppCalendar
                           className="h-9"
@@ -490,7 +531,7 @@ export function EditSessionDialog({
                       </div>
                       <div className="space-y-2">
                         <Label className="text-sm text-muted-foreground">
-                          Promotion End Date *
+                          End Date *
                         </Label>
                         <AppCalendar
                           className="h-9"
@@ -504,6 +545,11 @@ export function EditSessionDialog({
                           required
                         />
                       </div>
+                    </div>
+
+                    <div className="flex gap-2 text-md items-center">
+                      <DollarSign className="text-primary" size={16} />
+                      <h1 className="text-[#F3F4F6]">Price</h1>
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
@@ -537,28 +583,33 @@ export function EditSessionDialog({
                         />
                       </div>
                     </div>
+                    <div className="flex gap-2 text-md items-center">
+                      <Eye className="text-primary" size={16} />
+                      <h1 className="text-[#F3F4F6]">Storefront Display</h1>
+                    </div>
+
+                    <div className="flex items-center gap-4 px-8 bg-[#1A1A1A] border border-[#3A3A3A] rounded-[10px] p-2">
+                      <Checkbox
+                        name="displayOnWebsite"
+                        checked={session.show_storefront}
+                        onCheckedChange={(val) => {
+                          setSession((prev) => ({
+                            ...prev,
+                            show_storefront: val,
+                          }))
+                        }}
+                      />
+                      <div className="space-y-0">
+                        <h1 className="text-[#D1D5DC]">
+                          Show on Online Storefront
+                        </h1>
+                        <p className="text-sm text-[#6A7282]">
+                          Display promotional card with image, title, price
+                        </p>
+                      </div>
+                    </div>
                   </>}
 
-
-
-
-                <div className="space-y-2">
-                  <Label className="text-sm text-muted-foreground">
-                    Description *
-                  </Label>
-                  <Textarea
-                    name="description"
-                    placeholder="Add any additional details about this session..."
-                    className="min-h-26"
-                    value={session.description}
-                    onChange={(e) =>
-                      setSession((prev) => ({
-                        ...prev,
-                        description: e.target.value,
-                      }))
-                    }
-                  />
-                </div>
               </div>
             </ScrollArea>
             <Separator />

@@ -53,10 +53,20 @@ export async function GET(req: NextRequest) {
   u.last_name  AS coach_last_name,
 
   COALESCE(
-    jsonb_agg(DISTINCT p.status) FILTER (WHERE p.id IS NOT NULL),
+    jsonb_agg(
+      DISTINCT jsonb_build_object(
+        'id', p.id,
+        'session_id', p.session_id,
+        'user_id', p.user_id,
+        'amount', p.amount,
+        'status', p.status,
+        'method', p.method,
+        'created_at', p.created_at,
+        'paid_at', p.paid_at
+      )
+    ) FILTER (WHERE p.id IS NOT NULL),
     '[]'
-  ) AS payment_statuses,
-
+  ) AS payments,
   COALESCE(
     jsonb_agg(
       DISTINCT jsonb_build_object(

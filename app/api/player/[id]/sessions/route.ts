@@ -8,8 +8,6 @@ export async function GET(
   const { id } = await params;
   const month  = req.nextUrl.searchParams.get("month")
 
-  console.log(month)
-
   try {
     const query = `
        SELECT

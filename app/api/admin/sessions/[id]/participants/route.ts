@@ -27,23 +27,23 @@ export async function POST(
         { status: 409 }
       );
     }
-    const player_in_session=await pool.query(
+    const player_in_session = await pool.query(
       `SELECT COUNT(*) FROM session_players WHERE session_id = $1`,
       [session_id]
     )
-    const max_players= await pool.query(` SELECT max_players FROM sessions WHERE id=$1`,[session_id])
+    const max_players = await pool.query(` SELECT max_players FROM sessions WHERE id=$1`, [session_id])
     const currentPlayers = Number(player_in_session.rows[0].count);
     const maxPlayers = Number(max_players.rows[0].max_players);
-    
 
-    if(currentPlayers===maxPlayers){
+
+    if (currentPlayers === maxPlayers) {
       return NextResponse.json(
         { message: "Max players added in the session can not add more" },
         { status: 409 }
       );
     }
 
-    const amountQuery = await pool.query(`SELECT price, apply_promotion, promotion_price from sessions WHERE id = $1 LIMIT 1`, [session_id])
+    const amountQuery = await pool.query(`SELECT price, apply_promotion, promotion_price, comped from sessions WHERE id = $1 LIMIT 1`, [session_id])
     let amount = 0
     const amountQueryResult = amountQuery.rows[0] ?? null
 
@@ -62,14 +62,27 @@ export async function POST(
       [session_id, player_id]
     );
 
-    await pool.query(
-      `INSERT INTO payments
+    if (amountQueryResult?.comped) {
+      await pool.query(
+        `INSERT INTO payments
+      (session_id, user_id, amount, status, paid_at, transaction_id, method)
+      VALUES
+      ($1, $2, $3, $4)
+      RETURNING *;`,
+        [session_id, player_id, 0, "comped", new Date(), "Nil", "Nil"]
+      );
+    } else {
+      await pool.query(
+        `INSERT INTO payments
       (session_id, user_id, amount, status)
       VALUES
       ($1, $2, $3, $4)
       RETURNING *;`,
-      [session_id, player_id, amount, "pending"]
-    );
+        [session_id, player_id, amount, "pending"]
+      );
+    }
+
+
 
     return NextResponse.json(
       { message: "Done" },

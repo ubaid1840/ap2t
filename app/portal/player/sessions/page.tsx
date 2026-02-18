@@ -42,7 +42,6 @@ export default function Page() {
   }
       );
       if (result.data) {
-        console.log(result.data)
         const mappedSessions = result.data.map((s: any) => ({
           id: s.id,
           sessionName: s.name,

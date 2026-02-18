@@ -63,13 +63,13 @@ type noteType = {
   important: boolean;
 }
 
-export default function SessionMainPage({ id, back, back_title, type, admin = false }: { id: number, back: string, back_title: string, type: string, admin ?: boolean }) {
+export default function SessionMainPage({ id, back, back_title, admin = false }: { id: number, back: string, back_title: string, admin?: boolean }) {
   const [data, setData] = useState<SessionDataType>();
   const [rawSessionData, setRawSessionData] = useState<any>(null);
   const [tab, setTab] = useState("Participants");
   const isMobile = useIsMobile();
   const [loading, setLoading] = useState(false);
-  const {user} = useAuth()
+  const { user } = useAuth()
   const [participants, setParticipants] = useState<any[]>([]);
   const [payments, setPayments] = useState<any[]>([]);
   const [notes, setNotes] = useState([])
@@ -96,7 +96,6 @@ export default function SessionMainPage({ id, back, back_title, type, admin = fa
 
       if (result.data) {
         const d = result.data;
-        console.log(d)
         setRawSessionData(d);
         setData({
           id: d.id,
@@ -105,7 +104,7 @@ export default function SessionMainPage({ id, back, back_title, type, admin = fa
           time: `${d.start_time} - ${d.end_time}`,
           coachName: joinNames([d.coach_first_name, d.coach_last_name]),
           status: d.status,
-          price: d.price,
+          price: d?.apply_promotion ?  d.promotion_price : d.price,
           promotion_price: d.promotion_price,
           max_players: d.max_players,
           location: d.location,
@@ -155,7 +154,7 @@ export default function SessionMainPage({ id, back, back_title, type, admin = fa
   }
 
   useEffect(() => {
-    const res = calculatePaymentStats(participants, payments, type === "session" ? Number(data?.price || 0) : Number(data?.promotion_price || 0))
+    const res = calculatePaymentStats(participants, payments, Number(data?.price || 0))
     setPaymentStats({ paid_amount: res.totalPaid, pending_amount: res.totalPending, total_revenue: res.totalAmount })
   }, [participants, payments, data])
 
@@ -223,7 +222,6 @@ export default function SessionMainPage({ id, back, back_title, type, admin = fa
       type: "warning",
     },
   ];
-
   return (
     <div className="flex flex-col w-full gap-6">
       <BackButton title={back_title} route={back} />
@@ -240,19 +238,19 @@ export default function SessionMainPage({ id, back, back_title, type, admin = fa
                 {data?.comped && <CardStatus value={"comped"} icon={true} />}
               </div>
               <div className="flex gap-4">
-                
-            {data && data?.status === "upcoming" &&
-            <StartSessionNow id={id} onRefresh={async () => {
-              await fetchData()
-            }} />
-          }
 
-              <EditSessionDialog
-              coach_id={admin ? null : user?.id}
-                sessionId={id}
-                sessionData={rawSessionData}
-                onSuccess={fetchData}
-              />
+                {data && data?.status === "upcoming" &&
+                  <StartSessionNow id={id} onRefresh={async () => {
+                    await fetchData()
+                  }} />
+                }
+
+                <EditSessionDialog
+                  coach_id={admin ? null : user?.id}
+                  sessionId={id}
+                  sessionData={rawSessionData}
+                  onSuccess={fetchData}
+                />
               </div>
             </div>
             <p className="text-sm text-muted-foreground">
@@ -319,18 +317,21 @@ export default function SessionMainPage({ id, back, back_title, type, admin = fa
           </div>
           <Separator className="my-4" />
 
-           <div className="flex gap-2 flex-wrap px-6">
+          <div className="flex gap-2 flex-wrap px-6">
 
-          {data && data?.status === "upcoming" &&
-            <Markbuttons id={id} onRefresh={async () => {
-              await fetchData()
-              await fetchParticipants()
-            }} />
-          }
+            {data && data.status !== "completed" && data.status !== "cancelled" && (
+              <Markbuttons
+                id={id}
+                onRefresh={async () => {
+                  await fetchData()
+                  await fetchParticipants()
+                }}
+              />
+            )}
 
-          {data && !data?.comped &&
-            <MarkComped id={id} onRefresh={fetchData} />
-          }
+            {data && !data?.comped &&
+              <MarkComped id={id} onRefresh={fetchData} />
+            }
           </div>
         </CardContent>
       </Card>
@@ -601,6 +602,7 @@ const MarkComped = ({ id, onRefresh }: { id: number, onRefresh: () => Promise<vo
 
 const StartSessionNow = ({ id, onRefresh }: { id: number, onRefresh: () => Promise<void> }) => {
   const [loadingStatus, setLoadingStatus] = useState(false)
+
   async function handleUpdateStatus() {
     if (!id) return
     setLoadingStatus(true)
@@ -624,7 +626,7 @@ const StartSessionNow = ({ id, onRefresh }: { id: number, onRefresh: () => Promi
       >
         {loadingStatus ? (
           <>
-            <Spinner />
+            <Spinner className="text-black" />
             starting...
           </>
         ) : (

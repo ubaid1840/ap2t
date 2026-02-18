@@ -1,6 +1,6 @@
 "use client";
 import axios from "@/lib/axios";
-import { Calendar, MapPin, Plus, Tag, Users } from "lucide-react";
+import { Calendar, DollarSign, Eye, Image, MapPin, Plus, Tag, Users } from "lucide-react";
 import { useEffect, useState } from "react";
 import AppCalendar from "../app-calendar";
 import SelectSessionType from "../players/select-session-type";
@@ -29,6 +29,7 @@ import { Separator } from "../ui/separator";
 import { Spinner } from "../ui/spinner";
 import { Textarea } from "../ui/textarea";
 import { AssignCoachDialog } from "./assign-coach-dialog";
+import { Checkbox } from "../ui/checkbox";
 
 export type SessionType = {
   name: string,
@@ -48,10 +49,11 @@ export type SessionType = {
   end_date: undefined
   promotion_start: string | undefined
   promotion_end: string | undefined
+  show_storefront: boolean | 'indeterminate';
 
 }
 
-export function CreateSessionDialog({ onRefresh, coach_id = null, coach_name = null }: { coach_name?: string | null, coach_id?: string | null, onRefresh: () => Promise<void> }) {
+export function CreateSessionDialog({ onRefresh, coach_id = null, coach_name = null, promotion = false }: { coach_name?: string | null, coach_id?: string | null, onRefresh: () => Promise<void>, promotion?: boolean }) {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [session, setSession] = useState<SessionType>({
@@ -65,12 +67,13 @@ export function CreateSessionDialog({ onRefresh, coach_id = null, coach_name = n
     end_time: "",
     price: 0,
     max_players: 0,
-    apply_promotion: false,
+    apply_promotion: promotion,
     promotion_price: 0,
     image: "",
     end_date: undefined,
     promotion_start: undefined,
-    promotion_end: undefined
+    promotion_end: undefined,
+    show_storefront: false
   });
 
   useEffect(() => {
@@ -93,25 +96,51 @@ export function CreateSessionDialog({ onRefresh, coach_id = null, coach_name = n
           promotion_price: finalData?.promotion_price ? finalData?.promotion_price : 0
         });
       await onRefresh()
+      handleClear()
       setOpen(false)
     } finally {
       setLoading(false);
     }
   };
 
+  function handleClear() {
+    setSession({
+      name: "",
+      description: "",
+      session_type: "",
+      coach_id: null,
+      location: "",
+      date: undefined,
+      start_time: "",
+      end_time: "",
+      price: 0,
+      max_players: 0,
+      apply_promotion: promotion,
+      promotion_price: 0,
+      image: "",
+      end_date: undefined,
+      promotion_start: undefined,
+      promotion_end: undefined,
+      show_storefront: false
+    });
+  }
+
   return (
     <>
       <Button onClick={() => setOpen(!open)} className="gap-2 text-sm">
-        <Plus /> Create New Session
+        <Plus /> {promotion ? "Add New Promotion" : "Create New Session"}
       </Button>
-      <Dialog open={open} onOpenChange={setOpen}>
+      <Dialog open={open} onOpenChange={(val) => {
+        setOpen(val)
+        handleClear()
+      }}>
         <DialogContent className="bg-[#252525] border border-[#3A3A3A] sm:max-w-4xl p-0">
           <DialogHeader className="border-b border-[#3A3A3A] p-4">
             <DialogTitle className="text-[#F3F4F6] font-semibold text-lg">
-              Create New Session
+              {promotion ? "Add New Promotion" : "Create New Session"}
             </DialogTitle>
             <p className="text-muted-foreground">
-              Fill in the details to create a new training session
+              {promotion ? "Auto-syncs with Square and appears on online store" : "Fill in the details to create a new training session"}
             </p>
           </DialogHeader>
           <form onSubmit={createSession}>
@@ -135,6 +164,24 @@ export function CreateSessionDialog({ onRefresh, coach_id = null, coach_name = n
                       setSession((prev) => ({
                         ...prev,
                         name: e.target.value,
+                      }))
+                    }
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label className="text-sm text-muted-foreground">
+                    Description *
+                  </Label>
+                  <Textarea
+                    name="description"
+                    placeholder="Add any additional details about this session..."
+                    className="min-h-26"
+                    value={session.description}
+                    onChange={(e) =>
+                      setSession((prev) => ({
+                        ...prev,
+                        description: e.target.value,
                       }))
                     }
                   />
@@ -175,11 +222,7 @@ export function CreateSessionDialog({ onRefresh, coach_id = null, coach_name = n
                           }
                         />
                       }
-
                     </div>
-
-
-
                   </div>
 
                 </div>
@@ -349,37 +392,45 @@ export function CreateSessionDialog({ onRefresh, coach_id = null, coach_name = n
                       }}
                     />
                   </div>
-                  <div className="space-y-2">
-                    <Label className="text-sm text-muted-foreground">
-                      Apply Promotion (Optional)
-                    </Label>
+                  {!promotion &&
+                    <div className="space-y-2">
+                      <Label className="text-sm text-muted-foreground">
+                        Apply Promotion (Optional)
+                      </Label>
 
-                    <Select
-                      value={String(session.apply_promotion)}
-                      onValueChange={(value) =>
-                        setSession((prev) => ({
-                          ...prev,
-                          apply_promotion: value === "true",
-                        }))
-                      }
-                    >
-                      <SelectTrigger className="w-full dark:bg-[#1A1A1A] rounded-sm">
-                        <SelectValue placeholder="Select" />
-                      </SelectTrigger>
+                      <Select
+                        value={String(session.apply_promotion)}
+                        onValueChange={(value) =>
+                          setSession((prev) => ({
+                            ...prev,
+                            apply_promotion: value === "true",
+                          }))
+                        }
+                      >
+                        <SelectTrigger className="w-full dark:bg-[#1A1A1A] rounded-sm">
+                          <SelectValue placeholder="Select" />
+                        </SelectTrigger>
 
-                      <SelectContent className="!bg-[#1A1A1A]">
-                        <SelectGroup>
-                          <SelectLabel>Select</SelectLabel>
-                          <SelectItem value="true">Yes</SelectItem>
-                          <SelectItem value="false">No</SelectItem>
-                        </SelectGroup>
-                      </SelectContent>
-                    </Select>
-                  </div>
+                        <SelectContent className="!bg-[#1A1A1A]">
+                          <SelectGroup>
+                            <SelectLabel>Select</SelectLabel>
+                            <SelectItem value="true">Yes</SelectItem>
+                            <SelectItem value="false">No</SelectItem>
+                          </SelectGroup>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  }
                 </div>
 
                 {session?.apply_promotion &&
                   <>
+                    <div className="flex gap-2 text-md items-center">
+                      <Image className="text-primary" size={16} />
+                      <h1 className="text-[#F3F4F6]">
+                        Promotional Flyer
+                      </h1>
+                    </div>
                     <div className="space-y-2">
                       <Label className="text-sm text-muted-foreground">
                         Image URL *
@@ -413,10 +464,17 @@ export function CreateSessionDialog({ onRefresh, coach_id = null, coach_name = n
                       }
                     </div>
 
+                    <div className="flex gap-2 text-md items-center">
+                      <Calendar className="text-primary" size={16} />
+                      <h1 className="text-[#F3F4F6]">
+                        Promotion Duration
+                      </h1>
+                    </div>
+
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-2">
                         <Label className="text-sm text-muted-foreground">
-                          Promotion Start Date *
+                          Start Date *
                         </Label>
                         <AppCalendar
                           className="h-9"
@@ -432,7 +490,7 @@ export function CreateSessionDialog({ onRefresh, coach_id = null, coach_name = n
                       </div>
                       <div className="space-y-2">
                         <Label className="text-sm text-muted-foreground">
-                          Promotion End Date *
+                          End Date *
                         </Label>
                         <AppCalendar
                           className="h-9"
@@ -446,6 +504,11 @@ export function CreateSessionDialog({ onRefresh, coach_id = null, coach_name = n
                           required
                         />
                       </div>
+                    </div>
+
+                    <div className="flex gap-2 text-md items-center">
+                      <DollarSign className="text-primary" size={16} />
+                      <h1 className="text-[#F3F4F6]">Price</h1>
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
@@ -479,50 +542,57 @@ export function CreateSessionDialog({ onRefresh, coach_id = null, coach_name = n
                         />
                       </div>
                     </div>
+                    <div className="flex gap-2 text-md items-center">
+                      <Eye className="text-primary" size={16} />
+                      <h1 className="text-[#F3F4F6]">Storefront Display</h1>
+                    </div>
+
+                    <div className="flex items-center gap-4 px-8 bg-[#1A1A1A] border border-[#3A3A3A] rounded-[10px] p-2">
+                      <Checkbox
+                        name="displayOnWebsite"
+                        checked={session.show_storefront}
+                        onCheckedChange={(val) => {
+                          setSession((prev) => ({
+                            ...prev,
+                            show_storefront: val,
+                          }))
+                        }}
+                      />
+                      <div className="space-y-0">
+                        <h1 className="text-[#D1D5DC]">
+                          Show on Online Storefront
+                        </h1>
+                        <p className="text-sm text-[#6A7282]">
+                          Display promotional card with image, title, price
+                        </p>
+                      </div>
+                    </div>
                   </>}
 
 
 
-
-                <div className="space-y-2">
-                  <Label className="text-sm text-muted-foreground">
-                    Description *
-                  </Label>
-                  <Textarea
-                    name="description"
-                    placeholder="Add any additional details about this session..."
-                    className="min-h-26"
-                    value={session.description}
-                    onChange={(e) =>
-                      setSession((prev) => ({
-                        ...prev,
-                        description: e.target.value,
-                      }))
-                    }
-                  />
-                </div>
               </div>
             </ScrollArea>
             <Separator />
 
             <div className="p-4">
               <div className="flex gap-4 flex-wrap">
-                <DialogClose className="text-[13px] font-medium leading-none h-10 px-4 py-2 bg-black text-white border-border rounded-md hover:opacity-70 cursor-pointer flex flex-1 items-center justify-center">
+                <DialogClose className="text-[13px] font-medium leading-none px-4 py-2 bg-black text-white border-border rounded-md hover:opacity-70 cursor-pointer flex flex-1 items-center justify-center">
                   Cancel
                 </DialogClose>
                 <Button
                   type="submit"
                   disabled={loading}
                   className="flex-1 text-[13px]"
-                  size={"lg"}
+
                 >
                   {loading ? (
                     <span className="flex items-center gap-2">
-                      <Spinner className="text-black"/>
+                      <Spinner className="text-black" />
                       Creating...
                     </span>
                   ) : (
-                    "Create Session"
+                    promotion ? "Create Promotion" : "Create Session"
                   )}
                 </Button>
               </div>

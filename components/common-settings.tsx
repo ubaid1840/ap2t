@@ -76,7 +76,6 @@ export default function CommonSettings() {
 
             const res = await axios.get(`/settings?user_id=${user.id}`);
             const result = res.data;
-            console.log(res.data)
 
             setProfileInfo({
                 first_name: result.user?.first_name || "",

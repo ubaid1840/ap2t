@@ -88,7 +88,6 @@ export default function Page() {
     try {
       setLoading(true)
       const result = await axios.get("/admin/users?role=coach")
-      console.log(result.data)
       const mappedCoaches = result?.data?.data?.map((coach: any) => (
         { 
           name: joinNames([coach.first_name, coach.last_name]),

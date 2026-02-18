@@ -8,6 +8,6 @@ export default function Page() {
   const { id } = useParams()
 
   return (
-    <SessionMainPage id={Number(id || null)} back={"/portal/admin/promotions"} back_title={"Back to Promotions"} type="promotion"/>
+    <SessionMainPage admin={true} id={Number(id || null)} back={"/portal/admin/promotions"} back_title={"Back to Promotions"} />
   )
 }
