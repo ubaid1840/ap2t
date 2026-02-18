@@ -1,11 +1,11 @@
 
-import { joinNames } from '@/lib/functions'
+import { formatTimeWithAmPm, joinNames } from '@/lib/functions'
+import { CalendarEvent } from '@/lib/types'
 import CardStatus from '../card-status'
 import { AddParticipantDialog } from '../sessions/add-participant-dialog'
 import { Badge } from '../ui/badge'
 import { Dialog, DialogClose, DialogContent, DialogHeader, DialogTitle } from '../ui/dialog'
 import { ScrollArea } from '../ui/scroll-area'
-import { CalendarEvent } from './calendar-data'
 import ParticipateButton from './participate-button'
 
 
@@ -53,9 +53,9 @@ const EventDetail = ({
                                         </h3>
 
                                         <div className="text-xs text-muted-foreground flex gap-3">
-                                            <span>{event.date}</span>
+                                            <span>{event.start_date} - {event?.end_date}</span>
                                             <span>•</span>
-                                            <span>{event.time}</span>
+                                            <span>{formatTimeWithAmPm(event.time)} - {formatTimeWithAmPm(event?.end_time)}</span>
                                         </div>
                                         {event?.children?.length > 0 && (
                                             <p className="text-xs">
@@ -83,12 +83,12 @@ const EventDetail = ({
 
                                 {event.status === 'upcoming' &&
                                     <>
-                                        {player_id && <ParticipateButton player_id={player_id} session_id={event.id} onSuccess={async () => {
+                                        {player_id && <ParticipateButton player_id={player_id} session_id={event.originalId} onSuccess={async () => {
                                             await onSuccess()
                                             onOpenChange()
                                         }} />}
 
-                                        {parent_id && <AddParticipantDialog parent_id={parent_id} sessionId={Number(event.id)} onSuccess={async () => {
+                                        {parent_id && <AddParticipantDialog parent_id={parent_id} sessionId={Number(event.originalId)} onSuccess={async () => {
                                             await onSuccess()
                                             onOpenChange()
                                         }} />}</>

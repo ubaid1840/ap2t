@@ -51,16 +51,17 @@ export async function GET(
       JOIN users u ON u.id = p.user_id
     ) c
       ON c.user_id = sp.user_id
-       WHERE
-    s.date >= DATE_TRUNC(
-      'month',
-      COALESCE($2::timestamptz, NOW())
+      WHERE
+    (
+      s.date >= DATE_TRUNC('month', COALESCE($2::timestamptz, NOW()))
+      AND s.date < DATE_TRUNC('month', COALESCE($2::timestamptz, NOW())) + INTERVAL '1 month'
     )
-    AND s.date < DATE_TRUNC(
-      'month',
-      COALESCE($2::timestamptz, NOW())
-    ) + INTERVAL '1 month'
-  
+    OR
+    (
+      s.end_date IS NOT NULL
+      AND s.end_date >= DATE_TRUNC('month', COALESCE($2::timestamptz, NOW()))
+      AND s.end_date < DATE_TRUNC('month', COALESCE($2::timestamptz, NOW())) + INTERVAL '1 month'
+    )
     GROUP BY s.id, u.first_name, u.last_name
     ORDER BY s.date ASC
   `;

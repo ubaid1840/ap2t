@@ -169,6 +169,11 @@ export const EVENT_STYLES = {
         text: 'text-danger-text',
         border: 'border-danger-text/32',
     },
+    other: {
+        bg: 'bg-other-bg',
+        text: 'text-other-text',
+        border: 'border-other-text/32',
+    },
 }
 
 export const BASE_URL = "/api"

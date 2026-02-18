@@ -1,5 +1,5 @@
 "use client";
-import SessionCalendar from "@/components/sessions/session-calendar";
+import SessionCalendar from "@/components/calendar/session-calendar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/contexts/auth-context";
 import axios from "@/lib/axios";
@@ -41,7 +41,6 @@ export default function Page() {
   }
       );
       if (result.data) {
-        console.log(result.data)
         const mappedSessions = result.data.map((s: any) => ({
           id: s.id,
           sessionName: s.name,
@@ -51,8 +50,10 @@ export default function Page() {
           coachName: joinNames([s.coach_first_name, s.coach_last_name]),
           price: s.price,
           status: s?.status || 'upcoming',
-          children: s?.children || []
+          children: s?.children || [],
+          end_date : s?.end_date ? moment(new Date(s.end_date)).format("YYYY-MM-DD") : null
         }));
+
         setSessions(mappedSessions);
       }
     } catch (error) {

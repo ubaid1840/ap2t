@@ -1,5 +1,5 @@
 "use client";
-import SessionCalendar from "@/components/sessions/session-calendar";
+import SessionCalendar from "@/components/calendar/session-calendar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/contexts/auth-context";
 import axios from "@/lib/axios";
@@ -52,7 +52,8 @@ export default function Page() {
           coachName: joinNames([s.coach_first_name, s.coach_last_name]),
           price: s.price,
           status: s?.status || 'upcoming',
-          enrolled : s?.enrolled
+          enrolled : s?.enrolled,
+          end_date : s?.end_date ? moment(new Date(s.end_date)).format("YYYY-MM-DD") : null
         }));
         setSessions(mappedSessions);
       }

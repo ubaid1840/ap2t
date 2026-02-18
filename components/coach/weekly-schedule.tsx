@@ -15,21 +15,7 @@ import {
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { useIsMobile } from "@/hooks/use-mobile";
 import axios from "@/lib/axios";
-
-
-export interface Event {
-  title: string;
-  date: string; 
-  time: string; 
-  status: "Available" | "Booked" | "Blocked" | string;
-}
-
-interface WeeklyScheduleProps {
-  events: Event[];
-  id : string | null
-  preference : Record<string, string> | null | undefined
-}
-
+import { WeeklyScheduleProps } from "@/lib/types";
 
 const timeSlots = [
   "9:00",

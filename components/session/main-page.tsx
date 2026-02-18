@@ -3,9 +3,6 @@ import BackButton from "@/components/back-button";
 import CardStatus from "@/components/card-status";
 import { AddParticipantDialog } from "@/components/sessions/add-participant-dialog";
 import { EditSessionDialog } from "@/components/sessions/edit-session-dialog";
-import {
-  SessionDataType
-} from "@/components/sessions/session-data";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -36,6 +33,7 @@ import { useAuth } from "@/contexts/auth-context";
 import { useIsMobile } from "@/hooks/use-mobile";
 import axios from "@/lib/axios";
 import { joinNames } from "@/lib/functions";
+import { SessionDataType } from "@/lib/types";
 import { Scrollbar } from "@radix-ui/react-scroll-area";
 import {
   Calendar,
@@ -56,22 +54,6 @@ import {
 } from "lucide-react";
 import moment from "moment";
 import { useEffect, useState } from "react";
-
-type CardStatusType =
-  | "success"
-  | "warning"
-  | "danger"
-  | "info"
-  | "active"
-  | "ghost"
-  | "alternative";
-
-const paymentStatusMap: Record<string, CardStatusType> = {
-  paid: "active",
-  completed: "active",
-  pending: "warning",
-  partial: "warning",
-};
 
 type noteType = {
   id: string;

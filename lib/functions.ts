@@ -29,10 +29,10 @@ export function splitFullName(fullName: string | null) {
 
 export function joinNames(data: (string | null | undefined)[]): string {
   return data
-    .filter(Boolean)         // remove null, undefined, empty string
-    .map((s) => s!.trim())  // trim each string (s! because filtered)
-    .filter(Boolean)        // remove strings that were only spaces
-    .join(" ");             // join with space
+    .filter(Boolean)         
+    .map((s) => s!.trim())  
+    .filter(Boolean)        
+    .join(" ");             
 }
 
 export function getYear(val: string | null | Date | undefined) {
@@ -88,3 +88,16 @@ export const exportToExcel = async (
     throw new Error("Failed to generate Excel file");
   }
 };
+
+export function formatTimeWithAmPm(time: string): string {
+  if (!time) return ""
+
+  const [hourStr, minuteStr] = time.split(":")
+  let hour = parseInt(hourStr, 10)
+  const minute = minuteStr || "00"
+  const ampm = hour >= 12 ? "PM" : "AM"
+  hour = hour % 12
+  if (hour === 0) hour = 12
+  const hourFormatted = hour.toString().padStart(2, "0")
+  return `${hourFormatted}:${minute} ${ampm}`
+}

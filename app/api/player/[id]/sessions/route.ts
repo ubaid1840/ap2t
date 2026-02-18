@@ -8,6 +8,8 @@ export async function GET(
   const { id } = await params;
   const month  = req.nextUrl.searchParams.get("month")
 
+  console.log(month)
+
   try {
     const query = `
        SELECT
@@ -25,14 +27,16 @@ export async function GET(
       ON sp.session_id = s.id
       AND sp.user_id = $1
       WHERE
-    s.date >= DATE_TRUNC(
-      'month',
-      COALESCE($2::timestamptz, NOW())
+    (
+      s.date >= DATE_TRUNC('month', COALESCE($2::timestamptz, NOW()))
+      AND s.date < DATE_TRUNC('month', COALESCE($2::timestamptz, NOW())) + INTERVAL '1 month'
     )
-    AND s.date < DATE_TRUNC(
-      'month',
-      COALESCE($2::timestamptz, NOW())
-    ) + INTERVAL '1 month'
+    OR
+    (
+      s.end_date IS NOT NULL
+      AND s.end_date >= DATE_TRUNC('month', COALESCE($2::timestamptz, NOW()))
+      AND s.end_date < DATE_TRUNC('month', COALESCE($2::timestamptz, NOW())) + INTERVAL '1 month'
+    )
   ORDER BY s.date ASC
   `;
 

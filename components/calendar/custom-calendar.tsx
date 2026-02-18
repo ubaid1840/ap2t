@@ -1,26 +1,18 @@
 import { useIsMobile } from '@/hooks/use-mobile'
+import { EVENT_STYLES } from '@/lib/constants'
+import { CalendarEvent, CustomCalendarProps } from '@/lib/types'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import moment, { Moment } from 'moment'
 import { useMemo, useState } from 'react'
 import { Button } from '../ui/button'
 import { Card, CardContent } from '../ui/card'
 import { ScrollArea, ScrollBar } from '../ui/scroll-area'
-import { CalendarEvent } from './calendar-data'
 import CalendarSkeleton from './calendar-skeleton'
 import EventDetail from './event-details'
-import { EVENT_STYLES } from '@/lib/constants'
 
-type CustomCalendarProps = {
- events?: CalendarEvent[], 
- player_id: string | null | undefined, 
- onSuccess: () => Promise<void>, 
- parent_id: string | null | undefined | number, 
- loading?: boolean, 
- currentMonth : Moment, 
- setCurrentMonth : (item : any)=> void
-}
-export default function CustomCalendar({currentMonth, setCurrentMonth, loading, events = [], player_id = null, onSuccess, parent_id = null }: CustomCalendarProps) {
-    
+
+export default function CustomCalendar({ currentMonth, setCurrentMonth, loading, events = [], player_id = null, onSuccess, parent_id = null }: CustomCalendarProps) {
+
     const [selectedEvent, setSelectedEvent] = useState<CalendarEvent[]>([])
     const startOfMonth = currentMonth.clone().startOf('month')
     const endOfMonth = currentMonth.clone().endOf('month')
@@ -63,18 +55,18 @@ export default function CustomCalendar({currentMonth, setCurrentMonth, loading, 
 
                             <div className="flex gap-2">
                                 <Button
-                                disabled={loading}
+                                    disabled={loading}
                                     size="icon"
                                     variant="outline"
                                     onClick={() =>
-                                        setCurrentMonth((m : Moment) => m.clone().subtract(1, 'month'))
+                                        setCurrentMonth((m: Moment) => m.clone().subtract(1, 'month'))
                                     }
                                 >
                                     <ChevronLeft />
                                 </Button>
 
                                 <Button
-                                disabled={loading}
+                                    disabled={loading}
                                     className='h-9'
                                     variant="outline"
                                     onClick={() => setCurrentMonth(moment())}
@@ -83,11 +75,11 @@ export default function CustomCalendar({currentMonth, setCurrentMonth, loading, 
                                 </Button>
 
                                 <Button
-                                disabled={loading}
+                                    disabled={loading}
                                     size="icon"
                                     variant="outline"
                                     onClick={() =>
-                                        setCurrentMonth((m : Moment) => m.clone().add(1, 'month'))
+                                        setCurrentMonth((m: Moment) => m.clone().add(1, 'month'))
                                     }
                                 >
                                     <ChevronRight />

@@ -2,7 +2,7 @@
 import PageTable from "@/components/app-table";
 import InputWithIcon from "@/components/input-with-icon";
 import { CreateSessionDialog } from "@/components/sessions/create-session-dialog";
-import SessionCalendar from "@/components/sessions/session-calendar";
+import SessionCalendar from "@/components/calendar/session-calendar";
 import { SESSION_COLUMNS } from "@/components/sessions/session-column";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";

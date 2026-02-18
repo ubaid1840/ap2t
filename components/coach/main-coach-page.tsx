@@ -1,9 +1,8 @@
 "use client";
-import BackButton from "@/components/back-button";
 import CardStatus from "@/components/card-status";
 import LineChart from "@/components/charts/line-chart-dots";
-import { Event, WeeklySchedule } from "@/components/coach-dashboard/weekly-schedule";
 import EditCoachProfile from "@/components/coach/EditCoachProfile";
+import { WeeklySchedule } from "@/components/coach/weekly-schedule";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   type ChartConfig
@@ -17,6 +16,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useIsMobile } from "@/hooks/use-mobile";
 import axios from "@/lib/axios";
 import { getYear, joinNames } from "@/lib/functions";
+import { CoachResponse, Event, PaymentDataCoach, SessionDataCoach } from "@/lib/types";
 import { Scrollbar } from "@radix-ui/react-scroll-area";
 import {
   Award,
@@ -31,95 +31,9 @@ import {
   User
 } from "lucide-react";
 import moment from "moment";
-import { useParams } from "next/navigation";
 import { ReactNode, useEffect, useState } from "react";
 import { IoCalendarClear } from "react-icons/io5";
-import { Button } from "../ui/button";
 
-
-export interface CoachResponse {
-  id: number;
-  first_name: string;
-  last_name: string;
-  email: string;
-  role: string;
-  status: string;
-  picture: string | null;
-  location: string | null;
-  phone_no: string | null;
-  joining_date: string | null;
-  birth_date: string | null;
-  created_at: string;
-
-  profile: CoachProfile;
-
-  session_data: SessionData[];
-  payment_data: PaymentData[];
-  this_month_revenue: string
-  last_month_revenue: string
-  average_price_per_session: string
-  total_revenue: string
-}
-
-export interface CoachProfile {
-  id: number;
-  bio: string | null;
-  rating: number | null;
-  user_id: number;
-  created_at: string;
-  career_start: string | null;
-
-  specialities: string[];
-  certifications: string[];
-
-  schedule_preference: Record<string, string> | null;
-}
-
-export interface SessionData {
-  id: number;
-  name: string;
-  description: string;
-  status: string;
-  session_type: string;
-  coach_id: number;
-  location: string;
-
-  start_time: string;
-  end_time: string;
-  date: string;
-  end_date: string;
-
-  price: number;
-  promotion_price: number;
-
-  max_players: number;
-  apply_promotion: boolean;
-  show_storefront: boolean;
-
-  image: string;
-
-  created_at: string;
-  payment_detail: {
-    amount: number
-    created_at: string
-    id: number
-    method: string | null
-    paid_at: string | Date | null
-    session_id: number
-    status: string
-    transaction_id: string | null
-    user_id: number
-  }[]
-}
-
-export interface PaymentData {
-  id: number;
-  session_id: number;
-  user_id: number;
-  amount: number;
-  status: string;
-  created_at: string;
-}
 
 
 
@@ -577,7 +491,7 @@ const HeaderCard = ({
 };
 
 
-function calculateStats(sessions: SessionData[] | undefined, payments: PaymentData[] | undefined) {
+function calculateStats(sessions: SessionDataCoach[] | undefined, payments: PaymentDataCoach[] | undefined) {
   let totalSessions = 0
   let totalCompleted = 0
   let totalUpcoming = 0
@@ -619,7 +533,7 @@ function CalculateRevenuePercentage(localData: CoachResponse | undefined) {
   return percentageChange
 }
 
-function generateRevenueTrend(sessionData: SessionData[] | undefined) {
+function generateRevenueTrend(sessionData: SessionDataCoach[] | undefined) {
   if (!sessionData) return
   const now = moment();
 
@@ -657,7 +571,7 @@ function generateRevenueTrend(sessionData: SessionData[] | undefined) {
 
 
 function generateRevenueBySessionTypes(
-  sessionData: SessionData[] | undefined,
+  sessionData: SessionDataCoach[] | undefined,
   sessionTypes: string[]
 ) {
   if (!sessionData) return [];
