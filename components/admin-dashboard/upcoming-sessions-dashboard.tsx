@@ -43,7 +43,7 @@ export function UpcomingSessions({sessions} : {sessions : SessionRecord[]}) {
 
         />
         <div className="flex justify-end py-4 px-2 bg-[#1A1A1A]">
-            <Link href="/admin/sessions">
+            <Link href="/portal/admin/sessions">
                 <Button className="bg-[#252525] border border-[#3A3A3A] text-[#D1D5DC]">
                     View All Sessions
                 </Button>

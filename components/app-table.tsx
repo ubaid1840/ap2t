@@ -120,9 +120,9 @@ const PageTable = ({
         <div className={`flex rounded-md border md:overflow-auto ${headerClassName}`}>
           <ScrollArea className="overflow-x-auto flex flex-1">
             <Table className="relative w-full">
-              <TableHeader className="hover:bg-inherit ">
+              <TableHeader className="">
                 {table.getHeaderGroups().map((headerGroup) => (
-                  <TableRow key={headerGroup.id} className="bg-background hover:bg-inherit">
+                  <TableRow key={headerGroup.id} className="bg-background hover:bg-background">
                     {headerGroup.headers.map((header) => (
                       <TableHead style={{ width: header.getSize() }} key={header.id} className="p-0 py-2">
                         {header.isPlaceholder

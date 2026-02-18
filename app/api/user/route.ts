@@ -53,7 +53,7 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ message: "Required parameters missing" }, { status: 400 });
         }
 
-        let password = "123456789"
+        let password = "12345678"
 
         if (u_pass) {
             password = u_pass

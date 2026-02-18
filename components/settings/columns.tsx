@@ -118,7 +118,7 @@ export type ZipRevenueData = {
 
 export const ZIP_REVENUE_DATA_COLUMNS: ColumnDef<ZipRevenueData>[] = [
   {
-    accessorKey: "zip",
+    accessorKey: "zip_code",
     header: ({ column }) => (
       <Button
         variant="ghost"
@@ -132,12 +132,12 @@ export const ZIP_REVENUE_DATA_COLUMNS: ColumnDef<ZipRevenueData>[] = [
     cell: ({ row }) => (
       <div className="flex gap-2 items-center">
         <MapPin className="text-[#D1D5DC]" size={14} />
-        <div className="text-[#D1D5DC]">{row.getValue("zip")}</div>
+        <div className="text-[#D1D5DC]">{row.getValue("zip_code")}</div>
       </div>
     ),
   },
   {
-    accessorKey: "players",
+    accessorKey: "total_users",
     header: ({ column }) => (
       <Button
         variant="ghost"
@@ -150,12 +150,12 @@ export const ZIP_REVENUE_DATA_COLUMNS: ColumnDef<ZipRevenueData>[] = [
     ),
     cell: ({ row }) => (
       <div className="text-[#D1D5DC] flex items-center gap-2">
-        {row.getValue("players")}
+        {Number(row.getValue("total_users")|| 0).toFixed(0)}
       </div>
     ),
   },
   {
-    accessorKey: "revenue",
+    accessorKey: "total_revenue",
     header: ({ column }) => (
       <Button
         variant="ghost"
@@ -168,7 +168,7 @@ export const ZIP_REVENUE_DATA_COLUMNS: ColumnDef<ZipRevenueData>[] = [
     ),
     cell: ({ row }) => (
       <div className="text-[#D1D5DC] flex items-center gap-2">
-        ${row.getValue("revenue")}
+        ${Number(row.getValue("total_revenue") || 0).toFixed(0)}
       </div>
     ),
   },
@@ -186,7 +186,7 @@ export const ZIP_REVENUE_DATA_COLUMNS: ColumnDef<ZipRevenueData>[] = [
     ),
     cell: ({ row }) => (
       <div className="text-[#D1D5DC] flex items-center gap-2">
-        ${row.getValue("avg_revenue")}
+        ${Number(row.getValue("avg_revenue") || 0).toFixed(0)}
       </div>
     ),
   },
