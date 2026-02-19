@@ -134,3 +134,12 @@ export const exportDashboardToExcel = async (
   saveAs(blob, fileName);
 };
 
+
+ export function calcualteRevenu(paymentData: any[]) {
+  
+    const totalRevuew = paymentData.filter((item) => item.status === 'paid').reduce(
+      (sum, item) => sum + Number(item.amount || 0),
+      0
+    );
+    return totalRevuew
+  }

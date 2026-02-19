@@ -14,6 +14,7 @@ export type CalendarEvent = {
   end_date : string | null
   end_time : string
   originalId : string
+  price : string | number
 }
 
 export type CustomCalendarProps = {

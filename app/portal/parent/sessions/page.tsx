@@ -48,7 +48,7 @@ export default function Page() {
           date: moment(new Date(s.date)).format("YYYY-MM-DD"),
           time: `${s.start_time} - ${s.end_time}`,
           coachName: joinNames([s.coach_first_name, s.coach_last_name]),
-          price: s.price,
+          price: s?.apply_promotion ? s?.promotion_price : s.price,
           status: s?.status || 'upcoming',
           children: s?.children || [],
           end_date : s?.end_date ? moment(new Date(s.end_date)).format("YYYY-MM-DD") : null

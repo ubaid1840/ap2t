@@ -221,7 +221,7 @@ export function CreateSessionDialog({
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label className="text-sm text-muted-foreground">
-                      method
+                      Type
                     </Label>
                     <Select
                       value={session.type}
@@ -246,7 +246,7 @@ export function CreateSessionDialog({
                     </Label>
                     <Input
                       name="age_limit"
-                      placeholder="10-18"
+                      placeholder="e.g., 12+/10-18"
                       required
                       value={session.age_limit}
                       onChange={(e) =>

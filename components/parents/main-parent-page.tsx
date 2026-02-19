@@ -14,7 +14,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "@/contexts/auth-context";
 import { useIsMobile } from "@/hooks/use-mobile";
 import axios from "@/lib/axios";
-import { getYear, joinNames } from "@/lib/functions";
+import { calcualteRevenu, exportToExcel, getYear, joinNames } from "@/lib/functions";
 import { Scrollbar } from "@radix-ui/react-scroll-area";
 import {
   Calendar,
@@ -36,13 +36,31 @@ import { ReactNode, useEffect, useState } from "react";
 import { IoIosPin } from "react-icons/io";
 import { IoCalendarClear } from "react-icons/io5";
 import { Spinner } from "../ui/spinner";
+import Link from "next/link";
 
 export interface ParentDetailResponse {
   parent: Parent;
   stats: ParentStats;
   linked_childrens: LinkedChildren[];
   sessions: ParentSession[];
+  payments: PaymentItemParent[]
 }
+
+export type PaymentItemParent = {
+  id: number;
+  session_name: string
+  transaction_id: string;
+  user_id: number;
+  session_id: number;
+  amount: string; // or number if you prefer to convert
+  method: string;
+  status: "paid" | "pending" | "failed" | "comped" | "refunded";
+  paid_at: string; // ISO date string
+  created_at: string; // ISO date string
+  comped_category: string | null;
+  comped_reason: string | null;
+};
+
 
 export interface Parent {
   id: number;
@@ -93,6 +111,7 @@ export interface ChildNextSession {
 export interface ParentSession {
   session_id: number;
   name: string;
+  comped: boolean;
   status: string;
   date: string;
   start_time: string;
@@ -125,18 +144,18 @@ export default function MainParentPage({
   const [dataLoading, setDataLoading] = useState(true)
   const { user } = useAuth()
 
-  
+
   useEffect(() => {
     if (id && user?.id) {
       fetchData();
     }
   }, [id, user]);
-
   const fetchData = async () => {
     setDataLoading(true)
     try {
 
       const result = await axios.get(`/admin/parents/${id}`);
+      console.log(result.data)
       setData(result.data)
 
     } finally {
@@ -167,6 +186,31 @@ export default function MainParentPage({
     }
   };
 
+function handleExport(payments: PaymentItemParent[] | undefined, fileName = "payments.xlsx"){
+if (!payments || payments.length === 0) return;
+
+  const headers = [
+    "Session Name",
+    "Status",
+    "Amount",
+    "Created At",
+    "Method",
+    "Transaction ID",
+  ];
+
+  const rows: string[][] = payments.map((item) => [
+    item.session_name || "N/A",
+    item.status,
+    item.status === "refunded"
+      ? `-${Number(item.amount || 0).toFixed(2)}`
+      : `$${Number(item.amount || 0).toFixed(2)}`,
+    item.created_at ? moment(item.created_at).format("YYYY-MM-DD") : "N/A",
+    item.method || "N/A",
+    item.transaction_id || "Nil",
+  ]);
+
+  return exportToExcel(headers, rows, fileName);
+}
 
   if (dataLoading) {
     return (
@@ -363,7 +407,8 @@ export default function MainParentPage({
                     <div className="flex gap-4 items-center">
                       <RenderAvatar className="h-12 w-12" fallback={joinNames([item.first_name, item.last_name])} img={item.picture} />
                       <div>
-                        <div className="text-lg text-white">{joinNames([item.first_name, item.last_name])}</div>
+                        <Link href={`/portal/parent/dashboard/${item.user_id}`} className="hover:underline">
+                          <div className="text-lg text-white">{joinNames([item.first_name, item.last_name])}</div></Link>
                         <div className="text-muted-foreground">
                           Age {getYear(item.birth_date)} - {item.skill_level}
                         </div>
@@ -399,6 +444,7 @@ export default function MainParentPage({
                     <div className="flex items-center gap-2">
                       <span className="text-[#F3F4F6]">{item.name}</span>
                       <CardStatus value={item.status} />
+                      {item.comped && <CardStatus value={"comped"} />}
                     </div>
                     <div className="text-muted-foreground text-xs flex items-center gap-2">
                       <Calendar size={14} /> {item.date && moment(new Date(item.date)).format("YYYY-MM-DD")} <Clock size={14} />{" "}
@@ -433,48 +479,43 @@ export default function MainParentPage({
 
           <TabsContent value="payment" className="space-y-4 p-2">
             <div className="flex gap-4 flex-wrap justify-between items-center">
-              <div>
-                <p className="text-xs text-muted-foreground">
-                  Total Revenue from Parent
-                </p>
-                <p className="text-lg">$2,450</p>
-              </div>
-              <Button variant={"outline"} className="bg-black">
+              <div />
+              <Button onClick={()=> handleExport(data?.payments)} variant={"outline"} className="bg-black">
                 <Download /> Export
               </Button>
             </div>
 
-            {PAYMENT_HISTORY.map((item, i) => (
+            {data?.payments?.map((item, i) => (
               <Card key={item.id} className="bg-black">
                 <CardContent className="space-y-2">
                   <div className="flex justify-between gap-2 flex-wrap">
                     <div className="flex gap-4 items-center text-sm">
-                      <p>{item.session}</p>
+                      <p>{item?.session_name}</p>
                       <CardStatus
-                        value={item.status}
+                        value={item?.status}
                       />
                     </div>
                     <p
-                      className={`text-md ${item.status === "Refunded" && "text-danger-text"}`}
+                      className={`text-md ${item?.status === "refunded" && "text-danger-text"}`}
                     >
-                      {item.status === "Refunded"
-                        ? `-$${item.price}`
-                        : `$${item.price}`}
+                      {item?.status === "refunded"
+                        ? `-$${Number(item?.amount || 0).toFixed(0)}`
+                        : `$${Number(item?.amount || 0).toFixed(0)}`}
                     </p>
                   </div>
 
                   <div className="flex gap-2 items-center text-xs text-muted-foreground flex-wrap">
                     <div className="flex gap-2">
                       <Calendar size={14} />
-                      <p>{item.date}</p>
+                      <p>{item?.created_at && moment(new Date(item.created_at)).format("YYYY-MM-DD")}</p>
                     </div>
                     <div className="flex gap-2">
                       <CreditCard size={14} />
-                      <p>{item.card}</p>
+                      <p>{item.method}</p>
                     </div>
                     <div className="flex gap-2">
                       <p>Receipt: </p>
-                      <p>{item.receipt}</p>
+                      <p>{item?.transaction_id || "Nil"}</p>
                     </div>
                   </div>
                 </CardContent>
@@ -486,25 +527,6 @@ export default function MainParentPage({
     </div>
   );
 }
-
-const CardStatusHistory = ({ text = "" }: { text: string }) => {
-  const colors =
-    text === "Completed"
-      ? "bg-success-bg text-success-text"
-      : text === "Upcoming"
-        ? "bg-info-bg text-info-text"
-        : text === "Cancelled"
-          ? "bg-ghost-bg text-ghost-text"
-          : "bg-danger-bg text-danger-text";
-
-  return (
-    <div
-      className={`w-25 py-1 justify-center rounded-full flex items-center gap-2 ${colors}`}
-    >
-      <div className="text-xs">{text}</div>
-    </div>
-  );
-};
 
 const HeaderCard = ({
   title = "",
@@ -530,95 +552,3 @@ const HeaderCard = ({
   );
 };
 
-export const BOOKING_DATA = [
-  {
-    id: 1,
-    title: "Football Practice",
-    status: "Upcoming",
-    date: "2026-01-10",
-    time: "02:00 AM - 03:00 AM",
-    coach: "Ahmed Khan",
-    child: "John Smith",
-  },
-  {
-    id: 2,
-    title: "Swimming Lesson",
-    status: "Completed",
-    date: "2026-01-08",
-    time: "04:00 PM - 05:00 PM",
-    coach: "Sara Ali",
-    child: "Emma Johnson",
-  },
-  {
-    id: 3,
-    title: "Tennis Coaching",
-    status: "Cancelled",
-    date: "2026-01-09",
-    time: "10:00 AM - 11:00 AM",
-    coach: "Michael Brown",
-    child: "Michael Brown",
-  },
-  {
-    id: 4,
-    title: "Basketball Practice",
-    status: "Upcoming",
-    date: "2026-01-12",
-    time: "06:00 PM - 07:30 PM",
-    coach: "Olivia Davis",
-    child: "Olivia Davis",
-  },
-  {
-    id: 5,
-    title: "Yoga Session",
-    status: "Completed",
-    date: "2026-01-05",
-    time: "08:00 AM - 09:00 AM",
-    coach: "Sophia Martinez",
-    child: "Sophia Martinez",
-  },
-  {
-    id: 6,
-    title: "Martial Arts",
-    status: "Upcoming",
-    date: "2026-01-11",
-    time: "03:00 PM - 04:30 PM",
-    coach: "Liam Wilson",
-    child: "Liam Wilson",
-  },
-  {
-    id: 7,
-    title: "Football Strategy Meeting",
-    status: "Cancelled",
-    date: "2026-01-06",
-    time: "05:00 PM - 06:00 PM",
-    coach: "Isabella Taylor",
-    child: "Isabella Taylor",
-  },
-  {
-    id: 8,
-    title: "Swimming Technique Review",
-    status: "Upcoming",
-    date: "2026-01-13",
-    time: "09:00 AM - 10:00 AM",
-    coach: "Noah Anderson",
-    child: "Noah Anderson",
-  },
-  {
-    id: 9,
-    title: "Basketball Drill",
-    status: "Completed",
-    date: "2026-01-04",
-    time: "11:00 AM - 12:30 PM",
-    coach: "Mia Thomas",
-    child: "Mia Thomas",
-  },
-  {
-    id: 10,
-    title: "Tennis Match",
-    status: "Upcoming",
-    date: "2026-01-14",
-    time: "02:00 PM - 03:30 PM",
-    coach: "Ethan Lee",
-    child: "Ethan Lee",
-  },
-];
