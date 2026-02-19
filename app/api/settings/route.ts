@@ -10,7 +10,7 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    const userResult = await pool.query(`SELECT id FROM users WHERE id = $1`, [
+    const userResult = await pool.query(`SELECT id, first_name, last_name, email, picture, phone_no, location, birth_date FROM users WHERE id = $1`, [
       userid,
     ]);
 
