@@ -10,6 +10,7 @@ import { ScrollArea } from "../ui/scroll-area";
 import { Spinner } from "../ui/spinner";
 import { Textarea } from "../ui/textarea";
 import SelectCompCategory from "./select-comp-cateegory";
+import { toast } from "sonner";
 
 type CompedDialogProps = {
   data: PaymentItem;
@@ -25,6 +26,10 @@ export function CompedDialog({ open, onOpenChange, data, onRefresh }: CompedDial
 
   async function handleUpdateStatus() {
     if (!data?.id) return
+    if(!form.comped_category||!form.comped_reason){
+      toast.error("Comped Category or Comped Reason is not provided")
+      return
+    }
     setLoading(true)
     try {
       await axios.put(`/admin/payments`, {

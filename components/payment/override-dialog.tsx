@@ -13,6 +13,7 @@ import SelectCompCategory from "./select-comp-cateegory";
 import { Input } from "../ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import moment from "moment";
+import { toast } from "sonner";
 
 type CompedDialogProps = {
   data: PaymentItem;
@@ -32,6 +33,11 @@ export function OverrideDialog({ open, onOpenChange, data, onRefresh }: CompedDi
 
   async function handleUpdateStatus() {
     if (!data?.id) return
+    console.log(form)
+    if(!form.method||!form.transaction_id) {
+      toast.error("Method or Transection id not provided")
+      return
+    }
     setLoading(true)
     try {
       await axios.put(`/admin/payments`, {
@@ -68,6 +74,7 @@ export function OverrideDialog({ open, onOpenChange, data, onRefresh }: CompedDi
           </p>
         </DialogHeader>
         <ScrollArea className="h-[60dvh]">
+
           <div className="px-6 py-2 space-y-4">
             <div className="bg-[#1A1A1A] border border-border rounded-[10px] space-y-2 p-6">
               <div className="flex justify-between">
@@ -93,6 +100,7 @@ export function OverrideDialog({ open, onOpenChange, data, onRefresh }: CompedDi
 
               <Select
                 value={form.method}
+                required
                 onValueChange={(e) => {
                   setForm((prevState) => ({ ...prevState, method: e, transaction_id: e === 'Cash' ? moment().valueOf().toString() : "" }))
                 }}
@@ -114,7 +122,7 @@ export function OverrideDialog({ open, onOpenChange, data, onRefresh }: CompedDi
 
             <div className="space-y-2">
               <Label className="text-ghost-text">Transaction ID *</Label>
-              <Input disabled={form.method === 'Cash'} value={form.transaction_id} onChange={(e) => setForm((prevState) => ({ ...prevState, transaction_id: e.target.value }))} />
+              <Input disabled={form.method === 'Cash'} value={form.transaction_id} required onChange={(e) => setForm((prevState) => ({ ...prevState, transaction_id: e.target.value }))} />
 
             </div>
 
@@ -126,7 +134,8 @@ export function OverrideDialog({ open, onOpenChange, data, onRefresh }: CompedDi
             <DialogClose className="text-[12px] font-medium tracking-wider leading-none h-8 px-4 py-2 bg-black text-white rounded-md hover:opacity-70 cursor-pointer flex flex-1 items-center justify-center">
               Cancel
             </DialogClose>
-            <Button onClick={() => {
+            <Button onClick={(e) => {
+              e.preventDefault();
               handleUpdateStatus()
             }} disabled={loading} className="flex-1">
               {loading && <Spinner className="text-black" />} Mark as Paid
