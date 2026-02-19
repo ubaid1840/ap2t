@@ -1,6 +1,15 @@
 "use client";
 import axios from "@/lib/axios";
-import { Calendar, DollarSign, Eye, Image, MapPin, Plus, Tag, Users } from "lucide-react";
+import {
+  Calendar,
+  DollarSign,
+  Eye,
+  Image,
+  MapPin,
+  Plus,
+  Tag,
+  Users,
+} from "lucide-react";
 import { useEffect, useState } from "react";
 import AppCalendar from "../app-calendar";
 import SelectSessionType from "../players/select-session-type";
@@ -32,33 +41,46 @@ import { AssignCoachDialog } from "./assign-coach-dialog";
 import { Checkbox } from "../ui/checkbox";
 
 export type SessionType = {
-  name: string,
-  description: string,
-  session_type: string,
-  coach_id: number | null,
-  coach_name?: string
-  location: string,
-  date: undefined,
-  start_time: string,
-  end_time: string,
-  price: number | string,
-  max_players: number | string,
-  apply_promotion: boolean,
-  promotion_price?: number | string
-  image?: string
-  end_date: undefined
-  promotion_start: string | undefined
-  promotion_end: string | undefined
-  show_storefront: boolean | 'indeterminate';
+  name: string;
+  description: string;
+  type: string;
+  age_limit: string;
+  session_type: string;
+  coach_id: number | null;
+  coach_name?: string;
+  location: string;
+  date: undefined;
+  start_time: string;
+  end_time: string;
+  price: number | string;
+  max_players: number | string;
+  apply_promotion: boolean;
+  promotion_price?: number | string;
+  image?: string;
+  end_date: undefined;
+  promotion_start: string | undefined;
+  promotion_end: string | undefined;
+  show_storefront: boolean | "indeterminate";
+};
 
-}
-
-export function CreateSessionDialog({ onRefresh, coach_id = null, coach_name = null, promotion = false }: { coach_name?: string | null, coach_id?: string | null, onRefresh: () => Promise<void>, promotion?: boolean }) {
+export function CreateSessionDialog({
+  onRefresh,
+  coach_id = null,
+  coach_name = null,
+  promotion = false,
+}: {
+  coach_name?: string | null;
+  coach_id?: string | null;
+  onRefresh: () => Promise<void>;
+  promotion?: boolean;
+}) {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [session, setSession] = useState<SessionType>({
     name: "",
     description: "",
+    type: "",
+    age_limit: "",
     session_type: "",
     coach_id: null,
     location: "",
@@ -73,31 +95,35 @@ export function CreateSessionDialog({ onRefresh, coach_id = null, coach_name = n
     end_date: undefined,
     promotion_start: undefined,
     promotion_end: undefined,
-    show_storefront: false
+    show_storefront: false,
   });
 
   useEffect(() => {
     if (coach_id) {
-      setSession((prevState) => ({ ...prevState, coach_id: Number(coach_id), coach_name: coach_name || "" }))
+      setSession((prevState) => ({
+        ...prevState,
+        coach_id: Number(coach_id),
+        coach_name: coach_name || "",
+      }));
     }
-  }, [coach_id])
-
+  }, [coach_id]);
 
   const createSession = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
+    e.preventDefault();
     setLoading(true);
-    const { coach_name, ...finalData } = session
+    const { coach_name, ...finalData } = session;
     try {
-      await axios.post("/admin/sessions",
-        {
-          ...finalData,
-          max_players: finalData.max_players ? finalData.max_players : 0,
-          price: finalData.price ? finalData.price : 0,
-          promotion_price: finalData?.promotion_price ? finalData?.promotion_price : 0
-        });
-      await onRefresh()
-      handleClear()
-      setOpen(false)
+      await axios.post("/admin/sessions", {
+        ...finalData,
+        max_players: finalData.max_players ? finalData.max_players : 0,
+        price: finalData.price ? finalData.price : 0,
+        promotion_price: finalData?.promotion_price
+          ? finalData?.promotion_price
+          : 0,
+      });
+      await onRefresh();
+      handleClear();
+      setOpen(false);
     } finally {
       setLoading(false);
     }
@@ -107,6 +133,8 @@ export function CreateSessionDialog({ onRefresh, coach_id = null, coach_name = n
     setSession({
       name: "",
       description: "",
+      type: "",
+      age_limit: "",
       session_type: "",
       coach_id: null,
       location: "",
@@ -121,7 +149,7 @@ export function CreateSessionDialog({ onRefresh, coach_id = null, coach_name = n
       end_date: undefined,
       promotion_start: undefined,
       promotion_end: undefined,
-      show_storefront: false
+      show_storefront: false,
     });
   }
 
@@ -130,17 +158,22 @@ export function CreateSessionDialog({ onRefresh, coach_id = null, coach_name = n
       <Button onClick={() => setOpen(!open)} className="gap-2 text-sm">
         <Plus /> {promotion ? "Add New Promotion" : "Create New Session"}
       </Button>
-      <Dialog open={open} onOpenChange={(val) => {
-        setOpen(val)
-        handleClear()
-      }}>
+      <Dialog
+        open={open}
+        onOpenChange={(val) => {
+          setOpen(val);
+          handleClear();
+        }}
+      >
         <DialogContent className="bg-[#252525] border border-[#3A3A3A] sm:max-w-4xl p-0">
           <DialogHeader className="border-b border-[#3A3A3A] p-4">
             <DialogTitle className="text-[#F3F4F6] font-semibold text-lg">
               {promotion ? "Add New Promotion" : "Create New Session"}
             </DialogTitle>
             <p className="text-muted-foreground">
-              {promotion ? "Auto-syncs with Square and appears on online store" : "Fill in the details to create a new training session"}
+              {promotion
+                ? "Auto-syncs with Square and appears on online store"
+                : "Fill in the details to create a new training session"}
             </p>
           </DialogHeader>
           <form onSubmit={createSession}>
@@ -157,7 +190,6 @@ export function CreateSessionDialog({ onRefresh, coach_id = null, coach_name = n
                   <Input
                     name="sessionName"
                     placeholder="e.g., Advanced Skills Training"
-
                     required
                     value={session.name}
                     onChange={(e) =>
@@ -186,19 +218,63 @@ export function CreateSessionDialog({ onRefresh, coach_id = null, coach_name = n
                     }
                   />
                 </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label className="text-sm text-muted-foreground">
+                      method
+                    </Label>
+                    <Select
+                      value={session.type}
+                      required
+                      onValueChange={(e) => {
+                        setSession((prevState) => ({ ...prevState, type: e }));
+                      }}
+                    >
+                      <SelectTrigger className="w-full dark:bg-[#1A1A1A]">
+                        <SelectValue placeholder="Select method" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value={"camp"}>Camp</SelectItem>
+                        <SelectItem value={"comped"}>Clinic</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label className="text-sm text-muted-foreground">
+                      Age Limit *
+                    </Label>
+                    <Input
+                      name="age_limit"
+                      placeholder="10-18"
+                      required
+                      value={session.age_limit}
+                      onChange={(e) =>
+                        setSession((prev) => ({
+                          ...prev,
+                          age_limit: e.target.value,
+                        }))
+                      }
+                    />
+                  </div>
+                </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   <div className="space-y-2">
                     <Label className="text-sm text-muted-foreground">
                       Session Type *
                     </Label>
-                    <SelectSessionType required={true} placeholder="Select session type" value={session.session_type}
+                    <SelectSessionType
+                      required={true}
+                      placeholder="Select session type"
+                      value={session.session_type}
                       onChange={(e) =>
                         setSession((prev) => ({
                           ...prev,
                           session_type: e,
                         }))
-                      } />
+                      }
+                    />
                   </div>
                   <div className="space-y-2">
                     <Label className="text-sm text-muted-foreground">
@@ -211,7 +287,7 @@ export function CreateSessionDialog({ onRefresh, coach_id = null, coach_name = n
                           Selected Coach: {session.coach_name}
                         </p>
                       )}
-                      {!coach_id &&
+                      {!coach_id && (
                         <AssignCoachDialog
                           onSelect={(coach) =>
                             setSession((prev) => ({
@@ -221,10 +297,9 @@ export function CreateSessionDialog({ onRefresh, coach_id = null, coach_name = n
                             }))
                           }
                         />
-                      }
+                      )}
                     </div>
                   </div>
-
                 </div>
 
                 <div className="flex gap-2 text-md ">
@@ -233,7 +308,6 @@ export function CreateSessionDialog({ onRefresh, coach_id = null, coach_name = n
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-
                   <div className="space-y-2">
                     <Label className="text-sm text-muted-foreground">
                       Start Date *
@@ -257,7 +331,11 @@ export function CreateSessionDialog({ onRefresh, coach_id = null, coach_name = n
                     </Label>
                     <AppCalendar
                       className="h-9"
-                      date={session.end_date ? new Date(session.end_date) : undefined}
+                      date={
+                        session.end_date
+                          ? new Date(session.end_date)
+                          : undefined
+                      }
                       onChange={(date) =>
                         setSession((prevState) => ({
                           ...prevState,
@@ -267,11 +345,8 @@ export function CreateSessionDialog({ onRefresh, coach_id = null, coach_name = n
                       required
                     />
                   </div>
-
-
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-
                   <div className="space-y-2">
                     <Label className="text-sm text-muted-foreground">
                       Start Time *
@@ -317,7 +392,6 @@ export function CreateSessionDialog({ onRefresh, coach_id = null, coach_name = n
                     </Label>
                     <Input
                       name="location"
-
                       required
                       value={session.location}
                       onChange={(e) =>
@@ -342,17 +416,15 @@ export function CreateSessionDialog({ onRefresh, coach_id = null, coach_name = n
                           setSession((prev) => ({
                             ...prev,
                             price: e.target.value,
-                          }))
+                          }));
                         } else {
                           if (!Number.isNaN(Number(e.target.value))) {
                             setSession((prev) => ({
                               ...prev,
                               price: Number(e.target.value),
-                            }))
-
+                            }));
                           }
                         }
-
                       }}
                     />
                   </div>
@@ -378,21 +450,19 @@ export function CreateSessionDialog({ onRefresh, coach_id = null, coach_name = n
                           setSession((prev) => ({
                             ...prev,
                             max_players: e.target.value,
-                          }))
+                          }));
                         } else {
                           if (!Number.isNaN(Number(e.target.value))) {
                             setSession((prev) => ({
                               ...prev,
                               max_players: Number(e.target.value),
-                            }))
-
+                            }));
                           }
                         }
-
                       }}
                     />
                   </div>
-                  {!promotion &&
+                  {!promotion && (
                     <div className="space-y-2">
                       <Label className="text-sm text-muted-foreground">
                         Apply Promotion (Optional)
@@ -420,16 +490,14 @@ export function CreateSessionDialog({ onRefresh, coach_id = null, coach_name = n
                         </SelectContent>
                       </Select>
                     </div>
-                  }
+                  )}
                 </div>
 
-                {session?.apply_promotion &&
+                {session?.apply_promotion && (
                   <>
                     <div className="flex gap-2 text-md items-center">
                       <Image className="text-primary" size={16} />
-                      <h1 className="text-[#F3F4F6]">
-                        Promotional Flyer
-                      </h1>
+                      <h1 className="text-[#F3F4F6]">Promotional Flyer</h1>
                     </div>
                     <div className="space-y-2">
                       <Label className="text-sm text-muted-foreground">
@@ -444,7 +512,7 @@ export function CreateSessionDialog({ onRefresh, coach_id = null, coach_name = n
                           setSession((prev) => ({
                             ...prev,
                             image: e.target.value,
-                          }))
+                          }));
                         }}
                       />
                     </div>
@@ -453,22 +521,19 @@ export function CreateSessionDialog({ onRefresh, coach_id = null, coach_name = n
                     <div className="bg-[#1A1A1A] border border-border rounded-[10px] p-4 space-y-2">
                       <h1 className="text-[#99A1AF]">Preview:</h1>
 
-                      {session.image ?
+                      {session.image ? (
                         <img
                           src={session.image}
                           className="w-full h-50 object-contain"
                         />
-                        :
+                      ) : (
                         <div className="w-full h-50" />
-
-                      }
+                      )}
                     </div>
 
                     <div className="flex gap-2 text-md items-center">
                       <Calendar className="text-primary" size={16} />
-                      <h1 className="text-[#F3F4F6]">
-                        Promotion Duration
-                      </h1>
+                      <h1 className="text-[#F3F4F6]">Promotion Duration</h1>
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
@@ -478,7 +543,11 @@ export function CreateSessionDialog({ onRefresh, coach_id = null, coach_name = n
                         </Label>
                         <AppCalendar
                           className="h-9"
-                          date={session.promotion_start ? new Date(session.promotion_start) : undefined}
+                          date={
+                            session.promotion_start
+                              ? new Date(session.promotion_start)
+                              : undefined
+                          }
                           onChange={(date) =>
                             setSession((prevState) => ({
                               ...prevState,
@@ -494,7 +563,11 @@ export function CreateSessionDialog({ onRefresh, coach_id = null, coach_name = n
                         </Label>
                         <AppCalendar
                           className="h-9"
-                          date={session.promotion_end ? new Date(session.promotion_end) : undefined}
+                          date={
+                            session.promotion_end
+                              ? new Date(session.promotion_end)
+                              : undefined
+                          }
                           onChange={(date) =>
                             setSession((prevState) => ({
                               ...prevState,
@@ -519,7 +592,6 @@ export function CreateSessionDialog({ onRefresh, coach_id = null, coach_name = n
                         <Input
                           name="promotionPrice"
                           placeholder="$200"
-
                           required
                           value={session?.promotion_price}
                           onChange={(e) => {
@@ -527,17 +599,15 @@ export function CreateSessionDialog({ onRefresh, coach_id = null, coach_name = n
                               setSession((prev) => ({
                                 ...prev,
                                 promotion_price: e.target.value,
-                              }))
+                              }));
                             } else {
                               if (!Number.isNaN(Number(e.target.value))) {
                                 setSession((prev) => ({
                                   ...prev,
                                   promotion_price: Number(e.target.value),
-                                }))
-
+                                }));
                               }
                             }
-
                           }}
                         />
                       </div>
@@ -555,7 +625,7 @@ export function CreateSessionDialog({ onRefresh, coach_id = null, coach_name = n
                           setSession((prev) => ({
                             ...prev,
                             show_storefront: val,
-                          }))
+                          }));
                         }}
                       />
                       <div className="space-y-0">
@@ -567,10 +637,8 @@ export function CreateSessionDialog({ onRefresh, coach_id = null, coach_name = n
                         </p>
                       </div>
                     </div>
-                  </>}
-
-
-
+                  </>
+                )}
               </div>
             </ScrollArea>
             <Separator />
@@ -584,15 +652,16 @@ export function CreateSessionDialog({ onRefresh, coach_id = null, coach_name = n
                   type="submit"
                   disabled={loading}
                   className="flex-1 text-[13px]"
-
                 >
                   {loading ? (
                     <span className="flex items-center gap-2">
                       <Spinner className="text-black" />
                       Creating...
                     </span>
+                  ) : promotion ? (
+                    "Create Promotion"
                   ) : (
-                    promotion ? "Create Promotion" : "Create Session"
+                    "Create Session"
                   )}
                 </Button>
               </div>

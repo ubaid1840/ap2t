@@ -40,20 +40,30 @@ import AppCalendar from "../app-calendar";
 import { TimePicker } from "../time-picker";
 import { SessionType } from "./create-session-dialog";
 import { Separator } from "../ui/separator";
-import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "../ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
 import { Spinner } from "../ui/spinner";
 import ConfirmationDialog from "../alert-dialog";
 import { TimePickerFixed } from "../time-picker-fixed";
 import SelectSessionType from "../players/select-session-type";
 import { Checkbox } from "../ui/checkbox";
 
-
 interface EditSessionDialogProps {
   sessionId?: number;
-  sessionData?: SessionType & { coach_first_name?: string, coach_last_name?: string };
+  sessionData?: SessionType & {
+    coach_first_name?: string;
+    coach_last_name?: string;
+  };
   onSuccess?: () => void;
-  coach_id?: string | null,
-  promotion?: boolean
+  coach_id?: string | null;
+  promotion?: boolean;
 }
 
 export function EditSessionDialog({
@@ -61,17 +71,19 @@ export function EditSessionDialog({
   sessionData,
   onSuccess,
   coach_id = null,
-  promotion = false
+  promotion = false,
 }: EditSessionDialogProps) {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(false);
-  const [selectedSession, setSelectedSession] = useState<null | number>(null)
+  const [selectedSession, setSelectedSession] = useState<null | number>(null);
   const router = useRouter();
 
   const [session, setSession] = useState<SessionType>({
     name: "",
     description: "",
+    type: "",
+    age_limit: "",
     session_type: "",
     coach_id: null,
     location: "",
@@ -87,7 +99,7 @@ export function EditSessionDialog({
     coach_name: "",
     promotion_start: undefined,
     promotion_end: undefined,
-    show_storefront: false
+    show_storefront: false,
   });
 
   useEffect(() => {
@@ -95,6 +107,8 @@ export function EditSessionDialog({
       setSession({
         name: sessionData.name,
         description: sessionData.description,
+        type: sessionData.type,
+        age_limit: sessionData.age_limit,
         session_type: sessionData.session_type,
         coach_id: sessionData.coach_id,
         location: sessionData.location,
@@ -110,7 +124,7 @@ export function EditSessionDialog({
         coach_name: `${sessionData?.coach_first_name} ${sessionData?.coach_last_name}`,
         promotion_start: sessionData.promotion_start || undefined,
         promotion_end: sessionData.promotion_end || undefined,
-        show_storefront: sessionData?.show_storefront
+        show_storefront: sessionData?.show_storefront,
       });
     }
   }, [open, sessionData]);
@@ -122,12 +136,9 @@ export function EditSessionDialog({
       return;
     }
     setLoading(true);
-    const { coach_name, ...finalData } = session
+    const { coach_name, ...finalData } = session;
     try {
-      await axios.put(
-        `/admin/sessions`,
-        { ...finalData, id: sessionId },
-      );
+      await axios.put(`/admin/sessions`, { ...finalData, id: sessionId });
 
       toast.success("Session updated successfully");
       setOpen(false);
@@ -146,20 +157,19 @@ export function EditSessionDialog({
       return;
     }
 
-    setDeleteLoading(true)
+    setDeleteLoading(true);
 
     try {
       await axios.delete(`/admin/sessions/${sessionId}`);
       toast.success("Session deleted successfully");
-      setDeleteLoading(false)
-      setSelectedSession(null)
+      setDeleteLoading(false);
+      setSelectedSession(null);
       setOpen(false);
       if (promotion) {
         router.replace("/portal/admin/promotions");
       } else {
         router.replace("/portal/admin/sessions");
       }
-
     } finally {
       setDeleteLoading(false);
     }
@@ -168,7 +178,8 @@ export function EditSessionDialog({
   return (
     <>
       <Button onClick={() => setOpen(!open)} variant={"outline"}>
-        <SquarePen className="w-5 h-5" />{!promotion && "Edit"}
+        <SquarePen className="w-5 h-5" />
+        {!promotion && "Edit"}
       </Button>
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="bg-[#252525] border border-[#3A3A3A] sm:max-w-4xl p-0 gap-0">
@@ -191,7 +202,6 @@ export function EditSessionDialog({
                   <Input
                     name="sessionName"
                     placeholder="e.g., Advanced Skills Training"
-
                     required
                     value={session.name}
                     onChange={(e) =>
@@ -219,6 +229,46 @@ export function EditSessionDialog({
                       }))
                     }
                   />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label className="text-sm text-muted-foreground">
+                      method
+                    </Label>
+                    <Select
+                      value={session.type}
+                      required
+                      onValueChange={(e) => {
+                        setSession((prevState) => ({ ...prevState, type: e }));
+                      }}
+                    >
+                      <SelectTrigger className="w-full dark:bg-[#1A1A1A]">
+                        <SelectValue placeholder="Select method" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value={"camp"}>Camp</SelectItem>
+                        <SelectItem value={"clinic"}>Clinic</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label className="text-sm text-muted-foreground">
+                      Age Limit *
+                    </Label>
+                    <Input
+                      name="age_limit"
+                      placeholder="10-18"
+                      required
+                      value={session.age_limit}
+                      onChange={(e) =>
+                        setSession((prev) => ({
+                          ...prev,
+                          age_limit: e.target.value,
+                        }))
+                      }
+                    />
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -249,7 +299,7 @@ export function EditSessionDialog({
                           Selected Coach: {session.coach_name}
                         </p>
                       )}
-                      {!coach_id &&
+                      {!coach_id && (
                         <AssignCoachDialog
                           already={!!session?.coach_id}
                           onSelect={(coach) =>
@@ -260,14 +310,9 @@ export function EditSessionDialog({
                             }))
                           }
                         />
-                      }
-
+                      )}
                     </div>
-
-
-
                   </div>
-
                 </div>
 
                 <div className="flex gap-2 text-md ">
@@ -276,7 +321,6 @@ export function EditSessionDialog({
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-
                   <div className="space-y-2">
                     <Label className="text-sm text-muted-foreground">
                       Start Date *
@@ -300,7 +344,11 @@ export function EditSessionDialog({
                     </Label>
                     <AppCalendar
                       className="h-9"
-                      date={session.end_date ? new Date(session.end_date) : undefined}
+                      date={
+                        session.end_date
+                          ? new Date(session.end_date)
+                          : undefined
+                      }
                       onChange={(date) =>
                         setSession((prevState) => ({
                           ...prevState,
@@ -310,11 +358,8 @@ export function EditSessionDialog({
                       required
                     />
                   </div>
-
-
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-
                   <div className="space-y-2">
                     <Label className="text-sm text-muted-foreground">
                       Start Time *
@@ -360,7 +405,6 @@ export function EditSessionDialog({
                     </Label>
                     <Input
                       name="location"
-
                       required
                       value={session.location}
                       onChange={(e) =>
@@ -385,17 +429,15 @@ export function EditSessionDialog({
                           setSession((prev) => ({
                             ...prev,
                             price: e.target.value,
-                          }))
+                          }));
                         } else {
                           if (!Number.isNaN(Number(e.target.value))) {
                             setSession((prev) => ({
                               ...prev,
                               price: Number(e.target.value),
-                            }))
-
+                            }));
                           }
                         }
-
                       }}
                     />
                   </div>
@@ -421,17 +463,15 @@ export function EditSessionDialog({
                           setSession((prev) => ({
                             ...prev,
                             max_players: e.target.value,
-                          }))
+                          }));
                         } else {
                           if (!Number.isNaN(Number(e.target.value))) {
                             setSession((prev) => ({
                               ...prev,
                               max_players: Number(e.target.value),
-                            }))
-
+                            }));
                           }
                         }
-
                       }}
                     />
                   </div>
@@ -464,13 +504,11 @@ export function EditSessionDialog({
                   </div>
                 </div>
 
-                {session?.apply_promotion &&
+                {session?.apply_promotion && (
                   <>
                     <div className="flex gap-2 text-md items-center">
                       <Image className="text-primary" size={16} />
-                      <h1 className="text-[#F3F4F6]">
-                        Promotional Flyer
-                      </h1>
+                      <h1 className="text-[#F3F4F6]">Promotional Flyer</h1>
                     </div>
                     <div className="space-y-2">
                       <Label className="text-sm text-muted-foreground">
@@ -485,7 +523,7 @@ export function EditSessionDialog({
                           setSession((prev) => ({
                             ...prev,
                             image: e.target.value,
-                          }))
+                          }));
                         }}
                       />
                     </div>
@@ -494,22 +532,19 @@ export function EditSessionDialog({
                     <div className="bg-[#1A1A1A] border border-border rounded-[10px] p-4 space-y-2">
                       <h1 className="text-[#99A1AF]">Preview:</h1>
 
-                      {session.image ?
+                      {session.image ? (
                         <img
                           src={session.image}
                           className="w-full h-50 object-contain"
                         />
-                        :
+                      ) : (
                         <div className="w-full h-50" />
-
-                      }
+                      )}
                     </div>
 
                     <div className="flex gap-2 text-md items-center">
                       <Calendar className="text-primary" size={16} />
-                      <h1 className="text-[#F3F4F6]">
-                        Promotion Duration
-                      </h1>
+                      <h1 className="text-[#F3F4F6]">Promotion Duration</h1>
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
@@ -519,7 +554,11 @@ export function EditSessionDialog({
                         </Label>
                         <AppCalendar
                           className="h-9"
-                          date={session.promotion_start ? new Date(session.promotion_start) : undefined}
+                          date={
+                            session.promotion_start
+                              ? new Date(session.promotion_start)
+                              : undefined
+                          }
                           onChange={(date) =>
                             setSession((prevState) => ({
                               ...prevState,
@@ -535,7 +574,11 @@ export function EditSessionDialog({
                         </Label>
                         <AppCalendar
                           className="h-9"
-                          date={session.promotion_end ? new Date(session.promotion_end) : undefined}
+                          date={
+                            session.promotion_end
+                              ? new Date(session.promotion_end)
+                              : undefined
+                          }
                           onChange={(date) =>
                             setSession((prevState) => ({
                               ...prevState,
@@ -560,7 +603,6 @@ export function EditSessionDialog({
                         <Input
                           name="promotionPrice"
                           placeholder="$200"
-
                           required
                           value={session?.promotion_price}
                           onChange={(e) => {
@@ -568,17 +610,15 @@ export function EditSessionDialog({
                               setSession((prev) => ({
                                 ...prev,
                                 promotion_price: e.target.value,
-                              }))
+                              }));
                             } else {
                               if (!Number.isNaN(Number(e.target.value))) {
                                 setSession((prev) => ({
                                   ...prev,
                                   promotion_price: Number(e.target.value),
-                                }))
-
+                                }));
                               }
                             }
-
                           }}
                         />
                       </div>
@@ -596,7 +636,7 @@ export function EditSessionDialog({
                           setSession((prev) => ({
                             ...prev,
                             show_storefront: val,
-                          }))
+                          }));
                         }}
                       />
                       <div className="space-y-0">
@@ -608,14 +648,20 @@ export function EditSessionDialog({
                         </p>
                       </div>
                     </div>
-                  </>}
-
+                  </>
+                )}
               </div>
             </ScrollArea>
             <Separator />
 
             <div className="p-4 flex flex-wrap gap-4 justify-between">
-              <Button variant={"destructive"} type="button" onClick={() => setSelectedSession(sessionId ? Number(sessionId) : null)}>
+              <Button
+                variant={"destructive"}
+                type="button"
+                onClick={() =>
+                  setSelectedSession(sessionId ? Number(sessionId) : null)
+                }
+              >
                 <Trash2 /> Delete
               </Button>
               <div className="flex gap-4 flex-wrap">
@@ -626,7 +672,6 @@ export function EditSessionDialog({
                   type="submit"
                   disabled={loading}
                   className="flex-1 text-[13px]"
-
                 >
                   {loading && <Spinner className="text-black" />}
                   Save
@@ -637,9 +682,14 @@ export function EditSessionDialog({
         </DialogContent>
       </Dialog>
 
-      <ConfirmationDialog loading={deleteLoading} open={!!selectedSession} onPressCancel={() => setSelectedSession(null)} onPressYes={async () => await deleteSession()}
+      <ConfirmationDialog
+        loading={deleteLoading}
+        open={!!selectedSession}
+        onPressCancel={() => setSelectedSession(null)}
+        onPressYes={async () => await deleteSession()}
         title={"Are you sure you want to delete?"}
-        description={"Your action will remove this item from the system"} />
+        description={"Your action will remove this item from the system"}
+      />
     </>
   );
 }
