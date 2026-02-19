@@ -48,12 +48,8 @@ export async function POST(req: NextRequest) {
         const searchParams = req.nextUrl.searchParams
         const special = searchParams.get("special") === "true"
 
-        console.log(special)
-
         if (special) {
             const { player, parent } = await req.json();
-            console.log(player)
-            console.log(parent)
             let parent_id: number | null = null;
 
             try {

@@ -53,7 +53,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       if (fbUser?.email) {
         try {
           const res = await axios.get(`/userdetail?email=${fbUser.email}`);
-          console.log(res)
           setUser(res.data);
           const role = res.data?.role
           if (!role) {

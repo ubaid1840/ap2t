@@ -60,7 +60,6 @@ export default function Page() {
         try {
             setLoading(true)
             const response = await axios.get("/admin/dashboard")
-            console.log(response.data)
             setData(response.data)
         } finally {
             setLoading(false)

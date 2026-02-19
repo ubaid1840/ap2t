@@ -1,16 +1,15 @@
 "use client"
 
+import { detailIcons } from "@/components/landing/constants";
 import { CurvedImage } from "@/components/landing/curved-image";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { detailIcons } from "@/components/landing/constants";
 import { ArrowRight, Search } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
 import moment from "moment";
 import Link from "next/link";
+import { useState } from "react";
 
 export interface CampClinicSession {
     id: number;
@@ -49,12 +48,9 @@ export interface CampClinicCard {
 
 export default function CampsAndClinics({ data = [] }: any) {
 
-    console.log(data)
     const [search, setSearch] = useState("")
     const [filter, setFilter] = useState("All")
     const mobile = useIsMobile()
-    const router = useRouter()
-
     const camps = transformCampClinics(data);
 
     return (

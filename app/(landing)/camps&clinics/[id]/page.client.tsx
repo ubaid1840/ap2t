@@ -1,20 +1,18 @@
 "use client"
 
+import { detailIcons } from "@/components/landing/constants";
 import { CurvedImage } from "@/components/landing/curved-image";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { Camp, camps, detailIcons } from "@/components/landing/constants";
 import { CircleAlert, CircleCheckBig, DollarSign } from "lucide-react";
-import { useParams } from "next/navigation";
-import { useEffect, useState } from "react";
-import { CampClinicSession, transformCampClinics } from "../page.client";
 import moment from "moment";
+import { CampClinicSession } from "../page.client";
 
 
 
 export default function CampsAndClinicsDetail({ data = null }: { data: CampClinicSession | null }) {
-    
+
     const mobile = useIsMobile()
 
     const currentCamp = data ? {
