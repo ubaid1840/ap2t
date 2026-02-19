@@ -1,3 +1,4 @@
+import { PaymentItem } from "@/app/portal/admin/payments/page";
 import {
   Calendar,
   Clock,
@@ -7,36 +8,11 @@ import {
   ShieldCheck,
   User,
 } from "lucide-react";
+import moment from "moment";
+import { GoDotFill } from "react-icons/go";
+import CardStatus from "../card-status";
 import { DialogClose, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
 import { ScrollArea } from "../ui/scroll-area";
-import { PaymentData } from "./payment-columns";
-import CardStatus from "../card-status";
-import { GoDotFill } from "react-icons/go";
-import { Button } from "../ui/button";
-import { PaymentItem } from "@/app/portal/admin/payments/page";
-import moment from "moment";
-
-type ViewDialogProps = {
-  data: PaymentData;
-};
-
-type CardStatusType =
-  | "success"
-  | "warning"
-  | "danger"
-  | "info"
-  | "active"
-  | "other"
-  | "ghost"
-  | "alternative";
-
-const paymentStatusMap: Record<PaymentData["status"], CardStatusType> = {
-  Completed: "active",
-  Pending: "alternative",
-  Failed: "danger",
-  Comped: "info",
-  Voided: "ghost",
-};
 
 export function ViewDialog({ data } : {data : PaymentItem}) {
   return (
@@ -48,7 +24,7 @@ export function ViewDialog({ data } : {data : PaymentItem}) {
         <p className="text-sm text-ghost-text">Transaction</p>
         <p className="text-sm text-ghost-text">{data.transaction_id}</p>
       </DialogHeader>
-      <ScrollArea className="h-[70dvh]">
+      <ScrollArea className="h-[65dvh]">
         <div className="px-6 py-2 space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div className="bg-[#1A1A1A] border border-border p-4 space-y-1 rounded-[10px]">

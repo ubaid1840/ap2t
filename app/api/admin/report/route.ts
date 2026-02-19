@@ -175,8 +175,10 @@ const sessionTypeData = sessionTypes.map((type, idx) => ({
   FROM users u
   LEFT JOIN payments p
     ON p.user_id = u.id
+      AND p.status = 'paid'
   WHERE u.zip_code IS NOT NULL
     AND u.zip_code <> ''
+
   GROUP BY u.zip_code
   ORDER BY u.zip_code
 `);
