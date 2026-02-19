@@ -76,7 +76,6 @@ export default function CommonSettings() {
 
             const res = await axios.get(`/settings?user_id=${debouncedUserId}`);
             const result = res.data;
-            console.log(result)
             setProfileInfo({
                 first_name: result.user?.first_name || "",
                 last_name: result?.user?.last_name || "",
