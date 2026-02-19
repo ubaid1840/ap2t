@@ -25,14 +25,6 @@ export async function GET(req: NextRequest) {
       [userid],
     );
 
-
-    if (settingsResult.rows.length === 0) {
-     settingsResult = await pool.query(
-        `INSERT INTO settings (user_id) VALUES ($1) RETURNING *`,
-        [userid]
-      );
-    }
-
     const settings = settingsResult.rows[0];
 
     return NextResponse.json(
