@@ -120,7 +120,7 @@ export default function CampsAndClinicsDetail({ data = null }: { data: CampClini
                                                     return (
 
                                                         <div
-                                                            key={eachDetail}
+                                                            key={index}
                                                             className="flex items-center gap-2 text-xs text-muted-foreground"
                                                         >
                                                             {Icon && (
@@ -160,8 +160,8 @@ export default function CampsAndClinicsDetail({ data = null }: { data: CampClini
                                                 Highlights
                                             </div>
 
-                                            {currentCamp?.highlights?.map((eachHighlight) => (
-                                                <div key={eachHighlight} className="flex items-center gap-4">
+                                            {currentCamp?.highlights?.map((eachHighlight, idx) => (
+                                                <div key={idx} className="flex items-center gap-4">
                                                     <CircleCheckBig className="text-primary" size={16} />
                                                     <p className="text-[#B3B3B3] text-sm">{eachHighlight}</p>
                                                 </div>

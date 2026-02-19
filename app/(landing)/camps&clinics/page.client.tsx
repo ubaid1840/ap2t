@@ -134,7 +134,7 @@ export default function CampsAndClinics({ data = [] }: any) {
                             )
                             .map((item, i) => (
                                 <Card
-                                    key={i}
+                                    key={item.id}
                                     className="bg-[#131313] rounded border border-white/5"
                                 >
                                     <CardContent className="p-4 space-y-4">
@@ -173,7 +173,7 @@ export default function CampsAndClinics({ data = [] }: any) {
                                                 const Icon = detailIcons[index]
                                                 return (
                                                     <div
-                                                        key={eachDetail}
+                                                        key={index}
                                                         className="flex items-center gap-2 text-xs text-muted-foreground"
                                                     >
                                                         {Icon && (
