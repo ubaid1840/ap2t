@@ -101,7 +101,7 @@ export async function POST(req: NextRequest) {
             }
         } else {
             const { email, password: u_pass, position = "", skill_level = "", medical_notes = "", career_start = null, bio = "", parent_id = null, ...data } = await req.json();
-
+            console.log(data)
             if (!data || Object.keys(data).length === 0 || !email) {
                 await pool.query("ROLLBACK");
                 return NextResponse.json({ message: "Required parameters missing" }, { status: 400 });

@@ -97,7 +97,7 @@ export function CreateParent({ onRefresh }: { onRefresh: () => Promise<void> }) 
                   name="first_name"
                   placeholder="Pedro"
                   required
-                  className="dark:bg-black"
+                  className="dark:bg-[#1A1A1A]"
                   value={parent.first_name}
                   onChange={(e) =>
                     setParent((prev) => ({
@@ -116,7 +116,7 @@ export function CreateParent({ onRefresh }: { onRefresh: () => Promise<void> }) 
                   name="last_name"
                   placeholder="Duarte"
                   required
-                  className="dark:bg-black"
+                  className="dark:bg-[#1A1A1A]"
                   value={parent.last_name}
                   onChange={(e) =>
                     setParent((prev) => ({
@@ -142,7 +142,7 @@ export function CreateParent({ onRefresh }: { onRefresh: () => Promise<void> }) 
                   type="email"
                   placeholder="pedro@example.com"
                   required
-                  className="dark:bg-black"
+                  className="dark:bg-[#1A1A1A]"
                   value={parent.email}
                   onChange={(e) =>
                     setParent((prev) => ({
@@ -165,7 +165,7 @@ export function CreateParent({ onRefresh }: { onRefresh: () => Promise<void> }) 
                   name="phone"
                   type="tel"
                   placeholder="+1 234 567 890"
-                  className="dark:bg-black"
+                  className="dark:bg-[#1A1A1A]"
                   value={parent.phone}
                   onChange={(e) =>
                     setParent((prev) => ({
@@ -187,7 +187,7 @@ export function CreateParent({ onRefresh }: { onRefresh: () => Promise<void> }) 
                   id="zip_code"
                   name="zip_code"
                   placeholder="54000"
-                  className="dark:bg-black"
+                  className="dark:bg-[#1A1A1A]"
                   value={parent.zip_code}
                   onChange={(e) =>
                     setParent((prev) => ({
@@ -209,7 +209,7 @@ export function CreateParent({ onRefresh }: { onRefresh: () => Promise<void> }) 
                   id="address"
                   name="address"
                   placeholder="New York, USA"
-                  className="dark:bg-black"
+                  className="dark:bg-[#1A1A1A]"
                   value={parent.address}
                   onChange={(e) =>
                     setParent((prev) => ({
