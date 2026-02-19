@@ -217,7 +217,7 @@ export async function POST(req: NextRequest) {
 }
 
 
-async function createUserWithFirebase(
+export async function createUserWithFirebase(
     pool: any,
     admin: any,
     data: any
