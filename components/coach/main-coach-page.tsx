@@ -35,9 +35,6 @@ import { ReactNode, useEffect, useState } from "react";
 import { IoCalendarClear } from "react-icons/io5";
 
 
-
-
-
 export default function MainCoachPage({
   id,
   back = null,
@@ -71,6 +68,7 @@ export default function MainCoachPage({
     setLoading(true)
     try {
       const response = await axios.get(`/admin/coaches/${id}`);
+      
       setData(response.data)
     } finally {
       setLoading(false)
@@ -136,7 +134,7 @@ export default function MainCoachPage({
   const weeklyEvents = data?.session_data
     ? data.session_data.map((session) => ({
       title: session.name,
-      date: moment(session.date).format("YYYY-MM-DD"),
+      date: moment(new Date(session.date)).format("YYYY-MM-DD"),
       time: session.start_time,
       status: "Booked",
     }))

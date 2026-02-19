@@ -18,7 +18,7 @@ import axios from "@/lib/axios";
 import { WeeklyScheduleProps } from "@/lib/types";
 
 const timeSlots = [
-  "9:00",
+  "09:00",
   "10:00",
   "11:00",
   "12:00",
@@ -31,7 +31,7 @@ const timeSlots = [
 
 export const WeeklySchedule: React.FC<WeeklyScheduleProps> = ({ events, id, preference }) => {
 
-  console.log(events)
+  console.log("events ",events)
   const [currentWeekStart, setCurrentWeekStart] = useState(moment().startOf("week").add(1, "days")); 
   const isMobile = useIsMobile();
   const [contextMenu, setContextMenu] = useState<{
@@ -51,7 +51,6 @@ export const WeeklySchedule: React.FC<WeeklyScheduleProps> = ({ events, id, pref
   const prevWeek = () => setCurrentWeekStart(moment(currentWeekStart).subtract(7, "days"));
   const nextWeek = () => setCurrentWeekStart(moment(currentWeekStart).add(7, "days"));
 
-  console.log(events)
   const getEventForCell = (date: moment.Moment, time: string) => {
     const dt = moment(date).set({
       hour: parseInt(time.split(":")[0]),
@@ -63,12 +62,6 @@ export const WeeklySchedule: React.FC<WeeklyScheduleProps> = ({ events, id, pref
     if (localPreference[dt] === "blocked") {
       return { title: "", date: date.format("YYYY-MM-DD"), time, status: "Blocked" };
     }
-
-    if(events.find(e => e.date === date.format("YYYY-MM-DD") && e.time === time)){
-      console.log("ubaid")
-      console.log(events.find(e => e.date === date.format("YYYY-MM-DD") && e.time === time))
-    }
-
     return events.find(e => e.date === date.format("YYYY-MM-DD") && e.time === time);
   };
 

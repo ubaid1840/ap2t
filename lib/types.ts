@@ -141,3 +141,19 @@ export interface PaymentDataCoach {
   status: string;
   created_at: string;
 }
+
+
+export type PaymentData = {
+  transactionId: string;
+  transactionNote: string;
+  parentName: string;
+  playerName: string;
+  session: string;
+  amount: number;
+  methodType: string;
+  methodDetail: string;
+  date: string;
+  time: string;
+  status: "Completed" | "Pending" | "Failed" | "Comped" | "Voided";
+  id: number;
+};

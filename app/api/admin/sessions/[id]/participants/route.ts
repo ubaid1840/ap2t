@@ -65,11 +65,11 @@ export async function POST(
     if (amountQueryResult?.comped) {
       await pool.query(
         `INSERT INTO payments
-      (session_id, user_id, amount, status, paid_at, transaction_id, method)
+      (session_id, user_id, amount, status, paid_at, method)
       VALUES
-      ($1, $2, $3, $4, $5, $6, $7)
+      ($1, $2, $3, $4, $5, $6)
       RETURNING *;`,
-        [session_id, player_id, 0, "comped", new Date(), "Nil", "Nil"]
+        [session_id, player_id, amount, "comped", new Date(), "Nil"]
       );
     } else {
       await pool.query(

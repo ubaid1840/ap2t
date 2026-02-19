@@ -31,18 +31,18 @@ export async function GET() {
     const revenueTodayRes = await pool.query(
       `SELECT COALESCE(SUM(amount), 0) AS total_revenue
    FROM payments
-   WHERE status = ANY($1::text[])
+   WHERE status = 'paid'
      AND paid_at IS NOT NULL
-     AND DATE(paid_at AT TIME ZONE 'UTC') = CURRENT_DATE`, [["paid", "comped"]]
+     AND DATE(paid_at AT TIME ZONE 'UTC') = CURRENT_DATE`
     );
     const totalRevenue = Number(revenueTodayRes.rows[0]?.total_revenue || 0);
 
     const revenueYesterdayRes = await pool.query(
       `SELECT COALESCE(SUM(amount), 0) AS total_revenue
    FROM payments
-   WHERE status = ANY($1::text[])
+   WHERE status = 'paid'
      AND paid_at IS NOT NULL
-     AND DATE(paid_at AT TIME ZONE 'UTC') = CURRENT_DATE - INTERVAL '1 day'`, [["paid", "comped"]]
+     AND DATE(paid_at AT TIME ZONE 'UTC') = CURRENT_DATE - INTERVAL '1 day'`
     );
     const yesterdayRevenue = Number(revenueYesterdayRes.rows[0]?.total_revenue || 0);
 

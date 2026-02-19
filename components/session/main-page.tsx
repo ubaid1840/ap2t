@@ -172,7 +172,7 @@ export default function SessionMainPage({ id, back, back_title, admin = false }:
     participants.forEach(participant => {
       const payment = paymentMap.get(participant.player_id);
       if (payment) {
-        if (payment.status === "paid" || payment.status === 'comped') {
+        if (payment.status === "paid") {
           totalPaid += Number(payment?.amount || 0);
         } else if (payment.status === 'pending') {
           totalPending += Number(payment?.amount || 0);

@@ -8,6 +8,7 @@ export async function GET(req: NextRequest) {
     const position_list = searchParams.get("position_list") === 'true'
     const skill_level_list = searchParams.get("skill_level_list") === 'true'
      const session_types = searchParams.get("session_types") === 'true'
+     const comped_category_list = searchParams.get("comped_category_list") === "true"
     try {
         if (position_list) {
             const result = await pool.query(`SELECT position_list FROM configurations`)
@@ -22,6 +23,11 @@ export async function GET(req: NextRequest) {
         if (session_types) {
             const result = await pool.query(`SELECT session_types FROM configurations`)
             return NextResponse.json(result.rows?.[0]?.session_types, { status: 200 })
+        }
+
+         if (comped_category_list) {
+            const result = await pool.query(`SELECT comped_category_list FROM configurations`)
+            return NextResponse.json(result.rows?.[0]?.comped_category_list, { status: 200 })
         }
         const result = await pool.query(`SELECT * FROM configurations`)
         return NextResponse.json(result.rows, { status: 200 })
