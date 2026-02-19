@@ -44,59 +44,67 @@ const EventDetail = ({
                         {events.map((event) => (
                             <div
                                 key={event.id}
-                                className="rounded-lg border border-[#3A3A3A] bg-[#1E1E1E] p-4 flex flex-col justify-between hover:bg-[#242424] transition gap-2"
+                                className="rounded-lg border border-[#3A3A3A] bg-[#1E1E1E] p-4 flex flex-col justify-between hover:bg-[#242424] transition gap-4 sm:gap-2"
                             >
-                                <div className='flex items-center justify-between'>
-                                    <div className="space-y-1">
-                                        <h3 className="text-sm font-semibold text-white">
-                                            {event.title} {event?.enrolled && <Badge className='ml-2 bg-green-500/10 text-green-400'>Enrolled</Badge>}
+                                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4 sm:gap-2">
+                                    <div className="flex-1 space-y-2">
+                                        <h3 className="text-sm font-semibold text-white flex items-center gap-2">
+                                            {event.title} {event?.enrolled && <Badge className="bg-green-500/10 text-green-400">Enrolled</Badge>}
                                         </h3>
 
-                                        <div className="text-xs text-muted-foreground flex gap-3">
+                                        <div className="text-xs text-muted-foreground flex flex-wrap gap-2 sm:gap-3">
                                             <span>{event.start_date} - {event?.end_date}</span>
                                             <span>•</span>
                                             <span>{formatTimeWithAmPm(event.time)} - {formatTimeWithAmPm(event?.end_time)}</span>
                                         </div>
+
                                         {event?.children?.length > 0 && (
                                             <p className="text-xs">
                                                 <span className="font-medium text-sm">Players enrolled:</span>{" "}
-                                                {event.children
-                                                    .map(child => joinNames([child.first_name, child.last_name]))
-                                                    .join(", ")}
+                                                {event.children.map(child => joinNames([child.first_name, child.last_name])).join(", ")}
                                             </p>
                                         )}
-
-
-
                                     </div>
 
-                                    <div className='flex gap-2 flex-wrap'>
-
-                                        <span
-                                            className={`text-xs px-2 py-1 rounded-full font-medium capitalize bg-alternative-bg text-alternative-text`}
-                                        >
-                                            {event.sessionType}
-                                        </span>
-                                        <CardStatus value={event?.status} />
+                                    <div className="flex flex-col items-start sm:items-end gap-2">
+                                        <div className="p-2 bg-active-bg text-active-text border border-active-text/32 rounded-md">
+                                            <p className="text-md font-medium leading-none">${Number(event?.price || 0).toFixed(0)}</p>
+                                        </div>
+                                        <div className="flex flex-wrap gap-2">
+                                            <span className="text-xs px-2 py-1 rounded-full font-medium capitalize bg-alternative-bg text-alternative-text">
+                                                {event.sessionType}
+                                            </span>
+                                            <CardStatus value={event?.status} />
+                                        </div>
                                     </div>
                                 </div>
 
-                                {event.status === 'upcoming' &&
-                                    <>
-                                        {player_id && <ParticipateButton player_id={player_id} session_id={event.originalId} onSuccess={async () => {
-                                            await onSuccess()
-                                            onOpenChange()
-                                        }} />}
-
-                                        {parent_id && <AddParticipantDialog parent_id={parent_id} sessionId={Number(event.originalId)} onSuccess={async () => {
-                                            await onSuccess()
-                                            onOpenChange()
-                                        }} />}</>
-                                }
-
-
-
+                                {event.status === "upcoming" && (
+                                    <div className="flex flex-col sm:flex-row sm:justify-start sm:gap-2 mt-4">
+                                        {player_id && !event?.enrolled && (
+                                            <ParticipateButton
+                                                player_id={player_id}
+                                                session_id={event.originalId}
+                                                onSuccess={async () => {
+                                                    await onSuccess();
+                                                    onOpenChange();
+                                                }}
+                                            />
+                                        )}
+                                        {parent_id && (
+                                            <AddParticipantDialog
+                                                parent_id={parent_id}
+                                                sessionId={Number(event.originalId)}
+                                                onSuccess={async () => {
+                                                    await onSuccess();
+                                                    onOpenChange();
+                                                }}
+                                            />
+                                        )}
+                                    </div>
+                                )}
                             </div>
+
                         ))}
                     </div>
                 </ScrollArea>

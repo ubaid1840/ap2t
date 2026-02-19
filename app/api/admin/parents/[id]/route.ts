@@ -78,6 +78,7 @@ export async function GET(
           s.apply_promotion,
           s.price,
           s.promotion_price,
+          s.comped,
           coach.first_name AS coach_first_name,
           coach.last_name AS coach_last_name,
 
@@ -144,7 +145,8 @@ export async function GET(
           apply_promotion: row.apply_promotion,
           price: row.price,
           promotion_price: row.promotion_price,
-          players: []
+          players: [],
+          comped: row.comped
         });
       }
 
@@ -195,10 +197,27 @@ export async function GET(
     });
 
 
-
     /* -------------------------------------------------------
-       8️⃣ Final Response
+       8️⃣ Get payments record
     ------------------------------------------------------- */
+
+    const result = await pool.query(`
+SELECT 
+    p.*,
+    s.name AS session_name
+  FROM payments p
+  LEFT JOIN sessions s ON p.session_id = s.id
+  WHERE p.user_id = $1
+     OR p.user_id IN (
+         SELECT pl.user_id
+         FROM players pl
+         WHERE pl.parent_id = $1
+     )
+  ORDER BY p.created_at DESC
+`, [parentId]);
+
+    const payments = result.rows;
+
 
     return NextResponse.json({
       parent,
@@ -208,7 +227,8 @@ export async function GET(
         upcoming_sessions: upcomingSessionsCount
       },
       linked_childrens: childrenWithStats,
-      sessions
+      sessions,
+      payments
     });
 
   } catch (error) {

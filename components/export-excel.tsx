@@ -1,10 +1,9 @@
-import { Download } from "lucide-react";
-import { Button } from "./ui/button";
-import { useState } from "react";
-import { Spinner } from "./ui/spinner";
 import { exportToExcel } from "@/lib/functions";
+import { Download } from "lucide-react";
+import { useState } from "react";
 import { toast } from "sonner";
-import { ParentData } from "@/app/portal/admin/parents/page";
+import { Button } from "./ui/button";
+import { Spinner } from "./ui/spinner";
 
 
 export default function ExportExcel({ header, data, fileName }: { header: string[], data: (string)[][], fileName?: string }) {

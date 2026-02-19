@@ -22,7 +22,7 @@ import { Spinner } from "@/components/ui/spinner";
 import { Textarea } from "@/components/ui/textarea";
 import { useAuth } from "@/contexts/auth-context";
 import axios from "@/lib/axios"
-import { joinNames } from "@/lib/functions";
+import { calcualteRevenu, joinNames } from "@/lib/functions";
 import {
   Archive,
   Calendar,
@@ -126,13 +126,7 @@ export default function Page() {
     }
   };
 
-  function calcualteRevenu(paymentData: any[]) {
-    const totalRevuew = paymentData.filter((item) => item.status === 'paid').reduce(
-      (sum, item) => sum + Number(item.amount || 0),
-      0
-    );
-    return totalRevuew
-  }
+ 
 
   function calculateSessionStats(sessions: any[]) {
    const today = moment();

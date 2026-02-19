@@ -66,7 +66,8 @@ export default function SessionCalendar({ currentMonth, setCurrentMonth, session
     enrolled: session.enrolled,
     isMultiDay: Boolean(endDate),
     end_date : endDate,
-    start_date : startDate
+    start_date : startDate,
+    price : session?.price
   }))
 })
 
