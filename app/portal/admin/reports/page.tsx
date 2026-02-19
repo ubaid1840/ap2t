@@ -1,4 +1,5 @@
 "use client";
+import AppCalendar from "@/components/app-calendar";
 import PageTable from "@/components/app-table";
 import { BarChart } from "@/components/charts/bar-chart";
 import LineChart from "@/components/charts/line-chart-dots";
@@ -11,6 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useSidebar } from "@/components/ui/sidebar";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Spinner } from "@/components/ui/spinner";
 import { useAuth } from "@/contexts/auth-context";
 import { useIsMobile } from "@/hooks/use-mobile";
 import axios from "@/lib/axios";
@@ -26,6 +28,7 @@ import {
   MapPin,
   TrendingUp
 } from "lucide-react";
+import moment from "moment";
 import { ReactNode, useEffect, useState } from "react";
 
 
@@ -99,11 +102,17 @@ export type DashboardDataResponse = {
 
 export default function Page() {
 
-  const [filter, setFilter] = useState(false)
+  const [filter, setFilter] = useState(true)
   const { open } = useSidebar()
   const isMobile = useIsMobile()
   const [loading, setLoading] = useState(true)
   const [reports, setReports] = useState<DashboardDataResponse | undefined>()
+  const [filterLoading, setFilterLoading] = useState(false)
+
+  const [dates, setDates] = useState<{ start: Date | undefined; end: Date | undefined }>({
+    start: undefined,
+    end: undefined,
+  });
   const { user } = useAuth()
 
   useEffect(() => {
@@ -119,6 +128,23 @@ export default function Page() {
       setLoading(false)
     }
   }
+
+  async function filterData(start: Date | undefined, end: Date | undefined) {
+
+    const startDate = start ? moment(start).format("YYYY-MM-DD") : null
+    const endDate = end ? moment(end).format("YYYY-MM-DD") : null
+
+    if(!startDate || !endDate) return
+    
+    setFilterLoading(true)
+    try {
+      const response = await axios.get(`/admin/report?filter=true&start=${startDate}&end=${endDate}`)
+      setReports(response.data)
+    } finally {
+      setFilterLoading(false)
+    }
+  }
+
 
   const data = [
     {
@@ -293,30 +319,30 @@ export default function Page() {
             <div className="flex flex-col w-full gap-4">
 
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
 
-                <div className="flex flex-1 flex-col gap-2">
+                {/* <div className="flex flex-1 flex-col gap-2">
                   <Label className="text-muted-foreground font-normal text-xs">Coach</Label>
                   <Input className="rounded-[8px] dark:bg-black" />
-                </div>
+                </div> */}
 
-                <div className="flex flex-1 flex-col gap-2">
+                {/* <div className="flex flex-1 flex-col gap-2">
                   <Label className="text-muted-foreground font-normal text-xs">Session Type</Label>
                   <Input className="rounded-[8px] dark:bg-black" />
-                </div>
+                </div> */}
 
                 <div className="flex flex-1 flex-col gap-2">
                   <Label className="text-muted-foreground font-normal text-xs">Start Date</Label>
-                  <Input className="rounded-[8px] dark:bg-black" />
+                  <AppCalendar date={dates.start} onChange={(d) => setDates((prevState) => ({ ...prevState, start: d }))} />
                 </div>
 
 
                 <div className="flex flex-1 flex-col gap-2">
                   <Label className="text-muted-foreground font-normal text-xs">End Date</Label>
-                  <Input className="rounded-[8px] dark:bg-black" />
+                  <AppCalendar date={dates.end} onChange={(d) => setDates((prevState) => ({ ...prevState, end: d }))} />
                 </div>
 
-                <div className="flex flex-1 flex-col gap-2">
+                {/* <div className="flex flex-1 flex-col gap-2">
                   <Label className="text-muted-foreground font-normal text-xs">Additional</Label>
                   <Input className="rounded-[8px] dark:bg-black" />
                 </div>
@@ -324,9 +350,13 @@ export default function Page() {
                 <div className="flex flex-1 flex-col gap-2">
                   <Label className="text-muted-foreground font-normal text-xs">Additional</Label>
                   <Input className="rounded-[8px] dark:bg-black" />
-                </div>
+                </div> */}
 
               </div>
+              <Button disabled={filterLoading || !dates.start || !dates.end} onClick={() => {
+                setFilterLoading(true)
+                filterData(dates.start, dates.end)
+              }}>{filterLoading && <Spinner className="text-black" />}Apply Filter</Button>
             </div>
 
           </CardContent>
