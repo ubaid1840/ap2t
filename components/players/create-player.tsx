@@ -51,6 +51,8 @@ export function CreatePlayer({
     const values = {
       first_name: formData.get("first_name"),
       last_name: formData.get("last_name"),
+      zip_code:formData.get("zip_code"),
+      location:formData.get("location"),
       dob: date,
       email: formData.get("email")?.toString().trim().toLowerCase(),
       phone_no: formData.get("phone_no"),
@@ -67,6 +69,8 @@ export function CreatePlayer({
         email: values.email,
         phone_no: values.phone_no,
         birth_date: values.dob,
+        zip_code:values.zip_code,
+        location:values.location,
         role: "player",
         parent_id:parent_id,
         position: values.position,
@@ -146,6 +150,38 @@ export function CreatePlayer({
                     className="dark:bg-[#1A1A1A]"
                   />
                 </div>
+                <div className="grid grid-cols-2 gap-4">
+                <div className="grid gap-2">
+                  <Label
+                    htmlFor="zip_code"
+                    className="text-xs text-muted-foreground"
+                  >
+                    Zip Code
+                  </Label>
+                  <Input
+                    id="zip_code"
+                    name="zip_code"
+                    placeholder="45000"
+                    required
+                    className="dark:bg-[#1A1A1A]"
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label
+                    htmlFor="location"
+                    className="text-xs text-muted-foreground"
+                  >
+                    Location
+                  </Label>
+                  <Input
+                    id="location"
+                    name="location"
+                    placeholder="LA, Usa"
+                    required
+                    className="dark:bg-[#1A1A1A]"
+                  />
+                </div>
+              </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="grid gap-2">
                   <Label

@@ -76,7 +76,6 @@ export default function CommonSettings() {
 
             const res = await axios.get(`/settings?user_id=${debouncedUserId}`);
             const result = res.data;
-
             setProfileInfo({
                 first_name: result.user?.first_name || "",
                 last_name: result?.user?.last_name || "",
@@ -307,7 +306,7 @@ export default function CommonSettings() {
                                         title="First Name"
                                         Icon={<FaUser className="h-4 w-4 text-gray-400" />}
                                         value={profileInfo.first_name}
-                                        placeholder="Admin"
+                                        placeholder="First  Name"
                                         onChange={(e) =>
                                             setProfileInfo((prev) => ({
                                                 ...prev,
@@ -320,7 +319,7 @@ export default function CommonSettings() {
                                         title="Last Name"
                                         Icon={<FaUser className="h-4 w-4 text-gray-400" />}
                                         value={profileInfo.last_name}
-                                        placeholder="User"
+                                        placeholder="Last name"
                                         onChange={(e) =>
                                             setProfileInfo((prev) => ({
                                                 ...prev,
@@ -334,7 +333,7 @@ export default function CommonSettings() {
                                         title="Email"
                                         Icon={<MessageSquare className="h-4 w-4 text-gray-400" />}
                                         value={profileInfo.email}
-                                        placeholder="email@example.com"
+                                        placeholder="Email"
                                         onChange={(e) =>
                                             setProfileInfo((prev) => ({
                                                 ...prev,
@@ -347,7 +346,7 @@ export default function CommonSettings() {
                                         title="Phone Number"
                                         Icon={<Phone className="h-5 w-5 text-gray-400" />}
                                         value={profileInfo.phone_no}
-                                        placeholder="+91 3948392"
+                                        placeholder="Phone Number"
                                         onChange={(e) =>
                                             setProfileInfo((prev) => ({
                                                 ...prev,
@@ -360,7 +359,7 @@ export default function CommonSettings() {
                                         title="Location"
                                         Icon={<MapPin className="h-4 w-4 text-gray-400" />}
                                         value={profileInfo.location}
-                                        placeholder="NA, USA"
+                                        placeholder="Location"
                                         onChange={(e) =>
                                             setProfileInfo((prev) => ({
                                                 ...prev,

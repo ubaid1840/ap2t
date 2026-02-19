@@ -64,6 +64,15 @@ export async function POST(req: NextRequest) {
                         `INSERT INTO parents (user_id) VALUES ($1)`,
                         [parent_id]
                     );
+                    try{
+
+                    await pool.query(
+                        `INSERT INTO settings (user_id) VALUES ($1)`,
+                        [parent_id]
+                    );
+                }catch(error){
+                    console.log("error creating parent's setting",error)
+                }
                 }
 
                 const player_id = await createUserWithFirebase(pool, admin, player);
@@ -74,6 +83,16 @@ export async function POST(req: NextRequest) {
                     [player_id, parent_id]
                 );
 
+                try{
+
+                    await pool.query(
+                        `INSERT INTO settings (user_id) VALUES ($1)`,
+                        [player_id]
+                    );
+                }catch(error){
+                    console.log("error creating player's setting",error)
+                }
+
                 await pool.query("COMMIT");
                 return NextResponse.json({ message: "User added successfully" });
             } catch (err) {
@@ -82,7 +101,7 @@ export async function POST(req: NextRequest) {
             }
         } else {
             const { email, password: u_pass, position = "", skill_level = "", medical_notes = "", career_start = null, bio = "", parent_id = null, ...data } = await req.json();
-
+            console.log(data)
             if (!data || Object.keys(data).length === 0 || !email) {
                 await pool.query("ROLLBACK");
                 return NextResponse.json({ message: "Required parameters missing" }, { status: 400 });
@@ -116,8 +135,8 @@ export async function POST(req: NextRequest) {
 
             const userResult = await pool.query(
                 `INSERT INTO users (${fields.join(",")})
-       VALUES (${placeholders})
-       RETURNING id`,
+                    VALUES (${placeholders})
+                    RETURNING id`,
                 values
             );
 
@@ -128,6 +147,15 @@ export async function POST(req: NextRequest) {
                     `INSERT INTO parents (user_id) VALUES ($1)`,
                     [user.id]
                 );
+                try{
+
+                    await pool.query(
+                        `INSERT INTO settings (user_id) VALUES ($1)`,
+                        [user.id]
+                    );
+                }catch(error){
+                    console.log("error creating player's setting",error)
+                }
             } else if (role === 'player') {
                 await pool.query(
                     `
@@ -144,6 +172,15 @@ export async function POST(req: NextRequest) {
                         parent_id
                     ]
                 )
+                try{
+
+                    await pool.query(
+                        `INSERT INTO settings (user_id) VALUES ($1)`,
+                        [user.id]
+                    );
+                }catch(error){
+                    console.log("error creating player's setting",error)
+                }
             } else if (role === 'coach') {
                 await pool.query(
                     `
@@ -154,6 +191,16 @@ export async function POST(req: NextRequest) {
             `,
                     [user.id, bio, 5, career_start],
                 );
+
+                try{
+
+                    await pool.query(
+                        `INSERT INTO settings (user_id) VALUES ($1)`,
+                        [user.id]
+                    );
+                }catch(error){
+                    console.log("error creating player's setting",error)
+                }
             }
 
             await pool.query("COMMIT");

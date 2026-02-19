@@ -94,7 +94,7 @@ export function EditParents({ parent_id, data, onRefresh }: EditParentsProps) {
                                         id="first_name"
                                         name="first_name"
                                         placeholder="Pedro"
-                                        className="dark:bg-black"
+                                        className="dark:bg-[#1A1A1A]"
                                         value={localData?.first_name}
                                         onChange={(e) => handleChange("first_name", e.target.value)}
                                     />
@@ -105,7 +105,7 @@ export function EditParents({ parent_id, data, onRefresh }: EditParentsProps) {
                                         id="last_name"
                                         name="last_name"
                                         placeholder="Duarte"
-                                        className="dark:bg-black"
+                                        className="dark:bg-[#1A1A1A]"
                                         value={localData?.last_name}
                                         onChange={(e) => handleChange("last_name", e.target.value)}
                                     />
@@ -120,7 +120,7 @@ export function EditParents({ parent_id, data, onRefresh }: EditParentsProps) {
                                     name="phone"
                                     type="tel"
                                     placeholder="+1 234 567 890"
-                                    className="dark:bg-black"
+                                    className="dark:bg-[#1A1A1A]"
                                     value={localData?.phone_no || ""}
                                     onChange={(e) => handleChange("phone_no", e.target.value)}
                                 />
@@ -132,7 +132,7 @@ export function EditParents({ parent_id, data, onRefresh }: EditParentsProps) {
                                     id="zip_code"
                                     name="zip_code"
                                     placeholder="54000"
-                                    className="dark:bg-black"
+                                    className="dark:bg-[#1A1A1A]"
                                     value={localData?.zip_code || ""}
                                     onChange={(e) => handleChange("zip_code", e.target.value)}
                                 />
@@ -144,7 +144,7 @@ export function EditParents({ parent_id, data, onRefresh }: EditParentsProps) {
                                     id="address"
                                     name="address"
                                     placeholder="New York, USA"
-                                    className="dark:bg-black"
+                                    className="dark:bg-[#1A1A1A]"
                                     value={localData?.location || ""}
                                     onChange={(e) => handleChange("location", e.target.value)}
                                 />
