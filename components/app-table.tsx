@@ -29,6 +29,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import {
+  memo,
   useState
 } from "react";
 
@@ -59,7 +60,7 @@ const PageTable = ({
   const [columnVisibility, setColumnVisibility] = useState({});
   const [rowSelection, setRowSelection] = useState({});
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(20);
+  const [pageSize, setPageSize] = useState(10);
   const paginationState = {
     pageIndex: currentPage - 1,
     pageSize: pageSize,
@@ -264,4 +265,4 @@ const PageTable = ({
     </div>
   );
 };
-export default PageTable;
+export default memo(PageTable) ;

@@ -111,7 +111,7 @@ export default function Page() {
                   <h1 className="text-primary font-semibold">
                     ${item.price}/hr
                   </h1>
-                  <Link href="/auth?p=signup">
+                  <Link href="/portal/auth?p=signup">
                     <Button className="bg-primary text-secondary">
                       Book Now
                     </Button>

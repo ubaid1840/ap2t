@@ -1,177 +1,18 @@
-"use client"
+import CampsAndClinics from "./page.client";
 
-import { CurvedImage } from "@/components/landing/curved-image";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { useIsMobile } from "@/hooks/use-mobile";
-import { camps, detailIcons } from "@/components/landing/constants";
-import { ArrowRight, Search } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
 
-export default function Page() {
+export default async function Page(){
 
-    const [search, setSearch] = useState("")
-    const [filter, setFilter] = useState("All")
-     const mobile = useIsMobile()
-    const router = useRouter()
+    const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"}/api/camps-and-clinics`, {
+    cache: "no-store",
+  });
 
+  if (!res.ok) {
+    throw new Error("Failed to fetch camps and clinics");
+  }
+
+  const data = await res.json();
     return (
-        <div className="relative pt-16 sm:pt-20">
-            <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 space-y-10">
-
-                <section className="space-y-5">
-
-                    <div className="relative flex flex-col items-center bg-[#090909] py-12 sm:py-16 rounded-lg overflow-hidden">
-                        <div className="relative space-y-8 w-full max-w-4xl">
-                            <div className="flex flex-col items-center gap-4 text-center">
-                                <h1 className="text-4xl sm:text-5xl font-bold">
-                                    Camps & Clinis
-                                </h1>
-                                <p className="text-sm text-muted max-w-xl">
-                                    Enhance your reflection time, coordination, and movement efficiency.
-                                </p>
-                            </div>
-                        </div>
-
-                        <CurvedImage
-                            src="/images/camps/hero.JPG"
-                            alt="About hero"
-                             curveDepth={mobile ? 10 : 20}
-                            className="shadow-2xl"
-                              imageClassName="object-top"
-                        />
-
-                    </div>
-                    <div className="flex flex-wrap justify-between gap-6">
-
-                        <div className="flex items-center gap-2 rounded border border-gray-200 px-3 shadow-sm focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20">
-                            <Search className="h-4 w-4 text-gray-400" />
-                            <Input
-                                value={search}
-                                onChange={(e) => setSearch(e.target.value)}
-                                placeholder="Search by camp name or clinic..."
-                                className="w-80 border-none bg-transparent p-0 text-sm placeholder:text-gray-400 focus-visible:ring-0 focus-visible:ring-offset-0"
-                            />
-                        </div>
-
-                        {/* Buttons */}
-                        <div className="flex gap-4">
-                            <Button
-                                onClick={() => setFilter("All")}
-                                className="rounded-[8px]"
-                                variant={filter !== "All" ? "outline" : "default"}
-                            >
-                                All
-                            </Button>
-
-                            <Button
-                                onClick={() => setFilter("CAMP")}
-                                className="rounded-[8px]"
-                                variant={filter !== "CAMP" ? "outline" : "default"}
-                            >
-                                Camps
-                            </Button>
-
-                            <Button
-                                onClick={() => setFilter("CLINIC")}
-                                className="rounded-[8px]"
-                                variant={filter !== "CLINIC" ? "outline" : "default"}
-                            >
-                                Clinics
-                            </Button>
-                        </div>
-                    </div>
-
-                    {/* Grid */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {camps
-                            .filter((item) => {
-                                if (filter === "All") return item
-                                return item.badge
-                                    .toLowerCase()
-                                    .includes(filter.toLowerCase())
-                            })
-                            .filter((item) =>
-                                item.title.toLowerCase().includes(search?.toLowerCase())
-                            )
-                            .map((item, i) => (
-                                <Card
-                                    key={i}
-                                    className="bg-[#131313] rounded border border-white/5"
-                                >
-                                    <CardContent className="p-4 space-y-4">
-
-                                        {/* Badges */}
-                                        <div className="flex items-center justify-between">
-                                            <div
-                                                className={`text-xs font-semibold px-2.5 py-1 rounded-md ${item.badge === "CLINIC"
-                                                    ? "bg-blue-500/15 text-blue-400"
-                                                    : "bg-primary/15 text-primary"
-                                                    }`}
-                                            >
-                                                {item.badge}
-                                            </div>
-
-                                            {item?.left && (
-                                                <div className="text-xs font-semibold px-2 py-1 rounded-md bg-red-500/15 text-red-400">
-                                                    {item.left} Left
-                                                </div>
-                                            )}
-                                        </div>
-
-                                        {/* Title */}
-                                        <div className="text-base font-semibold text-white">
-                                            {item.title}
-                                        </div>
-
-                                        {/* Description */}
-                                        <div className="text-sm text-muted-foreground leading-relaxed">
-                                            {item.description}
-                                        </div>
-
-                                        {/* Details */}
-                                        <div className="flex flex-col gap-3 pt-1">
-                                            {item.details.map((eachDetail, index) => {
-                                                const Icon = detailIcons[index]
-                                                return (
-                                                    <div
-                                                        key={eachDetail}
-                                                        className="flex items-center gap-2 text-xs text-muted-foreground"
-                                                    >
-                                                        {Icon && (
-                                                            <Icon className="h-4 w-4 text-primary shrink-0" />
-                                                        )}
-                                                        <span>{eachDetail}</span>
-                                                    </div>
-                                                )
-                                            })}
-                                        </div>
-
-                                        {/* Action */}
-                                        <Button
-                                            onClick={() =>
-                                                router.push(
-                                                    `/camps&clinics/${encodeURIComponent(item.title)}`
-                                                )
-                                            }
-                                            className="w-full bg-primary/20 text-primary hover:bg-primary/30 flex items-center gap-2"
-                                        >
-                                            View Details
-                                            <ArrowRight className="h-4 w-4" />
-                                        </Button>
-                                    </CardContent>
-                                </Card>
-                            ))}
-                    </div>
-                </section>
-            </div>
-        </div>
+        <CampsAndClinics data={data}/>
     )
-
 }
-
-
-
-

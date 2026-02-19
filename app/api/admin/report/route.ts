@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import pool from "@/lib/db";
+import { joinNames } from "@/lib/functions";
 
 export async function GET() {
   try {
@@ -67,7 +68,7 @@ export async function GET() {
     const coachRevenueMap: Record<string, number> = {};
 
     coachRevenueRes.rows.forEach((row) => {
-      const coachName = `Coach ${row.first_name}`;
+      const coachName = joinNames([row.first_name, row.last_name]);
       coachRevenueMap[coachName] =
         (coachRevenueMap[coachName] || 0) + Number(row.amount);
     });

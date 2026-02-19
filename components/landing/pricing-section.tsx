@@ -72,7 +72,7 @@ export default function PricingSection() {
               ))}
             </ul>
 
-            <Button className="bg-black text-primary mt-8 w-full rounded-full border border-white/20 py-3 text-sm hover:text-black">
+            <Button className="bg-black text-primary mt-8 w-full rounded-full border border-white/20 py-3 text-sm ">
               Choose Plan
             </Button>
           </div>
@@ -196,7 +196,7 @@ export default function PricingSection() {
               ))}
             </ul>
 
-            <Button className="bg-black text-primary mt-8 w-full rounded-full border border-white/20 py-3 text-sm hover:text-black">
+            <Button className="bg-black text-primary mt-8 w-full rounded-full border border-white/20 py-3 text-sm ">
               Choose Plan
             </Button>
           </div>

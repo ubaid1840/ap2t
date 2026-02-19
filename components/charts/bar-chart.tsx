@@ -27,6 +27,7 @@ const chartConfig = {
 } satisfies ChartConfig
 
 export function BarChart({chartData = [], xaxis, yaxis} : {chartData : any[], xaxis : string, yaxis : string}) {
+
   return (
    
         <ChartContainer config={chartConfig} className="mt-4">

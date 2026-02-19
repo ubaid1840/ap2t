@@ -44,7 +44,7 @@ export default function JoinNow() {
           <p className="text-[#B3B3B3] mb-6 sm:mb-10 max-w-md sm:max-w-3xl text-center text-sm sm:text-base md:text-lg">
             Contact Advanced Physical and Technical Training today at 732-575-9300 for more information about any of our classes, events, or clubs. Our friendly team will be happy to answer any questions you have.
           </p>
-          <Link href={"/auth?p=signup"}>
+          <Link href={"/portal/auth?p=signup"}>
             <Button
               style={{
                 background:
