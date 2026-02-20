@@ -467,9 +467,9 @@ export default function MainPlayerPage({
                     <Label className="text-alternative-text text-[14px] leading-none">
                       Medical Notes
                     </Label>
-                    <p className="text-[#D1D5DC] text-xs">
+                    <div className="text-[#D1D5DC] flex-wrap text-xs">
                       {data?.profile?.medical_notes}
-                    </p>
+                    </div>
                   </div>
                 </div>
               </CardContent>

@@ -233,8 +233,8 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
                             </div>
                           </div>
                         )}
-
-                        <div className="space-y-3">
+                        <div className="flex flex-col gap-4">
+<div className="space-y-3">
                           <h4 className="text-sm font-medium text-white/80">
                             Player Information
                           </h4>
@@ -255,22 +255,6 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
                                 }))
                               }
                             />
-                             <input
-                            type="email"
-                            placeholder="Email"
-                            required
-                            className="w-full rounded-[8px] border border-[#6D6D6D] px-3 py-2 text-sm text-white placeholder-white/40 focus:outline-none focus:border-white/30"
-                            onChange={(e) =>
-                              setFormData((prev) => ({
-                                ...prev,
-                                player: {
-                                  ...prev.player,
-                                  email: e.target.value.trim().toLocaleLowerCase(),
-                                },
-                              }))
-                            }
-                          />
-
                             <input
                               type="text"
                               placeholder="Last Name"
@@ -286,6 +270,21 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
                                 }))
                               }
                             />
+                              <input
+                             type="email"
+                             placeholder="Email"
+                             required
+                             className="w-full rounded-[8px] border border-[#6D6D6D] px-3 py-2 text-sm text-white placeholder-white/40 focus:outline-none focus:border-white/30"
+                             onChange={(e) =>
+                               setFormData((prev) => ({
+                                 ...prev,
+                                 player: {
+                                   ...prev.player,
+                                   email: e.target.value.trim().toLocaleLowerCase(),
+                                 },
+                               }))
+                             }
+                           />
                           </div>
                               <div className="space-y-2">
                                 <h4 className="text-xs font-medium text-white/80">
@@ -408,6 +407,8 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
                             }
                           />
                         </div>
+                        </div>
+                        
 
                         <Button type="submit" className="w-full rounded-full" disabled={loading}>
                             {loading&&<Spinner className=" text-black h-5 w-5"/>}

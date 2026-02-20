@@ -48,7 +48,6 @@ export default function CommonSettings() {
         last_name: "",
         email: "",
         phone_no: "",
-        role: "",
         location: "",
         birth_date: undefined,
     });
@@ -81,7 +80,6 @@ export default function CommonSettings() {
                 last_name: result?.user?.last_name || "",
                 email: result.user?.email || "",
                 phone_no: result.user?.phone_no || "",
-                role: result.user?.role || "",
                 location: result.user?.location || "",
                 birth_date: result.user?.birth_date || undefined,
             });
@@ -98,7 +96,6 @@ export default function CommonSettings() {
 
     const updateSettings = async () => {
         setSavingChanges(true);
-
         try {
             await axios.put(`/user`, {
                 id: user?.id,
@@ -350,7 +347,7 @@ export default function CommonSettings() {
                                         onChange={(e) =>
                                             setProfileInfo((prev) => ({
                                                 ...prev,
-                                                phoneNo: e,
+                                               phone_no : e,
                                             }))
                                         }
                                     />

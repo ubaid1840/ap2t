@@ -477,7 +477,8 @@ export default function SessionMainPage({ id, back, back_title, admin = false }:
                   }
                 >
                   <CardContent className="">
-                    <div className="flex gap-2">
+                    <div className="flex flex-col gap-2">
+                      <div className="flex gap-2">
                       <h1 className="text-sm text-[#E5E7EB]">{note.name}</h1>
                       {note.important && (
                         <Badge className="border-[#F0B1004D] bg-[#F0B10033] text-[#FDC700] rounded-sm">
@@ -488,7 +489,12 @@ export default function SessionMainPage({ id, back, back_title, admin = false }:
                     <p className="text-sm text-muted-foreground">
                       {note.created_at}
                     </p>
-                    <h1 className="text-sm text-[#D1D5DC]">{note.content}</h1>
+                    <div className="note-content break-all overflow-wrap-anywhere w-full">
+  {note.content}
+</div>
+                    
+                    </div>
+                    
                   </CardContent>
                 </Card>
               );
@@ -719,9 +725,9 @@ const AddNoteDialog = ({ session_id, onRefresh }: { session_id: number, onRefres
               Add Internal Note
             </DialogTitle>
           </DialogHeader>
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={handleSubmit} className="max-w-[500px]">
             <div className="space-y-4 p-4">
-              <div className="flex gap-2 items-center">
+              <div className="flex gap-2 items-center ">
                 <Checkbox
                   className="data-[state=checked]:border-white data-[state=checked]:bg-primary data-[state=checked]:text-black dark:data-[state=checked]:border-white dark:data-[state=checked]:bg-primary"
                   checked={data.important}
@@ -731,7 +737,7 @@ const AddNoteDialog = ({ session_id, onRefresh }: { session_id: number, onRefres
                 />
                 <Label className="text-[#99A1AF] text-sm">Important</Label>
               </div>
-              <div className="space-y-2">
+              <div className="space-y-2 w-full">
                 <Label className="text-[#99A1AF] text-sm">Type</Label>
 
                 <Select
@@ -756,7 +762,7 @@ const AddNoteDialog = ({ session_id, onRefresh }: { session_id: number, onRefres
                 <Label className="text-[#99A1AF] text-sm">Note</Label>
                 <Textarea
                   placeholder="Enter your note here..."
-                  className="min-h-36"
+                  className="min-h-36 text-wrap"
                   value={data.note}
                   onChange={(e) => setData({ ...data, note: e.target.value })}
                 ></Textarea>

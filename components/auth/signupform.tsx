@@ -78,6 +78,10 @@ export default function SignUpForm({
 
     if (!playerData.email || !playerData.password) return;
     if (playerData.password !== playerData.confirm_password) return;
+    if(!playerData.birth_date){
+      toast.error("birth date is required...")
+      return
+    }
     if (underAged) {
       if (!parentData.email || !parentData.password) return;
       if (parentData.password !== parentData.confirm_password) return
@@ -578,7 +582,7 @@ export default function SignUpForm({
               <div className="flex p-1 gap-2 items-center">
                 <Checkbox
                   required
-                  className="data-[state=checked]:border-white data-[state=checked]:bg-primary data-[state=checked]:text-black dark:data-[state=checked]:border-white dark:data-[state=checked]:bg-primary"
+                  className="border-primary border-2 data-[state=checked]:border-white data-[state=checked]:bg-primary data-[state=checked]:text-black dark:data-[state=checked]:border-white dark:data-[state=checked]:bg-primary"
                   checked={waiverData}
                   onCheckedChange={(checked) => {
                     setWaiverData(checked === true);

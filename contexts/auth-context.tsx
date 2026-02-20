@@ -57,6 +57,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           const role = res.data?.role
           if (!role) {
             await handleLogout()
+            toast.error("There is no user role...")
           } else if (!pathname.startsWith(`/portal/${role}`)) {
             router.replace(`/portal/${role}`);
           }
