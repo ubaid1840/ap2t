@@ -37,6 +37,7 @@ export default function SignUpForm({
     last_name: "",
     birth_date: "",
     location: "",
+    zip_code:"",
     email: "",
     password: "",
     confirm_password: "",
@@ -47,6 +48,7 @@ export default function SignUpForm({
     last_name: "",
     birth_date: "",
     location: "",
+    zip_code:"",
     email: "",
     password: "",
     confirm_password: "",
@@ -94,6 +96,7 @@ export default function SignUpForm({
         first_name: playerData.first_name,
         last_name: playerData.last_name,
         email: playerData.email,
+        zip_code:playerData.zip_code,
         password: playerData.password,
         birth_date: playerData.birth_date,
         location: playerData.location,
@@ -106,6 +109,7 @@ export default function SignUpForm({
       payload.parent = {
         first_name: parentData.first_name,
         last_name: parentData.last_name,
+        zip_code:parentData.zip_code,
         email: parentData.email,
         password: parentData.password,
         birth_date: parentData.birth_date,
@@ -217,8 +221,25 @@ export default function SignUpForm({
                 />
               </div>
             </div>
+            <div className="grid grid-cols-2 gap-4">
+                  <div className="flex-1">
+                <Label className="text-sm">zip_code *</Label>
+                <Input
+                  required
+                  type="text"
+                  placeholder="New York"
+                  className="w-full px-4"
+                  value={playerData.zip_code}
+                  onChange={(e) =>
+                    setPlayerData((prev) => ({
+                      ...prev,
+                      zip_code: e.target.value,
+                    }))
+                  }
+                />
+              </div>
+              <div className="flex-1">
 
-            <div>
               <Label className="text-sm">Email *</Label>
               <Input
                 required
@@ -234,6 +255,8 @@ export default function SignUpForm({
                 }
               />
             </div>
+            </div>
+            
 
             <div className="flex gap-4">
               <div className="flex-1">
@@ -269,9 +292,9 @@ export default function SignUpForm({
                 />
               </div>
             </div>
-            <Separator />
             {underAged && (
               <>
+            <Separator />
                 <div className="border-b border-[#282828] pb-3">
                   <h2 className="text-sm font-medium">Parent Information</h2>
                 </div>
@@ -347,7 +370,27 @@ export default function SignUpForm({
                   </div>
                 </div>
 
-                <div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+
+                    <Label className="text-sm">Zip Code*</Label>
+                    <Input
+                      required
+                      type="text"
+                      placeholder="9867"
+                      className="w-full px-4"
+                      value={parentData.zip_code}
+                      onChange={(e) =>
+                        setParentData((prev) => ({
+                          ...prev,
+                          zip_code: e.target.value,
+                        }))
+                      }
+                    />
+                  </div>
+                  <div className="space-y-2">
+
+
                   <Label className="text-sm">Email *</Label>
                   <Input
                     required
@@ -362,6 +405,7 @@ export default function SignUpForm({
                       }))
                     }
                   />
+                  </div>
                 </div>
 
                 <div className="flex gap-4">
