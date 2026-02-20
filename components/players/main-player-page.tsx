@@ -467,7 +467,7 @@ export default function MainPlayerPage({
                     <Label className="text-alternative-text text-[14px] leading-none">
                       Medical Notes
                     </Label>
-                    <div className="text-[#D1D5DC] flex-wrap text-xs">
+                    <div className="text-[#D1D5DC] text-xs break-all whitespace-pre-wrap">
                       {data?.profile?.medical_notes}
                     </div>
                   </div>

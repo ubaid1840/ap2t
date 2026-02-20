@@ -15,7 +15,7 @@ import {
   DialogTitle
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import {
   Select,
   SelectContent,
@@ -178,7 +178,7 @@ export default function SessionMainPage({ id, back, back_title, admin = false }:
           totalPending += Number(payment?.amount || 0);
         }
         totalAmount += Number(payment?.amount || 0);
-      } 
+      }
     });
 
     return {
@@ -479,22 +479,22 @@ export default function SessionMainPage({ id, back, back_title, admin = false }:
                   <CardContent className="">
                     <div className="flex flex-col gap-2">
                       <div className="flex gap-2">
-                      <h1 className="text-sm text-[#E5E7EB]">{note.name}</h1>
-                      {note.important && (
-                        <Badge className="border-[#F0B1004D] bg-[#F0B10033] text-[#FDC700] rounded-sm">
-                          Important
-                        </Badge>
-                      )}
+                        <h1 className="text-sm text-[#E5E7EB]">{note.name}</h1>
+                        {note.important && (
+                          <Badge className="border-[#F0B1004D] bg-[#F0B10033] text-[#FDC700] rounded-sm">
+                            Important
+                          </Badge>
+                        )}
+                      </div>
+                      <p className="text-sm text-muted-foreground">
+                        {note.created_at}
+                      </p>
+                      <div className="note-content break-all overflow-wrap-anywhere w-full">
+                        {note.content}
+                      </div>
+
                     </div>
-                    <p className="text-sm text-muted-foreground">
-                      {note.created_at}
-                    </p>
-                    <div className="note-content break-all overflow-wrap-anywhere w-full">
-  {note.content}
-</div>
-                    
-                    </div>
-                    
+
                   </CardContent>
                 </Card>
               );
@@ -726,49 +726,52 @@ const AddNoteDialog = ({ session_id, onRefresh }: { session_id: number, onRefres
             </DialogTitle>
           </DialogHeader>
           <form onSubmit={handleSubmit} className="max-w-[500px]">
-            <div className="space-y-4 p-4">
-              <div className="flex gap-2 items-center ">
-                <Checkbox
-                  className="data-[state=checked]:border-white data-[state=checked]:bg-primary data-[state=checked]:text-black dark:data-[state=checked]:border-white dark:data-[state=checked]:bg-primary"
-                  checked={data.important}
-                  onCheckedChange={(checked) => {
-                    setData({ ...data, important: checked === true })
-                  }}
-                />
-                <Label className="text-[#99A1AF] text-sm">Important</Label>
-              </div>
-              <div className="space-y-2 w-full">
-                <Label className="text-[#99A1AF] text-sm">Type</Label>
+            <ScrollArea className=" py-1 space-y-4 px-2 h-[50vh]">
+              <div className="space-y-4 p-4">
+                <div className="flex gap-2 items-center ">
+                  <Checkbox
+                    className="data-[state=checked]:border-white data-[state=checked]:bg-primary data-[state=checked]:text-black dark:data-[state=checked]:border-white dark:data-[state=checked]:bg-primary"
+                    checked={data.important}
+                    onCheckedChange={(checked) => {
+                      setData({ ...data, important: checked === true })
+                    }}
+                  />
+                  <Label className="text-[#99A1AF] text-sm">Important</Label>
+                </div>
+                <div className="space-y-2 w-full">
+                  <Label className="text-[#99A1AF] text-sm">Type</Label>
 
-                <Select
-                  value={data.note_type}
-                  onValueChange={(value) => setData({ ...data, note_type: value })}
-                >
-                  <SelectTrigger className="w-full !bg-[#1A1A1A] border-border rounded-[10px]">
-                    <SelectValue placeholder="note type..." />
-                  </SelectTrigger>
-                  <SelectContent className="!bg-[#1A1A1A]">
-                    <SelectGroup>
-                      <SelectLabel>Select a type</SelectLabel>
-                      <SelectItem value="Reminder">Reminder</SelectItem>
-                      <SelectItem value="Task">Task</SelectItem>
-                      <SelectItem value="Idea">Idea</SelectItem>
-                      <SelectItem value="Sugestion">Sugestion</SelectItem>
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
+                  <Select
+                    value={data.note_type}
+                    onValueChange={(value) => setData({ ...data, note_type: value })}
+                  >
+                    <SelectTrigger className="w-full !bg-[#1A1A1A] border-border rounded-[10px]">
+                      <SelectValue placeholder="note type..." />
+                    </SelectTrigger>
+                    <SelectContent className="!bg-[#1A1A1A]">
+                      <SelectGroup>
+                        <SelectLabel>Select a type</SelectLabel>
+                        <SelectItem value="Reminder">Reminder</SelectItem>
+                        <SelectItem value="Task">Task</SelectItem>
+                        <SelectItem value="Idea">Idea</SelectItem>
+                        <SelectItem value="Sugestion">Sugestion</SelectItem>
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-[#99A1AF] text-sm">Note</Label>
+                  <Textarea
+                    placeholder="Enter your note here..."
+                    className="min-h-36 text-wrap"
+                    value={data.note}
+                    onChange={(e) => setData({ ...data, note: e.target.value })}
+                  ></Textarea>
+                </div>
               </div>
-              <div className="space-y-2">
-                <Label className="text-[#99A1AF] text-sm">Note</Label>
-                <Textarea
-                  placeholder="Enter your note here..."
-                  className="min-h-36 text-wrap"
-                  value={data.note}
-                  onChange={(e) => setData({ ...data, note: e.target.value })}
-                ></Textarea>
-              </div>
-            </div>
 
+                 <Scrollbar />
+            </ScrollArea>
             <div className="border-t border-border flex items-center justify-end p-4">
               <div className="flex gap-4">
                 <DialogClose className="text-[13px] font-medium leading-none h-8 px-4 bg-black text-white border-border rounded-md hover:opacity-70 cursor-pointer flex flex-1 items-center justify-center">

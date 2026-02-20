@@ -68,7 +68,7 @@ const CreateCoach = ({ onRefresh }: { onRefresh: () => Promise<void> }) => {
             </DialogTitle>
           </DialogHeader>
           <form onSubmit={addCoach} className="">
-            <ScrollArea className=" py-1 space-y-4 px-2 ">
+            <ScrollArea className=" py-1 space-y-4 px-2 h-[65vh]">
               <div className="space-y-2 px-2 pb-2">
                 <div className="grid grid-cols-2 gap-2">
                   <div className="space-y-2">
@@ -197,16 +197,15 @@ const CreateCoach = ({ onRefresh }: { onRefresh: () => Promise<void> }) => {
             <Separator />
             <div className="p-4">
               <div className="flex gap-4 flex-wrap">
-                <DialogClose className="text-[13px] font-medium leading-none h-10 px-4 py-2 bg-black text-white border-border rounded-md hover:opacity-70 cursor-pointer flex flex-1 items-center justify-center">
+                <DialogClose className="text-[13px] font-medium leading-none h-8 px-4 py-2 bg-black text-white border-border rounded-md hover:opacity-70 cursor-pointer flex flex-1 items-center justify-center">
                   Cancel
                 </DialogClose>
                 <Button
                   disabled={loading}
                   type="submit"
                   className="flex-1 text-[13px]"
-                  size={"lg"}
                 >
-                  {loading && <Spinner />} Add Coach
+                  {loading && <Spinner className="text-black"/>} Add Coach
                 </Button>
               </div>
             </div>
