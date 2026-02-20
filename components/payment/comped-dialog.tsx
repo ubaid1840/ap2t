@@ -115,7 +115,7 @@ export function CompedDialog({ open, onOpenChange, data, onRefresh }: CompedDial
           </ScrollArea>
           <div className="p-2 space-y-1 border-t border-[#3A3A3A]">
             <div className="flex gap-4">
-              <DialogClose className="text-[12px] font-medium tracking-wider leading-none h-8 px-4 py-2 bg-primary text-black rounded-md hover:opacity-70 cursor-pointer flex flex-1 items-center justify-center">
+              <DialogClose className="text-[12px] font-medium tracking-wider leading-none h-8 px-4 py-2 text-white border-2 border-border rounded-md hover:opacity-70 cursor-pointer flex flex-1 items-center justify-center">
                 Cancel
               </DialogClose>
               <Button onClick={() => {
