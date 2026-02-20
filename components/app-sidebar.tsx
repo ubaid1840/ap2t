@@ -22,6 +22,8 @@ import { ScrollArea, ScrollBar } from "./ui/scroll-area";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/auth-context";
 import { useEffect, useState } from "react";
+import { Dialog, DialogTrigger } from "./ui/dialog";
+import GetSupportDialog from "./get-sport-dialog/getsupportddialog";
 
 
 export const company = {
@@ -123,9 +125,16 @@ export default function AppSidebar() {
               <div className="flex flex-col gap-1 w-full bg-primary rounded-xl p-4">
                 <p className="text-xs text-[#282828]">Need Help?</p>
                 <p className="text-md text-[#282828]">Contact Support</p>
+                <Dialog>
+                  <DialogTrigger>
+
                 <Button className="bg-black text-primary rounded-xl">
                   Get Support
+
                 </Button>
+                  </DialogTrigger>
+                  <GetSupportDialog/>
+                </Dialog>
               </div>
             </SidebarMenuItem>
           </SidebarMenu>
