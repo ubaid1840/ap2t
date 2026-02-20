@@ -138,6 +138,55 @@ export default function SignUpForm({
     }
   };
 
+function checkinfo() {
+  if (currentStep !== 0) return;
+
+  
+  if (
+    !playerData.first_name ||
+    !playerData.last_name ||
+    !playerData.birth_date ||
+    !playerData.location ||
+    !playerData.zip_code ||
+    !playerData.email ||
+    !playerData.password ||
+    !playerData.confirm_password
+  ) {
+    toast.error("Please complete all player fields");
+    return; 
+  }
+
+  if (playerData.password !== playerData.confirm_password) {
+    toast.error("Passwords do not match");
+    return;
+  }
+
+  
+  if (underAged) {
+    if (
+      !parentData.first_name ||
+      !parentData.last_name ||
+      !parentData.birth_date ||
+      !parentData.location ||
+      !parentData.zip_code ||
+      !parentData.email ||
+      !parentData.password ||
+      !parentData.confirm_password
+    ) {
+      toast.error("Please complete all parent fields");
+      return;
+    }
+
+    if (parentData.password !== parentData.confirm_password) {
+      toast.error("Parent passwords do not match");
+      return;
+    }
+  }
+
+  
+  setCurrentStep(1);
+}
+
   const steps = [
     {
       id: "personal info",
@@ -451,7 +500,7 @@ export default function SignUpForm({
               <Button
                 onClick={(e) => {
                   e.preventDefault()
-                  setCurrentStep(1)
+                  checkinfo()
                 }}
                 className="flex-1 bg-primary text-secondary"
               >
