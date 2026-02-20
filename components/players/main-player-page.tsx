@@ -585,7 +585,7 @@ export default function MainPlayerPage({
                           <Separator />
                           <div className="flex flex-wrap gap-4 items-center text-xs text-muted-foreground">
                             <MessageSquare size={14} />
-                            <p>{eachNote?.note}</p>
+                            <p className="break-all whitespace-pre-wrap">{eachNote?.note}</p>
                           </div>
                         </div>
                       ))}
@@ -723,7 +723,7 @@ export default function MainPlayerPage({
                       <p>{item?.session_name}</p>
                     </div>
 
-                    <p className="text-xs text-[#D1D5DC]">{item?.note}</p>
+                    <p className="text-xs text-[#D1D5DC] break-all whitespace-pre-wrap">{item?.note}</p>
                   </CardContent>
                 </Card>
               ))}

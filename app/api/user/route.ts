@@ -20,7 +20,6 @@ export async function PUT(req: NextRequest) {
                 values.push(value);
             }
         });
-        console.log(fields)
 
         if (fields.length === 0) {
             return NextResponse.json({ message: "No valid data provided for update" }, { status: 400 });

@@ -246,7 +246,7 @@ export function CreateSessionDialog({
                     </Label>
                     <Input
                       name="age_limit"
-                      placeholder="e.g., 12+/10-18"
+                      placeholder="e.g., 12+ or 10-18"
                       required
                       value={session.age_limit}
                       onChange={(e) =>

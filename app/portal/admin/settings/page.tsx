@@ -79,7 +79,6 @@ export default function Page() {
     last_name: "",
     email: "",
     phone_no: "",
-    role: "",
     location: "",
     birth_date: undefined,
   });
@@ -194,7 +193,6 @@ export default function Page() {
         last_name: result?.last_name || "",
         email: result.user?.email || "",
         phone_no: result.user?.phone_no || "",
-        role: result.user?.role || "",
         location: result.user?.location,
         birth_date: result.user?.birth_date || undefined,
       });
