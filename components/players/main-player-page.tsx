@@ -383,100 +383,100 @@ export default function MainPlayerPage({
         </CardContent>
       </Card>
 
-      <Card className="w-full rounded-[12px] bg-[#252525]">
-        <CardContent className="space-y-4">
-          {data && !data?.parent_id && (
+      {data?.parent_id &&
+        <Card className="w-full rounded-[12px] bg-[#252525]">
+          <CardContent className="space-y-4">
+            {/* {data && !data?.parent_id && (
             <AddParentDialog playerId={id} onSuccess={fetchData} />
-          )}
-          {data?.parent_id && (
-            <>
-              <div className="w-full flex justify-between">
-                <p className="text-[18px] text-white">Linked Parent</p>
-                {admin && <Link
-                  target="blank"
-                  href={`/portal/admin/parents/${data?.parent_id}`}
-                >
-                  <Button>View Parent Profile</Button>
-                </Link>}
-              </div>
+          )} */}
 
-              <div className="flex gap-4">
-                <Avatar className="bg-primary text-black">
-                  <AvatarImage src={data.attach_parent?.picture} />
-                  <AvatarFallback className="bg-primary text-black">
-                    {getInitials(
-                      joinNames([
-                        data.attach_parent?.first_name,
-                        data.attach_parent?.last_name,
-                      ]),
-                    )}
-                  </AvatarFallback>
-                </Avatar>
+            <div className="w-full flex justify-between">
+              <p className="text-[18px] text-white">Linked Parent</p>
+              {admin && <Link
+                target="blank"
+                href={`/portal/admin/parents/${data?.parent_id}`}
+              >
+                <Button>View Parent Profile</Button>
+              </Link>}
+            </div>
 
-                <div>
-                  <p className="text-md">
-                    {joinNames([
+            <div className="flex gap-4">
+              <Avatar className="bg-primary text-black">
+                <AvatarImage src={data.attach_parent?.picture} />
+                <AvatarFallback className="bg-primary text-black">
+                  {getInitials(
+                    joinNames([
                       data.attach_parent?.first_name,
                       data.attach_parent?.last_name,
-                    ])}
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    Primary Contact
-                  </p>
-                </div>
+                    ]),
+                  )}
+                </AvatarFallback>
+              </Avatar>
+
+              <div>
+                <p className="text-md">
+                  {joinNames([
+                    data.attach_parent?.first_name,
+                    data.attach_parent?.last_name,
+                  ])}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  Primary Contact
+                </p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 max-w-lg gap-2 text-xs font-normal">
+              <div className="flex gap-1 items-center">
+                <Mail size={12} className="text-[#99A1AF]" />
+                <p className="text-[#D1D5DC]">{data.attach_parent?.email}</p>
               </div>
 
-              <div className="grid grid-cols-2 max-w-lg gap-2 text-xs font-normal">
-                <div className="flex gap-1 items-center">
-                  <Mail size={12} className="text-[#99A1AF]" />
-                  <p className="text-[#D1D5DC]">{data.attach_parent?.email}</p>
-                </div>
-
-                <div className="flex gap-1 items-center">
-                  <Phone size={12} className="text-[#99A1AF]" />
-                  <p className="text-[#D1D5DC]">
-                    {data.attach_parent?.phone_no}
-                  </p>
-                </div>
-
-                <div className="flex gap-1 items-center">
-                  <Info size={12} className="text-[#99A1AF]" />
-                  <p className="text-[#D1D5DC]">
-                    Emergency: {data.attach_parent?.phone_no}
-                  </p>
-                </div>
-
-                <div className="flex gap-1 items-center">
-                  <MapPin size={12} className="text-[#99A1AF]" />
-                  <p className="text-[#D1D5DC]">
-                    {data.attach_parent?.location}
-                  </p>
-                </div>
+              <div className="flex gap-1 items-center">
+                <Phone size={12} className="text-[#99A1AF]" />
+                <p className="text-[#D1D5DC]">
+                  {data.attach_parent?.phone_no}
+                </p>
               </div>
 
-              <Separator />
-            </>
-          )}
+              <div className="flex gap-1 items-center">
+                <Info size={12} className="text-[#99A1AF]" />
+                <p className="text-[#D1D5DC]">
+                  Emergency: {data.attach_parent?.phone_no}
+                </p>
+              </div>
 
-          {data?.profile?.medical_notes && (
-            <Card className="bg-alternative-bg p-3 border-alternative-text/30">
-              <CardContent className="p-0">
-                <div className="flex gap-4 items-start">
-                  <Info size={14} className="text-alternative-text" />
-                  <div className="font-normal space-y-1">
-                    <Label className="text-alternative-text text-[14px] leading-none">
-                      Medical Notes
-                    </Label>
-                    <div className="text-[#D1D5DC] text-xs break-all whitespace-pre-wrap">
-                      {data?.profile?.medical_notes}
+              <div className="flex gap-1 items-center">
+                <MapPin size={12} className="text-[#99A1AF]" />
+                <p className="text-[#D1D5DC]">
+                  {data.attach_parent?.location}
+                </p>
+              </div>
+            </div>
+
+            <Separator />
+
+
+            {data?.profile?.medical_notes && (
+              <Card className="bg-alternative-bg p-3 border-alternative-text/30">
+                <CardContent className="p-0">
+                  <div className="flex gap-4 items-start">
+                    <Info size={14} className="text-alternative-text" />
+                    <div className="font-normal space-y-1">
+                      <Label className="text-alternative-text text-[14px] leading-none">
+                        Medical Notes
+                      </Label>
+                      <div className="text-[#D1D5DC] text-xs break-all whitespace-pre-wrap">
+                        {data?.profile?.medical_notes}
+                      </div>
                     </div>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
-          )}
-        </CardContent>
-      </Card>
+                </CardContent>
+              </Card>
+            )}
+          </CardContent>
+        </Card>
+      }
 
       <div className="w-full rounded-[12px] bg-[#252525] p-2 border-[#3A3A3A]">
         <Tabs

@@ -33,9 +33,8 @@ export function OverrideDialog({ open, onOpenChange, data, onRefresh }: CompedDi
 
   async function handleUpdateStatus() {
     if (!data?.id) return
-    console.log(form)
     if(!form.method||!form.transaction_id) {
-      toast.error("Method or Transection id not provided")
+      toast.error("Method or Transaction id not provided")
       return
     }
     setLoading(true)
