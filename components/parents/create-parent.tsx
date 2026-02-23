@@ -15,71 +15,93 @@ import { Input } from "../ui/input";
 import axios from "@/lib/axios";
 import { splitFullName } from "@/lib/functions";
 import { Spinner } from "../ui/spinner";
+import { z } from "zod";
+import { Controller, useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { toast } from "sonner";
+import { Field, FieldError } from "../ui/field";
+import { RequiredStar } from "../required-star";
+import { Textarea } from "../ui/textarea";
 
 type EditParentsProps = {
-  visible: boolean
-  onChange: (open: boolean) => void
-}
+  visible: boolean;
+  onChange: (open: boolean) => void;
+};
 
-export function CreateParent({ onRefresh }: { onRefresh: () => Promise<void> }) {
+const parentSchema = z.object({
+  first_name: z.string().min(2, "First name is required"),
+  last_name: z.string().min(2, "Last name is required"),
+
+  email: z
+    .string()
+    .email("Invalid email")
+    .transform((val) => val.trim().toLowerCase()),
+
+  phone_no: z.string().min(6, "Phone is required"),
+
+  zip_code: z.string().min(3, "Zip code required"),
+
+  location: z.string().min(2, "Location required"),
+});
+type parentSchemaValues = z.infer<typeof parentSchema>;
+
+export function CreateParent({
+  onRefresh,
+}: {
+  onRefresh: () => Promise<void>;
+}) {
   const [open, setOpen] = useState(false);
-  const [loading, setLoading] = useState(false)
-  const [parent, setParent] = useState({
-    first_name: "",
-    last_name:"",
-    email: "",
-    phone: "",
-    address: "",
-    zip_code : ""
+  const [loading, setLoading] = useState(false);
+
+  const form = useForm<parentSchemaValues>({
+    resolver: zodResolver(parentSchema),
+    defaultValues: {
+      first_name: "",
+      last_name: "",
+      email: "",
+      phone_no: "",
+      location: "",
+      zip_code: "",
+    },
   });
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    setLoading(true)
+  const onSubmit = async (values: parentSchemaValues) => {
+    console.log(values);
+    return;
+    setLoading(true);
     try {
-      const result = await axios.post("/user",
-        {
-          first_name: parent.first_name,
-          last_name: parent.last_name,
-          email: parent.email,
-          phone_no: parent.phone,
-          location: parent.address,
-          zip_code : parent.zip_code,
-          role: "parent"
-        }
-      )
-      console.log("parent created", result)
-      await onRefresh()
-      clearForm()
-      setOpen(false)
+      const result = await axios.post("/user", {
+        first_name: values.first_name,
+        last_name: values.last_name,
+        email: values.email,
+        phone_no: values.phone_no,
+        location: values.location,
+        zip_code: values.zip_code,
+        role: "parent",
+      });
+      toast.success("Parent Created Successfully");
+      await onRefresh();
+      form.reset();
+      setOpen(false);
     } catch (error) {
-      console.log(error)
+      toast.error("Error while creating parent");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
   };
 
-  function clearForm() {
-    setParent({
-      first_name: "",
-      last_name:"",
-      email: "",
-      phone: "",
-      address: "",
-      zip_code : ""
-    });
-
-  }
   return (
     <>
-      <Button
-        onClick={() => setOpen(true)}
-      >
+      <Button onClick={() => setOpen(true)}>
         <Plus /> Add Parent
       </Button>
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="sm:max-w-[550px] bg-[#252525]">
-          <form onSubmit={handleSubmit}>
+          <form
+            onSubmit={form.handleSubmit(onSubmit, (errors) =>
+              console.log("errors", errors),
+            )}
+          >
             <DialogHeader className=" pb-4">
               <DialogTitle className="text-sm font-normal">
                 Add New Parent
@@ -89,134 +111,144 @@ export function CreateParent({ onRefresh }: { onRefresh: () => Promise<void> }) 
             <div className="grid gap-4 py-4 border-t">
               <div className="grid grid-cols-2 gap-2">
                 <div className="flex flex-col gap-2">
-                <Label htmlFor="first_name" className="text-xs text-muted-foreground">
-                  First Name
-                </Label>
-                <Input
-                  id="first_name"
-                  name="first_name"
-                  placeholder="Pedro"
-                  required
-                  className="dark:bg-[#1A1A1A]"
-                  value={parent.first_name}
-                  onChange={(e) =>
-                    setParent((prev) => ({
-                      ...prev,
-                      first_name: e.target.value,
-                    }))
-                  }
-                />
+                  <Controller
+                    name="first_name"
+                    control={form.control}
+                    render={({ field, fieldState }) => (
+                      <Field data-invalid={fieldState.invalid}>
+                        <Label className="text-sm text-[#99A1AF]">
+                          First Name <RequiredStar />
+                        </Label>
+                        <Input
+                          {...field}
+                          id={field.name}
+                          aria-invalid={fieldState.invalid}
+                          placeholder="john"
+                          autoComplete="off"
+                        />
+                        {fieldState.invalid && (
+                          <FieldError errors={[fieldState.error]} />
+                        )}
+                      </Field>
+                    )}
+                  />
                 </div>
                 <div className="flex flex-col gap-2">
-                <Label htmlFor="name" className="text-xs text-muted-foreground">
-                  last Name
-                </Label>
-                <Input
-                  id="last_name"
-                  name="last_name"
-                  placeholder="Duarte"
-                  required
-                  className="dark:bg-[#1A1A1A]"
-                  value={parent.last_name}
-                  onChange={(e) =>
-                    setParent((prev) => ({
-                      ...prev,
-                      last_name: e.target.value,
-                    }))
-                  }
-                />
+                  <Controller
+                    name="last_name"
+                    control={form.control}
+                    render={({ field, fieldState }) => (
+                      <Field data-invalid={fieldState.invalid}>
+                        <Label className="text-sm text-[#99A1AF]">
+                          Last Name <RequiredStar />
+                        </Label>
+                        <Input
+                          {...field}
+                          id={field.name}
+                          aria-invalid={fieldState.invalid}
+                          placeholder="martinz"
+                          autoComplete="off"
+                        />
+                        {fieldState.invalid && (
+                          <FieldError errors={[fieldState.error]} />
+                        )}
+                      </Field>
+                    )}
+                  />
                 </div>
-
               </div>
 
               <div className="grid gap-2">
-                <Label
-                  htmlFor="email"
-                  className="text-xs text-muted-foreground"
-                >
-                  Email
-                </Label>
-                <Input
-                  id="email"
+                <Controller
                   name="email"
-                  type="email"
-                  placeholder="pedro@example.com"
-                  required
-                  className="dark:bg-[#1A1A1A]"
-                  value={parent.email}
-                  onChange={(e) =>
-                    setParent((prev) => ({
-                      ...prev,
-                      email: e.target.value.trim().toLowerCase(),
-                    }))
-                  }
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <Field data-invalid={fieldState.invalid}>
+                      <Label className="text-sm text-[#99A1AF]">
+                        Email <RequiredStar />
+                      </Label>
+                      <Input
+                        {...field}
+                        id={field.name}
+                        aria-invalid={fieldState.invalid}
+                        placeholder="martinz@example.com"
+                        autoComplete="off"
+                      />
+                      {fieldState.invalid && (
+                        <FieldError errors={[fieldState.error]} />
+                      )}
+                    </Field>
+                  )}
                 />
               </div>
 
               <div className="grid gap-2">
-                <Label
-                  htmlFor="phone"
-                  className="text-xs text-muted-foreground"
-                >
-                  Phone
-                </Label>
-                <Input
-                  id="phone"
-                  name="phone"
-                  type="tel"
-                  placeholder="+1 234 567 890"
-                  className="dark:bg-[#1A1A1A]"
-                  value={parent.phone}
-                  onChange={(e) =>
-                    setParent((prev) => ({
-                      ...prev,
-                      phone: e.target.value,
-                    }))
-                  }
+                <Controller
+                  name="phone_no"
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <Field data-invalid={fieldState.invalid}>
+                      <Label className="text-sm text-[#99A1AF]">
+                        phone <RequiredStar />
+                      </Label>
+                      <Input
+                        {...field}
+                        id={field.name}
+                        aria-invalid={fieldState.invalid}
+                        placeholder="(187)-189-1038"
+                        autoComplete="off"
+                      />
+                      {fieldState.invalid && (
+                        <FieldError errors={[fieldState.error]} />
+                      )}
+                    </Field>
+                  )}
                 />
               </div>
 
-               <div className="grid gap-2">
-                <Label
-                  htmlFor="address"
-                  className="text-xs text-muted-foreground"
-                >
-                  Zip Code
-                </Label>
-                <Input
-                  id="zip_code"
+              <div className="grid gap-2">
+                <Controller
                   name="zip_code"
-                  placeholder="54000"
-                  className="dark:bg-[#1A1A1A]"
-                  value={parent.zip_code}
-                  onChange={(e) =>
-                    setParent((prev) => ({
-                      ...prev,
-                      zip_code: e.target.value,
-                    }))
-                  }
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <Field data-invalid={fieldState.invalid}>
+                      <Label className="text-sm text-[#99A1AF]">
+                        Zip Code <RequiredStar />
+                      </Label>
+                      <Input
+                        {...field}
+                        id={field.name}
+                        aria-invalid={fieldState.invalid}
+                        placeholder="1038"
+                        autoComplete="off"
+                      />
+                      {fieldState.invalid && (
+                        <FieldError errors={[fieldState.error]} />
+                      )}
+                    </Field>
+                  )}
                 />
               </div>
 
               <div className="grid gap-2">
-                <Label
-                  htmlFor="address"
-                  className="text-xs text-muted-foreground"
-                >
-                  Address
-                </Label>
-                <Input
-                  id="address"
-                  name="address"
-                  placeholder="New York, USA"
-                  className="dark:bg-[#1A1A1A]"
-                  value={parent.address}
-                  onChange={(e) =>
-                    setParent((prev) => ({
-                      ...prev,
-                      address: e.target.value,
-                    }))
-                  }
+                <Controller
+                  name="location"
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <Field data-invalid={fieldState.invalid}>
+                      <Label className="text-sm text-[#99A1AF]">Address</Label>
+                      <Textarea
+                        {...field}
+                        id={field.name}
+                        aria-invalid={fieldState.invalid}
+                        autoComplete="off"
+                        className="min-h-[170px]"
+                      />
+                      {fieldState.invalid && (
+                        <FieldError errors={[fieldState.error]} />
+                      )}
+                    </Field>
+                  )}
                 />
               </div>
             </div>
@@ -227,7 +259,9 @@ export function CreateParent({ onRefresh }: { onRefresh: () => Promise<void> }) 
                   Cancel
                 </Button>
               </DialogClose>
-              <Button type="submit" disabled={loading}>{loading && <Spinner />}Add Parent</Button>
+              <Button type="submit" disabled={loading}>
+                {loading && <Spinner className="text-black" />}Add Parent
+              </Button>
             </DialogFooter>
           </form>
         </DialogContent>
