@@ -128,6 +128,47 @@ export async function GET() {
        WHERE status = 'present'`
     );
     const attendanceData = attendanceDataRes.rows;
+
+
+    const paymentQuery = await pool.query(`
+    SELECT
+      p.id,
+      p.amount,
+      p.status,
+      u.id AS user_id,
+      u.first_name AS user_first_name,
+      u.last_name AS user_last_name,
+      pu.id AS parent_id,
+      pu.first_name AS parent_first_name,
+      pu.last_name AS parent_last_name,
+      s.name AS session_name
+    FROM payments p
+      LEFT JOIN users u
+      ON u.id = p.user_id
+    LEFT JOIN players pl
+      ON pl.user_id = u.id
+    LEFT JOIN users pu
+      ON pu.id = pl.parent_id
+    LEFT JOIN sessions s
+      ON s.id = p.session_id
+    WHERE p.status IN ('failed', 'pending')
+    AND NOT EXISTS (
+  SELECT 1
+  FROM payment_alert_actions pa
+  WHERE pa.payment_id = p.id
+    AND DATE(pa.acted_at) = CURRENT_DATE
+)
+    ORDER BY p.created_at DESC;
+    `)
+
+    const enhancedData = paymentQuery.rows.map((item)=>{
+      return (
+        {...item,
+          parent_name : joinNames([item.parent_first_name, item.parent_last_name]),
+          player_name : joinNames([item.user_first_name, item.user_last_name]),
+        }
+      )
+    })
     
     return NextResponse.json({
       totalCheckIns,
@@ -140,6 +181,7 @@ export async function GET() {
       upcomingChangePercentage: Number(upcomingChangePercentage.toFixed(0)),
       attendanceData,
       sessionsData,
+      paymentAlerts : enhancedData
     });
   } catch (error: any) {
     console.error(error);

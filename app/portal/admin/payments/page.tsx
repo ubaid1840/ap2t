@@ -357,7 +357,7 @@ const filteredData = useMemo(() => {
                     <Send size={16} />
                   </Button>
 
-                  <Button className="text-muted-foreground hover:dark:bg-primary hover:dark:text-black" size="icon" variant="ghost">
+                 <Button onClick={() => setVisible({ show: "override", data: row.original })} className="text-muted-foreground hover:dark:bg-primary hover:dark:text-black" size="icon" variant="ghost">
                     <CheckCircle size={16} />
                   </Button>
                 </>}

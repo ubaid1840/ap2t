@@ -72,7 +72,7 @@ export function CompedDialog({ open, onOpenChange, data, onRefresh }: CompedDial
                   <h1 className="text-[#E5E7EB]">{data?.player_name}</h1>
                 </div>
                 <div className="flex justify-between">
-                  <p className="text-ghost-text">Session::</p>
+                  <p className="text-ghost-text">Session:</p>
                   <h1 className="text-[#E5E7EB]">{data?.session_name}</h1>
                 </div>
                 <div className="flex justify-between">
