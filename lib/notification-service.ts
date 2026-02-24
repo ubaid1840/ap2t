@@ -1,8 +1,9 @@
 import nodemailer from 'nodemailer';
 import SMTPConnection from 'nodemailer/lib/smtp-connection';
+import pool from './db';
 
 
-// const twilioClient = require('twilio')(process.env.TWILIO_SID, process.env.TWILIO_TOKEN);
+const twilioClient = require('twilio')(process.env.TWILIO_SID, process.env.TWILIO_TOKEN);
 
 const transporter = nodemailer.createTransport({
   host: process.env.BULK_EMAIL_HOST,
@@ -40,26 +41,26 @@ export const sendSingleEmail = async (message: string, subject: string, email: s
 
 
 
-// export const sendSingleSMS = async (message: string, id: string | number) => {
-//   try {
-//     const usersQuery = await pool.query('SELECT phone FROM users WHERE id = $1 LIMIT 1', [id]);
-//     const user = usersQuery.rows[0];
+export const sendSingleSMS = async (message: string, id: string | number) => {
+  try {
+    const usersQuery = await pool.query('SELECT phone_no FROM users WHERE id = $1 LIMIT 1', [id]);
+    const user = usersQuery.rows[0];
 
-//     if (user?.phone) {
-//       const response = await twilioClient.messages.create({
-//         body: message,
-//         from: process.env.TWILIO_PHONE_NUMBER,
-//         to: user.phone,
-//       })
+    if (user?.phone) {
+      const response = await twilioClient.messages.create({
+        body: message,
+        from: process.env.TWILIO_PHONE_NUMBER,
+        to: user.phone,
+      })
 
 
-//     } else {
-//       console.log(`User with id ${id} not found or missing phone.`);
-//     }
-//   } catch (error) {
-//     console.log('Error in sending sms:', error);
-//   }
-// };
+    } else {
+      console.log(`User with id ${id} not found or missing phone.`);
+    }
+  } catch (error) {
+    console.log('Error in sending sms:', error);
+  }
+};
 
 // export const sendNotification = async (title: string, page: string, sendTo: string) => {
 //   try {

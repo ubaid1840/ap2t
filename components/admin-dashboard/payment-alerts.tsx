@@ -24,7 +24,7 @@ export function PaymentAlerts({data, onClickPaid, onClickOverride} : PaymentAler
       </CardHeader>
 
       <CardContent className="flex flex-1 pr-3">
-        <ScrollArea className="flex flex-1 pr-3 h-100">
+        <ScrollArea className="flex flex-1 pr-3 h-112.5">
           <div className="space-y-4">
             {data.map((alert, index) => (
               <Card

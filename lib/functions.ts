@@ -4,17 +4,18 @@ import { storage } from "./firebase";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import Cryptr from 'cryptr'
+import { sendSingleEmail } from "./notification-service";
 
 const cryptr = new Cryptr(process.env.NEXT_PUBLIC_ENCRYPTION_KEY || "1234");
 
-export const EncryptString = (data : string) => {
-    const encryptedString = cryptr.encrypt(data);
-    return encryptedString
+export const EncryptString = (data: string) => {
+  const encryptedString = cryptr.encrypt(data);
+  return encryptedString
 }
 
-export const DecryptString = (data : string) => {
-    const decryptedString = cryptr.decrypt(data);
-    return decryptedString
+export const DecryptString = (data: string) => {
+  const decryptedString = cryptr.decrypt(data);
+  return decryptedString
 }
 
 export function splitFullName(fullName: string | null) {
@@ -29,10 +30,10 @@ export function splitFullName(fullName: string | null) {
 
 export function joinNames(data: (string | null | undefined)[]): string {
   return data
-    .filter(Boolean)         
-    .map((s) => s!.trim())  
-    .filter(Boolean)        
-    .join(" ");             
+    .filter(Boolean)
+    .map((s) => s!.trim())
+    .filter(Boolean)
+    .join(" ");
 }
 
 export function getYear(val: string | null | Date | undefined) {
@@ -42,22 +43,22 @@ export function getYear(val: string | null | Date | undefined) {
 
 
 
-export async function GetProfileImage(imgLink : string | null) {
-    if (!imgLink) return "";
+export async function GetProfileImage(imgLink: string | null) {
+  if (!imgLink) return "";
 
-    try {
-        const url = await getDownloadURL(ref(storage, imgLink));
-        return url;
-    } catch (error) {
-        console.error("Error fetching profile image:", error);
-        return "";
-    }
+  try {
+    const url = await getDownloadURL(ref(storage, imgLink));
+    return url;
+  } catch (error) {
+    console.error("Error fetching profile image:", error);
+    return "";
+  }
 }
 
 
 export const exportToExcel = async (
-  headers : string[],
- data: (string)[][],
+  headers: string[],
+  data: (string)[][],
   fileName = "data.xlsx",
 ) => {
   if (!data || data.length === 0) {
@@ -66,16 +67,16 @@ export const exportToExcel = async (
 
   const worksheetData = [headers];
 
-  
-   for (const row of data) {
-      worksheetData.push(row);
+
+  for (const row of data) {
+    worksheetData.push(row);
   }
 
 
 
   const worksheet = XLSX.utils.aoa_to_sheet(worksheetData);
 
- 
+
   try {
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
@@ -135,11 +136,13 @@ export const exportDashboardToExcel = async (
 };
 
 
- export function calcualteRevenu(paymentData: any[]) {
-  
-    const totalRevuew = paymentData.filter((item) => item.status === 'paid').reduce(
-      (sum, item) => sum + Number(item.amount || 0),
-      0
-    );
-    return totalRevuew
-  }
+export function calcualteRevenu(paymentData: any[]) {
+
+  const totalRevuew = paymentData.filter((item) => item.status === 'paid').reduce(
+    (sum, item) => sum + Number(item.amount || 0),
+    0
+  );
+  return totalRevuew
+}
+
+

@@ -26,11 +26,11 @@ const chartConfig = {
   },
 } satisfies ChartConfig
 
-export function BarChart({chartData = [], xaxis, yaxis} : {chartData : any[], xaxis : string, yaxis : string}) {
+export function BarChart({chartData = [], xaxis, yaxis, className = ""} : {chartData : any[], xaxis : string, yaxis : string, className ?:string}) {
 
   return (
    
-        <ChartContainer config={chartConfig} className="mt-4">
+        <ChartContainer config={chartConfig} className={`mt-4 ${className}`}>
           <Chart data={chartData} accessibilityLayer>
             <CartesianGrid vertical={false} />
 
