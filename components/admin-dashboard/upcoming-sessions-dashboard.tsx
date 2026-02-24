@@ -33,13 +33,13 @@ export function UpcomingSessions({sessions} : {sessions : SessionRecord[]}) {
       <CardContent className="p-0">
 
         <PageTable
-          headerClassName={"rounded-none"}
+          headerClassName={"rounded-none border-none"}
           columns={DASHBOARD_SESSIONS_COLUMNS}
           data={sessions}
           onRowClick={() => {
 
           }}
-          scrollAreaWidth={`${open ? "w-[calc(100dvw-306px)]" : "w-[calc(100dvw-96px)]"} ${isMobile && "w-[calc(100vw-44px)]"}`}
+          scrollAreaWidth={`${open ? "w-[calc(100dvw-306px)]" : "w-[calc(100dvw-98px)]"} ${isMobile && "w-[calc(100vw-44px)]"}`}
 
         />
         <div className="flex justify-end py-4 px-2 bg-[#1A1A1A]">
