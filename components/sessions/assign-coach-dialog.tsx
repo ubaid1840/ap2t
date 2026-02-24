@@ -112,7 +112,7 @@ export function AssignCoachDialog({ onSelect, already = false }: AssignCoachDial
                         first_name: coach.first_name,
                         last_name: coach.last_name,
                       });
-                      setOpen(false); // close dialog
+                      setOpen(false); 
                     }}
                   >
                     <div className="flex items-center gap-3">

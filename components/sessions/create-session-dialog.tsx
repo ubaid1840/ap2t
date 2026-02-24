@@ -40,6 +40,10 @@ import { Textarea } from "../ui/textarea";
 import { AssignCoachDialog } from "./assign-coach-dialog";
 import { Checkbox } from "../ui/checkbox";
 import z from "zod";
+import { Controller, useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Field, FieldError } from "../ui/field";
+import { RequiredStar } from "../required-star";
 
 export type SessionType = {
   name: string;
@@ -64,16 +68,52 @@ export type SessionType = {
   show_storefront: boolean | "indeterminate";
 };
 
-const parentSchema = z.object({
-  first_name: z.string().min(2, "First name is required"),
-  last_name: z.string().min(2, "Last name is required"),
+export const sessionSchema = z.object({
+  name: z.string().min(2, "Session name is required"),
 
-  phone_no: z.string().min(6, "Phone is required"),
+  description: z.string().min(2, "Description is required"),
 
-  zip_code: z.string().min(3, "Zip code required"),
+  type: z.enum(["camp", "comped"], {
+    message: "Type is required",
+  }),
 
-  location: z.string().min(2, "Location required"),
+  age_limit: z.string().min(1, "Age limit is required"),
+
+  session_type: z.string().min(1, "Session type is required"),
+
+  coach_id: z.number().nullable(),
+
+  location: z.string().min(2, "Location is required"),
+
+  date: z.date({
+    required_error: "Start date is required",
+  }),
+
+  end_date: z.date({
+    required_error: "End date is required",
+  }),
+
+  start_time: z.string().min(1, "Start time required"),
+
+  end_time: z.string().min(1, "End time required"),
+
+  price: z.coerce.number().min(0, "Price required"),
+
+  max_players: z.coerce.number().min(1, "Max players required"),
+
+  apply_promotion: z.boolean().default(false),
+
+  image: z.string().optional(),
+
+  promotion_start: z.date().optional(),
+
+  promotion_end: z.date().optional(),
+
+  promotion_price: z.coerce.number().optional(),
+
+  show_storefront: z.boolean().default(false),
 });
+type SessionSchemaValues = z.infer<typeof sessionSchema>;
 
 export function CreateSessionDialog({
   onRefresh,
@@ -88,82 +128,62 @@ export function CreateSessionDialog({
 }) {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [session, setSession] = useState<SessionType>({
-    name: "",
-    description: "",
-    type: "",
-    age_limit: "",
-    session_type: "",
-    coach_id: null,
-    location: "",
-    date: undefined,
-    start_time: "",
-    end_time: "",
-    price: 0,
-    max_players: 0,
-    apply_promotion: promotion,
-    promotion_price: 0,
-    image: "",
-    end_date: undefined,
-    promotion_start: undefined,
-    promotion_end: undefined,
-    show_storefront: false,
-  });
 
-  useEffect(() => {
-    if (coach_id) {
-      setSession((prevState) => ({
-        ...prevState,
-        coach_id: Number(coach_id),
-        coach_name: coach_name || "",
-      }));
-    }
-  }, [coach_id]);
+  const [coach_Name, setCoach_name] = useState<string | null>(null);
 
-  const createSession = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setLoading(true);
-    const { coach_name, ...finalData } = session;
-    try {
-      await axios.post("/admin/sessions", {
-        ...finalData,
-        max_players: finalData.max_players ? finalData.max_players : 0,
-        price: finalData.price ? finalData.price : 0,
-        promotion_price: finalData?.promotion_price
-          ? finalData?.promotion_price
-          : 0,
-      });
-      await onRefresh();
-      handleClear();
-      setOpen(false);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  function handleClear() {
-    setSession({
+  const form = useForm<SessionSchemaValues>({
+    resolver: zodResolver(sessionSchema),
+    defaultValues: {
       name: "",
       description: "",
-      type: "",
+      type: undefined,
       age_limit: "",
       session_type: "",
-      coach_id: null,
+      coach_id: coach_id ? Number(coach_id) : null,
       location: "",
-      date: undefined,
       start_time: "",
       end_time: "",
       price: 0,
       max_players: 0,
       apply_promotion: promotion,
+      show_storefront: false,
+      date: undefined,
+      end_date: undefined,
       promotion_price: 0,
       image: "",
-      end_date: undefined,
       promotion_start: undefined,
       promotion_end: undefined,
-      show_storefront: false,
-    });
-  }
+    },
+  });
+
+  useEffect(() => {
+    if (coach_id) {
+      form.setValue("coach_id", Number(coach_id));
+    }
+
+    if (coach_name) {
+      setCoach_name(coach_name);
+    }
+  }, [coach_id, coach_name, form]);
+
+  const applyPromotion = form.watch("apply_promotion");
+  const image = form.watch("image");
+  const selectedCoachId = form.watch("coach_id");
+
+  const CreateSession = async (values: SessionSchemaValues) => {
+    setLoading(true);
+    try {
+      await axios.post("/admin/sessions", {
+        ...values,
+      });
+
+      await onRefresh();
+      form.reset();
+      setOpen(false);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <>
@@ -174,7 +194,6 @@ export function CreateSessionDialog({
         open={open}
         onOpenChange={(val) => {
           setOpen(val);
-          handleClear();
         }}
       >
         <DialogContent className="bg-[#252525] border border-[#3A3A3A] sm:max-w-4xl p-0">
@@ -188,7 +207,7 @@ export function CreateSessionDialog({
                 : "Fill in the details to create a new training session"}
             </p>
           </DialogHeader>
-          <form onSubmit={createSession}>
+          <form onSubmit={form.handleSubmit(CreateSession)}>
             <ScrollArea className=" py-1 space-y-4 px-2 h-[70vh]">
               <div className="space-y-2 px-2 pb-2">
                 <div className="flex gap-2 text-md ">
@@ -196,96 +215,127 @@ export function CreateSessionDialog({
                   <h1 className="text-[#F3F4F6]">Basic Information</h1>
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-sm text-muted-foreground">
-                    Session Name *
-                  </Label>
-                  <Input
-                    name="sessionName"
-                    placeholder="e.g., Advanced Skills Training"
-                    required
-                    value={session.name}
-                    onChange={(e) =>
-                      setSession((prev) => ({
-                        ...prev,
-                        name: e.target.value,
-                      }))
-                    }
+                  <Controller
+                    name="name"
+                    control={form.control}
+                    render={({ field, fieldState }) => (
+                      <Field data-invalid={fieldState.invalid}>
+                        <Label className="text-sm text-[#99A1AF]">
+                          Session Name <RequiredStar />
+                        </Label>
+                        <Input
+                          {...field}
+                          id={field.name}
+                          aria-invalid={fieldState.invalid}
+                          placeholder="Advance Skill Training"
+                          autoComplete="off"
+                        />
+                        {fieldState.invalid && (
+                          <FieldError errors={[fieldState.error]} />
+                        )}
+                      </Field>
+                    )}
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label className="text-sm text-muted-foreground">
-                    Description *
-                  </Label>
-                  <Textarea
+                  <Controller
                     name="description"
-                    placeholder="Add any additional details about this session..."
-                    className="min-h-26"
-                    value={session.description}
-                    onChange={(e) =>
-                      setSession((prev) => ({
-                        ...prev,
-                        description: e.target.value,
-                      }))
-                    }
+                    control={form.control}
+                    render={({ field, fieldState }) => (
+                      <Field data-invalid={fieldState.invalid}>
+                        <Label className="text-sm text-[#99A1AF]">
+                          Description <RequiredStar />
+                        </Label>
+                        <Input
+                          {...field}
+                          id={field.name}
+                          aria-invalid={fieldState.invalid}
+                          placeholder=""
+                          autoComplete="off"
+                        />
+                        {fieldState.invalid && (
+                          <FieldError errors={[fieldState.error]} />
+                        )}
+                      </Field>
+                    )}
                   />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label className="text-sm text-muted-foreground">
-                      Type
-                    </Label>
-                    <Select
-                      value={session.type}
-                      required
-                      onValueChange={(e) => {
-                        setSession((prevState) => ({ ...prevState, type: e }));
-                      }}
-                    >
-                      <SelectTrigger className="w-full dark:bg-[#1A1A1A]">
-                        <SelectValue placeholder="Select method" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value={"camp"}>Camp</SelectItem>
-                        <SelectItem value={"comped"}>Clinic</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <Controller
+                      name="type"
+                      control={form.control}
+                      render={({ field, fieldState }) => (
+                        <Field data-invalid={fieldState.invalid}>
+                          <Label className="text-sm text-[#99A1AF]">
+                            Type <RequiredStar />
+                          </Label>
+                          <Select
+                            value={field.value}
+                            onValueChange={field.onChange}
+                          >
+                            <SelectTrigger className="w-full dark:bg-[#1A1A1A]">
+                              <SelectValue placeholder="Select method" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value={"camp"}>Camp</SelectItem>
+                              <SelectItem value={"comped"}>Clinic</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          {fieldState.invalid && (
+                            <FieldError errors={[fieldState.error]} />
+                          )}
+                        </Field>
+                      )}
+                    />
                   </div>
 
                   <div className="space-y-2">
-                    <Label className="text-sm text-muted-foreground">
-                      Age Limit *
-                    </Label>
-                    <Input
+                    <Controller
                       name="age_limit"
-                      placeholder="e.g., 12+ or 10-18"
-                      required
-                      value={session.age_limit}
-                      onChange={(e) =>
-                        setSession((prev) => ({
-                          ...prev,
-                          age_limit: e.target.value,
-                        }))
-                      }
+                      control={form.control}
+                      render={({ field, fieldState }) => (
+                        <Field data-invalid={fieldState.invalid}>
+                          <Label className="text-sm text-[#99A1AF]">
+                            Age Limit <RequiredStar />
+                          </Label>
+                          <Input
+                            {...field}
+                            id={field.name}
+                            aria-invalid={fieldState.invalid}
+                            placeholder="18-24"
+                            autoComplete="off"
+                          />
+                          {fieldState.invalid && (
+                            <FieldError errors={[fieldState.error]} />
+                          )}
+                        </Field>
+                      )}
                     />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   <div className="space-y-2">
-                    <Label className="text-sm text-muted-foreground">
-                      Session Type *
-                    </Label>
-                    <SelectSessionType
-                      required={true}
-                      placeholder="Select session type"
-                      value={session.session_type}
-                      onChange={(e) =>
-                        setSession((prev) => ({
-                          ...prev,
-                          session_type: e,
-                        }))
-                      }
+                    <Controller
+                      name="session_type"
+                      control={form.control}
+                      render={({ field, fieldState }) => (
+                        <Field data-invalid={fieldState.invalid}>
+                          <Label className="text-sm text-[#99A1AF]">
+                            Session Type <RequiredStar />
+                          </Label>
+                          <SelectSessionType
+                            placeholder="Select session type"
+                            value={field.value}
+                            onChange={field.onChange}
+                          />
+                          {fieldState.invalid && (
+                            <FieldError errors={[fieldState.error]} />
+                          )}
+                        </Field>
+                      )}
                     />
                   </div>
                   <div className="space-y-2">
@@ -293,21 +343,23 @@ export function CreateSessionDialog({
                       Assigned Coach *
                     </Label>
 
-                    <div className="flex gap-4">
-                      {session.coach_id && (
+                    <div className="flex gap-4 items-center">
+                      {selectedCoachId && coach_Name && (
                         <p className="mt-1 text-sm text-ghost-text">
-                          Selected Coach: {session.coach_name}
+                          Selected Coach: {coach_Name}
                         </p>
                       )}
-                      {!coach_id && (
+
+                      {!selectedCoachId && (
                         <AssignCoachDialog
-                          onSelect={(coach) =>
-                            setSession((prev) => ({
-                              ...prev,
-                              coach_id: coach.id,
-                              coach_name: `${coach.first_name} ${coach.last_name}`,
-                            }))
-                          }
+                          onSelect={(coach) => {
+                            form.setValue("coach_id", coach.id, {
+                              shouldValidate: true,
+                            });
+                            setCoach_name(
+                              `${coach.first_name} ${coach.last_name}`,
+                            );
+                          }}
                         />
                       )}
                     </div>
@@ -321,73 +373,96 @@ export function CreateSessionDialog({
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   <div className="space-y-2">
-                    <Label className="text-sm text-muted-foreground">
-                      Start Date *
-                    </Label>
-                    <AppCalendar
-                      className="h-9"
-                      date={session.date ? new Date(session.date) : undefined}
-                      onChange={(date) =>
-                        setSession((prevState) => ({
-                          ...prevState,
-                          date: date,
-                        }))
-                      }
-                      required
+                    <Controller
+                      name="date"
+                      control={form.control}
+                      render={({ field, fieldState }) => (
+                        <Field data-invalid={fieldState.invalid}>
+                          <Label className="text-sm text-[#99A1AF]">
+                            Start Date <RequiredStar />
+                          </Label>
+                          <AppCalendar
+                            className="h-9"
+                            date={
+                              field.value ? new Date(field.value) : undefined
+                            }
+                            onChange={field.onChange}
+                            required
+                          />
+                          {fieldState.invalid && (
+                            <FieldError errors={[fieldState.error]} />
+                          )}
+                        </Field>
+                      )}
                     />
                   </div>
 
                   <div className="space-y-2">
-                    <Label className="text-sm text-muted-foreground">
-                      End Date *
-                    </Label>
-                    <AppCalendar
-                      className="h-9"
-                      date={
-                        session.end_date
-                          ? new Date(session.end_date)
-                          : undefined
-                      }
-                      onChange={(date) =>
-                        setSession((prevState) => ({
-                          ...prevState,
-                          end_date: date,
-                        }))
-                      }
-                      required
+                    <Controller
+                      name="end_date"
+                      control={form.control}
+                      render={({ field, fieldState }) => (
+                        <Field data-invalid={fieldState.invalid}>
+                          <Label className="text-sm text-[#99A1AF]">
+                            End Date <RequiredStar />
+                          </Label>
+                          <AppCalendar
+                            className="h-9"
+                            date={
+                              field.value ? new Date(field.value) : undefined
+                            }
+                            onChange={field.onChange}
+                            required
+                          />
+                          {fieldState.invalid && (
+                            <FieldError errors={[fieldState.error]} />
+                          )}
+                        </Field>
+                      )}
                     />
                   </div>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   <div className="space-y-2">
-                    <Label className="text-sm text-muted-foreground">
-                      Start Time *
-                    </Label>
-                    <TimePickerFixed
-                      className="h-9"
-                      value={session.start_time}
-                      onChange={(time) =>
-                        setSession((prev) => ({
-                          ...prev,
-                          start_time: time,
-                        }))
-                      }
+                    <Controller
+                      name="start_time"
+                      control={form.control}
+                      render={({ field, fieldState }) => (
+                        <Field data-invalid={fieldState.invalid}>
+                          <Label className="text-sm text-[#99A1AF]">
+                            Start Time <RequiredStar />
+                          </Label>
+                          <TimePickerFixed
+                            className="h-9"
+                            value={field.value}
+                            onChange={field.onChange}
+                          />
+                          {fieldState.invalid && (
+                            <FieldError errors={[fieldState.error]} />
+                          )}
+                        </Field>
+                      )}
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-sm text-muted-foreground">
-                      End Time *
-                    </Label>
-
-                    <TimePickerFixed
-                      className="h-9"
-                      value={session.end_time}
-                      onChange={(time) =>
-                        setSession((prev) => ({
-                          ...prev,
-                          end_time: time,
-                        }))
-                      }
+                    <Controller
+                      name="end_time"
+                      control={form.control}
+                      render={({ field, fieldState }) => (
+                        <Field data-invalid={fieldState.invalid}>
+                          <Label className="text-sm text-[#99A1AF]">
+                            End Time <RequiredStar />
+                          </Label>
+                          <TimePickerFixed
+                            className="h-9"
+                            value={field.value}
+                            onChange={field.onChange}
+                          />
+                          {fieldState.invalid && (
+                            <FieldError errors={[fieldState.error]} />
+                          )}
+                        </Field>
+                      )}
                     />
                   </div>
                 </div>
@@ -399,45 +474,49 @@ export function CreateSessionDialog({
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   <div className="space-y-2">
-                    <Label className="text-sm text-muted-foreground">
-                      Location *
-                    </Label>
-                    <Input
+                    <Controller
                       name="location"
-                      required
-                      value={session.location}
-                      onChange={(e) =>
-                        setSession((prev) => ({
-                          ...prev,
-                          location: e.target.value,
-                        }))
-                      }
+                      control={form.control}
+                      render={({ field, fieldState }) => (
+                        <Field data-invalid={fieldState.invalid}>
+                          <Label className="text-sm text-[#99A1AF]">
+                            Location <RequiredStar />
+                          </Label>
+                          <Input
+                            {...field}
+                            id={field.name}
+                            aria-invalid={fieldState.invalid}
+                            placeholder=""
+                            autoComplete="off"
+                          />
+                          {fieldState.invalid && (
+                            <FieldError errors={[fieldState.error]} />
+                          )}
+                        </Field>
+                      )}
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-sm text-muted-foreground">
-                      Price (USD) *
-                    </Label>
-                    <Input
+                    <Controller
                       name="price"
-                      placeholder="$0.00"
-                      required
-                      value={session.price}
-                      onChange={(e) => {
-                        if (!e.target.value) {
-                          setSession((prev) => ({
-                            ...prev,
-                            price: e.target.value,
-                          }));
-                        } else {
-                          if (!Number.isNaN(Number(e.target.value))) {
-                            setSession((prev) => ({
-                              ...prev,
-                              price: Number(e.target.value),
-                            }));
-                          }
-                        }
-                      }}
+                      control={form.control}
+                      render={({ field, fieldState }) => (
+                        <Field data-invalid={fieldState.invalid}>
+                          <Label className="text-sm text-[#99A1AF]">
+                            Price <RequiredStar />
+                          </Label>
+                          <Input
+                            {...field}
+                            id={field.name}
+                            aria-invalid={fieldState.invalid}
+                            placeholder=""
+                            autoComplete="off"
+                          />
+                          {fieldState.invalid && (
+                            <FieldError errors={[fieldState.error]} />
+                          )}
+                        </Field>
+                      )}
                     />
                   </div>
                 </div>
@@ -449,93 +528,102 @@ export function CreateSessionDialog({
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   <div className="space-y-2">
-                    <Label className="text-sm text-muted-foreground">
-                      Max Players *
-                    </Label>
-                    <Input
-                      name="maxPlayer"
-                      placeholder="e.g. 12"
-                      required
-                      value={session.max_players}
-                      onChange={(e) => {
-                        if (!e.target.value) {
-                          setSession((prev) => ({
-                            ...prev,
-                            max_players: e.target.value,
-                          }));
-                        } else {
-                          if (!Number.isNaN(Number(e.target.value))) {
-                            setSession((prev) => ({
-                              ...prev,
-                              max_players: Number(e.target.value),
-                            }));
-                          }
-                        }
-                      }}
+                    <Controller
+                      name="max_players"
+                      control={form.control}
+                      render={({ field, fieldState }) => (
+                        <Field data-invalid={fieldState.invalid}>
+                          <Label className="text-sm text-[#99A1AF]">
+                            Max Players <RequiredStar />
+                          </Label>
+                          <Input
+                            {...field}
+                            id={field.name}
+                            aria-invalid={fieldState.invalid}
+                            placeholder=""
+                            autoComplete="off"
+                          />
+                          {fieldState.invalid && (
+                            <FieldError errors={[fieldState.error]} />
+                          )}
+                        </Field>
+                      )}
                     />
                   </div>
                   {!promotion && (
                     <div className="space-y-2">
-                      <Label className="text-sm text-muted-foreground">
-                        Apply Promotion (Optional)
-                      </Label>
+                      <Controller
+                        name="apply_promotion"
+                        control={form.control}
+                        render={({ field, fieldState }) => (
+                          <Field data-invalid={fieldState.invalid}>
+                            <Label className="text-sm text-[#99A1AF]">
+                              Apply Promotion (Optional)
+                            </Label>
+                            <Select
+                              value={String(field.value)}
+                              onValueChange={(val) =>
+                                field.onChange(val === "true")
+                              }
+                            >
+                              <SelectTrigger className="w-full dark:bg-[#1A1A1A] rounded-sm">
+                                <SelectValue placeholder="Select" />
+                              </SelectTrigger>
 
-                      <Select
-                        value={String(session.apply_promotion)}
-                        onValueChange={(value) =>
-                          setSession((prev) => ({
-                            ...prev,
-                            apply_promotion: value === "true",
-                          }))
-                        }
-                      >
-                        <SelectTrigger className="w-full dark:bg-[#1A1A1A] rounded-sm">
-                          <SelectValue placeholder="Select" />
-                        </SelectTrigger>
-
-                        <SelectContent className="!bg-[#1A1A1A]">
-                          <SelectGroup>
-                            <SelectLabel>Select</SelectLabel>
-                            <SelectItem value="true">Yes</SelectItem>
-                            <SelectItem value="false">No</SelectItem>
-                          </SelectGroup>
-                        </SelectContent>
-                      </Select>
+                              <SelectContent className="!bg-[#1A1A1A]">
+                                <SelectGroup>
+                                  <SelectLabel>Select</SelectLabel>
+                                  <SelectItem value="true">Yes</SelectItem>
+                                  <SelectItem value="false">No</SelectItem>
+                                </SelectGroup>
+                              </SelectContent>
+                            </Select>
+                            {fieldState.invalid && (
+                              <FieldError errors={[fieldState.error]} />
+                            )}
+                          </Field>
+                        )}
+                      />
                     </div>
                   )}
                 </div>
 
-                {session?.apply_promotion && (
+                {applyPromotion && (
                   <>
                     <div className="flex gap-2 text-md items-center">
                       <Image className="text-primary" size={16} />
                       <h1 className="text-[#F3F4F6]">Promotional Flyer</h1>
                     </div>
                     <div className="space-y-2">
-                      <Label className="text-sm text-muted-foreground">
-                        Image URL *
-                      </Label>
-                      <Input
-                        name="imageUrl"
-                        placeholder="https://example.com/image.jpg"
-                        required
-                        value={session?.image}
-                        onChange={(e) => {
-                          setSession((prev) => ({
-                            ...prev,
-                            image: e.target.value,
-                          }));
-                        }}
+                      <Controller
+                        name="image"
+                        control={form.control}
+                        render={({ field, fieldState }) => (
+                          <Field data-invalid={fieldState.invalid}>
+                            <Label className="text-sm text-[#99A1AF]">
+                              Image Url <RequiredStar />
+                            </Label>
+                            <Input
+                              {...field}
+                              id={field.name}
+                              aria-invalid={fieldState.invalid}
+                              placeholder=""
+                              autoComplete="off"
+                            />
+                            {fieldState.invalid && (
+                              <FieldError errors={[fieldState.error]} />
+                            )}
+                          </Field>
+                        )}
                       />
                     </div>
 
-                    {/* preview */}
                     <div className="bg-[#1A1A1A] border border-border rounded-[10px] p-4 space-y-2">
                       <h1 className="text-[#99A1AF]">Preview:</h1>
 
-                      {session.image ? (
+                      {image ? (
                         <img
-                          src={session.image}
+                          src={image}
                           className="w-full h-50 object-contain"
                         />
                       ) : (
@@ -550,43 +638,55 @@ export function CreateSessionDialog({
 
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-2">
-                        <Label className="text-sm text-muted-foreground">
-                          Start Date *
-                        </Label>
-                        <AppCalendar
-                          className="h-9"
-                          date={
-                            session.promotion_start
-                              ? new Date(session.promotion_start)
-                              : undefined
-                          }
-                          onChange={(date) =>
-                            setSession((prevState) => ({
-                              ...prevState,
-                              promotion_start: date,
-                            }))
-                          }
-                          required
+                        <Controller
+                          name="promotion_start"
+                          control={form.control}
+                          render={({ field, fieldState }) => (
+                            <Field data-invalid={fieldState.invalid}>
+                              <Label className="text-sm text-[#99A1AF]">
+                                Start Date <RequiredStar />
+                              </Label>
+                              <AppCalendar
+                                className="h-9"
+                                date={
+                                  field.value
+                                    ? new Date(field.value)
+                                    : undefined
+                                }
+                                onChange={field.onChange}
+                                required
+                              />
+                              {fieldState.invalid && (
+                                <FieldError errors={[fieldState.error]} />
+                              )}
+                            </Field>
+                          )}
                         />
                       </div>
                       <div className="space-y-2">
-                        <Label className="text-sm text-muted-foreground">
-                          End Date *
-                        </Label>
-                        <AppCalendar
-                          className="h-9"
-                          date={
-                            session.promotion_end
-                              ? new Date(session.promotion_end)
-                              : undefined
-                          }
-                          onChange={(date) =>
-                            setSession((prevState) => ({
-                              ...prevState,
-                              promotion_end: date,
-                            }))
-                          }
-                          required
+                        <Controller
+                          name="promotion_end"
+                          control={form.control}
+                          render={({ field, fieldState }) => (
+                            <Field data-invalid={fieldState.invalid}>
+                              <Label className="text-sm text-[#99A1AF]">
+                                End Date <RequiredStar />
+                              </Label>
+                              <AppCalendar
+                                className="h-9"
+                                date={
+                                  field.value
+                                    ? new Date(field.value)
+                                    : undefined
+                                }
+                                onChange={field.onChange}
+                                required
+                              />
+                              {fieldState.invalid && (
+                                <FieldError errors={[fieldState.error]} />
+                              )}
+                            </Field>
+                          )}
                         />
                       </div>
                     </div>
@@ -598,29 +698,26 @@ export function CreateSessionDialog({
 
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-2">
-                        <Label className="text-sm text-muted-foreground">
-                          Promotion Price *
-                        </Label>
-                        <Input
-                          name="promotionPrice"
-                          placeholder="$200"
-                          required
-                          value={session?.promotion_price}
-                          onChange={(e) => {
-                            if (!e.target.value) {
-                              setSession((prev) => ({
-                                ...prev,
-                                promotion_price: e.target.value,
-                              }));
-                            } else {
-                              if (!Number.isNaN(Number(e.target.value))) {
-                                setSession((prev) => ({
-                                  ...prev,
-                                  promotion_price: Number(e.target.value),
-                                }));
-                              }
-                            }
-                          }}
+                        <Controller
+                          name="promotion_price"
+                          control={form.control}
+                          render={({ field, fieldState }) => (
+                            <Field data-invalid={fieldState.invalid}>
+                              <Label className="text-sm text-[#99A1AF]">
+                                Promotion Price <RequiredStar />
+                              </Label>
+                              <Input
+                                {...field}
+                                id={field.name}
+                                aria-invalid={fieldState.invalid}
+                                placeholder=""
+                                autoComplete="off"
+                              />
+                              {fieldState.invalid && (
+                                <FieldError errors={[fieldState.error]} />
+                              )}
+                            </Field>
+                          )}
                         />
                       </div>
                     </div>
@@ -629,25 +726,37 @@ export function CreateSessionDialog({
                       <h1 className="text-[#F3F4F6]">Storefront Display</h1>
                     </div>
 
-                    <div className="flex items-center gap-4 px-8 bg-[#1A1A1A] border border-[#3A3A3A] rounded-[10px] p-2">
-                      <Checkbox
-                        name="displayOnWebsite"
-                        checked={session.show_storefront}
-                        onCheckedChange={(val) => {
-                          setSession((prev) => ({
-                            ...prev,
-                            show_storefront: val,
-                          }));
-                        }}
+                    <div className="flex items-start gap-3 px-4 py-3 bg-[#1A1A1A] border border-[#3A3A3A] rounded-[10px] w-full">
+                      <Controller
+                        name="show_storefront"
+                        control={form.control}
+                        render={({ field, fieldState }) => (
+                          <>
+                            <div className="pt-1 flex-none">
+                              <Checkbox
+                                checked={field.value}
+                                onCheckedChange={field.onChange}
+                                className="h-4 w-4"
+                              />
+                            </div>
+
+                            <div className="flex-1">
+                              <label className="text-sm font-medium text-[#D1D5DC]">
+                                Show on Online Storefront
+                              </label>
+
+                              <p className="text-sm text-[#6A7282]">
+                                Display promotional card with image, title,
+                                price
+                              </p>
+
+                              {fieldState.invalid && (
+                                <FieldError errors={[fieldState.error]} />
+                              )}
+                            </div>
+                          </>
+                        )}
                       />
-                      <div className="space-y-0">
-                        <h1 className="text-[#D1D5DC]">
-                          Show on Online Storefront
-                        </h1>
-                        <p className="text-sm text-[#6A7282]">
-                          Display promotional card with image, title, price
-                        </p>
-                      </div>
                     </div>
                   </>
                 )}
