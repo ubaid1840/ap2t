@@ -1,12 +1,11 @@
-
 import AppCalendar from "@/components/app-calendar";
 import { Button } from "@/components/ui/button";
 import {
-    Dialog,
-    DialogClose,
-    DialogContent,
-    DialogHeader,
-    DialogTitle
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -15,124 +14,151 @@ import { Separator } from "@/components/ui/separator";
 import { Spinner } from "@/components/ui/spinner";
 import { Textarea } from "@/components/ui/textarea";
 import axios from "@/lib/axios";
-import {
-    Edit
-} from "lucide-react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Edit } from "lucide-react";
 import { useEffect, useState } from "react";
-const EditCoachProfile = ({ id, data, onRefresh }: { id: string | undefined, data: any, onRefresh: () => Promise<void> }) => {
-  const [open, setOpen] = useState(false);
-  const [loading, setLoading] = useState(false)
-  const [specialityInput, setSpecialityInput] = useState("")
-  const [certificationInput, setCertificationInput] = useState("")
+import { Controller, useForm } from "react-hook-form";
+import { z } from "zod";
+import { RequiredStar } from "../required-star";
+import { Field, FieldDescription, FieldError, FieldLabel } from "../ui/field";
 
-  const [coach, setCoach] = useState({
-    first_name: "",
-    last_name: "",
-    phone: "",
-    career_start: "",
-    bio: "",
-    zip_code : "",
-    specialities: [],
-    certifications: []
+const coachSchema = z.object({
+  first_name: z.string().min(2, "First name is required"),
+  last_name: z.string().min(2, "Last name is required"),
+
+  phone_no: z.string().min(6, "Phone is required"),
+
+  zip_code: z.string().min(3, "Zip code required"),
+
+  career_start: z.date({
+    required_error: "Career Start Date is required",
+  }),
+
+  bio: z.string().min(2, "Biography required"),
+  specialities: z.array(z.string()).default([]),
+  certifications: z.array(z.string()).default([]),
+});
+type coachSchemaValues = z.infer<typeof coachSchema>;
+
+const EditCoachProfile = ({
+  id,
+  data,
+  onRefresh,
+}: {
+  id: string | undefined;
+  data: any;
+  onRefresh: () => Promise<void>;
+}) => {
+  const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [specialityInput, setSpecialityInput] = useState("");
+  const [certificationInput, setCertificationInput] = useState("");
+
+  const form = useForm<coachSchemaValues>({
+    resolver: zodResolver(coachSchema),
+    defaultValues: {
+      specialities: [],
+      certifications: [],
+      bio: "",
+      career_start: undefined,
+      first_name: "",
+      last_name: "",
+      phone_no: "",
+      zip_code: "",
+    },
   });
+
+  const specialities = form.watch("specialities");
+  const certifications = form.watch("certifications");
 
   useEffect(() => {
     if (data) {
-      setCoach({
+      form.reset({
         first_name: data?.first_name,
         last_name: data?.last_name,
-        phone: data?.phone_no,
-        career_start: data?.profile?.career_start,
+        phone_no: data?.phone_no,
+        career_start: new Date(data?.profile?.career_start),
         bio: data?.profile?.bio,
         specialities: data?.profile?.specialities || [],
         certifications: data?.profile?.certifications || [],
-        zip_code : data?.zip_code || ""
-      })
+        zip_code: data?.zip_code || "",
+      });
     }
-  }, [data])
+  }, [data]);
 
-  const changeCoach = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true)
+  const changeCoach = async (values: coachSchemaValues) => {
+    console.log(values);
+    return;
+    setLoading(true);
     try {
       await axios.put(`/user`, {
         id: id,
-        first_name: coach?.first_name,
-        last_name: coach?.last_name,
-        phone_no: coach?.phone,
-        zip_code : coach?.zip_code
-      })
+        first_name: values?.first_name,
+        last_name: values?.last_name,
+        phone_no: values?.phone_no,
+        zip_code: values?.zip_code,
+      });
       await axios.put(`/admin/coaches/${id}`, {
         id: id,
-        career_start: coach?.career_start,
-        bio: coach?.bio,
-        specialities: coach?.specialities,
-        certifications: coach?.certifications
-      })
+        career_start: values?.career_start,
+        bio: values?.bio,
+        specialities: values?.specialities,
+        certifications: values?.certifications,
+      });
 
-      await onRefresh()
-      setOpen(false)
+      await onRefresh();
+      setOpen(false);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
   };
-
 
   const handleAddSpeciality = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
+    if (e.key !== "Enter") return;
+    e.preventDefault();
 
-      const trimmed = specialityInput.trim();
-      if (!trimmed) return;
+    const trimmed = specialityInput.trim();
+    if (!trimmed) return;
 
-      setCoach((prev: any) => {
-        if (prev.specialities.includes(trimmed)) return prev;
-
-        return {
-          ...prev,
-          specialities: [...prev.specialities, trimmed]
-        };
+    if (!specialities.includes(trimmed)) {
+      form.setValue("specialities", [...specialities, trimmed], {
+        shouldValidate: true,
       });
-
-      setSpecialityInput("");
     }
-  };
 
+    setSpecialityInput("");
+  };
 
   const handleRemoveSpeciality = (tag: string) => {
-    setCoach(prev => ({
-      ...prev,
-      specialities: prev.specialities.filter(t => t !== tag)
-    }));
+    form.setValue(
+      "specialities",
+      specialities.filter((t) => t !== tag),
+      { shouldValidate: true },
+    );
   };
-
 
   const handleAddCertification = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
+    if (e.key !== "Enter") return;
+    e.preventDefault();
 
-      const trimmed = certificationInput.trim();
-      if (!trimmed) return;
+    const trimmed = certificationInput.trim();
+    if (!trimmed) return;
 
-      setCoach((prev: any) => {
-        if (prev.certifications.includes(trimmed)) return prev;
-
-        return {
-          ...prev,
-          certifications: [...prev.certifications, trimmed]
-        };
+    if (!certifications.includes(trimmed)) {
+      form.setValue("certifications", [...certifications, trimmed], {
+        shouldValidate: true,
       });
-
-      setCertificationInput("");
     }
+
+    setCertificationInput("");
   };
 
-
   const handleRemoveCertification = (tag: string) => {
-    setCoach(prev => ({
-      ...prev,
-      certifications: prev.certifications.filter(t => t !== tag)
-    }));
+    form.setValue(
+      "certifications",
+      certifications.filter((t) => t !== tag),
+      { shouldValidate: true },
+    );
   };
 
   return (
@@ -148,129 +174,181 @@ const EditCoachProfile = ({ id, data, onRefresh }: { id: string | undefined, dat
               Edit Coach Profile
             </DialogTitle>
           </DialogHeader>
-          <form onSubmit={changeCoach} className="">
+          <form onSubmit={form.handleSubmit(changeCoach)} className="">
             <ScrollArea className="h-[60vh] py-1 space-y-4 px-2 ">
               <div className="space-y-2 px-2 pb-2">
                 <div className="grid grid-cols-2 gap-2">
                   <div className="space-y-2">
-                    <Label className="text-sm text-[#99A1AF]">
-                      First Name
-                    </Label>
-                    <Input
-                      name="fullName"
-                      placeholder="Coach Martinez"
-
-                      required
-                      value={coach.first_name}
-                      onChange={(e) =>
-                        setCoach((prev) => ({
-                          ...prev,
-                          first_name: e.target.value,
-                        }))
-                      }
+                    <Controller
+                      name="first_name"
+                      control={form.control}
+                      render={({ field, fieldState }) => (
+                        <Field data-invalid={fieldState.invalid}>
+                          <Label className="text-sm text-[#99A1AF]">
+                            First Name <RequiredStar />
+                          </Label>
+                          <Input
+                            {...field}
+                            id={field.name}
+                            aria-invalid={fieldState.invalid}
+                            placeholder="Coach"
+                            autoComplete="off"
+                          />
+                          {fieldState.invalid && (
+                            <FieldError errors={[fieldState.error]} />
+                          )}
+                        </Field>
+                      )}
                     />
                   </div>
 
                   <div className="space-y-2">
-                    <Label className="text-sm text-[#99A1AF]">
-                      Last Name
-                    </Label>
-                    <Input
-                      name="lastName"
-                      placeholder="Coach Martinez"
-
-                      required
-                      value={coach.last_name}
-                      onChange={(e) =>
-                        setCoach((prev) => ({
-                          ...prev,
-                          last_name: e.target.value,
-                        }))
-                      }
+                    
+                    <Controller
+                      name="last_name"
+                      control={form.control}
+                      render={({ field, fieldState }) => (
+                        <Field data-invalid={fieldState.invalid}>
+                          <Label className="text-sm text-[#99A1AF]">
+                            Last Name <RequiredStar />
+                          </Label>
+                          <Input
+                            {...field}
+                            id={field.name}
+                            aria-invalid={fieldState.invalid}
+                            placeholder="martinz"
+                            autoComplete="off"
+                          />
+                          {fieldState.invalid && (
+                            <FieldError errors={[fieldState.error]} />
+                          )}
+                        </Field>
+                      )}
                     />
                   </div>
 
                   <div className="space-y-2">
-                    <Label className="text-sm text-[#99A1AF]">Phone</Label>
-                    <Input
-                      name="phone"
-                      placeholder="(555) 123-4567"
-
-                      required
-                      value={coach.phone}
-                      onChange={(e) =>
-                        setCoach((prev) => ({
-                          ...prev,
-                          phone: e.target.value,
-                        }))
-                      }
+                    <Controller
+                      name="phone_no"
+                      control={form.control}
+                      render={({ field, fieldState }) => (
+                        <Field data-invalid={fieldState.invalid}>
+                          <Label className="text-sm text-[#99A1AF]">
+                            phone <RequiredStar />
+                          </Label>
+                          <Input
+                            {...field}
+                            id={field.name}
+                            aria-invalid={fieldState.invalid}
+                            placeholder="(187)-189-1038"
+                            autoComplete="off"
+                          />
+                          {fieldState.invalid && (
+                            <FieldError errors={[fieldState.error]} />
+                          )}
+                        </Field>
+                      )}
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-sm text-[#99A1AF]">
-                      Start of Career
-                    </Label>
-                    <AppCalendar
-
-                      date={coach.career_start ? new Date(coach.career_start) : undefined}
-                      onChange={(date) =>
-                        setCoach((prevState) => ({
-                          ...prevState,
-                          career_start: date,
-                        }))
-                      }
-                      required
+                    
+                    <Controller
+                      name="career_start"
+                      control={form.control}
+                      render={({ field, fieldState }) => (
+                        <Field data-invalid={fieldState.invalid}>
+                          <Label className="text-sm text-[#99A1AF]">
+                            Career_start <RequiredStar />
+                          </Label>
+                          
+                          <AppCalendar
+                            date={field.value}
+                            onChange={field.onChange}
+                          />
+                          {fieldState.invalid && (
+                            <p className="text-xs text-red-500">
+                              {fieldState?.error?.message}
+                            </p>
+                          )}
+                        </Field>
+                        
+                      )}
                     />
                   </div>
                 </div>
 
-                 <div className="space-y-2">
-                    <Label className="text-sm text-[#99A1AF]">
-                      Zip Code
-                    </Label>
-                    <Input
+                <div className="space-y-2">
+                  <Controller
                       name="zip_code"
-                      placeholder="54000"
-
-                      required
-                      value={coach.zip_code}
-                      onChange={(e) =>
-                        setCoach((prev) => ({
-                          ...prev,
-                          zip_code: e.target.value,
-                        }))
-                      }
+                      control={form.control}
+                      render={({ field, fieldState }) => (
+                        <Field data-invalid={fieldState.invalid}>
+                          <Label className="text-sm text-[#99A1AF]">
+                            Zip Code <RequiredStar />
+                          </Label>
+                          <Input
+                            {...field}
+                            id={field.name}
+                            aria-invalid={fieldState.invalid}
+                            placeholder="1038"
+                            autoComplete="off"
+                          />
+                          {fieldState.invalid && (
+                            <FieldError errors={[fieldState.error]} />
+                          )}
+                        </Field>
+                      )}
                     />
-                  </div>
-
+                </div>
 
                 <div className="space-y-2">
-                  <Label className="text-sm text-[#99A1AF]">
-                    Biography
-                  </Label>
-                  <Textarea className="min-h-28"
-                    value={coach.bio}
-                    onChange={(e) =>
-                      setCoach((prev) => ({
-                        ...prev,
-                        bio: e.target.value,
-                      }))
-                    }
-                  />
+                  <Controller
+                      name="bio"
+                      control={form.control}
+                      render={({ field, fieldState }) => (
+                        <Field data-invalid={fieldState.invalid}>
+                          <Label className="text-sm text-[#99A1AF]">
+                            Biography <RequiredStar />
+                          </Label>
+                          <Textarea
+                            {...field}
+                            id={field.name}
+                            aria-invalid={fieldState.invalid}
+                            autoComplete="off"
+                          />
+                          {fieldState.invalid && (
+                            <FieldError errors={[fieldState.error]} />
+                          )}
+                        </Field>
+                      )}
+                    />
                 </div>
 
                 <div className="space-y-2">
                   <Label className="text-sm text-[#99A1AF]">Specialities</Label>
                   <div className="flex flex-col gap-2 border rounded-md p-2">
-
                     <Input
                       placeholder="Type speciality and press Enter"
                       value={specialityInput}
                       onChange={(e) => setSpecialityInput(e.target.value)}
-                      onKeyDown={handleAddSpeciality}
+                      onKeyDown={(e) => {
+                        if (e.key !== "Enter") return;
+                        e.preventDefault();
+
+                        const trimmed = specialityInput.trim();
+                        if (!trimmed) return;
+
+                        if (!specialities.includes(trimmed)) {
+                          setValue("specialities", [...specialities, trimmed], {
+                            shouldValidate: true,
+                          });
+                        }
+
+                        setSpecialityInput("");
+                      }}
                     />
                     <div className="flex flex-wrap gap-2">
-                      {coach.specialities.map((tag, idx) => (
+                      {specialities.map((tag, idx) => (
                         <span
                           key={idx}
                           className="flex items-center gap-1 bg-primary text-black px-2 py-1 rounded-md text-sm"
@@ -289,11 +367,11 @@ const EditCoachProfile = ({ id, data, onRefresh }: { id: string | undefined, dat
                   </div>
                 </div>
 
-
                 <div className="space-y-2">
-                  <Label className="text-sm text-[#99A1AF]">Certifications</Label>
+                  <Label className="text-sm text-[#99A1AF]">
+                    Certifications
+                  </Label>
                   <div className="flex flex-col gap-2 border rounded-md p-2">
-
                     <Input
                       placeholder="Type certification and press Enter"
                       value={certificationInput}
@@ -301,7 +379,7 @@ const EditCoachProfile = ({ id, data, onRefresh }: { id: string | undefined, dat
                       onKeyDown={handleAddCertification}
                     />
                     <div className="flex flex-wrap gap-2">
-                      {coach.certifications?.map((tag, idx) => (
+                      {certifications.map((tag, idx) => (
                         <span
                           key={idx}
                           className="flex items-center gap-1 bg-primary text-black px-2 py-1 rounded-md text-sm"
@@ -319,8 +397,6 @@ const EditCoachProfile = ({ id, data, onRefresh }: { id: string | undefined, dat
                     </div>
                   </div>
                 </div>
-
-
               </div>
             </ScrollArea>
             <Separator />
@@ -334,7 +410,7 @@ const EditCoachProfile = ({ id, data, onRefresh }: { id: string | undefined, dat
                   type="submit"
                   className="flex-1 text-[13px]"
                 >
-                  {loading && <Spinner />} Save
+                  {loading && <Spinner className="text-black" />} Save
                 </Button>
               </div>
             </div>
@@ -345,4 +421,4 @@ const EditCoachProfile = ({ id, data, onRefresh }: { id: string | undefined, dat
   );
 };
 
-export default EditCoachProfile
+export default EditCoachProfile;

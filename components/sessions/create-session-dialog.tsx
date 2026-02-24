@@ -39,6 +39,7 @@ import { Spinner } from "../ui/spinner";
 import { Textarea } from "../ui/textarea";
 import { AssignCoachDialog } from "./assign-coach-dialog";
 import { Checkbox } from "../ui/checkbox";
+import z from "zod";
 
 export type SessionType = {
   name: string;
@@ -62,6 +63,17 @@ export type SessionType = {
   promotion_end: string | undefined;
   show_storefront: boolean | "indeterminate";
 };
+
+const parentSchema = z.object({
+  first_name: z.string().min(2, "First name is required"),
+  last_name: z.string().min(2, "Last name is required"),
+
+  phone_no: z.string().min(6, "Phone is required"),
+
+  zip_code: z.string().min(3, "Zip code required"),
+
+  location: z.string().min(2, "Location required"),
+});
 
 export function CreateSessionDialog({
   onRefresh,

@@ -1,168 +1,241 @@
-"use client"
+"use client";
 
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button";
 import {
-    Dialog,
-    DialogClose,
-    DialogContent,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-} from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { SquarePen } from "lucide-react"
-import { useEffect, useState } from "react"
-import axios from "@/lib/axios"
-import { useParams } from "next/navigation"
-import { Spinner } from "../ui/spinner"
-import { toast } from "sonner"
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { SquarePen } from "lucide-react";
+import { useEffect, useState } from "react";
+import axios from "@/lib/axios";
+import { useParams } from "next/navigation";
+import { Spinner } from "../ui/spinner";
+import { toast } from "sonner";
+import z from "zod";
+import { Controller, useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Field, FieldError } from "../ui/field";
+import { RequiredStar } from "../required-star";
+import { Textarea } from "../ui/textarea";
 
 type EditParentsProps = {
-    parent_id: number | null
-    data: DataProp
-    onRefresh: () => Promise<void>
-}
+  parent_id: number | null;
+  data: DataProp;
+  onRefresh: () => Promise<void>;
+};
 
 type DataProp = {
+  first_name: string;
+  last_name: string;
+  phone_no: string | null;
+  location: string | null;
+  zip_code: string | null;
+};
 
-    first_name: string
-    last_name: string
-    phone_no: string | null
-    location: string | null
-    zip_code : string | null
+const parentSchema = z.object({
+  first_name: z.string().min(2, "First name is required"),
+  last_name: z.string().min(2, "Last name is required"),
 
-}
+  phone_no: z.string().min(6, "Phone is required"),
+
+  zip_code: z.string().min(3, "Zip code required"),
+
+  location: z.string().min(2, "Location required"),
+});
+type parentSchemaValues = z.infer<typeof parentSchema>;
 
 export function EditParents({ parent_id, data, onRefresh }: EditParentsProps) {
-    const [open, setOpen] = useState(false)
-    const [localData, setLocalData] = useState<DataProp | undefined>()
-    const [loading, setLoading] = useState(false)
+  const [open, setOpen] = useState(false);
+  const [localData, setLocalData] = useState<DataProp | undefined>();
+  const [loading, setLoading] = useState(false);
 
-    useEffect(() => {
-        if (data) {
-            setLocalData(data)
-        }
-    }, [parent_id, data])
-
-    async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-        e.preventDefault();
-        setLoading(true)
-        try {
-
-            await axios.put(`/user`, {
-                id: parent_id,
-                ...localData
-            });
-            toast.success("Profile updated")
-            await onRefresh()
-            setOpen(false);
-        } finally {
-            setLoading(false)
-        }
+  useEffect(() => {
+    if (data) {
+      form.reset(data);
     }
+  }, [parent_id, data]);
 
-    function handleChange(key: string, val: string) {
-        setLocalData((prevState) => {
-            if (!prevState) return prevState
-            return {
-                ...prevState,
-                [key]: val
-            }
+  const form = useForm<parentSchemaValues>({
+    resolver: zodResolver(parentSchema),
+    defaultValues: {},
+  });
 
-        })
+  async function onSubmit(values: parentSchemaValues) {
+    console.log(values)
+    return
+    setLoading(true);
+    try {
+      await axios.put(`/user`, {
+        id: parent_id,
+        ...values,
+      });
+      toast.success("Profile updated");
+      await onRefresh();
+      setOpen(false);
+    } finally {
+      setLoading(false);
     }
+  }
 
 
-    return (
-        <>
-            <Button variant={"outline"} className="bg-black dark:bg-black" onClick={() => setOpen(true)}>
-                <SquarePen />   Edit Details
-            </Button>
-            <Dialog open={open} onOpenChange={setOpen}>
-                <DialogContent className="sm:max-w-[550px] bg-[#252525]">
-                    <form onSubmit={handleSubmit}>
-                        <DialogHeader className=" pb-4">
-                            <DialogTitle className="text-sm font-normal">Edit Parent Details</DialogTitle>
-                        </DialogHeader>
+  return (
+    <>
+      <Button
+        variant={"outline"}
+        className="bg-black dark:bg-black"
+        onClick={() => setOpen(true)}
+      >
+        <SquarePen /> Edit Details
+      </Button>
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent className="sm:max-w-[550px] bg-[#252525]">
+          <form onSubmit={form.handleSubmit(onSubmit)}>
+            <DialogHeader className=" pb-4">
+              <DialogTitle className="text-sm font-normal">
+                Edit Parent Details
+              </DialogTitle>
+            </DialogHeader>
 
-                        <div className="grid gap-4 py-4 border-t">
-                            <div className="grid grid-cols-2 gap-2">
-                                <div className="grid gap-2">
-                                    <Label htmlFor="name" className="text-xs text-muted-foreground">First Name</Label>
-                                    <Input
-                                        id="first_name"
-                                        name="first_name"
-                                        placeholder="Pedro"
-                                        className="dark:bg-[#1A1A1A]"
-                                        value={localData?.first_name}
-                                        onChange={(e) => handleChange("first_name", e.target.value)}
+            <div className="grid gap-4 py-4 border-t">
+              <div className="grid grid-cols-2 gap-2">
+                <div className="grid gap-2">
+                  <Controller
+                                      name="first_name"
+                                      control={form.control}
+                                      render={({ field, fieldState }) => (
+                                        <Field data-invalid={fieldState.invalid}>
+                                          <Label className="text-sm text-[#99A1AF]">
+                                            First Name <RequiredStar />
+                                          </Label>
+                                          <Input
+                                            {...field}
+                                            id={field.name}
+                                            aria-invalid={fieldState.invalid}
+                                            placeholder="john"
+                                            autoComplete="off"
+                                          />
+                                          {fieldState.invalid && (
+                                            <FieldError errors={[fieldState.error]} />
+                                          )}
+                                        </Field>
+                                      )}
                                     />
-                                </div>
-                                <div className="grid gap-2">
-                                    <Label htmlFor="last_name" className="text-xs text-muted-foreground">Last Name</Label>
-                                    <Input
-                                        id="last_name"
-                                        name="last_name"
-                                        placeholder="Duarte"
-                                        className="dark:bg-[#1A1A1A]"
-                                        value={localData?.last_name}
-                                        onChange={(e) => handleChange("last_name", e.target.value)}
+                </div>
+                <div className="grid gap-2">
+                  <Controller
+                                      name="last_name"
+                                      control={form.control}
+                                      render={({ field, fieldState }) => (
+                                        <Field data-invalid={fieldState.invalid}>
+                                          <Label className="text-sm text-[#99A1AF]">
+                                            Last Name <RequiredStar />
+                                          </Label>
+                                          <Input
+                                            {...field}
+                                            id={field.name}
+                                            aria-invalid={fieldState.invalid}
+                                            placeholder="martinz"
+                                            autoComplete="off"
+                                          />
+                                          {fieldState.invalid && (
+                                            <FieldError errors={[fieldState.error]} />
+                                          )}
+                                        </Field>
+                                      )}
                                     />
-                                </div>
-                            </div>
+                </div>
+              </div>
 
+              <div className="grid gap-2">
+                <Controller
+                  name="phone_no"
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <Field data-invalid={fieldState.invalid}>
+                      <Label className="text-sm text-[#99A1AF]">
+                        phone <RequiredStar />
+                      </Label>
+                      <Input
+                        {...field}
+                        id={field.name}
+                        aria-invalid={fieldState.invalid}
+                        placeholder="(187)-189-1038"
+                        autoComplete="off"
+                      />
+                      {fieldState.invalid && (
+                        <FieldError errors={[fieldState.error]} />
+                      )}
+                    </Field>
+                  )}
+                />
+              </div>
 
-                            <div className="grid gap-2">
-                                <Label htmlFor="phone" className="text-xs text-muted-foreground">Phone</Label>
-                                <Input
-                                    id="phone"
-                                    name="phone"
-                                    type="tel"
-                                    placeholder="+1 234 567 890"
-                                    className="dark:bg-[#1A1A1A]"
-                                    value={localData?.phone_no || ""}
-                                    onChange={(e) => handleChange("phone_no", e.target.value)}
+              <div className="grid gap-2">
+                <Controller
+                  name="zip_code"
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <Field data-invalid={fieldState.invalid}>
+                      <Label className="text-sm text-[#99A1AF]">
+                        Zip Code <RequiredStar />
+                      </Label>
+                      <Input
+                        {...field}
+                        id={field.name}
+                        aria-invalid={fieldState.invalid}
+                        placeholder="1038"
+                        autoComplete="off"
+                      />
+                      {fieldState.invalid && (
+                        <FieldError errors={[fieldState.error]} />
+                      )}
+                    </Field>
+                  )}
+                />
+              </div>
+
+              <div className="grid gap-2">
+                <Controller
+                                  name="location"
+                                  control={form.control}
+                                  render={({ field, fieldState }) => (
+                                    <Field data-invalid={fieldState.invalid}>
+                                      <Label className="text-sm text-[#99A1AF]">Address</Label>
+                                      <Textarea
+                                        {...field}
+                                        id={field.name}
+                                        aria-invalid={fieldState.invalid}
+                                        autoComplete="off"
+                                        className="min-h-[170px]"
+                                      />
+                                      {fieldState.invalid && (
+                                        <FieldError errors={[fieldState.error]} />
+                                      )}
+                                    </Field>
+                                  )}
                                 />
-                            </div>
+              </div>
+            </div>
 
-                              <div className="grid gap-2">
-                                <Label htmlFor="zip_code" className="text-xs text-muted-foreground">Zip Code</Label>
-                                <Input
-                                    id="zip_code"
-                                    name="zip_code"
-                                    placeholder="54000"
-                                    className="dark:bg-[#1A1A1A]"
-                                    value={localData?.zip_code || ""}
-                                    onChange={(e) => handleChange("zip_code", e.target.value)}
-                                />
-                            </div>
-
-                            <div className="grid gap-2">
-                                <Label htmlFor="address" className="text-xs text-muted-foreground">Address</Label>
-                                <Input
-                                    id="address"
-                                    name="address"
-                                    placeholder="New York, USA"
-                                    className="dark:bg-[#1A1A1A]"
-                                    value={localData?.location || ""}
-                                    onChange={(e) => handleChange("location", e.target.value)}
-                                />
-                            </div>
-                        </div>
-
-                        <DialogFooter>
-                            <DialogClose asChild>
-                                <Button type="button" variant="outline">
-                                    Cancel
-                                </Button>
-                            </DialogClose>
-                            <Button disabled={loading} type="submit">{loading && <Spinner className="text-black" />}Save</Button>
-                        </DialogFooter>
-                    </form>
-                </DialogContent>
-            </Dialog>
-        </>
-
-    )
+            <DialogFooter>
+              <DialogClose asChild>
+                <Button type="button" variant="outline">
+                  Cancel
+                </Button>
+              </DialogClose>
+              <Button disabled={loading} type="submit">
+                {loading && <Spinner className="text-black" />}Save
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+    </>
+  );
 }

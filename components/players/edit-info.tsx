@@ -28,88 +28,112 @@ import { PlayerResponse } from "./main-player-page";
 import { Spinner } from "../ui/spinner";
 import SelectPosition from "./select-position";
 import SelectSkill from "./select-skill";
-
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Controller, useForm } from "react-hook-form";
+import { RequiredStar } from "../required-star";
+import { Field, FieldError } from "../ui/field";
 type DataProps = {
-  first_name: string,
-  last_name: string,
-  phone_no: string,
-  position: string,
-  skillLevel: string,
-  medicalNotes: string,
-  birth_date: null | Date
-  zip_code : string
+  first_name: string;
+  last_name: string;
+  phone_no: string;
+  position: string;
+  skillLevel: string;
+  medicalNotes: string;
+  birth_date: null | Date;
+  zip_code: string;
+};
 
-}
+const playerSchema = z.object({
+  first_name: z.string().min(2, "First name is required"),
+  last_name: z.string().min(2, "Last name is required"),
 
-export function EditInfo({ player_id, data, onRefresh }: { player_id: number | undefined, data: PlayerResponse, onRefresh: () => Promise<void> }) {
+  phone_no: z.string().min(6, "Phone is required"),
 
+  zip_code: z.string().min(3, "Zip code required"),
+
+  dob: z.date({
+    required_error: "Date of birth is required",
+  }),
+
+  position: z.string().min(1, "Select a position"),
+
+  skillLevel: z.string().min(1, "Select skill level"),
+
+  medicalNotes: z.string().optional(),
+});
+type PlayerFormValues = z.infer<typeof playerSchema>;
+
+export function EditInfo({
+  player_id,
+  data,
+  onRefresh,
+}: {
+  player_id: number | undefined;
+  data: PlayerResponse;
+  onRefresh: () => Promise<void>;
+}) {
   const [open, setOpen] = useState(false);
-  const [position, setPosition] = useState("");
-  const [skillLevel, setSkillLevel] = useState("");
-  const [date, setDate] = useState(undefined);
-  const positions = ["Forward", "Defender", "GoalKeeper"];
-  const skillLevels = ["Beginner", "Intermediate", "Advanced", "Expert"];
-  const [loading, setLoading] = useState(false)
-  const [localData, setLocalData] = useState<DataProps>({
-    first_name: "",
-    last_name: "",
-    phone_no: "",
-    position: "",
-    skillLevel: "",
-    medicalNotes: "",
-    birth_date: null,
-    zip_code : ""
-  })
+  const [loading, setLoading] = useState(false);
+
+  const form = useForm<PlayerFormValues>({
+    resolver: zodResolver(playerSchema),
+    defaultValues: {
+      first_name: "",
+      last_name: "",
+      phone_no: "",
+      dob: undefined,
+      zip_code: "",
+      position: "",
+      skillLevel: "",
+      medicalNotes: "",
+    },
+  });
 
   useEffect(() => {
-    if (data) {
-      setLocalData({
-        first_name: data?.first_name || "",
-        last_name: data?.last_name || "",
-        birth_date: data?.birth_date || null,
-        phone_no: data?.phone_no || "",
-        position: data?.profile?.position || "",
-        skillLevel: data?.profile?.skill_level || "",
-        medicalNotes: data?.profile?.medical_notes || "",
-        zip_code : data?.zip_code || ""
-      })
+    if (!open || !data) return;
 
-    }
-  }, [data])
+    form.reset({
+      first_name: data.first_name ?? "",
+      last_name: data.last_name ?? "",
+      phone_no: data.phone_no ?? "",
+      zip_code: data.zip_code ?? "",
+      dob: data.birth_date ? new Date(data.birth_date) : undefined,
+      position: data.profile?.position ?? "",
+      skillLevel: data.profile?.skill_level ?? "",
+      medicalNotes: data.profile?.medical_notes ?? "",
+    });
+  }, [open, data, form.reset]);
 
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    setLoading(true)
+  async function onSubmit(values: PlayerFormValues) {
+    console.log(values)
+    return
+    setLoading(true);
 
     try {
-
       await axios.put(`/user`, {
         id: player_id,
-        first_name: localData.first_name,
-        last_name: localData.last_name,
-        phone_no: localData.phone_no,
-        birth_date: localData.birth_date,
-        zip_code : localData.zip_code
+        first_name: values.first_name,
+        last_name: values.last_name,
+        phone_no: values.phone_no,
+        birth_date: values.dob,
+        zip_code: values.zip_code,
       });
       await axios.put(`/admin/players/${player_id}`, {
         id: player_id,
-        position: localData.position,
-        skill_level: localData.skillLevel,
-        medical_notes: localData.medicalNotes,
-
+        position: values.position,
+        skill_level: values.skillLevel,
+        medical_notes: values.medicalNotes,
       });
-      await onRefresh()
-      setOpen(false)
+      await onRefresh();
+      setOpen(false);
     } catch (error) {
       console.log(error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
   }
 
-  function handleChange(key: string, value: string) {
-    setLocalData((prevState) => ({ ...prevState, [key]: value }))
-  }
   return (
     <>
       <Button
@@ -122,7 +146,7 @@ export function EditInfo({ player_id, data, onRefresh }: { player_id: number | u
 
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="sm:max-w-[550px] bg-[#252525]">
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={form.handleSubmit(onSubmit, (errors) => console.log("errors", errors))}>
             <DialogHeader className="pb-4">
               <DialogTitle className="text-sm font-normal">
                 Edit Player Information
@@ -132,124 +156,200 @@ export function EditInfo({ player_id, data, onRefresh }: { player_id: number | u
             <div className="grid gap-4 py-4 border-t">
               <div className="grid grid-cols-2 gap-4">
                 <div className="grid gap-2">
-                  <Label
-                    htmlFor="first_name"
-                    className="text-xs text-muted-foreground"
-                  >
-                    First Name
-                  </Label>
-                  <Input
-                    id="first_name"
+                  <Controller
                     name="first_name"
-                    placeholder="Pedro"
-                    required
-                    className="dark:bg-[#1A1A1A]"
-                    value={localData.first_name}
-                    onChange={(e) => handleChange("first_name", e.target.value)}
+                    control={form.control}
+                    render={({ field, fieldState }) => (
+                      <Field data-invalid={fieldState.invalid}>
+                        <Label className="text-sm text-[#99A1AF]">
+                          First Name <RequiredStar />
+                        </Label>
+                        <Input
+                          {...field}
+                          id={field.name}
+                          aria-invalid={fieldState.invalid}
+                          placeholder="john"
+                          autoComplete="off"
+                        />
+                        {fieldState.invalid && (
+                          <FieldError errors={[fieldState.error]} />
+                        )}
+                      </Field>
+                    )}
                   />
                 </div>
                 <div className="grid gap-2">
-                  <Label
-                    htmlFor="last_name"
-                    className="text-xs text-muted-foreground"
-                  >
-                    Last Name
-                  </Label>
-                  <Input
-                    id="last_name"
+                  <Controller
                     name="last_name"
-                    placeholder="Duarte"
-                    required
-                    className="dark:bg-[#1A1A1A]"
-                    value={localData.last_name}
-                    onChange={(e) => handleChange("last_name", e.target.value)}
+                    control={form.control}
+                    render={({ field, fieldState }) => (
+                      <Field data-invalid={fieldState.invalid}>
+                        <Label className="text-sm text-[#99A1AF]">
+                          Last Name <RequiredStar />
+                        </Label>
+                        <Input
+                          {...field}
+                          id={field.name}
+                          aria-invalid={fieldState.invalid}
+                          placeholder="doe"
+                          autoComplete="off"
+                        />
+                        {fieldState.invalid && (
+                          <FieldError errors={[fieldState.error]} />
+                        )}
+                      </Field>
+                    )}
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="grid gap-2">
-                  <Label
-                    htmlFor="dob"
-                    className="text-xs text-muted-foreground"
-                  >
-                    Date of Birth
-                  </Label>
-                  <AppCalendar date={localData.birth_date} onChange={(d) => handleChange("birth_date", d)} />
-                </div>
+                  <Controller
+                    name="dob"
+                    control={form.control}
+                    render={({ field, fieldState }) => (
+                      <Field data-invalid={fieldState.invalid}>
+                        <Label className="text-sm text-[#99A1AF]">
+                          Date Of Birth <RequiredStar />
+                        </Label>
 
-                <div className="grid gap-2">
-                  <Label
-                    htmlFor="phone_no"
-                    className="text-xs text-muted-foreground"
-                  >
-                    phone
-                  </Label>
-                  <Input
-                    id="phone_no"
-                    name="phone_no"
-                    placeholder="+1 2983 39843"
-                    required
-                    className="dark:bg-[#1A1A1A]"
-                    value={localData.phone_no}
-                    onChange={(e) => handleChange("phone_no", e.target.value)}
+                        <AppCalendar
+                          date={field.value? new Date(field.value):undefined}
+                          onChange={field.onChange}
+                        />
+                        {fieldState.invalid && (
+                          <p className="text-xs text-red-500">
+                            {fieldState?.error?.message}
+                          </p>
+                        )}
+                      </Field>
+                    )}
                   />
                 </div>
 
-
                 <div className="grid gap-2">
-                  <Label
-                    htmlFor="position"
-                    className="text-xs text-muted-foreground"
-                  >
-                    Position
-                  </Label>
-                  <SelectPosition placeholder="Select position" value={localData.position} onChange={(val) => handleChange("position", val)} />
+                  <Controller
+                    name="phone_no"
+                    control={form.control}
+                    render={({ field, fieldState }) => (
+                      <Field data-invalid={fieldState.invalid}>
+                        <Label className="text-sm text-[#99A1AF]">
+                          Phone <RequiredStar />
+                        </Label>
+                        <Input
+                          {...field}
+                          id={field.name}
+                          aria-invalid={fieldState.invalid}
+                          placeholder="(555)-292-2492"
+                          autoComplete="off"
+                        />
+                        {fieldState.invalid && (
+                          <FieldError errors={[fieldState.error]} />
+                        )}
+                      </Field>
+                    )}
+                  />
                 </div>
 
                 <div className="grid gap-2">
-                  <Label
-                    htmlFor="skillLevel"
-                    className="text-xs text-muted-foreground"
-                  >
-                    Skill Level
-                  </Label>
-                  <SelectSkill value={localData.skillLevel} onChange={(val) => handleChange("skillLevel", val)} placeholder="Select skill level" />
+                  <Controller
+                    name="position"
+                    control={form.control}
+                    render={({ field, fieldState }) => (
+                      <Field data-invalid={fieldState.invalid}>
+                        <Label className="text-sm text-[#99A1AF]">
+                          Position <RequiredStar />
+                        </Label>
+
+                        <SelectPosition
+                          value={field.value}
+                          onChange={field.onChange}
+                          placeholder="Select position"
+                        />
+                        {fieldState.invalid && (
+                          <p className="text-xs text-red-500">
+                            {fieldState?.error?.message}
+                          </p>
+                        )}
+                      </Field>
+                    )}
+                  />
+                </div>
+
+                <div className="grid gap-2">
+                  <Controller
+                    name="skillLevel"
+                    control={form.control}
+                    render={({ field, fieldState }) => (
+                      <Field data-invalid={fieldState.invalid}>
+                        <Label className="text-sm text-[#99A1AF]">
+                          Skill Level <RequiredStar />
+                        </Label>
+
+                        <SelectSkill
+                          value={field.value}
+                          onChange={field.onChange}
+                          placeholder="Select skill"
+                        />
+
+                        {fieldState.invalid && (
+                          <p className="text-xs text-red-500">
+                            {fieldState?.error?.message}
+                          </p>
+                        )}
+                      </Field>
+                    )}
+                  />
                 </div>
               </div>
 
-               <div className="grid gap-2">
-                  <Label
-                    htmlFor="zip_code"
-                    className="text-xs text-muted-foreground"
-                  >
-                    Zip Code
-                  </Label>
-                  <Input
-                    id="zip_code"
-                    name="zip_code"
-                    placeholder="54000"
-                    required
-                    className="dark:bg-[#1A1A1A]"
-                    value={localData.zip_code}
-                    onChange={(e) => handleChange("zip_code", e.target.value)}
-                  />
-                </div>
+              <div className="grid gap-2">
+                <Controller
+                  name="zip_code"
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <Field data-invalid={fieldState.invalid}>
+                      <Label className="text-sm text-[#99A1AF]">
+                        Zip Code <RequiredStar />
+                      </Label>
+                      <Input
+                        {...field}
+                        id={field.name}
+                        aria-invalid={fieldState.invalid}
+                        placeholder="2873"
+                        autoComplete="off"
+                      />
+                      {fieldState.invalid && (
+                        <FieldError errors={[fieldState.error]} />
+                      )}
+                    </Field>
+                  )}
+                />
+              </div>
 
               <div className="grid gap-2">
-                <Label
-                  htmlFor="medicalNotes"
-                  className="text-xs text-muted-foreground"
-                >
-                  Medical Notes
-                </Label>
-                <Textarea
-                  id="medicalNotes"
+                <Controller
                   name="medicalNotes"
-                  placeholder="Enter medical notes or observations..."
-                  className="dark:bg-[#1A1A1A] h-30"
-                  value={localData.medicalNotes}
-                  onChange={(e) => handleChange("medicalNotes", e.target.value)}
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <Field data-invalid={fieldState.invalid}>
+                      <Label className="text-sm text-[#99A1AF]">
+                        Medical notes <RequiredStar />
+                      </Label>
+                      <Textarea
+                        {...field}
+                        id={field.name}
+                        aria-invalid={fieldState.invalid}
+                        placeholder=""
+                        autoComplete="off"
+                        className="min-h-[100px]"
+                      />
+                      {fieldState.invalid && (
+                        <FieldError errors={[fieldState.error]} />
+                      )}
+                    </Field>
+                  )}
                 />
               </div>
             </div>
@@ -260,7 +360,10 @@ export function EditInfo({ player_id, data, onRefresh }: { player_id: number | u
                   Cancel
                 </Button>
               </DialogClose>
-              <Button disabled={loading} type="submit"> {loading && <Spinner className="text-black" />}Save</Button>
+              <Button disabled={loading} type="submit">
+                {" "}
+                {loading && <Spinner className="text-black" />}Save
+              </Button>
             </DialogFooter>
           </form>
         </DialogContent>

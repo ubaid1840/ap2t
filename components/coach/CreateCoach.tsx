@@ -1,7 +1,12 @@
-
 import AppCalendar from "@/components/app-calendar";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogClose, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -9,48 +14,76 @@ import { Separator } from "@/components/ui/separator";
 import { Spinner } from "@/components/ui/spinner";
 import { Textarea } from "@/components/ui/textarea";
 import axios from "@/lib/axios";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Plus } from "lucide-react";
 import { useState } from "react";
+import { Controller, useForm } from "react-hook-form";
+import { z } from "zod";
+import { Field, FieldError } from "../ui/field";
+import { RequiredStar } from "../required-star";
 
+const coachSchema = z.object({
+  first_name: z.string().min(2, "First name is required"),
+  last_name: z.string().min(2, "Last name is required"),
 
+  email: z
+    .string()
+    .email("Invalid email")
+    .transform((val) => val.trim().toLowerCase()),
 
+  phone_no: z.string().min(6, "Phone is required"),
+
+  zip_code: z.string().min(3, "Zip code required"),
+
+  career_start: z.date({
+    required_error: "Date of birth is required",
+  }),
+
+  bio: z.string().min(2, "Biography required"),
+});
+type coachSchemaValues = z.infer<typeof coachSchema>;
 
 const CreateCoach = ({ onRefresh }: { onRefresh: () => Promise<void> }) => {
+  const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  const [open, setOpen] = useState(false)
-  const [loading, setLoading] = useState(false)
-  const [coach, setCoach] = useState({
-    first_name: "",
-    last_name:"",
-    email: "",
-    phone: "",
-    career_start: "",
-    bio: "",
-    zip_code : ""
+  const form = useForm<coachSchemaValues>({
+    resolver: zodResolver(coachSchema),
+    defaultValues: {
+      first_name: "",
+      last_name: "",
+      email: "",
+      phone_no: "",
+      career_start: undefined,
+      bio: "",
+      zip_code: "",
+    },
   });
 
-  const addCoach = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    setLoading(true)
-
+  const addCoach = async (values: coachSchemaValues) => {
+    
+    console.log(values)
+    return
+    setLoading(true);
+    
     try {
       await axios.post("/user", {
-        first_name: coach.first_name,
-        last_name: coach.last_name,
-        email: coach.email,
-        phone_no: coach.phone,
-        career_start: coach.career_start,
-        bio: coach.bio,
-        zip_code : coach.zip_code,
-        role: "coach"
-      })
+        first_name: values.first_name,
+        last_name: values.last_name,
+        email: values.email,
+        phone_no: values.phone_no,
+        career_start: values.career_start,
+        bio: values.bio,
+        zip_code: values.zip_code,
+        role: "coach",
+      });
 
-      await onRefresh()
-      setOpen(false)
+      await onRefresh();
+      setOpen(false);
     } catch (error) {
-      console.log(error)
+      console.log(error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
   };
 
@@ -60,138 +93,185 @@ const CreateCoach = ({ onRefresh }: { onRefresh: () => Promise<void> }) => {
         <Plus /> Add Coach
       </Button>
       <Dialog open={open} onOpenChange={setOpen}>
-
         <DialogContent className="bg-[#252525] border border-[#3A3A3A] sm:max-w-4xl p-0">
           <DialogHeader className="border-b border-[#3A3A3A] p-4">
             <DialogTitle className="text-[#F3F4F6] font-semibold text-lg">
               Add New Coach
             </DialogTitle>
           </DialogHeader>
-          <form onSubmit={addCoach} className="">
+          <form onSubmit={form.handleSubmit(addCoach)} className="">
             <ScrollArea className=" py-1 space-y-4 px-2 h-[65vh]">
               <div className="space-y-2 px-2 pb-2">
                 <div className="grid grid-cols-2 gap-2">
                   <div className="space-y-2">
-                    <Label className="text-sm text-[#99A1AF]">
-                      Frist Name
-                    </Label>
-                    <Input
+                    <Controller
                       name="first_name"
-                      placeholder="Coach Martinez"
-                      
-                      required
-                      value={coach.first_name}
-                      onChange={(e) =>
-                        setCoach((prev) => ({
-                          ...prev,
-                          first_name: e.target.value,
-                        }))
-                      }
+                      control={form.control}
+                      render={({ field, fieldState }) => (
+                        <Field data-invalid={fieldState.invalid}>
+                          <Label className="text-sm text-[#99A1AF]">
+                            First Name <RequiredStar />
+                          </Label>
+                          <Input
+                            {...field}
+                            id={field.name}
+                            aria-invalid={fieldState.invalid}
+                            placeholder="Coach"
+                            autoComplete="off"
+                          />
+                          {fieldState.invalid && (
+                            <FieldError errors={[fieldState.error]} />
+                          )}
+                        </Field>
+                      )}
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-sm text-[#99A1AF]">
-                      Last Name
-                    </Label>
-                    <Input
+                    <Controller
                       name="last_name"
-                      placeholder="Coach Martinez"
-                      
-                      required
-                      value={coach.last_name}
-                      onChange={(e) =>
-                        setCoach((prev) => ({
-                          ...prev,
-                          last_name: e.target.value,
-                        }))
-                      }
+                      control={form.control}
+                      render={({ field, fieldState }) => (
+                        <Field data-invalid={fieldState.invalid}>
+                          <Label className="text-sm text-[#99A1AF]">
+                            Last Name <RequiredStar />
+                          </Label>
+                          <Input
+                            {...field}
+                            id={field.name}
+                            aria-invalid={fieldState.invalid}
+                            placeholder="martinz"
+                            autoComplete="off"
+                          />
+                          {fieldState.invalid && (
+                            <FieldError errors={[fieldState.error]} />
+                          )}
+                        </Field>
+                      )}
                     />
                   </div>
                 </div>
-                   <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-2 gap-2">
                   <div className="space-y-2">
-                    <Label className="text-sm text-[#99A1AF]">Email</Label>
-                    <Input
+                    <Controller
                       name="email"
-                      placeholder="martinez@ap2t.com"
-                  
-                      required
-                      value={coach.email}
-                      onChange={(e) =>
-                        setCoach((prev) => ({
-                          ...prev,
-                          email: e.target.value.trim().toLowerCase(),
-                        }))
-                      }
+                      control={form.control}
+                      render={({ field, fieldState }) => (
+                        <Field data-invalid={fieldState.invalid}>
+                          <Label className="text-sm text-[#99A1AF]">
+                            Email <RequiredStar />
+                          </Label>
+                          <Input
+                            {...field}
+                            id={field.name}
+                            aria-invalid={fieldState.invalid}
+                            placeholder="martinz"
+                            autoComplete="off"
+                          />
+                          {fieldState.invalid && (
+                            <FieldError errors={[fieldState.error]} />
+                          )}
+                        </Field>
+                      )}
                     />
                   </div>
 
                   <div className="space-y-2">
-                    <Label className="text-sm text-[#99A1AF]">Zip Code</Label>
-                    <Input
+                    <Controller
                       name="zip_code"
-                      placeholder="54000"
-                      value={coach.zip_code}
-                      required
-                      onChange={(e) =>
-                        setCoach((prev) => ({
-                          ...prev,
-                          zip_code: e.target.value.trim().toLowerCase(),
-                        }))
-                      }
+                      control={form.control}
+                      render={({ field, fieldState }) => (
+                        <Field data-invalid={fieldState.invalid}>
+                          <Label className="text-sm text-[#99A1AF]">
+                            Zip Code <RequiredStar />
+                          </Label>
+                          <Input
+                            {...field}
+                            id={field.name}
+                            aria-invalid={fieldState.invalid}
+                            placeholder="1038"
+                            autoComplete="off"
+                          />
+                          {fieldState.invalid && (
+                            <FieldError errors={[fieldState.error]} />
+                          )}
+                        </Field>
+                      )}
                     />
                   </div>
-                  </div>
+                </div>
                 <div className="grid grid-cols-2 gap-2">
                   <div className="space-y-2">
-                    <Label className="text-sm text-[#99A1AF]">Phone</Label>
-                    <Input
-                      name="phone"
-                      placeholder="(555) 123-4567"
-                      
-                      required
-                      value={coach.phone}
-                      onChange={(e) =>
-                        setCoach((prev) => ({
-                          ...prev,
-                          phone: e.target.value,
-                        }))
-                      }
+                   <Controller
+                      name="phone_no"
+                      control={form.control}
+                      render={({ field, fieldState }) => (
+                        <Field data-invalid={fieldState.invalid}>
+                          <Label className="text-sm text-[#99A1AF]">
+                            phone <RequiredStar />
+                          </Label>
+                          <Input
+                            {...field}
+                            id={field.name}
+                            aria-invalid={fieldState.invalid}
+                            placeholder="(187)-189-1038"
+                            autoComplete="off"
+                          />
+                          {fieldState.invalid && (
+                            <FieldError errors={[fieldState.error]} />
+                          )}
+                        </Field>
+                      )}
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-sm text-[#99A1AF]">
-                      Start of Career
-                    </Label>
-                    <AppCalendar
-                      date={coach.career_start ? new Date(coach.career_start) : undefined}
-                      onChange={(date) =>
-                        setCoach((prevState) => ({
-                          ...prevState,
-                          career_start: date,
-                        }))
-                      }
-                      required
+                    <Controller
+                      name="career_start"
+                      control={form.control}
+                      render={({ field, fieldState }) => (
+                        <Field data-invalid={fieldState.invalid}>
+                          <Label className="text-sm text-[#99A1AF]">
+                            Career_start <RequiredStar />
+                          </Label>
+                          
+                          <AppCalendar
+                            date={field.value}
+                            onChange={field.onChange}
+                          />
+                          {fieldState.invalid && (
+                            <p className="text-xs text-red-500">
+                              {fieldState?.error?.message}
+                            </p>
+                          )}
+                        </Field>
+                        
+                      )}
                     />
                   </div>
                 </div>
 
                 <div className="space-y-2">
-                  <Label className="text-sm text-[#99A1AF]">
-                    Biography
-                  </Label>
-                  <Textarea className="!bg-[#1A1A1A] border border-border rounded-[10px] min-h-28"
-                    value={coach.bio}
-                    onChange={(e) =>
-                      setCoach((prev) => ({
-                        ...prev,
-                        bio: e.target.value,
-                      }))
-                    }
-                  />
+                  <Controller
+                      name="bio"
+                      control={form.control}
+                      render={({ field, fieldState }) => (
+                        <Field data-invalid={fieldState.invalid}>
+                          <Label className="text-sm text-[#99A1AF]">
+                            Biography
+                          </Label>
+                          <Textarea
+                            {...field}
+                            id={field.name}
+                            aria-invalid={fieldState.invalid}
+                            autoComplete="off"
+                            className="min-h-[170px]"
+                          />
+                          {fieldState.invalid && (
+                            <FieldError errors={[fieldState.error]} />
+                          )}
+                        </Field>
+                      )}
+                    />
                 </div>
-
-
               </div>
             </ScrollArea>
             <Separator />
@@ -205,7 +285,7 @@ const CreateCoach = ({ onRefresh }: { onRefresh: () => Promise<void> }) => {
                   type="submit"
                   className="flex-1 text-[13px]"
                 >
-                  {loading && <Spinner className="text-black"/>} Add Coach
+                  {loading && <Spinner className="text-black" />} Add Coach
                 </Button>
               </div>
             </div>
@@ -213,7 +293,7 @@ const CreateCoach = ({ onRefresh }: { onRefresh: () => Promise<void> }) => {
         </DialogContent>
       </Dialog>
     </>
-  )
-}
+  );
+};
 
-export default CreateCoach
+export default CreateCoach;
