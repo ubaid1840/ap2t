@@ -63,12 +63,18 @@ export function EditParents({ parent_id, data, onRefresh }: EditParentsProps) {
 
   const form = useForm<parentSchemaValues>({
     resolver: zodResolver(parentSchema),
-    defaultValues: {},
+    defaultValues: {
+      first_name: "",
+      last_name: "",
+      phone_no: "",
+      location: "",
+      zip_code: "",
+    },
   });
 
   async function onSubmit(values: parentSchemaValues) {
-    console.log(values)
-    return
+    console.log(values);
+    return;
     setLoading(true);
     try {
       await axios.put(`/user`, {
@@ -82,7 +88,6 @@ export function EditParents({ parent_id, data, onRefresh }: EditParentsProps) {
       setLoading(false);
     }
   }
-
 
   return (
     <>
@@ -106,49 +111,49 @@ export function EditParents({ parent_id, data, onRefresh }: EditParentsProps) {
               <div className="grid grid-cols-2 gap-2">
                 <div className="grid gap-2">
                   <Controller
-                                      name="first_name"
-                                      control={form.control}
-                                      render={({ field, fieldState }) => (
-                                        <Field data-invalid={fieldState.invalid}>
-                                          <Label className="text-sm text-[#99A1AF]">
-                                            First Name <RequiredStar />
-                                          </Label>
-                                          <Input
-                                            {...field}
-                                            id={field.name}
-                                            aria-invalid={fieldState.invalid}
-                                            placeholder="john"
-                                            autoComplete="off"
-                                          />
-                                          {fieldState.invalid && (
-                                            <FieldError errors={[fieldState.error]} />
-                                          )}
-                                        </Field>
-                                      )}
-                                    />
+                    name="first_name"
+                    control={form.control}
+                    render={({ field, fieldState }) => (
+                      <Field data-invalid={fieldState.invalid}>
+                        <Label className="text-sm text-[#99A1AF]">
+                          First Name <RequiredStar />
+                        </Label>
+                        <Input
+                          {...field}
+                          id={field.name}
+                          aria-invalid={fieldState.invalid}
+                          placeholder="john"
+                          autoComplete="off"
+                        />
+                        {fieldState.invalid && (
+                          <FieldError errors={[fieldState.error]} />
+                        )}
+                      </Field>
+                    )}
+                  />
                 </div>
                 <div className="grid gap-2">
                   <Controller
-                                      name="last_name"
-                                      control={form.control}
-                                      render={({ field, fieldState }) => (
-                                        <Field data-invalid={fieldState.invalid}>
-                                          <Label className="text-sm text-[#99A1AF]">
-                                            Last Name <RequiredStar />
-                                          </Label>
-                                          <Input
-                                            {...field}
-                                            id={field.name}
-                                            aria-invalid={fieldState.invalid}
-                                            placeholder="martinz"
-                                            autoComplete="off"
-                                          />
-                                          {fieldState.invalid && (
-                                            <FieldError errors={[fieldState.error]} />
-                                          )}
-                                        </Field>
-                                      )}
-                                    />
+                    name="last_name"
+                    control={form.control}
+                    render={({ field, fieldState }) => (
+                      <Field data-invalid={fieldState.invalid}>
+                        <Label className="text-sm text-[#99A1AF]">
+                          Last Name <RequiredStar />
+                        </Label>
+                        <Input
+                          {...field}
+                          id={field.name}
+                          aria-invalid={fieldState.invalid}
+                          placeholder="martinz"
+                          autoComplete="off"
+                        />
+                        {fieldState.invalid && (
+                          <FieldError errors={[fieldState.error]} />
+                        )}
+                      </Field>
+                    )}
+                  />
                 </div>
               </div>
 
@@ -202,24 +207,24 @@ export function EditParents({ parent_id, data, onRefresh }: EditParentsProps) {
 
               <div className="grid gap-2">
                 <Controller
-                                  name="location"
-                                  control={form.control}
-                                  render={({ field, fieldState }) => (
-                                    <Field data-invalid={fieldState.invalid}>
-                                      <Label className="text-sm text-[#99A1AF]">Address</Label>
-                                      <Textarea
-                                        {...field}
-                                        id={field.name}
-                                        aria-invalid={fieldState.invalid}
-                                        autoComplete="off"
-                                        className="min-h-[170px]"
-                                      />
-                                      {fieldState.invalid && (
-                                        <FieldError errors={[fieldState.error]} />
-                                      )}
-                                    </Field>
-                                  )}
-                                />
+                  name="location"
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <Field data-invalid={fieldState.invalid}>
+                      <Label className="text-sm text-[#99A1AF]">Address</Label>
+                      <Textarea
+                        {...field}
+                        id={field.name}
+                        aria-invalid={fieldState.invalid}
+                        autoComplete="off"
+                        className="min-h-[170px]"
+                      />
+                      {fieldState.invalid && (
+                        <FieldError errors={[fieldState.error]} />
+                      )}
+                    </Field>
+                  )}
+                />
               </div>
             </div>
 
