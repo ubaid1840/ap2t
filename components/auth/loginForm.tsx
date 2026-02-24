@@ -8,6 +8,26 @@ import { toast } from "sonner";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Spinner } from "../ui/spinner";
+import z from "zod";
+import { Controller, useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Field, FieldError } from "../ui/field";
+
+
+const loginSchema = z.object({
+  email: z
+    .string()
+    .trim()
+    .min(1, "Email is required")
+    .email("Invalid email address"),
+
+  password: z
+    .string()
+    .min(1, "Password is required"),
+});
+
+type LoginSchemaValues = z.infer<typeof loginSchema>;
+
 
 export default function LoginForm({ onClickSignup }: { onClickSignup: () => void }) {
   const [loading, setLoading] = useState(false)
@@ -19,15 +39,14 @@ export default function LoginForm({ onClickSignup }: { onClickSignup: () => void
     }
   )
 
-  const handlesubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const onSubmit = async (values:LoginSchemaValues) => {
     setLoading(true)
 
     try {
       await signInWithEmailAndPassword(
         auth,
-        logindata.email,
-        logindata.password
+        values.email,
+        values.password
       );
       toast.success("Login successfull")
     } catch (error: any) {
@@ -37,40 +56,60 @@ export default function LoginForm({ onClickSignup }: { onClickSignup: () => void
     }
   };
 
+  const form=useForm<LoginSchemaValues>(
+    {
+      resolver:zodResolver(loginSchema),
+      defaultValues:{
+        email:"",
+        password:""
+      }
+    }
+  )
+
   return (
-    <form className="space-y-5" onSubmit={handlesubmit}>
+    <form className="space-y-5" onSubmit={form.handleSubmit(onSubmit)}>
       <div className="flex flex-col justify-center items-center gap-5">
 
-        {/* Email */}
-        <Input
-          required
-          className="rounded"
-          type="email"
-          placeholder="Email"
-          value={logindata.email}
-          onChange={(e) =>
-            setLoginData((prev) => ({
-              ...prev,
-              email: e.target.value.trim().toLowerCase(),
-            }))
-          }
-        />
+        <Controller
+                  name="email"
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <Field data-invalid={fieldState.invalid}>
+                      
+                      <Input
+                        {...field}
+                        id={field.name}
+                        aria-invalid={fieldState.invalid}
+                        placeholder="Email"
+                        autoComplete="off"
+                      />
+                      {fieldState.invalid && (
+                        <FieldError errors={[fieldState.error]} />
+                      )}
+                    </Field>
+                  )}
+                />
 
-        {/* Password with eye */}
         <div className="relative w-full">
-          <Input
-            required
-            className="rounded pr-10"
-            type={showPassword ? "text" : "password"}
-            placeholder="Password"
-            value={logindata.password}
-            onChange={(e) =>
-              setLoginData((prev) => ({
-                ...prev,
-                password: e.target.value,
-              }))
-            }
-          />
+          <Controller
+                  name="password"
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <Field data-invalid={fieldState.invalid}>
+                      
+                      <Input
+                        {...field}
+                        id={field.name}
+                        aria-invalid={fieldState.invalid}
+                        placeholder="Password"
+                        autoComplete="off"
+                      />
+                      {fieldState.invalid && (
+                        <FieldError errors={[fieldState.error]} />
+                      )}
+                    </Field>
+                  )}
+                />
 
           <button
             type="button"

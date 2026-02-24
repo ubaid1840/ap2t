@@ -24,6 +24,7 @@ import { auth } from "@/lib/firebase";
 import { Separator } from "../ui/separator";
 import { toast } from "sonner";
 import { Spinner } from "../ui/spinner";
+import { RequiredStar } from "../required-star";
 
 export default function SignUpForm({
   onClickLogin,
@@ -202,7 +203,7 @@ function checkinfo() {
 
             <div className="flex gap-4">
               <div className="flex-1">
-                <Label className="text-sm">First Name *</Label>
+                <Label className="text-sm">First Name <RequiredStar/></Label>
                 <Input
                   required
                   type="text"
@@ -218,7 +219,7 @@ function checkinfo() {
                 />
               </div>
               <div className="flex-1">
-                <Label className="text-sm">Last Name *</Label>
+                <Label className="text-sm">Last Name <RequiredStar/></Label>
                 <Input
                   required
                   type="text"
@@ -237,7 +238,7 @@ function checkinfo() {
 
             <div className="flex gap-4">
               <div className="flex-1">
-                <Label className="text-sm">Birth Date *</Label>
+                <Label className="text-sm">Birth Date <RequiredStar/></Label>
                 <AppCalendar
                   date={
                     playerData.birth_date
@@ -254,7 +255,7 @@ function checkinfo() {
                 />
               </div>
               <div className="flex-1">
-                <Label className="text-sm">Town / City *</Label>
+                <Label className="text-sm">Town / City <RequiredStar/></Label>
                 <Input
                   required
                   type="text"
@@ -272,7 +273,7 @@ function checkinfo() {
             </div>
             <div className="grid grid-cols-2 gap-4">
                   <div className="flex-1">
-                <Label className="text-sm">zip_code *</Label>
+                <Label className="text-sm">zip_code <RequiredStar/></Label>
                 <Input
                   required
                   type="text"
@@ -289,7 +290,7 @@ function checkinfo() {
               </div>
               <div className="flex-1">
 
-              <Label className="text-sm">Email *</Label>
+              <Label className="text-sm">Email <RequiredStar/></Label>
               <Input
                 required
                 type="email"
@@ -309,7 +310,7 @@ function checkinfo() {
 
             <div className="flex gap-4">
               <div className="flex-1">
-                <Label className="text-sm">Password *</Label>
+                <Label className="text-sm">Password <RequiredStar/></Label>
                 <Input
                   required
                   type="password"
@@ -325,7 +326,7 @@ function checkinfo() {
                 />
               </div>
               <div className="flex-1">
-                <Label className="text-sm">Confirm Password *</Label>
+                <Label className="text-sm">Confirm Password <RequiredStar/></Label>
                 <Input
                   required
                   type="password"
@@ -350,7 +351,7 @@ function checkinfo() {
 
                 <div className="flex gap-4">
                   <div className="flex-1">
-                    <Label className="text-sm">First Name *</Label>
+                    <Label className="text-sm">First Name <RequiredStar/></Label>
                     <Input
                       required
                       type="text"
@@ -366,7 +367,7 @@ function checkinfo() {
                     />
                   </div>
                   <div className="flex-1">
-                    <Label className="text-sm">Last Name *</Label>
+                    <Label className="text-sm">Last Name <RequiredStar/></Label>
                     <Input
                       required
                       type="text"
@@ -385,7 +386,7 @@ function checkinfo() {
 
                 <div className="flex gap-4">
                   <div className="flex-1">
-                    <Label className="text-sm">Birth Date *</Label>
+                    <Label className="text-sm">Birth Date <RequiredStar/></Label>
                     <AppCalendar
                       date={
                         parentData.birth_date
@@ -402,7 +403,7 @@ function checkinfo() {
                     />
                   </div>
                   <div className="flex-1">
-                    <Label className="text-sm">Town / City *</Label>
+                    <Label className="text-sm">Town / City <RequiredStar/></Label>
                     <Input
                       required
                       type="text"
@@ -422,7 +423,7 @@ function checkinfo() {
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
 
-                    <Label className="text-sm">Zip Code*</Label>
+                    <Label className="text-sm">Zip Code <RequiredStar/></Label>
                     <Input
                       required
                       type="text"
@@ -440,7 +441,7 @@ function checkinfo() {
                   <div className="space-y-2">
 
 
-                  <Label className="text-sm">Email *</Label>
+                  <Label className="text-sm">Email <RequiredStar/></Label>
                   <Input
                     required
                     type="email"
@@ -459,7 +460,7 @@ function checkinfo() {
 
                 <div className="flex gap-4">
                   <div className="flex-1">
-                    <Label className="text-sm">Password *</Label>
+                    <Label className="text-sm">Password <RequiredStar/></Label>
                     <Input
                       required
                       type="password"
@@ -475,7 +476,7 @@ function checkinfo() {
                     />
                   </div>
                   <div className="flex-1">
-                    <Label className="text-sm">Confirm Password *</Label>
+                    <Label className="text-sm">Confirm Password <RequiredStar/></Label>
                     <Input
                       required
                       type="password"
