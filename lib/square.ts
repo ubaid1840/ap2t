@@ -1,0 +1,6 @@
+import { SquareClient, SquareEnvironment } from "square";
+
+export const squareClient = new SquareClient({
+  token: process.env.SQUARE_SANDBOX_ACCESS_TOKEN!,
+  environment: SquareEnvironment.Sandbox,
+});

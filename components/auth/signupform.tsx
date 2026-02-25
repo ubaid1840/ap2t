@@ -10,7 +10,7 @@ import {
   StepperTrigger,
 } from "@/components/ui/stepper";
 import { File, FileWarning, User, Wallet } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import AppCalendar from "../app-calendar";
 import GradientIcon from "../landing/icon-container";
 import { Button } from "../ui/button";
@@ -26,19 +26,26 @@ import { toast } from "sonner";
 import { Spinner } from "../ui/spinner";
 import { RequiredStar } from "../required-star";
 
+declare const Square: any;
+
 export default function SignUpForm({
   onClickLogin,
 }: {
   onClickLogin: () => void;
 }) {
-  const [underAged, setUnderAged] = useState(false)
-  const [loading, setLoading] = useState(false)
+  const [underAged, setUnderAged] = useState(false);
+  const [loading, setLoading] = useState(false);
+  
+  
+  const squareCardRef = useRef<any>(null);
+  const squareInitializedRef = useRef(false);
+
   const [playerData, setPlayerData] = useState({
     first_name: "",
     last_name: "",
     birth_date: "",
     location: "",
-    zip_code:"",
+    zip_code: "",
     email: "",
     password: "",
     confirm_password: "",
@@ -49,144 +56,240 @@ export default function SignUpForm({
     last_name: "",
     birth_date: "",
     location: "",
-    zip_code:"",
+    zip_code: "",
     email: "",
     password: "",
     confirm_password: "",
-  })
-
-
-  const [paymentData, setPaymentData] = useState({
-    cardholder_name: "",
-    card_number: "",
-    expiry_date: "",
-    cvv: "",
   });
+
+  
+  const [cardholderName, setCardholderName] = useState("");
 
   const [waiverData, setWaiverData] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
 
-  useEffect((() => {
-    const age = new Date().getFullYear() - new Date(playerData.birth_date).getFullYear()
-    if (age < 18) {
-      setUnderAged(true)
+  
+  useEffect(() => {
+    const age =
+      new Date().getFullYear() -
+      new Date(playerData.birth_date).getFullYear();
+    setUnderAged(age < 18);
+  }, [playerData.birth_date]);
+
+  
+  useEffect(() => {
+    if (currentStep !== 1) return;
+    if (squareInitializedRef.current) return;
+
+    const initSquare = async () => {
+      try {
+        
+        if (typeof Square === "undefined") {
+          toast.error("Payment system failed to load. Please refresh.");
+          return;
+        }
+
+        const payments = Square.payments(
+          process.env.NEXT_PUBLIC_SQUARE_APP_ID!,
+          process.env.NEXT_PUBLIC_SQUARE_LOCATION_ID!
+        );
+
+        const card = await payments.card({
+  style: {
+    ".input-container": {
+      borderRadius: "6px",
+      borderColor: "#282828",
+    },
+    ".input-container.is-focus": {
+      borderColor: "#d3fb20",
+    },
+    input: {
+      color: "#000000",
+      fontSize: "14px",
+    },
+    "input::placeholder": {
+      color: "#6b7280",
+    },
+  },
+});
+
+        await card.attach("#square-card-container");
+        squareCardRef.current = card;
+        squareInitializedRef.current = true;
+      } catch (err: any) {
+        toast.error("Failed to load payment form: " + err.message);
+      }
+    };
+
+    
+    const timer = setTimeout(initSquare, 100);
+    return () => clearTimeout(timer);
+  }, [currentStep]);
+
+  const checkinfo = () => {
+    if (currentStep !== 0) return;
+
+    if (
+      !playerData.first_name ||
+      !playerData.last_name ||
+      !playerData.birth_date ||
+      !playerData.location ||
+      !playerData.zip_code ||
+      !playerData.email ||
+      !playerData.password ||
+      !playerData.confirm_password
+    ) {
+      toast.error("Please complete all player fields");
+      return;
     }
-    else {
-      setUnderAged(false)
+
+    if (playerData.password !== playerData.confirm_password) {
+      toast.error("Passwords do not match");
+      return;
     }
-  }), [playerData.birth_date])
+
+    if (underAged) {
+      if (
+        !parentData.first_name ||
+        !parentData.last_name ||
+        !parentData.birth_date ||
+        !parentData.location ||
+        !parentData.zip_code ||
+        !parentData.email ||
+        !parentData.password ||
+        !parentData.confirm_password
+      ) {
+        toast.error("Please complete all parent fields");
+        return;
+      }
+
+      if (parentData.password !== parentData.confirm_password) {
+        toast.error("Parent passwords do not match");
+        return;
+      }
+    }
+
+    setCurrentStep(1);
+  };
+
+  
+  const checkPayment = async () => {
+    if (!cardholderName.trim()) {
+      toast.error("Please enter the cardholder name");
+      return;
+    }
+
+    if (!squareCardRef.current) {
+      toast.error("Payment form not ready. Please wait a moment.");
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      
+      const result = await squareCardRef.current.tokenize();
+
+      if (result.status !== "OK") {
+        const errorMsg =
+          result.errors?.[0]?.message || "Invalid card details";
+        toast.error(errorMsg);
+        return;
+      }
+
+      
+      
+      sessionStorage.setItem("sq_card_token", result.token);
+      setCurrentStep(2);
+    } catch (err: any) {
+      toast.error("Payment error: " + err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const signUp = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!playerData.email || !playerData.password) return;
     if (playerData.password !== playerData.confirm_password) return;
-    if(!playerData.birth_date){
-      toast.error("birth date is required...")
-      return
+    if (!playerData.birth_date) {
+      toast.error("Birth date is required");
+      return;
     }
     if (underAged) {
       if (!parentData.email || !parentData.password) return;
-      if (parentData.password !== parentData.confirm_password) return
+      if (parentData.password !== parentData.confirm_password) return;
     }
-    if (!waiverData) return;
+    if (!waiverData) {
+      toast.error("Please agree to the waiver");
+      return;
+    }
 
+    const cardToken = sessionStorage.getItem("sq_card_token");
+    if (!cardToken) {
+      toast.error("Payment info missing. Please go back and re-enter your card.");
+      setCurrentStep(1);
+      return;
+    }
 
-    const payload = {
+    const payload: any = {
       player: {
         first_name: playerData.first_name,
         last_name: playerData.last_name,
         email: playerData.email,
-        zip_code:playerData.zip_code,
+        zip_code: playerData.zip_code,
         password: playerData.password,
         birth_date: playerData.birth_date,
         location: playerData.location,
-        role: "player"
+        role: "player",
       },
-      parent: {}
+      parent: {},
+      
+      
+     
+    };
 
-    }
     if (underAged) {
       payload.parent = {
         first_name: parentData.first_name,
         last_name: parentData.last_name,
-        zip_code:parentData.zip_code,
+        zip_code: parentData.zip_code,
         email: parentData.email,
         password: parentData.password,
         birth_date: parentData.birth_date,
         location: parentData.location,
         role: "parent",
+         card_token:cardToken,
+      cardholder_name:cardholderName,
       };
+    } else {
+      payload.player = {
+        ...payload.player,
+         card_token:cardToken,
+      cardholder_name:cardholderName,
+      }
     }
 
     try {
-      setLoading(true)
-      let parent_id = null
-      let email = playerData.email
-      let password = playerData.password
+      setLoading(true);
 
+      
       await axios.post("/user?special=true", payload);
-      if (underAged && payload?.parent) {
-        email = parentData.email
-        password = parentData.password
-      }
-      await signInWithEmailAndPassword(auth, email, password)
 
+      
+      sessionStorage.removeItem("sq_card_token");
+
+      const loginEmail = underAged ? parentData.email : playerData.email;
+      const loginPassword = underAged ? parentData.password : playerData.password;
+
+      await signInWithEmailAndPassword(auth, loginEmail, loginPassword);
     } catch (error: any) {
-      toast.error(error?.message)
+      toast.error(error?.message);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
   };
-
-function checkinfo() {
-  if (currentStep !== 0) return;
-
-  
-  if (
-    !playerData.first_name ||
-    !playerData.last_name ||
-    !playerData.birth_date ||
-    !playerData.location ||
-    !playerData.zip_code ||
-    !playerData.email ||
-    !playerData.password ||
-    !playerData.confirm_password
-  ) {
-    toast.error("Please complete all player fields");
-    return; 
-  }
-
-  if (playerData.password !== playerData.confirm_password) {
-    toast.error("Passwords do not match");
-    return;
-  }
-
-  
-  if (underAged) {
-    if (
-      !parentData.first_name ||
-      !parentData.last_name ||
-      !parentData.birth_date ||
-      !parentData.location ||
-      !parentData.zip_code ||
-      !parentData.email ||
-      !parentData.password ||
-      !parentData.confirm_password
-    ) {
-      toast.error("Please complete all parent fields");
-      return;
-    }
-
-    if (parentData.password !== parentData.confirm_password) {
-      toast.error("Parent passwords do not match");
-      return;
-    }
-  }
-
-  
-  setCurrentStep(1);
-}
 
   const steps = [
     {
@@ -196,41 +299,32 @@ function checkinfo() {
       content: (
         <form className="bg-[#131313] p-6 rounded-[10px] w-full">
           <div className="space-y-6">
-
             <div className="border-b border-[#282828] pb-3">
               <h2 className="text-sm font-medium">Player Information</h2>
             </div>
 
             <div className="flex gap-4">
               <div className="flex-1">
-                <Label className="text-sm">First Name <RequiredStar/></Label>
+                <Label className="text-sm">First Name <RequiredStar /></Label>
                 <Input
-                  required
                   type="text"
                   placeholder="First Name"
                   className="w-full px-4"
                   value={playerData.first_name}
                   onChange={(e) =>
-                    setPlayerData((prev) => ({
-                      ...prev,
-                      first_name: e.target.value,
-                    }))
+                    setPlayerData((prev) => ({ ...prev, first_name: e.target.value }))
                   }
                 />
               </div>
               <div className="flex-1">
-                <Label className="text-sm">Last Name <RequiredStar/></Label>
+                <Label className="text-sm">Last Name <RequiredStar /></Label>
                 <Input
-                  required
                   type="text"
                   placeholder="Last Name"
                   className="w-full px-4"
                   value={playerData.last_name}
                   onChange={(e) =>
-                    setPlayerData((prev) => ({
-                      ...prev,
-                      last_name: e.target.value,
-                    }))
+                    setPlayerData((prev) => ({ ...prev, last_name: e.target.value }))
                   }
                 />
               </div>
@@ -238,147 +332,115 @@ function checkinfo() {
 
             <div className="flex gap-4">
               <div className="flex-1">
-                <Label className="text-sm">Birth Date <RequiredStar/></Label>
+                <Label className="text-sm">Birth Date <RequiredStar /></Label>
                 <AppCalendar
-                  date={
-                    playerData.birth_date
-                      ? new Date(playerData.birth_date)
-                      : undefined
-                  }
+                  date={playerData.birth_date ? new Date(playerData.birth_date) : undefined}
                   onChange={(date) =>
-                    setPlayerData((prevState) => ({
-                      ...prevState,
-                      birth_date: date,
-                    }))
+                    setPlayerData((prev) => ({ ...prev, birth_date: date }))
                   }
                   required
                 />
               </div>
               <div className="flex-1">
-                <Label className="text-sm">Town / City <RequiredStar/></Label>
+                <Label className="text-sm">Town / City <RequiredStar /></Label>
                 <Input
-                  required
                   type="text"
                   placeholder="New York"
                   className="w-full px-4"
                   value={playerData.location}
                   onChange={(e) =>
-                    setPlayerData((prev) => ({
-                      ...prev,
-                      location: e.target.value,
-                    }))
+                    setPlayerData((prev) => ({ ...prev, location: e.target.value }))
                   }
                 />
               </div>
             </div>
+
             <div className="grid grid-cols-2 gap-4">
-                  <div className="flex-1">
-                <Label className="text-sm">zip_code <RequiredStar/></Label>
+              <div className="flex-1">
+                <Label className="text-sm">Zip Code <RequiredStar /></Label>
                 <Input
-                  required
                   type="text"
-                  placeholder="New York"
+                  placeholder="10001"
                   className="w-full px-4"
                   value={playerData.zip_code}
                   onChange={(e) =>
-                    setPlayerData((prev) => ({
-                      ...prev,
-                      zip_code: e.target.value,
-                    }))
+                    setPlayerData((prev) => ({ ...prev, zip_code: e.target.value }))
                   }
                 />
               </div>
               <div className="flex-1">
-
-              <Label className="text-sm">Email <RequiredStar/></Label>
-              <Input
-                required
-                type="email"
-                placeholder="johnsmith@gmail.com"
-                className="w-full px-4"
-                value={playerData.email}
-                onChange={(e) =>
-                  setPlayerData((prev) => ({
-                    ...prev,
-                    email: e.target.value.trim().toLowerCase(),
-                  }))
-                }
-              />
+                <Label className="text-sm">Email <RequiredStar /></Label>
+                <Input
+                  type="email"
+                  placeholder="johnsmith@gmail.com"
+                  className="w-full px-4"
+                  value={playerData.email}
+                  onChange={(e) =>
+                    setPlayerData((prev) => ({
+                      ...prev,
+                      email: e.target.value.trim().toLowerCase(),
+                    }))
+                  }
+                />
+              </div>
             </div>
-            </div>
-            
 
             <div className="flex gap-4">
               <div className="flex-1">
-                <Label className="text-sm">Password <RequiredStar/></Label>
+                <Label className="text-sm">Password <RequiredStar /></Label>
                 <Input
-                  required
                   type="password"
                   placeholder="••••••••"
                   className="w-full px-4"
                   value={playerData.password}
                   onChange={(e) =>
-                    setPlayerData((prev) => ({
-                      ...prev,
-                      password: e.target.value,
-                    }))
+                    setPlayerData((prev) => ({ ...prev, password: e.target.value }))
                   }
                 />
               </div>
               <div className="flex-1">
-                <Label className="text-sm">Confirm Password <RequiredStar/></Label>
+                <Label className="text-sm">Confirm Password <RequiredStar /></Label>
                 <Input
-                  required
                   type="password"
                   placeholder="••••••••"
                   className="w-full px-4"
                   value={playerData.confirm_password}
                   onChange={(e) =>
-                    setPlayerData((prev) => ({
-                      ...prev,
-                      confirm_password: e.target.value,
-                    }))
+                    setPlayerData((prev) => ({ ...prev, confirm_password: e.target.value }))
                   }
                 />
               </div>
             </div>
+
             {underAged && (
               <>
-            <Separator />
+                <Separator />
                 <div className="border-b border-[#282828] pb-3">
                   <h2 className="text-sm font-medium">Parent Information</h2>
                 </div>
 
                 <div className="flex gap-4">
                   <div className="flex-1">
-                    <Label className="text-sm">First Name <RequiredStar/></Label>
+                    <Label className="text-sm">First Name <RequiredStar /></Label>
                     <Input
-                      required
                       type="text"
                       placeholder="First Name"
                       className="w-full px-4"
                       value={parentData.first_name}
                       onChange={(e) =>
-                        setParentData((prev) => ({
-                          ...prev,
-                          first_name: e.target.value,
-                        }))
+                        setParentData((prev) => ({ ...prev, first_name: e.target.value }))
                       }
                     />
                   </div>
                   <div className="flex-1">
-                    <Label className="text-sm">Last Name <RequiredStar/></Label>
+                    <Label className="text-sm">Last Name <RequiredStar /></Label>
                     <Input
-                      required
                       type="text"
                       placeholder="Last Name"
                       className="w-full px-4"
                       value={parentData.last_name}
                       onChange={(e) =>
-                        setParentData((prev) => ({
-                          ...prev,
-                          last_name: e.target.value,
-                        }))
+                        setParentData((prev) => ({ ...prev, last_name: e.target.value }))
                       }
                     />
                   </div>
@@ -386,35 +448,24 @@ function checkinfo() {
 
                 <div className="flex gap-4">
                   <div className="flex-1">
-                    <Label className="text-sm">Birth Date <RequiredStar/></Label>
+                    <Label className="text-sm">Birth Date <RequiredStar /></Label>
                     <AppCalendar
-                      date={
-                        parentData.birth_date
-                          ? new Date(parentData.birth_date)
-                          : undefined
-                      }
+                      date={parentData.birth_date ? new Date(parentData.birth_date) : undefined}
                       onChange={(date) =>
-                        setParentData((prevState) => ({
-                          ...prevState,
-                          birth_date: date,
-                        }))
+                        setParentData((prev) => ({ ...prev, birth_date: date }))
                       }
                       required
                     />
                   </div>
                   <div className="flex-1">
-                    <Label className="text-sm">Town / City <RequiredStar/></Label>
+                    <Label className="text-sm">Town / City <RequiredStar /></Label>
                     <Input
-                      required
                       type="text"
                       placeholder="New York"
                       className="w-full px-4"
                       value={parentData.location}
                       onChange={(e) =>
-                        setParentData((prev) => ({
-                          ...prev,
-                          location: e.target.value,
-                        }))
+                        setParentData((prev) => ({ ...prev, location: e.target.value }))
                       }
                     />
                   </div>
@@ -422,63 +473,50 @@ function checkinfo() {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-
-                    <Label className="text-sm">Zip Code <RequiredStar/></Label>
+                    <Label className="text-sm">Zip Code <RequiredStar /></Label>
                     <Input
-                      required
                       type="text"
-                      placeholder="9867"
+                      placeholder="10001"
                       className="w-full px-4"
                       value={parentData.zip_code}
                       onChange={(e) =>
-                        setParentData((prev) => ({
-                          ...prev,
-                          zip_code: e.target.value,
-                        }))
+                        setParentData((prev) => ({ ...prev, zip_code: e.target.value }))
                       }
                     />
                   </div>
                   <div className="space-y-2">
-
-
-                  <Label className="text-sm">Email <RequiredStar/></Label>
-                  <Input
-                    required
-                    type="email"
-                    placeholder="johnsmith@gmail.com"
-                    className="w-full px-4"
-                    value={parentData.email}
-                    onChange={(e) =>
-                      setParentData((prev) => ({
-                        ...prev,
-                        email: e.target.value.trim().toLowerCase(),
-                      }))
-                    }
-                  />
+                    <Label className="text-sm">Email <RequiredStar /></Label>
+                    <Input
+                      type="email"
+                      placeholder="johnsmith@gmail.com"
+                      className="w-full px-4"
+                      value={parentData.email}
+                      onChange={(e) =>
+                        setParentData((prev) => ({
+                          ...prev,
+                          email: e.target.value.trim().toLowerCase(),
+                        }))
+                      }
+                    />
                   </div>
                 </div>
 
                 <div className="flex gap-4">
                   <div className="flex-1">
-                    <Label className="text-sm">Password <RequiredStar/></Label>
+                    <Label className="text-sm">Password <RequiredStar /></Label>
                     <Input
-                      required
                       type="password"
                       placeholder="••••••••"
                       className="w-full px-4"
                       value={parentData.password}
                       onChange={(e) =>
-                        setParentData((prev) => ({
-                          ...prev,
-                          password: e.target.value,
-                        }))
+                        setParentData((prev) => ({ ...prev, password: e.target.value }))
                       }
                     />
                   </div>
                   <div className="flex-1">
-                    <Label className="text-sm">Confirm Password <RequiredStar/></Label>
+                    <Label className="text-sm">Confirm Password <RequiredStar /></Label>
                     <Input
-                      required
                       type="password"
                       placeholder="••••••••"
                       className="w-full px-4"
@@ -493,25 +531,17 @@ function checkinfo() {
                   </div>
                 </div>
               </>
-            )
-
-            }
+            )}
 
             <div className="flex gap-4">
               <Button
-                onClick={(e) => {
-                  e.preventDefault()
-                  checkinfo()
-                }}
+                onClick={(e) => { e.preventDefault(); checkinfo(); }}
                 className="flex-1 bg-primary text-secondary"
               >
                 Continue
               </Button>
               <Button
-                onClick={(e) => {
-                  e.preventDefault()
-                  onClickLogin()
-                }}
+                onClick={(e) => { e.preventDefault(); onClickLogin(); }}
                 className="flex-1 bg-secondary text-white"
               >
                 Login
@@ -526,84 +556,33 @@ function checkinfo() {
       icon: <Wallet />,
       step: 1,
       content: (
-        <form className="bg-[#131313] p-6 rounded-[10px] w-full">
+        <div className="bg-[#131313] p-6 rounded-[10px] w-full">
           <div className="space-y-6">
             <div className="border-b border-[#282828] pb-3">
               <h2 className="text-sm font-medium">Payment Information</h2>
             </div>
 
-            <div className="flex gap-4">
-              <div className="flex-1">
-                <Label className="text-sm">Cardholder Name *</Label>
-                <Input
-                  required
-                  type="text"
-                  placeholder="joe smith"
-                  className="w-full px-4"
-                  value={paymentData.cardholder_name}
-                  onChange={(e) =>
-                    setPaymentData((prev) => ({
-                      ...prev,
-                      cardholder_name: e.target.value,
-                    }))
-                  }
-                />
-              </div>
+            
+            <div>
+              <Label className="text-sm">Cardholder Name <RequiredStar /></Label>
+              <Input
+                type="text"
+                placeholder="Joe Smith"
+                className="w-full px-4"
+                value={cardholderName}
+                onChange={(e) => setCardholderName(e.target.value)}
+              />
             </div>
 
-            <div className="flex gap-4">
-              <div className="flex-1">
-                <Label className="text-sm">Card Number *</Label>
-                <Input
-                  required
-                  type="text"
-                  className="w-full px-4"
-                  placeholder="1234 5678 9012 3456"
-                  value={paymentData.card_number}
-                  onChange={(e) =>
-                    setPaymentData((prev) => ({
-                      ...prev,
-                      card_number: e.target.value,
-                    }))
-                  }
-                />
-              </div>
-            </div>
-
-            <div className="flex gap-4">
-              <div className="flex-1">
-                <Label className="text-sm">Expiry Date *</Label>
-                <AppCalendar
-                  date={
-                    paymentData.expiry_date
-                      ? new Date(paymentData.expiry_date)
-                      : undefined
-                  }
-                  onChange={(date) =>
-                    setPaymentData((prevState) => ({
-                      ...prevState,
-                      expiry_date: date,
-                    }))
-                  }
-                  required
-                />
-              </div>
-              <div className="flex-1">
-                <Label className="text-sm">CVV *</Label>
-                <Input
-                  required
-                  type="text"
-                  placeholder="222"
-                  className="w-full px-4"
-                  value={paymentData.cvv}
-                  onChange={(e) =>
-                    setPaymentData((prev) => ({
-                      ...prev,
-                      cvv: e.target.value,
-                    }))
-                  }
-                />
-              </div>
+            
+            <div>
+              <Label className="text-sm block mb-2">
+                Card Details <RequiredStar />
+              </Label>
+              <div
+                id="square-card-container"
+                className="min-h-[100px] rounded-[6px] p-1 bg-[#1A1A1A]"
+              />
             </div>
 
             <div className="bg-[#CBFD0026] flex items-center gap-2 p-2 rounded-[5px]">
@@ -621,14 +600,15 @@ function checkinfo() {
                 Back
               </Button>
               <Button
-                onClick={() => setCurrentStep(2)}
+                onClick={checkPayment}
+                disabled={loading}
                 className="flex-1 bg-primary text-secondary"
               >
-                Continue
+                {loading ? <Spinner className="text-black" /> : "Continue"}
               </Button>
             </div>
           </div>
-        </form>
+        </div>
       ),
     },
     {
@@ -648,8 +628,7 @@ function checkinfo() {
                 <p>
                   I, the undersigned, acknowledge that participation in sports
                   and physical training activities involves inherent risks,
-                  including but not limited to physical injury, disability, or
-                  death.
+                  including but not limited to physical injury, disability, or death.
                 </p>
                 <p>
                   I voluntarily agree to assume all risks associated with my
@@ -657,8 +636,7 @@ function checkinfo() {
                   Technical Training. I hereby release, waive, discharge, and
                   covenant not to sue Advanced Physical and Technical Training,
                   its owners, employees, coaches, and affiliates from any and
-                  all liability for any injury, loss, or damage to person or
-                  property.
+                  all liability for any injury, loss, or damage to person or property.
                 </p>
                 <p>
                   I certify that I am in good physical condition and have no
@@ -672,15 +650,13 @@ function checkinfo() {
                 </p>
               </article>
             </div>
+
             <div className="bg-[#CBFD0026] flex items-center gap-2 p-2 rounded-[5px]">
               <div className="flex p-1 gap-2 items-center">
                 <Checkbox
-                  required
                   className="border-primary border-2 data-[state=checked]:border-white data-[state=checked]:bg-primary data-[state=checked]:text-black dark:data-[state=checked]:border-white dark:data-[state=checked]:bg-primary"
                   checked={waiverData}
-                  onCheckedChange={(checked) => {
-                    setWaiverData(checked === true);
-                  }}
+                  onCheckedChange={(checked) => setWaiverData(checked === true)}
                 />
                 <p className="text-muted-foreground">
                   I have read and agree to the terms of the Liability Waiver and
@@ -692,23 +668,17 @@ function checkinfo() {
 
             <div className="flex gap-4">
               <Button
-                onClick={(e) => {
-                  e.preventDefault();
-                  setCurrentStep(1);
-                }}
+                onClick={(e) => { e.preventDefault(); setCurrentStep(1); }}
                 className="flex-1 bg-secondary text-white"
               >
-                back
+                Back
               </Button>
               <Button
-                onClick={(e) => {
-                  e.preventDefault();
-                  setCurrentStep(2);
-                  signUp(e);
-                }}
+                onClick={signUp}
+                disabled={loading}
                 className="flex-1 bg-primary text-secondary"
               >
-                {loading && <Spinner className="text-black" />}  Sign up
+                {loading && <Spinner className="text-black" />} Sign Up
               </Button>
             </div>
           </div>
@@ -718,8 +688,7 @@ function checkinfo() {
   ];
 
   return (
-    <div className="flex flex-col gap-6 w-full ">
-      {/* Warning */}
+    <div className="flex flex-col gap-6 w-full">
       <div className="bg-[#CBFD0026] flex items-center gap-2 p-2 rounded-[5px]">
         <FileWarning className="text-primary w-4 h-4" />
         <p className="text-xs text-muted-foreground">
@@ -727,20 +696,16 @@ function checkinfo() {
         </p>
       </div>
 
-      {/* Stepper */}
-
       <Stepper
         value={currentStep}
-        onValueChange={() => { }}
-        className="space-y-8 w-full "
+        onValueChange={() => {}}
+        className="space-y-8 w-full"
       >
         <StepperNav>
           {steps.map((s) => (
             <StepperItem key={s.id} step={s.step}>
               <StepperTrigger>
-                <GradientIcon
-                  className={`${s.step <= currentStep && "text-primary"}`}
-                >
+                <GradientIcon className={`${s.step <= currentStep && "text-primary"}`}>
                   {s.icon}
                 </GradientIcon>
               </StepperTrigger>
@@ -751,17 +716,15 @@ function checkinfo() {
           ))}
         </StepperNav>
         <StepperPanel className="text-sm">
-          {steps.map((s, idx) => {
-            return (
-              <StepperContent
-                key={s.step}
-                value={s.step}
-                className="flex items-center justify-center"
-              >
-                {s.content}
-              </StepperContent>
-            );
-          })}
+          {steps.map((s) => (
+            <StepperContent
+              key={s.step}
+              value={s.step}
+              className="flex items-center justify-center"
+            >
+              {s.content}
+            </StepperContent>
+          ))}
         </StepperPanel>
       </Stepper>
     </div>

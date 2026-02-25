@@ -34,6 +34,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         suppressHydrationWarning
       >
+        <script src="https://sandbox.web.squarecdn.com/v1/square.js" async />
         <Suspense fallback={
           <AnimatingLoader />}>
           <NextTopLoader

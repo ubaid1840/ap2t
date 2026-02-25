@@ -1,6 +1,7 @@
 import pool from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
 import admin from "@/lib/firebase-admin";
+import { squareClient } from "@/lib/square";
 
 export async function PUT(req: NextRequest) {
     try {
@@ -222,7 +223,7 @@ export async function createUserWithFirebase(
     admin: any,
     data: any
 ) {
-    const { password, email, ...rest } = data;
+    const { password, email, card_token, cardholder_name, ...rest } = data;
 
     if (!email) throw new Error("Email required");
 
@@ -245,18 +246,59 @@ export async function createUserWithFirebase(
         }
     }
 
-    const fields = Object.keys({ ...rest, email });
-    const values = Object.values({ ...rest, email });
-    const placeholders = fields.map((_, i) => `$${i + 1}`).join(",");
+
+    let squareCustomerId: string | null = null;
+    let squareCardId: string | null = null;
+
+    if (card_token) {
+        try {
+            const customerRes = await squareClient.customers.create({
+                givenName: rest.first_name,
+                familyName: rest.last_name,
+                emailAddress: email,
+                phoneNumber: rest.phone_no ?? "",
+                idempotencyKey: crypto.randomUUID(),
+            })
+
+            squareCustomerId = customerRes.customer?.id ?? null
+            if (!squareCustomerId) throw new Error("Failed to create Square customer")
+
+            const cardRes = await squareClient.cards.create({
+                idempotencyKey: crypto.randomUUID(),
+                sourceId: card_token,        
+                card: {
+                    customerId: squareCustomerId,
+                    cardholderName: cardholder_name, 
+                },
+            })
+
+            squareCardId = cardRes.card?.id ?? null
+            if (!squareCardId) throw new Error("Failed to save card")
+
+        } catch (error: any) {
+            throw new Error("Payment setup failed: " + error.message)
+           
+        }
+    }
+
+    const insertData: Record<string, any> = { ...rest, email }
+
+    if (squareCustomerId) insertData.square_customer_id = squareCustomerId
+    if (squareCardId) insertData.square_card_id = squareCardId
+    if (cardholder_name) insertData.cardholder_name = cardholder_name
+
+    const fields = Object.keys(insertData)
+    const values = Object.values(insertData)
+    const placeholders = fields.map((_, i) => `$${i + 1}`).join(",")
 
     const res = await pool.query(
         `INSERT INTO users (${fields.join(",")})
-     VALUES (${placeholders})
-     RETURNING id`,
+         VALUES (${placeholders})
+         RETURNING id`,
         values
-    );
+    )
 
-    return res.rows[0].id;
+    return res.rows[0].id
 }
 
 
