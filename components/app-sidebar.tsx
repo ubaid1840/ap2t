@@ -126,7 +126,7 @@ export default function AppSidebar() {
                 <p className="text-xs text-[#282828]">Need Help?</p>
                 <p className="text-md text-[#282828]">Contact Support</p>
                 <Dialog>
-                  <DialogTrigger>
+                  <DialogTrigger asChild>
 
                 <Button className="bg-black text-primary rounded-xl">
                   Get Support

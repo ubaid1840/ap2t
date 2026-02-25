@@ -14,6 +14,9 @@ export default function GetSupportDialog(){
     }
     return(
         <DialogContent>
+            <DialogTitle>
+                Get Support
+            </DialogTitle>
              <form className="mt-8 space-y-5" onSubmit={handleSubmit}>
                                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                             <input
