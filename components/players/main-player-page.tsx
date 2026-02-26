@@ -20,6 +20,7 @@ import {
   Calendar,
   CircleCheckBig,
   Clock,
+  CreditCard,
   DollarSign,
   Gift,
   Info,
@@ -39,6 +40,8 @@ import { IoIosStar, IoIosStarOutline } from "react-icons/io";
 import getInitials from "../parents/get-initials";
 import { Skeleton } from "../ui/skeleton";
 import { AddParentDialog } from "./add-parents";
+import PaymentMethodSteps from "../square/payment-method-steps";
+import { SquareSavedCard } from "@/lib/types";
 
 export interface PlayerResponse {
   id: number;
@@ -177,10 +180,19 @@ export default function MainPlayerPage({
   const isMobile = useIsMobile();
   const [loading, setLoading] = useState(true);
   const [statusLoading, setStatusLoading] = useState(false);
+  const [cardInformation, setCardInformation] = useState<SquareSavedCard | undefined>()
 
   useEffect(() => {
-    if (user?.id && id) fetchData();
+    if (user?.id && id) {
+      fetchData()
+      fetchCardInformation()
+    };
   }, [id, user]);
+
+  async function fetchCardInformation() {
+    const result = await axios.get(`/user/card?id=${id}`);
+    setCardInformation(result.data)
+  }
 
   const setStatus = async (status: string) => {
     setStatusLoading(true);
@@ -245,6 +257,8 @@ export default function MainPlayerPage({
       </div>
     );
   }
+
+
 
   return (
     <div className="flex flex-col w-full gap-6">
@@ -494,6 +508,7 @@ export default function MainPlayerPage({
                 "Attendance Timeline",
                 "Payment Status",
                 "Coach Notes",
+                "Payment Method"
               ].map((t, i) => (
                 <TabsTrigger
                   key={t}
@@ -523,6 +538,12 @@ export default function MainPlayerPage({
                   {i === 3 && (
                     <div className="flex gap-2 items-center  py-2">
                       <MessageSquare /> {t}
+                    </div>
+                  )}
+
+                  {i === 4 && (
+                    <div className="flex gap-2 items-center  py-2">
+                      <CreditCard /> {t}
                     </div>
                   )}
                 </TabsTrigger>
@@ -727,6 +748,12 @@ export default function MainPlayerPage({
                   </CardContent>
                 </Card>
               ))}
+          </TabsContent>
+
+          <TabsContent value="Payment Method" className="space-y-4 p-2">
+
+            <PaymentMethodSteps id={id} data={cardInformation} onRefresh={fetchCardInformation} />
+
           </TabsContent>
         </Tabs>
       </div>

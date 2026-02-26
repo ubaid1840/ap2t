@@ -29,14 +29,14 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ success: false, error: "Session not found" }, { status: 404 })
   }
 
-  const price = session_data.rows[0].price 
+  const price = session_data.rows[0].price
 
   try {
     const payment = await squareClient.payments.create({
       sourceId: square_card_id,
       idempotencyKey: crypto.randomUUID(),
       amountMoney: {
-        amount: BigInt(Math.round(Number(price) * 100)), 
+        amount: BigInt(Math.round(Number(price) * 100)),
         currency: "USD",
       },
       locationId: process.env.SQUARE_LOCATION_ID,
@@ -44,15 +44,42 @@ export async function POST(req: NextRequest) {
     })
 
     return NextResponse.json({
-  success: true,
-  paymentId: payment.payment?.id,
-  status: payment.payment?.status,
-  amount: {
-    amount: Number(payment.payment?.amountMoney?.amount), 
-    currency: payment.payment?.amountMoney?.currency,
-  }
-})
+      success: true,
+      paymentId: payment.payment?.id,
+      status: payment.payment?.status,
+      amount: {
+        amount: Number(payment.payment?.amountMoney?.amount),
+        currency: payment.payment?.amountMoney?.currency,
+      }
+    })
   } catch (error: any) {
     return NextResponse.json({ success: false, error: error.message }, { status: 500 })
+  }
+}
+
+export async function GET(req: NextRequest) {
+
+  try {
+    const searchParams = req.nextUrl.searchParams
+    const card = searchParams.get("card")
+
+    if (!card) return NextResponse.json({ message: "Card information missing" }, { status: 400 })
+
+    const response = await squareClient.cards.get({ cardId: card });
+    const fetchedCard = response?.card
+    let last = null
+    let month = null
+    let year = null
+    let brand = null
+    if (!fetchedCard) {
+      return NextResponse.json({ last, month, year, brand }, { status: 200 })
+    }
+    last = fetchedCard?.last4 ?? null
+    month = fetchedCard?.expMonth?.toString()
+    year = fetchedCard?.expYear?.toString()
+    brand = fetchedCard?.cardBrand
+    return NextResponse.json({ last, month, year, brand }, { status: 200 })
+  } catch (error: any) {
+    return NextResponse.json({ message: error?.message }, { status: 500 })
   }
 }

@@ -17,6 +17,7 @@ import axios from "@/lib/axios";
 import { calcualteRevenu, exportToExcel, getYear, joinNames } from "@/lib/functions";
 import { Scrollbar } from "@radix-ui/react-scroll-area";
 import {
+  Banknote,
   Calendar,
   Clock,
   CreditCard,
@@ -32,11 +33,16 @@ import {
   UserX
 } from "lucide-react";
 import moment from "moment";
-import { ReactNode, useEffect, useState } from "react";
+import { ReactNode, useEffect, useRef, useState } from "react";
 import { IoIosPin } from "react-icons/io";
 import { IoCalendarClear } from "react-icons/io5";
 import { Spinner } from "../ui/spinner";
 import Link from "next/link";
+import { toast } from "sonner";
+import { DARKMODECARDSTYLE } from "@/lib/constants";
+import SquareCard, { SquareCardRef } from "../square/square-card";
+import PaymentMethodSteps from "../square/payment-method-steps";
+import { SquareSavedCard } from "@/lib/types";
 
 export interface ParentDetailResponse {
   parent: Parent;
@@ -77,6 +83,7 @@ export interface Parent {
   birth_date: string | null;
   created_at: string;
   profile: ParentProfile;
+  square_card_id ?: string | null
 }
 
 export interface ParentProfile {
@@ -128,6 +135,9 @@ export interface SessionPlayer {
   last_name: string;
 }
 
+
+
+
 export default function MainParentPage({
   id,
   back,
@@ -143,19 +153,27 @@ export default function MainParentPage({
   const [loading, setLoading] = useState(false);
   const [dataLoading, setDataLoading] = useState(true)
   const { user } = useAuth()
+  const [cardInformation, setCardInformation] = useState<SquareSavedCard | undefined>()
 
 
   useEffect(() => {
     if (id && user?.id) {
       fetchData();
+      fetchCardInformation()
     }
   }, [id, user]);
+
+  async function fetchCardInformation(){
+    const result = await axios.get(`/user/card?id=${id}`);
+    console.log(result.data)
+    setCardInformation(result.data)
+  }
+
   const fetchData = async () => {
     setDataLoading(true)
     try {
 
       const result = await axios.get(`/admin/parents/${id}`);
-      console.log(result.data)
       setData(result.data)
 
     } finally {
@@ -186,31 +204,31 @@ export default function MainParentPage({
     }
   };
 
-function handleExport(payments: PaymentItemParent[] | undefined, fileName = "payments.xlsx"){
-if (!payments || payments.length === 0) return;
+  function handleExport(payments: PaymentItemParent[] | undefined, fileName = "payments.xlsx") {
+    if (!payments || payments.length === 0) return;
 
-  const headers = [
-    "Session Name",
-    "Status",
-    "Amount",
-    "Created At",
-    "Method",
-    "Transaction ID",
-  ];
+    const headers = [
+      "Session Name",
+      "Status",
+      "Amount",
+      "Created At",
+      "Method",
+      "Transaction ID",
+    ];
 
-  const rows: string[][] = payments.map((item) => [
-    item.session_name || "N/A",
-    item.status,
-    item.status === "refunded"
-      ? `-${Number(item.amount || 0).toFixed(2)}`
-      : `$${Number(item.amount || 0).toFixed(2)}`,
-    item.created_at ? moment(item.created_at).format("YYYY-MM-DD") : "N/A",
-    item.method || "N/A",
-    item.transaction_id || "Nil",
-  ]);
+    const rows: string[][] = payments.map((item) => [
+      item.session_name || "N/A",
+      item.status,
+      item.status === "refunded"
+        ? `-${Number(item.amount || 0).toFixed(2)}`
+        : `$${Number(item.amount || 0).toFixed(2)}`,
+      item.created_at ? moment(item.created_at).format("YYYY-MM-DD") : "N/A",
+      item.method || "N/A",
+      item.transaction_id || "Nil",
+    ]);
 
-  return exportToExcel(headers, rows, fileName);
-}
+    return exportToExcel(headers, rows, fileName);
+  }
 
   if (dataLoading) {
     return (
@@ -222,6 +240,8 @@ if (!payments || payments.length === 0) return;
       </div>
     )
   }
+
+
 
   return (
     <div className="flex flex-col w-full gap-6">
@@ -332,7 +352,9 @@ if (!payments || payments.length === 0) return;
               }
             />
 
-            <HeaderCard
+            <RenderCardDetail data={cardInformation} />
+
+            {/* <HeaderCard
               title={"**** 4242"}
               description="Exp:12/2026"
               icon={
@@ -340,7 +362,7 @@ if (!payments || payments.length === 0) return;
                   <CreditCard className="text-active-text" size={20} />
                 </div>
               }
-            />
+            /> */}
 
             <HeaderCard
               title={String(data?.stats?.upcoming_sessions || 0)}
@@ -366,7 +388,7 @@ if (!payments || payments.length === 0) return;
             className={`overflow-x-auto ${isMobile && "max-w-[calc(100vw-64px)]"}`}
           >
             <TabsList className="bg-transparent relative flex gap-2">
-              {["linked", "history", "payment"].map((t) => (
+              {["linked", "history", "payment", "method"].map((t) => (
                 <TabsTrigger
                   key={t}
                   value={t}
@@ -385,6 +407,12 @@ if (!payments || payments.length === 0) return;
                   {t === "payment" && (
                     <div className="flex gap-2 items-center py-2">
                       <CreditCard /> Payment History
+                    </div>
+                  )}
+
+                  {t === "method" && (
+                    <div className="flex gap-2 items-center py-2">
+                      <Banknote /> Payment Method
                     </div>
                   )}
                 </TabsTrigger>
@@ -480,7 +508,7 @@ if (!payments || payments.length === 0) return;
           <TabsContent value="payment" className="space-y-4 p-2">
             <div className="flex gap-4 flex-wrap justify-between items-center">
               <div />
-              <Button onClick={()=> handleExport(data?.payments)} variant={"outline"} className="bg-black">
+              <Button onClick={() => handleExport(data?.payments)} variant={"outline"} className="bg-black">
                 <Download /> Export
               </Button>
             </div>
@@ -522,10 +550,38 @@ if (!payments || payments.length === 0) return;
               </Card>
             ))}
           </TabsContent>
+
+          <TabsContent value="method" className="space-y-4 p-2">
+
+        <PaymentMethodSteps  id={data?.parent?.id} data={cardInformation} onRefresh={fetchCardInformation}/>
+
+          </TabsContent>
         </Tabs>
       </div>
     </div>
   );
+}
+
+
+
+const RenderCardDetail = ({ data }: { data: SquareSavedCard | undefined }) => {
+
+ 
+  return (
+    <Card className="rounded-[10px] bg-[#1A1A1A] border-[#3A3A3A] sm:w-[250px] w-full">
+      <CardContent>
+        <div className="flex gap-4 items-center">
+          <div className="rounded-[8px] flex w-10 h-10 items-center justify-center bg-active-bg">
+            <CreditCard className="text-active-text" size={20} />
+          </div>
+          <div>
+            <div className="text-lg text-white">{data?.last4 ? `**** ${data?.last4}` : "NA"}</div>
+            <div className="text-muted-foreground">{data?.expMonth ? `Exp:${data?.expMonth}/${data?.expYear}` : "NA"}</div>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  )
 }
 
 const HeaderCard = ({

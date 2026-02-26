@@ -25,8 +25,9 @@ import { Separator } from "../ui/separator";
 import { toast } from "sonner";
 import { Spinner } from "../ui/spinner";
 import { RequiredStar } from "../required-star";
+import { DARKMODECARDSTYLE } from "@/lib/constants";
 
-declare const Square: any;
+
 
 export default function SignUpForm({
   onClickLogin,
@@ -35,8 +36,8 @@ export default function SignUpForm({
 }) {
   const [underAged, setUnderAged] = useState(false);
   const [loading, setLoading] = useState(false);
-  
-  
+
+
   const squareCardRef = useRef<any>(null);
   const squareInitializedRef = useRef(false);
 
@@ -62,13 +63,13 @@ export default function SignUpForm({
     confirm_password: "",
   });
 
-  
+
   const [cardholderName, setCardholderName] = useState("");
 
   const [waiverData, setWaiverData] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
 
-  
+
   useEffect(() => {
     const age =
       new Date().getFullYear() -
@@ -76,54 +77,41 @@ export default function SignUpForm({
     setUnderAged(age < 18);
   }, [playerData.birth_date]);
 
-  
+
   useEffect(() => {
     if (currentStep !== 1) return;
-    if (squareInitializedRef.current) return;
+    // if (squareInitializedRef.current) return;
+
 
     const initSquare = async () => {
       try {
-        
-        if (typeof Square === "undefined") {
+
+        if (typeof (window as any).Square === "undefined") {
           toast.error("Payment system failed to load. Please refresh.");
           return;
         }
 
-        const payments = Square.payments(
+        const payments = (window as any).Square.payments(
           process.env.NEXT_PUBLIC_SQUARE_APP_ID!,
           process.env.NEXT_PUBLIC_SQUARE_LOCATION_ID!
         );
 
         const card = await payments.card({
-  style: {
-    ".input-container": {
-      borderRadius: "6px",
-      borderColor: "#282828",
-    },
-    ".input-container.is-focus": {
-      borderColor: "#d3fb20",
-    },
-    input: {
-      color: "#000000",
-      fontSize: "14px",
-    },
-    "input::placeholder": {
-      color: "#6b7280",
-    },
-  },
-});
+          style: DARKMODECARDSTYLE,
+        });
 
         await card.attach("#square-card-container");
         squareCardRef.current = card;
         squareInitializedRef.current = true;
       } catch (err: any) {
+        console.log(err)
         toast.error("Failed to load payment form: " + err.message);
       }
     };
+    initSquare()
 
-    
-    const timer = setTimeout(initSquare, 100);
-    return () => clearTimeout(timer);
+
+   
   }, [currentStep]);
 
   const checkinfo = () => {
@@ -172,7 +160,7 @@ export default function SignUpForm({
     setCurrentStep(1);
   };
 
-  
+
   const checkPayment = async () => {
     if (!cardholderName.trim()) {
       toast.error("Please enter the cardholder name");
@@ -187,7 +175,7 @@ export default function SignUpForm({
     try {
       setLoading(true);
 
-      
+
       const result = await squareCardRef.current.tokenize();
 
       if (result.status !== "OK") {
@@ -197,8 +185,6 @@ export default function SignUpForm({
         return;
       }
 
-      
-      
       sessionStorage.setItem("sq_card_token", result.token);
       setCurrentStep(2);
     } catch (err: any) {
@@ -245,9 +231,9 @@ export default function SignUpForm({
         role: "player",
       },
       parent: {},
-      
-      
-     
+
+
+
     };
 
     if (underAged) {
@@ -260,24 +246,24 @@ export default function SignUpForm({
         birth_date: parentData.birth_date,
         location: parentData.location,
         role: "parent",
-         card_token:cardToken,
-      cardholder_name:cardholderName,
+        card_token: cardToken,
+        cardholder_name: cardholderName,
       };
     } else {
       payload.player = {
         ...payload.player,
-         card_token:cardToken,
-      cardholder_name:cardholderName,
+        card_token: cardToken,
+        cardholder_name: cardholderName,
       }
     }
 
     try {
       setLoading(true);
 
-      
+
       await axios.post("/user?special=true", payload);
 
-      
+
       sessionStorage.removeItem("sq_card_token");
 
       const loginEmail = underAged ? parentData.email : playerData.email;
@@ -562,7 +548,6 @@ export default function SignUpForm({
               <h2 className="text-sm font-medium">Payment Information</h2>
             </div>
 
-            
             <div>
               <Label className="text-sm">Cardholder Name <RequiredStar /></Label>
               <Input
@@ -574,7 +559,7 @@ export default function SignUpForm({
               />
             </div>
 
-            
+
             <div>
               <Label className="text-sm block mb-2">
                 Card Details <RequiredStar />
@@ -698,7 +683,7 @@ export default function SignUpForm({
 
       <Stepper
         value={currentStep}
-        onValueChange={() => {}}
+        onValueChange={() => { }}
         className="space-y-8 w-full"
       >
         <StepperNav>

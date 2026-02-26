@@ -158,3 +158,26 @@ export type PaymentData = {
   status: "Completed" | "Pending" | "Failed" | "Comped" | "Voided";
   id: number;
 };
+
+export type SquareSavedCard = {
+  id: string;
+  cardBrand: string;
+  last4: string;
+  expMonth: string; // could also be number
+  expYear: string;  // could also be number
+  cardholderName: string;
+  billingAddress: {
+    postalCode?: string;
+    [key: string]: any; // in case other fields exist
+  };
+  fingerprint: string;
+  customerId: string;
+  merchantId: string;
+  enabled: boolean;
+  cardType: "CREDIT" | "DEBIT" | string;
+  prepaidType: "PREPAID" | "NOT_PREPAID" | string;
+  bin: string;
+  createdAt: string; // ISO date string
+  version: string;
+  hsaFsa: boolean;
+};

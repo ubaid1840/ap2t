@@ -258,7 +258,7 @@ export async function createUserWithFirebase(
                 emailAddress: email,
                 phoneNumber: rest.phone_no ?? "",
                 idempotencyKey: crypto.randomUUID(),
-            })
+            }) 
 
             squareCustomerId = customerRes.customer?.id ?? null
             if (!squareCustomerId) throw new Error("Failed to create Square customer")

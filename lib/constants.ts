@@ -176,6 +176,42 @@ export const EVENT_STYLES = {
     },
 }
 
+ export  const DARKMODECARDSTYLE = {
+        '.input-container': {
+          borderColor: '#2D2D2D',
+          borderRadius: '6px',
+        },
+        '.input-container.is-focus': {
+          borderColor: '#d3fb20',
+        },
+        '.input-container.is-error': {
+          borderColor: '#ff1600',
+        },
+        '.message-text': {
+          color: '#999999',
+        },
+        '.message-icon': {
+          color: '#999999',
+        },
+        '.message-text.is-error': {
+          color: '#ff1600',
+        },
+        '.message-icon.is-error': {
+          color: '#ff1600',
+        },
+        input: {
+          backgroundColor: '#1A1A1A',
+          color: '#FFFFFF',
+          fontFamily: 'helvetica neue, sans-serif',
+        },
+        'input::placeholder': {
+          color: '#999999',
+        },
+        'input.is-error': {
+          color: '#ff1600',
+        },
+      };
+
 export const BASE_URL = "/api"
 
 
