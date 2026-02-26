@@ -581,7 +581,7 @@ export default function SignUpForm({
               </Label>
               <div
                 id="square-card-container"
-                className="min-h-[100px] rounded-[6px] p-1 bg-[#1A1A1A]"
+                className="min-h-[100px] rounded-[6px] p-1"
               />
             </div>
 
