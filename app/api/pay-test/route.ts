@@ -39,7 +39,7 @@ export async function POST(req: NextRequest) {
         amount: BigInt(Math.round(Number(price) * 100)),
         currency: "USD",
       },
-      locationId: process.env.SQUARE_LOCATION_ID,
+      locationId: process.env.NEXT_PUBLIC_SQUARE_LOCATION_ID,
       customerId: square_customer_id,
     })
 
