@@ -129,6 +129,8 @@ export function OverrideDialog({
                               "transaction_id",
                               moment().valueOf().toString(),
                             );
+                          }else{
+                            form.setValue("transaction_id","")
                           }
                         }}
                       >

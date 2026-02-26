@@ -73,8 +73,6 @@ export function EditParents({ parent_id, data, onRefresh }: EditParentsProps) {
   });
 
   async function onSubmit(values: parentSchemaValues) {
-    console.log(values);
-    return;
     setLoading(true);
     try {
       await axios.put(`/user`, {

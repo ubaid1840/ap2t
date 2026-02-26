@@ -106,8 +106,6 @@ export function EditInfo({
   }, [open, data, form.reset]);
 
   async function onSubmit(values: PlayerFormValues) {
-    console.log(values)
-    return
     setLoading(true);
 
     try {

@@ -66,8 +66,7 @@ export function CreateParent({
   });
 
   const onSubmit = async (values: parentSchemaValues) => {
-    console.log(values);
-    return;
+
     setLoading(true);
     try {
       const result = await axios.post("/user", {

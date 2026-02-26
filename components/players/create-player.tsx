@@ -82,8 +82,6 @@ export function CreatePlayer({
   });
 
   const onSubmit = async (values: PlayerFormValues) => {
-    console.log(values);
-    return;
     try {
       setLoading(true);
 
