@@ -50,7 +50,6 @@ export async function GetProfileImage(imgLink: string | null) {
     const url = await getDownloadURL(ref(storage, imgLink));
     return url;
   } catch (error) {
-    console.error("Error fetching profile image:", error);
     return "";
   }
 }

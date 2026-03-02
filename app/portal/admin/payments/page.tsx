@@ -28,6 +28,7 @@ import { ArrowUpDown, CheckCircle, Eye, Send } from "lucide-react";
 import moment from "moment";
 import { OverrideDialog } from "@/components/payment/override-dialog";
 import { useDebounce } from "@/hooks/use-debounce";
+import useSquareConnection from "@/hooks/use-square-connection";
 
 
 
@@ -83,6 +84,7 @@ export default function Page() {
   const [payments, setPayments] = useState<PaymentsSummaryResponse | undefined>()
   const [visible, setVisible] = useState<{ show: string, data: any }>({ show: "", data: null })
   const debouncedSearch = useDebounce(search, 300);
+  const {connected} = useSquareConnection()
 
 
    useEffect(() => {
@@ -396,8 +398,8 @@ const filteredData = useMemo(() => {
               <div className="space-y-1 ">
                 <h1 className="text-[#99A1AF] text-xs">Square Integration</h1>
                 <div className="flex items-center gap-2 text-sm">
-                  <GoDotFill className="text-active-text" />
-                  <h1 className="text-active-text">Connected</h1>
+                  <GoDotFill className={connected ? "text-active-text" : "text-warning-text"} />
+                  <h1 className={connected ? "text-active-text" : "text-warning-text"}>{connected ? "Connected"  : "Disconnected"}</h1> 
                 </div>
               </div>
             </CardContent>

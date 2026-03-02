@@ -162,7 +162,33 @@ export default function Page() {
   useEffect(() => {
 
     fetchData();
+    fetchSquare()
   }, [user]);
+
+  async function fetchSquare() {
+
+    const res = await axios.get(`/square`);
+    const settings = res.data;
+   
+    setSquareIntegration(
+      {
+        mode: settings.mode ? "test" : "live",
+
+        credentials: {
+          test: {
+            merchantId: settings?.test_merchant_id || "",
+            locationId: settings?.test_location_id || "",
+            apiKey: settings?.test_api_key || "",
+          },
+          live: {
+            merchantId: settings?.live_merchant_id || "",
+            locationId: settings?.live_location_id || "",
+            apiKey: settings?.live_api_key || "",
+          },
+        },
+      }
+    )
+  }
 
   const fetchData = async () => {
     if (!user?.id) return;
@@ -183,25 +209,7 @@ export default function Page() {
       });
       setProfileImage(result.user?.picture || null);
       const settings = result.settings;
-      setSquareIntegration(
-        {
-          mode: settings.mode ? "test" : "live",
 
-          credentials: {
-            test: {
-              merchantId: settings?.test_merchant_id || "",
-              locationId: settings?.test_location_id || "",
-              apiKey: settings?.test_api_key || "",
-            },
-            live: {
-              merchantId: settings?.live_merchant_id || "",
-              locationId: settings?.live_location_id || "",
-              apiKey: settings?.live_api_key || "",
-            },
-          },
-        }
-      )
-      console.log(settings)
       setRolePermissions({
         manage_users: settings.manage_users,
         manage_coaches: settings.manage_coaches,
@@ -278,6 +286,10 @@ export default function Page() {
         email_notification: notificationInfo[4].value,
         sms_notification: notificationInfo[5].value,
         // push_notification: notificationInfo[6].value,
+
+      }
+
+      const squarePayload = {
         live_merchant_id: squareIntegration.credentials.live.merchantId,
         live_location_id: squareIntegration.credentials.live.locationId,
         live_api_key: squareIntegration.credentials.live.apiKey,
@@ -292,6 +304,7 @@ export default function Page() {
       })
 
       await axios.put("/admin/settings", payload)
+      await axios.put(`/square`, squarePayload)
 
       toast.success("Settings saved...")
 
@@ -381,8 +394,8 @@ export default function Page() {
               <ProfileInfo profileInfo={profileInfo} setProfileInfo={setProfileInfo} profileImage={profileImage} setProfileImage={setProfileImage} />
               <NotificationPreference notificationInfo={notificationInfo} setNotificationInfo={setNotificationInfo} />
               <RolePersmission rolePermissions={rolePermissions} />
-              <SquareIntegration squareIntegration={squareIntegration} setSquareIntegration={setSquareIntegration}/>
-             <Security />
+              <SquareIntegration squareIntegration={squareIntegration} setSquareIntegration={setSquareIntegration} />
+              <Security />
             </CardContent>
           </Tabs>
         </Card>}
