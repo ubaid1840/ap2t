@@ -1,6 +1,5 @@
 import pool from "@/lib/db";
-import { DecryptString } from "@/lib/functions";
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { SquareClient, SquareEnvironment } from "square";
 
 

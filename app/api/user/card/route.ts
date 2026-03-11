@@ -62,13 +62,15 @@ export async function POST(req: NextRequest) {
 export async function PUT(req: NextRequest) {
     const { token, id, cardholder, card_id: old_card, customer_id } = await req.json()
 
+    console.log(token, id, cardholder,  old_card, customer_id)
+
     try {
         if (!id || !token) return NextResponse.json({ message: "Parameters missing" }, { status: 400 })
 
         let squareCustomerId = customer_id;
         let squareCardId: string | null = null;
 
-        if (token) {
+        
             try {
 
                 if (!squareCustomerId) throw new Error("Failed to create Square customer")
@@ -91,7 +93,7 @@ export async function PUT(req: NextRequest) {
                 throw new Error("Payment setup failed: " + error.message)
 
             }
-        }
+     
 
         await pool.query(`UPDATE users SET  square_card_id  = $1, cardholder_name= $2 WHERE id = $3`, [squareCardId, cardholder, id])
         return NextResponse.json({ message: "Card updated successfully" })
