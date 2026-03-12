@@ -108,7 +108,8 @@ export default function SessionMainPage({ id, back, back_title, admin = false }:
           promotion_price: d.promotion_price,
           max_players: d.max_players,
           location: d.location,
-          comped: d.comped
+          comped: d.comped,
+          description: d.description
         } as any);
       }
     } finally {
@@ -248,8 +249,7 @@ export default function SessionMainPage({ id, back, back_title, admin = false }:
               </div>
             </div>
             <p className="text-sm text-muted-foreground">
-              Advanced skills training session focusing on ball handling,
-              agility and awareness{" "}
+              {data?.description}
             </p>
 
             <div className="flex gap-4 flex-col sm:flex-row">

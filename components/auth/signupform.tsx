@@ -36,6 +36,7 @@ export default function SignUpForm({
 }) {
   const [underAged, setUnderAged] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [selfPaid,setSelfPaid]=useState(false)
 
 
   const squareCardRef = useRef<any>(null);
@@ -136,7 +137,7 @@ export default function SignUpForm({
       return;
     }
 
-    if (underAged) {
+    if (underAged && !selfPaid) {
       if (
         !parentData.first_name ||
         !parentData.last_name ||
@@ -397,8 +398,18 @@ export default function SignUpForm({
                 />
               </div>
             </div>
+              <div className="flex p-1 gap-2 items-center">
+                <Checkbox
+                  className="border-primary border-2 data-[state=checked]:border-white data-[state=checked]:bg-primary data-[state=checked]:text-black dark:data-[state=checked]:border-white dark:data-[state=checked]:bg-primary"
+                  checked={selfPaid}
+                  onCheckedChange={(checked) => setSelfPaid(checked === true)}
+                />
+                <p className="text-muted-foreground">
+                  I will pay my self
+                </p>
+              </div>
 
-            {underAged && (
+            {underAged && !selfPaid && (
               <>
                 <Separator />
                 <div className="border-b border-[#282828] pb-3">

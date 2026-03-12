@@ -188,6 +188,7 @@ export function EditSessionDialog({
           : undefined,
         show_storefront: (sessionData.show_storefront as boolean) ?? false,
       });
+      setCoach_name(`${sessionData?.coach_first_name} ${sessionData?.coach_last_name}`)
     }
   }, [open, sessionData]);
 
@@ -390,8 +391,8 @@ export function EditSessionDialog({
                           Selected Coach: {coach_Name}
                         </p>
                       )}
-
-                      {!selectedCoachId && (
+                      {/* !selectedCoachId && to remove assign coach button after the coach has been selected*/}
+                      { (
                         <AssignCoachDialog
                           onSelect={(coach) => {
                             form.setValue("coach_id", coach.id, {

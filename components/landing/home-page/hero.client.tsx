@@ -94,7 +94,7 @@ export default function Hero() {
                     <div className="flex flex-col sm:flex-row mt-4 gap-4 justify-center sm:justify-start">
                         <Link href="/auth">
                             <Button size={"lg"} className="rounded-full bg-primary text-secondary font-bold w-full sm:w-auto">
-                                GET STARTED
+                                BOOK SESSION
                             </Button>
                         </Link>
 

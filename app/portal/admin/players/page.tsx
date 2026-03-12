@@ -39,6 +39,7 @@ export default function Page() {
     const [search, setSearch] = useState("")
     const [coachSearch, setCoachSearch] = useState("")
     const [typeSearch, setTypeSearch] = useState("")
+    const [ageSearch,setAgeSearch]=useState("")
     const { user } = useAuth()
 
     useEffect((() => {
@@ -77,10 +78,12 @@ export default function Page() {
         const playerSearch = `${item?.name} ${item?.parent} ${item?.position}`.toLowerCase();
         const coachSearchLower = `${item?.coach_name}`.toLowerCase();
         const typeSearchLower = `${item?.last_session}`.toLowerCase();
+        const playerAge=   `${item?.age}`
         const matchesPlayer = search ? playerSearch.includes(search.toLowerCase()) : true;
         const matchesCoach = coachSearch ? coachSearchLower.includes(coachSearch.toLowerCase()) : true;
         const matchesType = typeSearch ? typeSearchLower.includes(typeSearch.toLowerCase()) : true;
-        return matchesPlayer && matchesCoach && matchesType;
+        const matchesAge= ageSearch ? ageSearch>playerAge:true
+        return matchesPlayer && matchesCoach && matchesType && matchesAge;
     });
 
 
@@ -133,10 +136,10 @@ export default function Page() {
                                 <Input className="rounded-[8px] dark:bg-black" value={typeSearch} onChange={(e) => setTypeSearch(e.target.value)} />
                             </div>
 
-                            {/* <div className="flex flex-1 flex-col gap-2">
-                                <Label className="text-muted-foreground font-normal">Attendance</Label>
-                                <Input className="rounded-[8px] dark:bg-black" />
-                            </div> */}
+                            <div className="flex flex-1 flex-col gap-2">
+                                <Label className="text-muted-foreground font-normal">age</Label>
+                                <Input className="rounded-[8px] dark:bg-black" value={ageSearch} onChange={(e)=>setAgeSearch(e.target.value)}/>
+                            </div>
                         </div>
                     </div>}
             </div>

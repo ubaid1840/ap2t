@@ -30,6 +30,7 @@ export type CustomCalendarProps = {
 export interface SessionDataType {
   id: string;
   sessionName: string;
+  description:string;
   type: string;
   date: string;
   time: string;

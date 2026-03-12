@@ -172,7 +172,7 @@ export default function PricingSection() {
             <h2 className="text-lg">Elite Plan</h2>
             <p className="text-xs text-muted mt-1">12 months</p>
 
-            <p className="text-3xl font-semibold mt-4">$200 <span className="text-sm font-normal">/month</span></p>
+            <p className="text-3xl font-semibold mt-4">$350 <span className="text-sm font-normal">/month</span></p>
 
             <p className="text-sm text-muted mt-4">
               Perfect for beginners or those looking to establish a solid foundation at home.
