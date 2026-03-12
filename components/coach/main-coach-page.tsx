@@ -122,13 +122,13 @@ export default function MainCoachPage({
       type: "other",
       going: "active",
     },
-    {
-      Icon: <DollarSign />,
-      title: "Total Revenue",
-      description: statsData?.totalRevenue,
-      type: "warning",
-      going: "warning",
-    },
+    // {
+    //   Icon: <DollarSign />,
+    //   title: "Total Revenue",
+    //   description: statsData?.totalRevenue,
+    //   type: "warning",
+    //   going: "warning",
+    // },
   ];
 
   const weeklyEvents = data?.session_data

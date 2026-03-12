@@ -35,8 +35,8 @@ const coachSchema = z.object({
   }),
 
   bio: z.string().min(2, "Biography required"),
-  specialities: z.array(z.string()).default([]),
-  certifications: z.array(z.string()).default([]),
+  specialities: z.array(z.string()).default([]).optional(),
+  certifications: z.array(z.string()).default([]).optional(),
 });
 type coachSchemaValues = z.infer<typeof coachSchema>;
 
@@ -87,8 +87,7 @@ const EditCoachProfile = ({
   }, [data]);
 
   const changeCoach = async (values: coachSchemaValues) => {
-    console.log(values);
-    return;
+
     setLoading(true);
     try {
       await axios.put(`/user`, {
@@ -119,7 +118,7 @@ const EditCoachProfile = ({
 
     const trimmed = specialityInput.trim();
     if (!trimmed) return;
-
+    if(!specialities) return
     if (!specialities.includes(trimmed)) {
       form.setValue("specialities", [...specialities, trimmed], {
         shouldValidate: true,
@@ -130,6 +129,7 @@ const EditCoachProfile = ({
   };
 
   const handleRemoveSpeciality = (tag: string) => {
+    if(!specialities) return
     form.setValue(
       "specialities",
       specialities.filter((t) => t !== tag),
@@ -143,7 +143,7 @@ const EditCoachProfile = ({
 
     const trimmed = certificationInput.trim();
     if (!trimmed) return;
-
+    if(!certifications) return
     if (!certifications.includes(trimmed)) {
       form.setValue("certifications", [...certifications, trimmed], {
         shouldValidate: true,
@@ -154,6 +154,7 @@ const EditCoachProfile = ({
   };
 
   const handleRemoveCertification = (tag: string) => {
+    if(!certifications) return
     form.setValue(
       "certifications",
       certifications.filter((t) => t !== tag),
@@ -331,24 +332,11 @@ const EditCoachProfile = ({
                       placeholder="Type speciality and press Enter"
                       value={specialityInput}
                       onChange={(e) => setSpecialityInput(e.target.value)}
-                      onKeyDown={(e) => {
-                        if (e.key !== "Enter") return;
-                        e.preventDefault();
-
-                        const trimmed = specialityInput.trim();
-                        if (!trimmed) return;
-
-                        if (!specialities.includes(trimmed)) {
-                          setValue("specialities", [...specialities, trimmed], {
-                            shouldValidate: true,
-                          });
-                        }
-
-                        setSpecialityInput("");
-                      }}
+                       onKeyDown={
+                        handleAddSpeciality}
                     />
                     <div className="flex flex-wrap gap-2">
-                      {specialities.map((tag, idx) => (
+                      {specialities?.map((tag, idx) => (
                         <span
                           key={idx}
                           className="flex items-center gap-1 bg-primary text-black px-2 py-1 rounded-md text-sm"
@@ -379,7 +367,7 @@ const EditCoachProfile = ({
                       onKeyDown={handleAddCertification}
                     />
                     <div className="flex flex-wrap gap-2">
-                      {certifications.map((tag, idx) => (
+                      {certifications?.map((tag, idx) => (
                         <span
                           key={idx}
                           className="flex items-center gap-1 bg-primary text-black px-2 py-1 rounded-md text-sm"

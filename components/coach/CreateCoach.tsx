@@ -61,9 +61,6 @@ const CreateCoach = ({ onRefresh }: { onRefresh: () => Promise<void> }) => {
   });
 
   const addCoach = async (values: coachSchemaValues) => {
-    
-    console.log(values)
-    return
     setLoading(true);
     
     try {
