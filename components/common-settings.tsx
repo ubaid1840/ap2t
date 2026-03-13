@@ -153,6 +153,7 @@ export default function CommonSettings() {
 
     const handlePasswordUpdate = async () => {
         if (!securityInfo.newPass || !securityInfo.confirmNewPass) {
+            toast.error("New password or confirm password not added.")
             return;
         }
         if (securityInfo.newPass !== securityInfo.confirmNewPass) {

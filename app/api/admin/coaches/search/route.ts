@@ -5,7 +5,29 @@ export async function GET(req: NextRequest) {
   try {
 
     const result = await pool.query(
-      `SELECT id, first_name,email, last_name, role FROM users WHERE role = 'coach'
+      `SELECT 
+  u.id,
+  u.first_name,
+  u.last_name,
+  u.role,
+  COALESCE(
+    json_agg(
+      json_build_object(
+        'name', s.name,
+        'date', s.date,
+        'end_date', s.end_date,
+        'start_time', s.start_time,
+        'end_time', s.end_time
+      )
+    ) FILTER (WHERE s.id IS NOT NULL),
+    '[]'
+  ) AS sessions
+FROM users u
+LEFT JOIN sessions s 
+  ON s.coach_id = u.id 
+  AND s.status = 'upcoming'
+WHERE u.role = 'coach'
+GROUP BY u.id, u.first_name, u.last_name, u.role;
       `,
     );
 

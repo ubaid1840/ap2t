@@ -18,18 +18,31 @@ import { Loader2, Plus, Search } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Spinner } from "../ui/spinner";
 
-interface AssignCoachDialogProps {
-  onSelect: (coach: { id: number; first_name: string; last_name: string }) => void;
-  already?: boolean
-}
 
-interface Coach {
+type Session = {
+  name: string;
+  date: string;
+  end_date: string;
+  start_time: string;
+  end_time: string;
+};
+
+type Coach = {
   id: number;
   first_name: string;
   last_name: string;
-  email: string;
-  picture: string;
+  email:string;
+  picture:string;
+  sessions: Session[];
+};
+interface AssignCoachDialogProps {
+  onSelect: (coach: { id: number; first_name: string; last_name: string; 
+    booked_sessions:Session[]
+
+  }) => void;
+  already?: boolean
 }
+
 
 export function AssignCoachDialog({ onSelect, already = false }: AssignCoachDialogProps) {
   const [open, setOpen] = useState(false);
@@ -111,6 +124,7 @@ export function AssignCoachDialog({ onSelect, already = false }: AssignCoachDial
                         id: coach.id,
                         first_name: coach.first_name,
                         last_name: coach.last_name,
+                        booked_sessions:coach.sessions
                       });
                       setOpen(false); 
                     }}

@@ -67,6 +67,13 @@ export type SessionType = {
   promotion_end: string | undefined;
   show_storefront: boolean | "indeterminate";
 };
+type BookedSession = {
+  name: string;
+  date: string;
+  end_date: string;
+  start_time: string;
+  end_time: string;
+};
 
 export const sessionSchema = z.object({
   name: z.string().min(2, "Session name is required"),
@@ -130,6 +137,13 @@ export function CreateSessionDialog({
   const [loading, setLoading] = useState(false);
 
   const [coach_Name, setCoach_name] = useState<string | null>(null);
+  const [coachBookedSessions, setCoachBookedSessions] = useState<
+    BookedSession[]
+  >([]);
+  const [notAvailableSessions, setNotAvailableSessions] = useState<
+    BookedSession[]
+  >([]);
+  const [booked, setBooked] = useState(false);
 
   const form = useForm<SessionSchemaValues>({
     resolver: zodResolver(sessionSchema),
@@ -169,6 +183,73 @@ export function CreateSessionDialog({
   const applyPromotion = form.watch("apply_promotion");
   const image = form.watch("image");
   const selectedCoachId = form.watch("coach_id");
+  function to24Hour(timeStr: string): string {
+    if (!timeStr) return "";
+    
+    if (!timeStr.includes("AM") && !timeStr.includes("PM")) return timeStr;
+    
+    const [time, suffix] = timeStr.split(" ");
+    let [hours, minutes] = time.split(":").map(Number);
+    if (suffix === "PM" && hours !== 12) hours += 12;
+    if (suffix === "AM" && hours === 12) hours = 0;
+    return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}`;
+  }
+
+  const checkAvailability = (
+    overrides: {
+      start_time?: string;
+      end_time?: string;
+      date?: Date;
+      end_date?: Date;
+    } = {},
+  ) => {
+    const selectedDate = overrides.date ?? form.getValues("date");
+    const selectedEndDate = overrides.end_date ?? form.getValues("end_date");
+    const selectedStartTime =
+      overrides.start_time ?? form.getValues("start_time");
+    const selectedEndTime = overrides.end_time ?? form.getValues("end_time");
+
+    if (
+      !selectedDate ||
+      !selectedEndDate ||
+      !selectedStartTime ||
+      !selectedEndTime
+    )
+      return;
+
+    const newStart = to24Hour(selectedStartTime);
+    const newEnd = to24Hour(selectedEndTime);
+
+    
+    const toDateOnly = (d: Date | string) => {
+      if (typeof d === "string") return d.slice(0, 10); 
+      
+      const year = d.getFullYear();
+      const month = String(d.getMonth() + 1).padStart(2, "0");
+      const day = String(d.getDate()).padStart(2, "0");
+      return `${year}-${month}-${day}`;
+    };
+
+    const selStartStr = toDateOnly(selectedDate);
+    const selEndStr = toDateOnly(selectedEndDate);
+
+    const conflicts = coachBookedSessions.filter((session) => {
+      const sessionStartStr = toDateOnly(session.date);
+      const sessionEndStr = toDateOnly(session.end_date);
+
+      const dateOverlap =
+        sessionStartStr <= selEndStr && sessionEndStr >= selStartStr;
+
+      const sessionStart24 = to24Hour(session.start_time);
+      const sessionEnd24 = to24Hour(session.end_time);
+      const timeOverlap = sessionStart24 < newEnd && sessionEnd24 > newStart;
+
+      return dateOverlap && timeOverlap;
+    });
+
+    setNotAvailableSessions(conflicts);
+    setBooked(conflicts.length > 0);
+  };
 
   const CreateSession = async (values: SessionSchemaValues) => {
     setLoading(true);
@@ -349,8 +430,8 @@ export function CreateSessionDialog({
                           Selected Coach: {coach_Name}
                         </p>
                       )}
-
-                      {!selectedCoachId && (
+                      {/* !selectedCoachId && for removing assign coach button after its selected */}
+                      {
                         <AssignCoachDialog
                           onSelect={(coach) => {
                             form.setValue("coach_id", coach.id, {
@@ -359,9 +440,10 @@ export function CreateSessionDialog({
                             setCoach_name(
                               `${coach.first_name} ${coach.last_name}`,
                             );
+                            setCoachBookedSessions(coach.booked_sessions);
                           }}
                         />
-                      )}
+                      }
                     </div>
                   </div>
                 </div>
@@ -386,7 +468,10 @@ export function CreateSessionDialog({
                             date={
                               field.value ? new Date(field.value) : undefined
                             }
-                            onChange={field.onChange}
+                            onChange={(value) => {
+                              field.onChange(value);
+                              checkAvailability({ date: value });
+                            }}
                             required
                           />
                           {fieldState.invalid && (
@@ -411,7 +496,10 @@ export function CreateSessionDialog({
                             date={
                               field.value ? new Date(field.value) : undefined
                             }
-                            onChange={field.onChange}
+                            onChange={(value) => {
+                              field.onChange(value);
+                              checkAvailability({ end_date: value });
+                            }}
                             required
                           />
                           {fieldState.invalid && (
@@ -435,7 +523,10 @@ export function CreateSessionDialog({
                           <TimePickerFixed
                             className="h-9"
                             value={field.value}
-                            onChange={field.onChange}
+                            onChange={(value) => {
+                              field.onChange(value);
+                              checkAvailability({ start_time: value });
+                            }}
                           />
                           {fieldState.invalid && (
                             <FieldError errors={[fieldState.error]} />
@@ -456,7 +547,10 @@ export function CreateSessionDialog({
                           <TimePickerFixed
                             className="h-9"
                             value={field.value}
-                            onChange={field.onChange}
+                            onChange={(value) => {
+                              field.onChange(value);
+                              checkAvailability({ end_time: value });
+                            }}
                           />
                           {fieldState.invalid && (
                             <FieldError errors={[fieldState.error]} />
@@ -466,7 +560,15 @@ export function CreateSessionDialog({
                     />
                   </div>
                 </div>
-
+                {booked && notAvailableSessions.length > 0 && (
+                  <p className="text-sm text-red-500">
+                    Coach is booked on session {notAvailableSessions[0].name} at{" "}
+                    {notAvailableSessions[0].date} till{" "}
+                    {notAvailableSessions[0].end_date} at time{" "}
+                    {notAvailableSessions[0].start_time} till{" "}
+                    {notAvailableSessions[0].end_time}
+                  </p>
+                )}
                 <div className="flex gap-2 text-md ">
                   <MapPin className="text-primary w-4 w-4" />
                   <h1 className="text-[#F3F4F6]">Location & Pricing</h1>

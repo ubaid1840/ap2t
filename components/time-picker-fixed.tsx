@@ -12,7 +12,7 @@ import { cn } from "@/lib/utils";
 import { Clock } from "lucide-react";
 
 type TimePickerProps = {
-  value?: string; // "HH:mm"
+  value?: string; // "HH:mm AM/PM"
   onChange: (value: string) => void;
   className?: string;
 };
@@ -26,6 +26,16 @@ function pad(n: number) {
   return String(n).padStart(2, "0");
 }
 
+// --- new helper to parse hour from "hh:mm AM/PM" ---
+function parseHour12(time?: string) {
+  if (!time) return null;
+  const [hhmm, suffix] = time.split(" ");
+  let hour = parseInt(hhmm.split(":")[0], 10);
+  if (suffix === "PM" && hour !== 12) hour += 12;
+  if (suffix === "AM" && hour === 12) hour = 0;
+  return hour;
+}
+
 export function TimePickerFixed({
   value,
   onChange,
@@ -33,12 +43,17 @@ export function TimePickerFixed({
 }: TimePickerProps) {
   const [open, setOpen] = React.useState(false);
 
-  const selectedHour = value ? parseInt(value.split(":")[0]) : null;
+  // --- fixed: parse hour correctly including AM/PM ---
+  const selectedHour = parseHour12(value);
 
-const updateTime = (hour: number) => {
-  onChange(format12Hour(hour))
-  setOpen(false)
-}
+  const updateTime = (hour: number) => {
+    onChange(format12Hour(hour));
+    setOpen(false);
+  };
+
+  function formatDisplay(time: string) {
+    return time; // already in "hh:mm AM/PM"
+  }
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -48,11 +63,11 @@ const updateTime = (hour: number) => {
           className={cn(
             "w-full h-9 rounded-md dark:bg-[#1A1A1A]",
             !value && "text-muted-foreground",
-            className,
+            className
           )}
         >
           {value ? (
-            format12Hour(parseInt(value.split(":")[0]))
+            formatDisplay(value)
           ) : (
             <p className="text-[14px] font-normal">Pick a time</p>
           )}
@@ -65,7 +80,7 @@ const updateTime = (hour: number) => {
         align="start"
       >
         <ScrollArea className="max-h-32 w-20">
-          <div className="max-h-32 py-1 flex flex-col gap-1">
+          <div className=" max-h-32 py-1 flex flex-col gap-1">
             {Array.from({ length: 9 }, (_, i) => i + 9).map((h) => (
               <Button
                 key={h}
