@@ -204,9 +204,15 @@ export default function SignUpForm({
       toast.error("Birth date is required");
       return;
     }
-    if (underAged) {
-      if (!parentData.email || !parentData.password) return;
-      if (parentData.password !== parentData.confirm_password) return;
+    if (underAged&&!selfPaid) {
+      if (!parentData.email || !parentData.password) {
+        toast.error("under aged players required parents information")
+        return
+      }
+      if (parentData.password !== parentData.confirm_password){
+        toast.error("parent's password did not match")
+        return
+      }
     }
     if (!waiverData) {
       toast.error("Please agree to the waiver");
@@ -237,7 +243,7 @@ export default function SignUpForm({
 
     };
 
-    if (underAged) {
+    if (underAged&&!selfPaid) {
       payload.parent = {
         first_name: parentData.first_name,
         last_name: parentData.last_name,
@@ -267,8 +273,8 @@ export default function SignUpForm({
 
       sessionStorage.removeItem("sq_card_token");
 
-      const loginEmail = underAged ? parentData.email : playerData.email;
-      const loginPassword = underAged ? parentData.password : playerData.password;
+      const loginEmail = underAged&&!selfPaid ? parentData.email : playerData.email;
+      const loginPassword = underAged&&!selfPaid ? parentData.password : playerData.password;
 
       await signInWithEmailAndPassword(auth, loginEmail, loginPassword);
     } catch (error: any) {
