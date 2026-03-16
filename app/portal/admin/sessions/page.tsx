@@ -14,6 +14,7 @@ import { joinNames } from "@/lib/functions";
 import { Calendar, Filter, List } from "lucide-react";
 import moment, { Moment } from "moment";
 import { ReactNode, useEffect, useState } from "react";
+import SessionSheetCalendar from "@/components/sessions/session-sheet-calender";
 
 export type SessionProps = {
   id: number,
@@ -162,7 +163,7 @@ export default function Page() {
           onRowClick={() => { }}
         />
       )}
-      {tab === "calendar" && <SessionCalendar sessions={sessions} currentMonth={currentMonth} setCurrentMonth={setCurrentMonth}/>}
+      {tab === "calendar" && <SessionSheetCalendar sessions={sessions} currentMonth={currentMonth} setCurrentMonth={setCurrentMonth}/>}
 
 
     </div>
