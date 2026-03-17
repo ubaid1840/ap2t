@@ -3,6 +3,9 @@
 import moment, { Moment } from "moment";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { Dialog } from "../ui/dialog";
+import { DialogTrigger } from "@radix-ui/react-dialog";
+import ShowCalenderSessionDialog from "./show-calender-session-dialog";
 
 type SessionProps = {
   id: number;
@@ -123,9 +126,15 @@ export default function SessionSheetCalendar({
 
                       return (
                         <td key={coach} className="border h-10">
+                          <Dialog>
+                            <DialogTrigger asChild>
                           <div className="bg-red-500 text-white text-xs p-1 rounded h-full min-h-[2.5rem]">
-                            {session.sessionName}
+                           {session.sessionName}
                           </div>
+                            </DialogTrigger>
+                            <ShowCalenderSessionDialog session={session.sessionName} coach={coach} time={session.time} start={session.date} end={session.end_date}/>
+                          </Dialog>
+
                         </td>
                       );
                     })}
