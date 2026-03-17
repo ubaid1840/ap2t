@@ -22,6 +22,7 @@ export type SessionProps = {
   type: string,
   date: string,
   time: string,
+  end_date:string,
   coachName: string,
   price: string | number,
   status: string

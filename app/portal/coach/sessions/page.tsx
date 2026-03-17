@@ -14,6 +14,7 @@ import { joinNames } from "@/lib/functions";
 import { Calendar, Filter, List } from "lucide-react";
 import moment, { Moment } from "moment";
 import { ReactNode, useEffect, useState } from "react";
+import SessionSheetCalendar from "@/components/sessions/session-sheet-calender";
 
 export type SessionProps = {
   id: number,
@@ -40,9 +41,34 @@ export default function Page() {
       fetchData();
   }, [user]);
 
+  // .....for only that coaches sessions.at..........
+
+  // const fetchData = async () => {
+  //   try {
+  //     const result = await axios.get(`/coach/${user?.id}/sessions`);
+  //     if (result.data) {
+  //       const mappedSessions = result.data.map((s: any) => ({
+  //         id: s.id,
+  //         sessionName: s.name,
+  //         type: s.session_type,
+  //         date: moment(new Date(s.date)).format("YYYY-MM-DD"),
+  //         time: `${s.start_time} - ${s.end_time}`,
+  //         coachName: joinNames([s.coach_first_name, s.coach_last_name]),
+  //         price: s.price,
+  //         status: s?.status || 'upcoming',
+  //         end_date: s?.end_date ? moment(new Date(s.end_date)).format("YYYY-MM-DD") : null
+  //       }));
+  //       setSessions(mappedSessions);
+  //     }
+  //   } catch (error) {
+  //     console.error("Error fetching sessions", error);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
   const fetchData = async () => {
     try {
-      const result = await axios.get(`/coach/${user?.id}/sessions`);
+      const result = await axios.get("/admin/sessions");
       if (result.data) {
         const mappedSessions = result.data.map((s: any) => ({
           id: s.id,
@@ -53,9 +79,9 @@ export default function Page() {
           coachName: joinNames([s.coach_first_name, s.coach_last_name]),
           price: s.price,
           status: s?.status || 'upcoming',
-          end_date: s?.end_date ? moment(new Date(s.end_date)).format("YYYY-MM-DD") : null
+            end_date : s?.end_date ? moment(new Date(s.end_date)).format("YYYY-MM-DD") : null
         }));
-        setSessions(mappedSessions);
+        setSessions(mappedSessions); 
       }
     } catch (error) {
       console.error("Error fetching sessions", error);
@@ -162,7 +188,7 @@ export default function Page() {
           onRowClick={() => { }}
         />
       )}
-      {tab === "calendar" && <SessionCalendar sessions={sessions} currentMonth={currentMonth} setCurrentMonth={setCurrentMonth} />}
+      {tab === "calendar" && <SessionSheetCalendar sessions={sessions} currentMonth={currentMonth} setCurrentMonth={setCurrentMonth}/>}
 
 
     </div>
