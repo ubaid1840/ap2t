@@ -128,7 +128,7 @@ export default function SessionSheetCalendar({
                         <td key={coach} className="border h-10">
                           <Dialog>
                             <DialogTrigger asChild>
-                          <div className="bg-red-500 text-white text-xs p-1 rounded h-full min-h-[2.5rem]">
+                          <div className="bg-red-500 text-white text-xs p-1 rounded h-full min-h-[2.5rem] cursor-pointer">
                            {session.sessionName}
                           </div>
                             </DialogTrigger>
