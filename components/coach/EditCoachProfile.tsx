@@ -28,7 +28,7 @@ const coachSchema = z.object({
 
   phone_no: z.string().min(6, "Phone is required"),
 
-  zip_code: z.string().min(3, "Zip code required"),
+  // zip_code: z.string().min(3, "Zip code required"),
 
   career_start: z.date({
     required_error: "Career Start Date is required",
@@ -64,7 +64,7 @@ const EditCoachProfile = ({
       first_name: "",
       last_name: "",
       phone_no: "",
-      zip_code: "",
+      // zip_code: "",
     },
   });
 
@@ -81,7 +81,7 @@ const EditCoachProfile = ({
         bio: data?.profile?.bio,
         specialities: data?.profile?.specialities || [],
         certifications: data?.profile?.certifications || [],
-        zip_code: data?.zip_code || "",
+        // zip_code: data?.zip_code || "",
       });
     }
   }, [data]);
@@ -95,7 +95,7 @@ const EditCoachProfile = ({
         first_name: values?.first_name,
         last_name: values?.last_name,
         phone_no: values?.phone_no,
-        zip_code: values?.zip_code,
+        // zip_code: values?.zip_code,
       });
       await axios.put(`/admin/coaches/${id}`, {
         id: id,
@@ -278,7 +278,7 @@ const EditCoachProfile = ({
                   </div>
                 </div>
 
-                <div className="space-y-2">
+                {/* <div className="space-y-2">
                   <Controller
                       name="zip_code"
                       control={form.control}
@@ -300,7 +300,7 @@ const EditCoachProfile = ({
                         </Field>
                       )}
                     />
-                </div>
+                </div> */}
 
                 <div className="space-y-2">
                   <Controller

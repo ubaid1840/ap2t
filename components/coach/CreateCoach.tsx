@@ -33,7 +33,7 @@ const coachSchema = z.object({
 
   phone_no: z.string().min(6, "Phone is required"),
 
-  zip_code: z.string().min(3, "Zip code required"),
+  // zip_code: z.string().min(3, "Zip code required"),
 
   career_start: z.date({
     required_error: "Date of birth is required",
@@ -56,7 +56,7 @@ const CreateCoach = ({ onRefresh }: { onRefresh: () => Promise<void> }) => {
       phone_no: "",
       career_start: undefined,
       bio: "",
-      zip_code: "",
+      // zip_code: "",
     },
   });
 
@@ -71,7 +71,7 @@ const CreateCoach = ({ onRefresh }: { onRefresh: () => Promise<void> }) => {
         phone_no: values.phone_no,
         career_start: values.career_start,
         bio: values.bio,
-        zip_code: values.zip_code,
+        // zip_code: values.zip_code,
         role: "coach",
       });
 
@@ -147,7 +147,7 @@ const CreateCoach = ({ onRefresh }: { onRefresh: () => Promise<void> }) => {
                     />
                   </div>
                 </div>
-                <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-1 gap-2">
                   <div className="space-y-2">
                     <Controller
                       name="email"
@@ -172,7 +172,7 @@ const CreateCoach = ({ onRefresh }: { onRefresh: () => Promise<void> }) => {
                     />
                   </div>
 
-                  <div className="space-y-2">
+                  {/* <div className="space-y-2">
                     <Controller
                       name="zip_code"
                       control={form.control}
@@ -194,7 +194,7 @@ const CreateCoach = ({ onRefresh }: { onRefresh: () => Promise<void> }) => {
                         </Field>
                       )}
                     />
-                  </div>
+                  </div> */}
                 </div>
                 <div className="grid grid-cols-2 gap-2">
                   <div className="space-y-2">
