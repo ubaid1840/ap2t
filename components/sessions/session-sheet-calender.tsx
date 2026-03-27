@@ -30,12 +30,14 @@ export default function SessionSheetCalendar({
   currentMonth,
   setCurrentMonth,
 }: Props) {
-  const startOfWeek = currentMonth.clone().startOf("week");
+  // const startOfWeek = currentMonth.clone().startOf("week");
 
-  const days: Moment[] = [];
-  for (let i = 0; i < 7; i++) {
-    days.push(startOfWeek.clone().add(i, "day"));
-  }
+const days: Moment[] = [];
+const today = moment(); // current date
+
+for (let i = 0; i < 7; i++) {
+  days.push(today.clone().add(i, "day"));
+}
 
   const coaches = [...new Set(sessions.map((s) => s.coachName))];
 
