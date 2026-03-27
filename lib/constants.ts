@@ -147,6 +147,15 @@ export const coach_nav_items = [
     shortcut: ['d', 'a', 's', 'h'],
   },
 ];
+export const front_desk_items=[
+  {
+    title: 'Dashboard',
+    url: '/portal/front-desk/dashboard',
+    icon: 'dashboard',
+   
+    shortcut: ['d', 'a', 's', 'h'],
+  },
+]
 
 export const EVENT_STYLES = {
     active: {

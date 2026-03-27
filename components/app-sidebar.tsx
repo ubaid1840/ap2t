@@ -14,7 +14,7 @@ import {
 
 import { Icons } from "@/components/icons";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { admin_nav_items, coach_nav_items, parent_nav_items, player_nav_items } from "@/lib/constants";
+import { admin_nav_items, coach_nav_items, front_desk_items, parent_nav_items, player_nav_items } from "@/lib/constants";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Button } from "./ui/button";
@@ -54,6 +54,9 @@ export default function AppSidebar() {
 
     if (pathname.startsWith("/portal/coach")) {
       setNavItems([...coach_nav_items])
+    }
+    if (pathname.startsWith("/portal/front-desk")) {
+      setNavItems([...front_desk_items])
     }
   }, [pathname])
 
