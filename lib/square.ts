@@ -1,6 +1,15 @@
 import { SquareClient, SquareEnvironment } from "square";
+import { GetSquare } from "./square-creds";
 
-export const squareClient = new SquareClient({
-  token: process.env.SQUARE_SANDBOX_ACCESS_TOKEN!,
-  environment: SquareEnvironment.Sandbox,
-});
+
+export async function getSquareClient() {
+  const { apiKey, mode } = await GetSquare();
+
+
+  const client = new SquareClient({
+    token: apiKey!,
+    environment: mode ? SquareEnvironment.Sandbox : SquareEnvironment.Production,
+  });
+
+  return client;
+}

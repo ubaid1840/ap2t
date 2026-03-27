@@ -1,10 +1,11 @@
 import pool from "@/lib/db";
-import { squareClient } from "@/lib/square";
+import { getSquareClient } from "@/lib/square";
 import { NextRequest, NextResponse } from "next/server";
 
 
 export async function POST(req: NextRequest) {
     const { token, id, cardholder, } = await req.json()
+      const squareClient = await getSquareClient();
 
     try {
         if (!id || !token) return NextResponse.json({ message: "Parameters missing" }, { status: 400 })
@@ -62,7 +63,7 @@ export async function POST(req: NextRequest) {
 export async function PUT(req: NextRequest) {
     const { token, id, cardholder, card_id: old_card, customer_id } = await req.json()
 
-    console.log(token, id, cardholder,  old_card, customer_id)
+     const squareClient = await getSquareClient();
 
     try {
         if (!id || !token) return NextResponse.json({ message: "Parameters missing" }, { status: 400 })
@@ -105,7 +106,7 @@ export async function PUT(req: NextRequest) {
 }
 
 export async function GET(req: NextRequest) {
-
+  const squareClient = await getSquareClient();
     try {
         const searchParams = req.nextUrl.searchParams
         const id = searchParams.get("id")
