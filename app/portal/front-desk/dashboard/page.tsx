@@ -2,66 +2,212 @@
 
 import { useEffect, useState } from "react";
 import PageTable from "@/components/app-table";
-import { FRONT_DESK_SESSION_COLUMNS } from "@/components/sessions/session-column";
 import axios from "@/lib/axios";
+import { Button } from "@/components/ui/button";
+import { ArrowUpDown } from "lucide-react";
+import { ColumnDef } from "@tanstack/react-table";
+import axiosInstance from "@/lib/axios";
 
-const MOCK_FRONT_DESK_SESSIONS = [
-  {
-    id: 1,
-    sessionName: "Morning Training",
-    playerName: "Ali Khan",
-    date: "2026-03-27",
-    end_date: "2026-03-30",
-    time: "10:00 - 12:00",
-    referal_code: "REF123",
-    price: 50,
-    action: "approval",
-  },
-  {
-    id: 2,
-    sessionName: "Evening Fitness",
-    playerName: "Ahmed Raza",
-    date: "2026-03-28",
-    end_date: "2026-03-28",
-    time: "16:00 - 18:00",
-    referal_code: "REF456",
-    price: 70,
-    action: "cash",
-  },
-  {
-    id: 3,
-    sessionName: "Strength Session",
-    playerName: "Usman Tariq",
-    date: "2026-03-29",
-    end_date: "2026-03-31",
-    time: "12:00 - 14:00",
-    referal_code: "REF789",
-    price: 60,
-    action: "approval",
-  },
-  {
-    id: 4,
-    sessionName: "Cardio Blast",
-    playerName: "Hassan Ali",
-    date: "2026-03-30",
-    end_date: null,
-    time: "08:00 - 09:00",
-    referal_code: "REF321",
-    price: 40,
-    action: "cash",
-  },
-];
+
+export type FrontDeskActionData = {
+  id: number;
+
+  session_name: string;
+  player_name: string;
+
+  date: string;
+  end_date: string | null;
+
+  start_time: string;
+  end_time: string;
+
+  referal_code: string | null;
+  price: number;
+
+  action: "cash" | "approval";
+  status: "waiting" | "accepted" | "rejected";
+};
 
 export default function Page() {
   const [loading, setLoading] = useState(false);
-  const [sessions, setSessions] = useState(MOCK_FRONT_DESK_SESSIONS);
+  const [sessions, setSessions] = useState<FrontDeskActionData[]>([]);
+  const FRONT_DESK_SESSION_COLUMNS: ColumnDef<FrontDeskActionData>[] = [
+    {
+      accessorKey: "session_name",
+      header: ({ column }) => (
+        <Button
+          variant="ghost"
+          className="text-[#99A1AF] text-[12px] tracking-wider dark:hover:bg-transparent dark:hover:text-white/50"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          SESSION NAME
+          <ArrowUpDown />
+        </Button>
+      ),
+      cell: ({ row }) => (
+        <span className="font-medium text-[#D1D5DC]">
+          {row.getValue("session_name")}
+        </span>
+      ),
+    },
+  
+    {
+      accessorKey: "player_name",
+      header: ({ column }) => (
+        <Button
+          variant="ghost"
+          className="text-[#99A1AF] text-[12px] tracking-wider dark:hover:bg-transparent dark:hover:text-white/50"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          PLAYER NAME
+          <ArrowUpDown />
+        </Button>
+      ),
+      cell: ({ row }) => (
+        <span className="font-medium text-[#D1D5DC]">
+          {row.getValue("player_name")}
+        </span>
+      ),
+    },
+  
+   
+  
+    {
+      id: "date",
+      header: ({ column }) => (
+        <Button
+          variant="ghost"
+          className="text-[#99A1AF] text-[12px] tracking-wider dark:hover:bg-transparent dark:hover:text-white/50"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          DATE & TIME
+          <ArrowUpDown />
+        </Button>
+      ),
+      cell: ({ row }) =>{
+        console.log(row.original.end_date);
+         return(
+        <div className="leading-tight">
+          <div className="text-[#D1D5DC]">{row.original.date}-{row.original.end_date}</div>
+          <div className="text-xs text-[#9CA3AF]">{row.original.start_time} - {row.original.end_time}</div>
+        </div>
+      )
+    }
+  
+    },
+  
+  
+  
+  
+    {
+      accessorKey: "referal_code",
+      header: ({ column }) => (
+        <Button
+          variant="ghost"
+          className="text-[#99A1AF] text-[12px] tracking-wider dark:hover:bg-transparent dark:hover:text-white/50"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Referal Code
+          <ArrowUpDown />
+        </Button>
+      ),
+      cell: ({ row }) => (
+        <span className="font-medium text-[#D1D5DC]">
+          {row.getValue("referal_code")}
+        </span>
+      ),
+    },
+    {
+      accessorKey: "price",
+      header: ({ column }) => (
+        <Button
+          variant="ghost"
+          className="text-[#99A1AF] text-[12px] tracking-wider dark:hover:bg-transparent dark:hover:text-white/50"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          PRICE
+          <ArrowUpDown />
+        </Button>
+      ),
+      cell: ({ row }) => (
+        <span className="font-medium text-[#D1D5DC]">
+          $ {row.getValue("price")}
+        </span>
+      ),
+    },
+  
+  
+    {
+      accessorKey: "Message",
+      header: ({ column }) => (
+        <Button
+          variant="ghost"
+          className="text-[#99A1AF] text-[12px] tracking-wider dark:hover:bg-transparent dark:hover:text-white/50"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          MESSAGE
+          <ArrowUpDown />
+        </Button>
+      ),
+     cell: ({ row }) => {
+    const action = row.original.action;
+  
+    if (action === "approval") {
+      return (
+        <span className="font-medium text-[#D1D5DC]">
+          Requires Approval..
+        </span>
+      );
+    } else if (action === "cash") {
+      return (
+        <span className="font-medium text-[#D1D5DC]">
+          Requires Cash Confirmation..
+        </span>
+      );
+    }}
+    },
+  
+    {
+      id: "actions",
+      header: () => <div className="text-[#99A1AF] text-[12px] tracking-wider dark:hover:bg-transparent dark:hover:text-white/50">ACTIONS</div>,
+  
+      cell: ({ row }) => {
+    const action = row.original.action;
+  
+    if (action === "approval") {
+      return (
+        <div className="flex gap-2">
+            
+          <Button onClick={()=>handleSubmit(row.original.id,"accepted")}>Approve</Button>
+          <Button onClick={()=>handleSubmit(row.original.id,"rejected")}>Disapprove</Button>
+        </div>
+      );
+    }
+  
+    else if (action === "cash") {
+      return (
+        <div className="flex gap-2">
+          <Button onClick={()=>handleSubmit(row.original.id,"accepted")}>Received</Button>
+          <Button onClick={()=>handleSubmit(row.original.id,"rejected")}>Not Received</Button>
+        </div>
+      );
+    }
+  }
+      }
+        
+      
+    
+  ];
 
   useEffect(() => {
-    const fetchData = async () => {
+    fetchData();
+  }, []);
+
+   async function fetchData() {
       setLoading(true);
       try {
         const response = await axios.get("/front-desk");
-        setSessions(response.data || MOCK_FRONT_DESK_SESSIONS);
+        setSessions(response.data);
         console.log("Front Desk Sessions:", response.data);
       } catch (error) {
         console.error("Failed to fetch sessions:", error);
@@ -70,8 +216,21 @@ export default function Page() {
       }
     };
 
-    fetchData();
-  }, []);
+
+async function handleSubmit(id: number, status: "accepted" | "rejected") {
+  try {
+    setLoading(true);
+    await axios.put("/front-desk", {
+      id,
+      status,
+    });
+    await fetchData();
+  } catch (error) {
+    console.error("Failed to update status:", error);
+  } finally {
+    setLoading(false);
+  }
+}
 
   return (
     <div className="p-4">
