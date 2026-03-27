@@ -1,7 +1,6 @@
 import { useAuth } from "@/contexts/auth-context"
-import { useEffect, useState } from "react"
 import axios from "@/lib/axios"
-import { EncryptString } from "@/lib/functions"
+import { useEffect, useState } from "react"
 
 
 export default function useSquareConnection( mode ?: string) {

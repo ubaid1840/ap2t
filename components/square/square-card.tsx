@@ -11,6 +11,7 @@ import {
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
 import { RequiredStar } from "../required-star";
+import { GetSquare } from "@/lib/square-creds";
 
 declare global {
     interface Window {
@@ -39,9 +40,13 @@ const SquareCard = forwardRef<SquareCardRef, SquareCardProps>(
             if (initializedRef.current) return;
             if (!(window as any).Square) return;
 
+            const {error,merchant, location } = await GetSquare()
+
+            if(error) return
+
             const payments = (window as any).Square.payments(
-                process.env.NEXT_PUBLIC_SQUARE_APP_ID!,
-                process.env.NEXT_PUBLIC_SQUARE_LOCATION_ID!
+                merchant!,
+                location!
             );
 
             const card = await payments.card({

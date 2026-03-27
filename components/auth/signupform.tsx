@@ -26,6 +26,7 @@ import { toast } from "sonner";
 import { Spinner } from "../ui/spinner";
 import { RequiredStar } from "../required-star";
 import { DARKMODECARDSTYLE } from "@/lib/constants";
+import { GetSquare } from "@/lib/square-creds";
 
 
 
@@ -36,7 +37,7 @@ export default function SignUpForm({
 }) {
   const [underAged, setUnderAged] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [selfPaid,setSelfPaid]=useState(false)
+  const [selfPaid, setSelfPaid] = useState(false)
 
 
   const squareCardRef = useRef<any>(null);
@@ -92,9 +93,13 @@ export default function SignUpForm({
           return;
         }
 
+        const { error, merchant, location } = await GetSquare()
+
+        if (error) toast.error("Square configuration not found");
+
         const payments = (window as any).Square.payments(
-          process.env.NEXT_PUBLIC_SQUARE_APP_ID!,
-          process.env.NEXT_PUBLIC_SQUARE_LOCATION_ID!
+          merchant!,
+          location!
         );
 
         const card = await payments.card({
@@ -112,7 +117,7 @@ export default function SignUpForm({
     initSquare()
 
 
-   
+
   }, [currentStep]);
 
   const checkinfo = () => {
@@ -204,12 +209,12 @@ export default function SignUpForm({
       toast.error("Birth date is required");
       return;
     }
-    if (underAged&&!selfPaid) {
+    if (underAged && !selfPaid) {
       if (!parentData.email || !parentData.password) {
         toast.error("under aged players required parents information")
         return
       }
-      if (parentData.password !== parentData.confirm_password){
+      if (parentData.password !== parentData.confirm_password) {
         toast.error("parent's password did not match")
         return
       }
@@ -243,7 +248,7 @@ export default function SignUpForm({
 
     };
 
-    if (underAged&&!selfPaid) {
+    if (underAged && !selfPaid) {
       payload.parent = {
         first_name: parentData.first_name,
         last_name: parentData.last_name,
@@ -273,8 +278,8 @@ export default function SignUpForm({
 
       sessionStorage.removeItem("sq_card_token");
 
-      const loginEmail = underAged&&!selfPaid ? parentData.email : playerData.email;
-      const loginPassword = underAged&&!selfPaid ? parentData.password : playerData.password;
+      const loginEmail = underAged && !selfPaid ? parentData.email : playerData.email;
+      const loginPassword = underAged && !selfPaid ? parentData.password : playerData.password;
 
       await signInWithEmailAndPassword(auth, loginEmail, loginPassword);
     } catch (error: any) {
@@ -404,16 +409,16 @@ export default function SignUpForm({
                 />
               </div>
             </div>
-              <div className="flex p-1 gap-2 items-center">
-                <Checkbox
-                  className="border-primary border-2 data-[state=checked]:border-white data-[state=checked]:bg-primary data-[state=checked]:text-black dark:data-[state=checked]:border-white dark:data-[state=checked]:bg-primary"
-                  checked={selfPaid}
-                  onCheckedChange={(checked) => setSelfPaid(checked === true)}
-                />
-                <p className="text-muted-foreground">
-                  I will pay my self
-                </p>
-              </div>
+            <div className="flex p-1 gap-2 items-center">
+              <Checkbox
+                className="border-primary border-2 data-[state=checked]:border-white data-[state=checked]:bg-primary data-[state=checked]:text-black dark:data-[state=checked]:border-white dark:data-[state=checked]:bg-primary"
+                checked={selfPaid}
+                onCheckedChange={(checked) => setSelfPaid(checked === true)}
+              />
+              <p className="text-muted-foreground">
+                I will pay my self
+              </p>
+            </div>
 
             {underAged && !selfPaid && (
               <>

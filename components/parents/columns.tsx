@@ -6,6 +6,7 @@ import Link from "next/link";
 import { IoIosPin } from "react-icons/io";
 import getInitials from "./get-initials";
 import CardStatus from "../card-status";
+import DummyButton from "../dummy-button";
 
 
 export interface ParentData {
@@ -188,13 +189,9 @@ export const PARENT_COLUMNS: ColumnDef<ParentData>[] = [
         >ACTIONS</div>,
         cell: ({ row }) => (
             <Link href={`/portal/admin/parents/${row.original.id}`}>
-                <Button
-                    onClick={(e) => {
-                        e.stopPropagation();
-                    }}
-                >
+               <DummyButton>
                     <Eye /> View
-                </Button>
+                </DummyButton>
             </Link>
         ),
     },

@@ -7,6 +7,7 @@ import { IoIosPin } from "react-icons/io";
 import getInitials from "../parents/get-initials";
 import CardStatus, { typeClasses } from "../card-status";
 import { DashIcon } from "@radix-ui/react-icons";
+import DummyButton from "../dummy-button";
 
 
 
@@ -150,13 +151,9 @@ export const PLAYERS_COLUMNS: ColumnDef<PlayersData>[] = [
         header: () => <div className="text-[#99A1AF] text-[12px] tracking-wider dark:hover:bg-transparent dark:hover:text-white/50">ACTIONS</div>,
         cell: ({ row }) => (
             <Link href={`/portal/admin/players/${row.original.id}`}>
-                <Button
-                    onClick={(e) => {
-                        e.stopPropagation();
-                    }}
-                >
+               <DummyButton>
                     <Eye /> View
-                </Button>
+                </DummyButton>
             </Link>
         ),
     },

@@ -3,6 +3,7 @@ import { ColumnDef } from "@tanstack/react-table";
 import { ArrowUpDown, Eye } from "lucide-react";
 import Link from "next/link";
 import CardStatus from "../card-status";
+import DummyButton from "../dummy-button";
 
 
 export type SessionData = {
@@ -38,7 +39,7 @@ const sessionStatusMap: Record<SessionData["status"], CardStatusType> = {
   completed: "active",
   upcoming: "info",
   cancelled: "danger",
-  comped : "alternative"
+  comped: "alternative"
 };
 
 
@@ -166,13 +167,9 @@ export const SESSION_COLUMNS: ColumnDef<SessionData>[] = [
 
     cell: ({ row }) => (
       <Link href={`/portal/admin/sessions/${row.original.id}`}>
-        <Button
-          onClick={(e) => {
-            e.stopPropagation();
-          }}
-        >
+        <DummyButton>
           <Eye /> View
-        </Button>
+        </DummyButton>
       </Link>
     ),
   },
@@ -300,13 +297,9 @@ export const SESSION_COLUMNS_COACH: ColumnDef<SessionData>[] = [
 
     cell: ({ row }) => (
       <Link href={`/portal/coach/sessions/${row.original.id}`}>
-        <Button
-          onClick={(e) => {
-            e.stopPropagation();
-          }}
-        >
+        <DummyButton>
           <Eye /> View
-        </Button>
+        </DummyButton>
       </Link>
     ),
   },
