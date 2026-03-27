@@ -3,7 +3,10 @@ import PageTable from "@/components/app-table";
 import InputWithIcon from "@/components/input-with-icon";
 import { CreateSessionDialog } from "@/components/sessions/create-session-dialog";
 import SessionCalendar from "@/components/calendar/session-calendar";
-import { SESSION_COLUMNS, SESSION_COLUMNS_COACH } from "@/components/sessions/session-column";
+import {
+  SESSION_COLUMNS,
+  SESSION_COLUMNS_COACH,
+} from "@/components/sessions/session-column";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -17,28 +20,28 @@ import { ReactNode, useEffect, useState } from "react";
 import SessionSheetCalendar from "@/components/sessions/session-sheet-calender";
 
 export type SessionProps = {
-  id: number,
-  sessionName: string,
-  type: string,
-  date: string,
-  time: string,
-  coachName: string,
-  price: string | number,
-  status: string
-}
+  id: number;
+  sessionName: string;
+  type: string;
+  date: string;
+  time: string;
+  coachName: string;
+  price: string | number;
+  status: string;
+  original : any
+};
 
 export default function Page() {
   const [filter, setFilter] = useState(false);
   const [tab, setTab] = useState("table");
   const [sessions, setSessions] = useState<SessionProps[]>([]);
-  const [search, setSearch] = useState({ main: "", coach: "", type: "" })
-  const [currentMonth, setCurrentMonth] = useState<Moment>(moment())
+  const [search, setSearch] = useState({ main: "", coach: "", type: "" });
+  const [currentMonth, setCurrentMonth] = useState<Moment>(moment());
   const [loading, setLoading] = useState(true);
-  const { user } = useAuth()
+  const { user } = useAuth();
 
   useEffect(() => {
-    if (user?.id)
-      fetchData();
+    if (user?.id) fetchData();
   }, [user]);
 
   // .....for only that coaches sessions.at..........
@@ -78,10 +81,13 @@ export default function Page() {
           time: `${s.start_time} - ${s.end_time}`,
           coachName: joinNames([s.coach_first_name, s.coach_last_name]),
           price: s.price,
-          status: s?.status || 'upcoming',
-            end_date : s?.end_date ? moment(new Date(s.end_date)).format("YYYY-MM-DD") : null
+          status: s?.status || "upcoming",
+          end_date: s?.end_date
+            ? moment(new Date(s.end_date)).format("YYYY-MM-DD")
+            : null,
+          original: s,
         }));
-        setSessions(mappedSessions); 
+        setSessions(mappedSessions);
       }
     } catch (error) {
       console.error("Error fetching sessions", error);
@@ -91,22 +97,26 @@ export default function Page() {
   };
 
   function handleChangeSearch(key: string, val: string) {
-    setSearch((prev) => ({ ...prev, [key]: val }))
+    setSearch((prev) => ({ ...prev, [key]: val }));
   }
 
   const filteredData = sessions.filter((item) => {
+    const sessionSearch = item?.sessionName?.toLowerCase();
+    const coachSearch = `${item?.coachName}`.toLowerCase();
+    const typeSearch = item?.type?.toLowerCase();
 
-    const sessionSearch = item?.sessionName?.toLowerCase()
-    const coachSearch = `${item?.coachName}`.toLowerCase()
-    const typeSearch = item?.type?.toLowerCase()
+    const matchSessions = search.main
+      ? sessionSearch.includes(search.main.toLocaleLowerCase())
+      : true;
 
-    const matchSessions = search.main ? sessionSearch.includes(search.main.toLocaleLowerCase()) : true
-
-    const matchesCoach = search.coach ? coachSearch.includes(search.coach.toLowerCase()) : true;
-    const matchesType = search.type ? typeSearch.includes(search.type.toLowerCase()) : true;
+    const matchesCoach = search.coach
+      ? coachSearch.includes(search.coach.toLowerCase())
+      : true;
+    const matchesType = search.type
+      ? typeSearch.includes(search.type.toLowerCase())
+      : true;
     return matchSessions && matchesCoach && matchesType;
   });
-
 
   return (
     <div className="flex flex-col w-full gap-4">
@@ -131,9 +141,14 @@ export default function Page() {
                 <Calendar /> Calendar
               </Button>
             </div>
-            <CreateSessionDialog coach_id={user?.id} coach_name={joinNames([user?.first_name, user?.last_name])} onRefresh={async () => {
-              await fetchData()
-            }} />
+            <CreateSessionDialog
+              coach_id={user?.id}
+              coach_name={joinNames([user?.first_name, user?.last_name])}
+              all_sessions={sessions}
+              onRefresh={async () => {
+                await fetchData();
+              }}
+            />
           </div>
         </div>
       </Header>
@@ -141,7 +156,11 @@ export default function Page() {
       <div className="flex flex-col gap-4 rounded-[14px] bg-#252525 border border-[#3A3A3A] p-4 bg-[#252525]">
         <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 items-center">
           <div className="w-full">
-            <InputWithIcon value={search.main} onChange={(e) => handleChangeSearch("main", e.target.value)} placeholder="Search by session..." />
+            <InputWithIcon
+              value={search.main}
+              onChange={(e) => handleChangeSearch("main", e.target.value)}
+              placeholder="Search by session..."
+            />
           </div>
 
           <Button onClick={() => setFilter(!filter)}>
@@ -156,14 +175,22 @@ export default function Page() {
                 <Label className="text-muted-foreground font-normal">
                   Coach
                 </Label>
-                <Input value={search.coach} onChange={(e) => handleChangeSearch("coach", e.target.value)} className="rounded-[8px] dark:bg-black" />
+                <Input
+                  value={search.coach}
+                  onChange={(e) => handleChangeSearch("coach", e.target.value)}
+                  className="rounded-[8px] dark:bg-black"
+                />
               </div>
 
               <div className="flex flex-1 flex-col gap-2">
                 <Label className="text-muted-foreground font-normal">
                   Session Type
                 </Label>
-                <Input value={search.type} onChange={(e) => handleChangeSearch("type", e.target.value)} className="rounded-[8px] dark:bg-black" />
+                <Input
+                  value={search.type}
+                  onChange={(e) => handleChangeSearch("type", e.target.value)}
+                  className="rounded-[8px] dark:bg-black"
+                />
               </div>
 
               {/* <div className="flex flex-1 flex-col gap-2">
@@ -177,31 +204,41 @@ export default function Page() {
         )}
       </div>
 
-
-
       {tab === "table" && (
         <PageTable
           loading={loading}
           headerClassName={"rounded-4xl"}
           columns={SESSION_COLUMNS_COACH}
           data={filteredData || []}
-          onRowClick={() => { }}
+          onRowClick={() => {}}
         />
       )}
-      {tab === "calendar" && <SessionSheetCalendar sessions={sessions} currentMonth={currentMonth} setCurrentMonth={setCurrentMonth}/>}
-
-
+      {tab === "calendar" && (
+        <SessionSheetCalendar
+          sessions={sessions}
+          currentMonth={currentMonth}
+          setCurrentMonth={setCurrentMonth}
+        />
+      )}
     </div>
   );
 }
 
-const Header = ({ children, session_length }: { children: ReactNode, session_length: number | undefined }) => {
+const Header = ({
+  children,
+  session_length,
+}: {
+  children: ReactNode;
+  session_length: number | undefined;
+}) => {
   return (
     <div className="flex w-full gap-4 justify-between flex-wrap items-center">
       <div className="space-y-2">
         <p className="text-xl">Sessions Management</p>
         <span className="text-xs text-muted-foreground flex items-center">
-          <span>{session_length} of {session_length} sessions </span>
+          <span>
+            {session_length} of {session_length} sessions{" "}
+          </span>
           <span className="text-warning-text inline-flex">
             {" "}
             {/* <Dot size={16} /> 1 pending payments */}

@@ -66,6 +66,7 @@ type noteType = {
 export default function SessionMainPage({ id, back, back_title, admin = false }: { id: number, back: string, back_title: string, admin?: boolean }) {
   const [data, setData] = useState<SessionDataType>();
   const [rawSessionData, setRawSessionData] = useState<any>(null);
+  const [allSessions, setAllSessions] = useState<any[]>([]);
   const [tab, setTab] = useState("Participants");
   const isMobile = useIsMobile();
   const [loading, setLoading] = useState(false);
@@ -82,6 +83,7 @@ export default function SessionMainPage({ id, back, back_title, admin = false }:
   useEffect(() => {
     if (id) {
       fetchData();
+      fetchAllSessions();
       fetchParticipants();
       fetchNotes()
       fetchPayments();
@@ -114,6 +116,27 @@ export default function SessionMainPage({ id, back, back_title, admin = false }:
       }
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchAllSessions = async () => {
+    try {
+      const result = await axios.get("/admin/sessions");
+      if (result.data) {
+        const mapped = result.data.map((s: any) => ({
+          id: s.id,
+          sessionName: s.name,
+          type: s.session_type,
+          date: s.date,
+          time: `${s.start_time} - ${s.end_time}`,
+          status: s.status || "upcoming",
+          end_date: s.end_date,
+          original: s,
+        }));
+        setAllSessions(mapped);
+      }
+    } catch {
+      // non-critical — availability check will silently skip
     }
   };
 
@@ -245,6 +268,7 @@ export default function SessionMainPage({ id, back, back_title, admin = false }:
                   sessionId={id}
                   sessionData={rawSessionData}
                   onSuccess={fetchData}
+                  all_sessions={allSessions}
                 />
               </div>
             </div>

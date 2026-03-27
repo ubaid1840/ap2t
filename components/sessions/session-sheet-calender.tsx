@@ -39,18 +39,19 @@ export default function SessionSheetCalendar({
 
   const coaches = [...new Set(sessions.map((s) => s.coachName))];
 
-  const timeSlots: { label: string; hour: number }[] = [];
+  const timeSlots: { label: string; start_hour: number ;end_hour:number}[] = [];
   for (let i = 8; i <= 19; i++) {
     timeSlots.push({
-      label: `${moment({ hour: i }).format("hA")}`,
-      hour: i,
+      label: `${moment({ hour: i }).format("hA")}-${moment({ hour: i+1 }).format("hA")}`,
+      start_hour: i,
+      end_hour:i+1,
     });
   }
   const parseHour = (timeStr: string): number => {
     return moment(timeStr.trim(), ["hh:mm A", "h:mm A", "HH:mm"]).hour();
   };
 
-  const getSession = (day: Moment, coach: string, slotHour: number) => {
+  const getSession = (day: Moment, coach: string, startHour: number,endHour:number) => {
     return sessions.find((s) => {
       const sessionStartDay = moment(s.date).startOf("day");
       const sessionEndDay = moment(s.end_date).startOf("day");
@@ -62,7 +63,7 @@ export default function SessionSheetCalendar({
       const sessionEnd = parseHour(end);
 
 
-      return slotHour >= sessionStart && slotHour <= sessionEnd;
+      return startHour >= sessionStart && endHour <= sessionEnd;
     });
   };
 
@@ -102,7 +103,7 @@ export default function SessionSheetCalendar({
                   {coaches.map((coach) => (
                     <th
                       key={coach}
-                      className="border p-2 bg-primary text-black"
+                      className="border p-2 bg-primary text-black min-w-[100px] max-w-[100px]"
                     >
                       {coach}
                     </th>
@@ -112,13 +113,13 @@ export default function SessionSheetCalendar({
 
               <tbody>
                 {timeSlots.map((slot) => (
-                  <tr key={slot.hour}>
+                  <tr key={slot.start_hour}>
                     <td className="border p-2 bg-primary/20 font-medium whitespace-nowrap">
                       {slot.label}
                     </td>
 
                     {coaches.map((coach) => {
-                      const session = getSession(day, coach, slot.hour);
+                      const session = getSession(day, coach, slot.start_hour,slot.end_hour);
 
                       if (!session) {
                         return <td key={coach} className="border h-10" />;

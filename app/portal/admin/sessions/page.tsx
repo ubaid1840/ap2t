@@ -26,6 +26,7 @@ export type SessionProps = {
   coachName: string,
   price: string | number,
   status: string
+  original:any
 }
 
 export default function Page() {
@@ -55,7 +56,8 @@ export default function Page() {
           coachName: joinNames([s.coach_first_name, s.coach_last_name]),
           price: s.price,
           status: s?.status || 'upcoming',
-            end_date : s?.end_date ? moment(new Date(s.end_date)).format("YYYY-MM-DD") : null
+            end_date : s?.end_date ? moment(new Date(s.end_date)).format("YYYY-MM-DD") : null,
+            original:s
         }));
         setSessions(mappedSessions); 
       }
@@ -109,7 +111,8 @@ export default function Page() {
             </div>
             <CreateSessionDialog onRefresh={async () => {
               await fetchData()
-            }} />
+            }} 
+            all_sessions={sessions}/>
           </div>
         </div>
       </Header>

@@ -60,6 +60,14 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Field, FieldError } from "../ui/field";
 import { RequiredStar } from "../required-star";
 
+type BookedSession = {
+  name: string;
+  date: string;
+  end_date: string;
+  start_time: string;
+  end_time: string;
+};
+
 interface EditSessionDialogProps {
   sessionId?: number;
   sessionData?: SessionType & {
@@ -69,6 +77,7 @@ interface EditSessionDialogProps {
   onSuccess?: () => void;
   coach_id?: string | null;
   promotion?: boolean;
+  all_sessions?: any[];
 }
 
 export const sessionSchema = z.object({
@@ -124,13 +133,87 @@ export function EditSessionDialog({
   onSuccess,
   coach_id = null,
   promotion = false,
+  all_sessions = [],
 }: EditSessionDialogProps) {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [selectedSession, setSelectedSession] = useState<null | number>(null);
   const [coach_Name, setCoach_name] = useState<string | null>(null);
+  const [notAvailableSessions, setNotAvailableSessions] = useState<BookedSession[]>([]);
+  const [booked, setBooked] = useState(false);
   const router = useRouter();
+
+  function to24Hour(timeStr: string): string {
+    if (!timeStr) return "";
+    if (!timeStr.includes("AM") && !timeStr.includes("PM")) return timeStr;
+    const [time, suffix] = timeStr.split(" ");
+    let [hours, minutes] = time.split(":").map(Number);
+    if (suffix === "PM" && hours !== 12) hours += 12;
+    if (suffix === "AM" && hours === 12) hours = 0;
+    return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}`;
+  }
+
+  function getCoachBookedSessions(coachId: number | null): BookedSession[] {
+    if (!all_sessions || all_sessions.length === 0 || !coachId) return [];
+    return all_sessions
+      .filter(
+        (session) =>
+          (session.status === "upcoming" || session.status === "ongoing") &&
+          coachId === session.original.coach_id &&
+          session.original.id !== sessionId, // exclude the session being edited
+      )
+      .map((session) => {
+        const [start_time, end_time] = session.time.split(" - ");
+        return {
+          name: session.original.name,
+          date: session.original.date,
+          end_date: session.original.end_date,
+          start_time,
+          end_time,
+        };
+      });
+  }
+
+  const checkAvailability = (
+    overrides: { start_time?: string; end_time?: string; date?: Date; end_date?: Date } = {},
+  ):BookedSession[] => {
+    const selectedDate = overrides.date ?? form.getValues("date");
+    const selectedEndDate = overrides.end_date ?? form.getValues("end_date");
+    const selectedStartTime = overrides.start_time ?? form.getValues("start_time");
+    const selectedEndTime = overrides.end_time ?? form.getValues("end_time");
+
+    if (!selectedDate || !selectedEndDate || !selectedStartTime || !selectedEndTime) return [];
+
+    const coachSessions = getCoachBookedSessions(form.getValues("coach_id"));
+    const newStart = to24Hour(selectedStartTime);
+    const newEnd = to24Hour(selectedEndTime);
+
+    const toDateOnly = (d: Date | string) => {
+      if (typeof d === "string") return d.slice(0, 10);
+      const year = d.getFullYear();
+      const month = String(d.getMonth() + 1).padStart(2, "0");
+      const day = String(d.getDate()).padStart(2, "0");
+      return `${year}-${month}-${day}`;
+    };
+
+    const selStartStr = toDateOnly(selectedDate);
+    const selEndStr = toDateOnly(selectedEndDate);
+
+    const conflicts = coachSessions.filter((session) => {
+      const sessionStartStr = toDateOnly(session.date);
+      const sessionEndStr = toDateOnly(session.end_date);
+      const dateOverlap = sessionStartStr <= selEndStr && sessionEndStr >= selStartStr;
+      const sessionStart24 = to24Hour(session.start_time);
+      const sessionEnd24 = to24Hour(session.end_time);
+      const timeOverlap = sessionStart24 < newEnd && sessionEnd24 > newStart;
+      return dateOverlap && timeOverlap;
+    });
+
+    setNotAvailableSessions(conflicts);
+    setBooked(conflicts.length > 0);
+    return conflicts
+  };
 
   const form = useForm<SessionSchemaValues>({
     resolver: zodResolver(sessionSchema),
@@ -195,6 +278,16 @@ export function EditSessionDialog({
   const editSession = async (values: SessionSchemaValues) => {
     if (!sessionId) {
       toast.error("Session ID is required");
+      return;
+    }
+    const conflicts=checkAvailability({
+      date: values.date,
+      end_date: values.end_date,
+      start_time: values.start_time,
+      end_time: values.end_time,
+    });
+    if (conflicts?.length>0) {
+      toast.error("Can't update session because coach is already booked at this time and date");
       return;
     }
     setLoading(true);
@@ -508,6 +601,16 @@ export function EditSessionDialog({
                     />
                   </div>
                 </div>
+
+                {booked && notAvailableSessions.length > 0 && (
+                  <p className="text-sm text-red-500">
+                    Coach is booked on session {notAvailableSessions[0].name} at{" "}
+                    {notAvailableSessions[0].date} till{" "}
+                    {notAvailableSessions[0].end_date} at time{" "}
+                    {notAvailableSessions[0].start_time} till{" "}
+                    {notAvailableSessions[0].end_time}
+                  </p>
+                )}
 
                 <div className="flex gap-2 text-md ">
                   <MapPin className="text-primary w-4 w-4" />

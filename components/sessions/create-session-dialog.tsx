@@ -44,6 +44,7 @@ import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Field, FieldError } from "../ui/field";
 import { RequiredStar } from "../required-star";
+import { toast } from "sonner";
 
 export type SessionType = {
   name: string;
@@ -54,15 +55,16 @@ export type SessionType = {
   coach_id: number | null;
   coach_name?: string;
   location: string;
-  date: undefined;
+  date: undefined|Date;
   start_time: string;
+  status:string;
   end_time: string;
   price: number | string;
   max_players: number | string;
   apply_promotion: boolean;
   promotion_price?: number | string;
   image?: string;
-  end_date: undefined;
+  end_date: undefined|Date;
   promotion_start: string | undefined;
   promotion_end: string | undefined;
   show_storefront: boolean | "indeterminate";
@@ -127,23 +129,47 @@ export function CreateSessionDialog({
   coach_id = null,
   coach_name = null,
   promotion = false,
+  all_sessions=[],
 }: {
   coach_name?: string | null;
   coach_id?: string | null;
   onRefresh: () => Promise<void>;
   promotion?: boolean;
+  all_sessions:any[]
 }) {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const [coach_Name, setCoach_name] = useState<string | null>(null);
-  const [coachBookedSessions, setCoachBookedSessions] = useState<
-    BookedSession[]
-  >([]);
   const [notAvailableSessions, setNotAvailableSessions] = useState<
     BookedSession[]
   >([]);
   const [booked, setBooked] = useState(false);
+
+  function getCoachBookedSessions(coachId: number | null): BookedSession[] {
+    if (!all_sessions || all_sessions.length === 0 || !coachId) return [];
+
+    return all_sessions
+      .filter(
+        (session) =>
+          (session.status === "upcoming" || session.status === "ongoing") &&
+          coachId === session.original.coach_id,
+      )
+      .map((session) => {
+        const [start_time, end_time] = session.time.split(" - ");
+        return {
+          name: session.original.name,
+          date: session.original.date,
+          end_date: session.original.end_date,
+          start_time,
+          end_time,
+        };
+      });
+  }
+ 
+
+
+
 
   const form = useForm<SessionSchemaValues>({
     resolver: zodResolver(sessionSchema),
@@ -202,7 +228,7 @@ export function CreateSessionDialog({
       date?: Date;
       end_date?: Date;
     } = {},
-  ) => {
+  ):BookedSession[] => {
     const selectedDate = overrides.date ?? form.getValues("date");
     const selectedEndDate = overrides.end_date ?? form.getValues("end_date");
     const selectedStartTime =
@@ -215,15 +241,14 @@ export function CreateSessionDialog({
       !selectedStartTime ||
       !selectedEndTime
     )
-      return;
+      return [];
 
+    const coachSessions = getCoachBookedSessions(selectedCoachId);
     const newStart = to24Hour(selectedStartTime);
     const newEnd = to24Hour(selectedEndTime);
 
-    
     const toDateOnly = (d: Date | string) => {
-      if (typeof d === "string") return d.slice(0, 10); 
-      
+      if (typeof d === "string") return d.slice(0, 10);
       const year = d.getFullYear();
       const month = String(d.getMonth() + 1).padStart(2, "0");
       const day = String(d.getDate()).padStart(2, "0");
@@ -233,7 +258,7 @@ export function CreateSessionDialog({
     const selStartStr = toDateOnly(selectedDate);
     const selEndStr = toDateOnly(selectedEndDate);
 
-    const conflicts = coachBookedSessions.filter((session) => {
+    const conflicts = coachSessions.filter((session) => {
       const sessionStartStr = toDateOnly(session.date);
       const sessionEndStr = toDateOnly(session.end_date);
 
@@ -246,13 +271,25 @@ export function CreateSessionDialog({
 
       return dateOverlap && timeOverlap;
     });
-
+    
     setNotAvailableSessions(conflicts);
     setBooked(conflicts.length > 0);
+    return conflicts;
   };
 
   const CreateSession = async (values: SessionSchemaValues) => {
     setLoading(true);
+    const conflicts=checkAvailability({
+      date: values.date,
+      end_date: values.end_date,
+      start_time: values.start_time,
+      end_time: values.end_time,
+    })
+    if(conflicts.length>0){
+      toast.error("Can't create session because coach is already booked at this time and date")
+      setLoading(false)
+      return
+    }
     try {
       await axios.post("/admin/sessions", {
         ...values,
@@ -275,6 +312,12 @@ export function CreateSessionDialog({
         open={open}
         onOpenChange={(val) => {
           setOpen(val);
+          if (!val) {
+      form.reset(); 
+      setBooked(false);
+      setNotAvailableSessions([]);
+      setLoading(false)
+    }
         }}
       >
         <DialogContent className="bg-[#252525] border border-[#3A3A3A] sm:max-w-4xl p-0">
@@ -440,7 +483,6 @@ export function CreateSessionDialog({
                             setCoach_name(
                               `${coach.first_name} ${coach.last_name}`,
                             );
-                            setCoachBookedSessions(coach.booked_sessions);
                           }}
                         />
                       }
@@ -470,7 +512,6 @@ export function CreateSessionDialog({
                             }
                             onChange={(value) => {
                               field.onChange(value);
-                              checkAvailability({ date: value });
                             }}
                             required
                           />
@@ -498,7 +539,6 @@ export function CreateSessionDialog({
                             }
                             onChange={(value) => {
                               field.onChange(value);
-                              checkAvailability({ end_date: value });
                             }}
                             required
                           />
@@ -525,7 +565,7 @@ export function CreateSessionDialog({
                             value={field.value}
                             onChange={(value) => {
                               field.onChange(value);
-                              checkAvailability({ start_time: value });
+                              
                             }}
                           />
                           {fieldState.invalid && (
@@ -549,7 +589,6 @@ export function CreateSessionDialog({
                             value={field.value}
                             onChange={(value) => {
                               field.onChange(value);
-                              checkAvailability({ end_time: value });
                             }}
                           />
                           {fieldState.invalid && (

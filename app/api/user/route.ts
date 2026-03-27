@@ -62,7 +62,6 @@ export async function POST(req: NextRequest) {
                         [parent_id]
                     );
                     try{
-
                     await pool.query(
                         `INSERT INTO settings (user_id) VALUES ($1)`,
                         [parent_id]

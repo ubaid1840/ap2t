@@ -9,26 +9,10 @@ export async function GET(req: NextRequest) {
   u.id,
   u.first_name,
   u.last_name,
-  u.role,
-  COALESCE(
-    json_agg(
-      json_build_object(
-        'name', s.name,
-        'date', s.date,
-        'end_date', s.end_date,
-        'start_time', s.start_time,
-        'end_time', s.end_time
-      )
-    ) FILTER (WHERE s.id IS NOT NULL),
-    '[]'
-  ) AS sessions
+  u.email,
+  u.picture
 FROM users u
-LEFT JOIN sessions s 
-  ON s.coach_id = u.id 
-  AND s.status = 'upcoming'
-WHERE u.role = 'coach'
-GROUP BY u.id, u.first_name, u.last_name, u.role;
-      `,
+WHERE u.role = 'coach';`,
     );
 
     return NextResponse.json(result.rows, { status: 200 });
