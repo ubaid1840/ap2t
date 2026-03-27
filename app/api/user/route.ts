@@ -1,7 +1,7 @@
 import pool from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
 import admin from "@/lib/firebase-admin";
-import { squareClient } from "@/lib/square";
+import { getSquareClient } from "@/lib/square";
 
 export async function PUT(req: NextRequest) {
     try {
@@ -249,8 +249,11 @@ export async function createUserWithFirebase(
     let squareCustomerId: string | null = null;
     let squareCardId: string | null = null;
 
+      const squareClient = await getSquareClient();
+
     if (card_token) {
         try {
+            
             const customerRes = await squareClient.customers.create({
                 givenName: rest.first_name,
                 familyName: rest.last_name,
