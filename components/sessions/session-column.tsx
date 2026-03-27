@@ -11,6 +11,7 @@ export type SessionData = {
   sessionName: string;
   type: string;
   date: string;
+  end_date:string;
   time: string;
   coachName: string;
   playerName: string;
@@ -94,12 +95,16 @@ export const SESSION_COLUMNS: ColumnDef<SessionData>[] = [
         <ArrowUpDown />
       </Button>
     ),
-    cell: ({ row }) => (
+    cell: ({ row }) =>{
+      console.log(row.original.end_date);
+       return(
       <div className="leading-tight">
-        <div className="text-[#D1D5DC]">{row.original.date}</div>
+        <div className="text-[#D1D5DC]">{row.original.date}-{row.original.end_date}</div>
         <div className="text-xs text-[#9CA3AF]">{row.original.time}</div>
       </div>
-    ),
+    )
+  }
+
   },
 
   {
@@ -226,7 +231,7 @@ export const SESSION_COLUMNS_COACH: ColumnDef<SessionData>[] = [
     ),
     cell: ({ row }) => (
       <div className="leading-tight">
-        <div className="text-[#D1D5DC]">{row.original.date}</div>
+        <div className="text-[#D1D5DC]">{row.original.date}-{row.original.end_date}</div>
         <div className="text-xs text-[#9CA3AF]">{row.original.time}</div>
       </div>
     ),

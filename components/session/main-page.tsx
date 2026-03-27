@@ -103,6 +103,7 @@ export default function SessionMainPage({ id, back, back_title, admin = false }:
           id: d.id,
           sessionName: d.name,
           date: moment(new Date(d.date)).format("YYYY-MM-DD"),
+          end_date:moment(new Date(d.end_date)).format("YYYY-MM-DD"),
           time: `${d.start_time} - ${d.end_time}`,
           coachName: joinNames([d.coach_first_name, d.coach_last_name]),
           status: d.status,
@@ -281,7 +282,7 @@ export default function SessionMainPage({ id, back, back_title, admin = false }:
                 <Calendar className="h-4 w-4 text-ghost-text" />
                 <div className=" ">
                   <p className="text-xs text-ghost-text">Date</p>
-                  <h1 className="text-[#E5E7EB] text-sm">{data?.date}</h1>
+                  <h1 className="text-[#E5E7EB] text-sm">{data?.date} - {data?.end_date}</h1>
                 </div>
               </div>
 

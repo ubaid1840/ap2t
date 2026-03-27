@@ -59,6 +59,7 @@ import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Field, FieldError } from "../ui/field";
 import { RequiredStar } from "../required-star";
+import moment from "moment";
 
 type BookedSession = {
   name: string;
@@ -605,8 +606,8 @@ export function EditSessionDialog({
                 {booked && notAvailableSessions.length > 0 && (
                   <p className="text-sm text-red-500">
                     Coach is booked on session {notAvailableSessions[0].name} at{" "}
-                    {notAvailableSessions[0].date} till{" "}
-                    {notAvailableSessions[0].end_date} at time{" "}
+                    {moment(notAvailableSessions[0].date).format("YYYY-MM-DD")} till{" "}
+                    {moment(notAvailableSessions[0].end_date).format("YYYY-MM-DD")} at time{" "}
                     {notAvailableSessions[0].start_time} till{" "}
                     {notAvailableSessions[0].end_time}
                   </p>

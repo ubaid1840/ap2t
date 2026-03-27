@@ -33,6 +33,7 @@ export interface SessionDataType {
   description:string;
   type: string;
   date: string;
+  end_date:string;
   time: string;
   coachName: string;
   playerName: string;
