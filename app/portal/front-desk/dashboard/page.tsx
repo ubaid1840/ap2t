@@ -2,11 +2,10 @@
 
 import { useEffect, useState } from "react";
 import PageTable from "@/components/app-table";
-import axios from "@/lib/axios";
 import { Button } from "@/components/ui/button";
-import { ArrowUpDown } from "lucide-react";
+import { ArrowUpDown, Loader2 } from "lucide-react";
 import { ColumnDef } from "@tanstack/react-table";
-import axiosInstance from "@/lib/axios";
+import axios from "@/lib/axios";
 import moment from "moment";
 
 
@@ -32,6 +31,8 @@ export type FrontDeskActionData = {
 export default function Page() {
   const [loading, setLoading] = useState(false);
   const [sessions, setSessions] = useState<FrontDeskActionData[]>([]);
+  const [loadingId,setLoadingId]=useState<number|null>()
+  const [loadingType,setLoadingType]=useState<string|null>()
   const FRONT_DESK_SESSION_COLUMNS: ColumnDef<FrontDeskActionData>[] = [
     {
       accessorKey: "session_name",
@@ -172,28 +173,75 @@ export default function Page() {
       id: "actions",
       header: () => <div className="text-[#99A1AF] text-[12px] tracking-wider dark:hover:bg-transparent dark:hover:text-white/50">ACTIONS</div>,
   
-      cell: ({ row }) => {
-    const action = row.original.action;
-  
-    if (action === "approval") {
-      return (
-        <div className="flex gap-2">
-            
-          <Button onClick={()=>handleSubmit(row.original.id,"accepted")}>Approve</Button>
-          <Button variant={"outline"} className="text-red-500" onClick={()=>handleSubmit(row.original.id,"rejected")}>Disapprove</Button>
-        </div>
-      );
-    }
-  
-    else if (action === "cash") {
-      return (
-        <div className="flex gap-2">
-          <Button onClick={()=>handleSubmit(row.original.id,"accepted")}>Received</Button>
-          <Button variant={"outline"} className="text-red-500" onClick={()=>handleSubmit(row.original.id,"rejected")}>Not Received</Button>
-        </div>
-      );
-    }
+   cell: ({ row }) => {
+  const action = row.original.action;
+
+  const isAcceptedLoading =
+    loadingId === row.original.id && loadingType === "accepted";
+
+  const isRejectedLoading =
+    loadingId === row.original.id && loadingType === "rejected";
+
+  if (action === "approval") {
+    return (
+      <div className="flex gap-2">
+        <Button
+          disabled={loadingId === row.original.id}
+          onClick={() => handleSubmit(row.original.id, "accepted")}
+        >
+          {isAcceptedLoading ? (
+            <Loader2 className="animate-spin w-4 h-4" />
+          ) : (
+            "Approve"
+          )}
+        </Button>
+
+        <Button
+          disabled={loadingId === row.original.id}
+          variant="outline"
+          className="text-red-500 border-red-500"
+          onClick={() => handleSubmit(row.original.id, "rejected")}
+        >
+          {isRejectedLoading ? (
+            <Loader2 className="animate-spin w-4 h-4" />
+          ) : (
+            "Disapprove"
+          )}
+        </Button>
+      </div>
+    );
   }
+
+  if (action === "cash") {
+    return (
+      <div className="flex gap-2">
+        <Button
+          disabled={loadingId === row.original.id}
+          onClick={() => handleSubmit(row.original.id, "accepted")}
+        >
+          {isAcceptedLoading ? (
+            <Loader2 className="animate-spin w-4 h-4" />
+          ) : (
+            "Received"
+          )}
+        </Button>
+
+        <Button
+          disabled={loadingId === row.original.id}
+          variant="outline"
+          className="text-red-500 border-red-500"
+          onClick={() => handleSubmit(row.original.id, "rejected")}
+        >
+          {isRejectedLoading ? (
+            <Loader2 className="animate-spin w-4 h-4" />
+          ) : (
+            "Not Received"
+          )}
+        </Button>
+      </div>
+    );
+  }
+}
       }
         
       
@@ -220,16 +268,16 @@ export default function Page() {
 
 async function handleSubmit(id: number, status: "accepted" | "rejected") {
   try {
-    setLoading(true);
-    await axios.put("/front-desk", {
-      id,
-      status,
-    });
+    setLoadingId(id);
+    setLoadingType(status);
+
+    await axios.put("/front-desk", { id, status });
     await fetchData();
   } catch (error) {
     console.error("Failed to update status:", error);
   } finally {
-    setLoading(false);
+    setLoadingId(null);
+    setLoadingType(null);
   }
 }
 
