@@ -92,15 +92,16 @@ export default function Hero() {
                     </div>
 
                     <div className="flex flex-col sm:flex-row mt-4 gap-4 justify-center sm:justify-start">
-                        <Link href="/auth">
+                        <Link href="/portal/auth">
                             <Button size={"lg"} className="rounded-full bg-primary text-secondary font-bold w-full sm:w-auto">
                                 BOOK SESSION
                             </Button>
                         </Link>
-
+                        <Link href="/contact">
                         <Button size={"lg"} className="bg-transparent border-2 border-white rounded-full text-white w-full sm:w-auto hover:bg-white/10">
                             CALL US 732-XXX-XXXX
                         </Button>
+                        </Link>
                     </div>
                 </div>
 

@@ -2,6 +2,7 @@
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
+import Link from "next/link";
 
 export default function Page() {
 
@@ -111,7 +112,9 @@ export default function Page() {
               }}
               className="text-white w-36 sm:w-40 h-10 mt-5"
             >
+              <Link href={"portal/auth"}>
               Register Now
+              </Link>
             </Button>
           </div>
         </div>
