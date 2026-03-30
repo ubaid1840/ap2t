@@ -190,7 +190,7 @@ export default function FrontdeskDashboard() {
             <div className="flex gap-2">
               <Button
                 disabled={loadingId === row.original.id}
-                onClick={() => handleSubmit(row.original.id, "accepted")}
+                onClick={() => handleSubmit(row.original.id, "accepted", "approval")}
               >
                 {isAcceptedLoading ? (
                   <Loader2 className="animate-spin w-4 h-4" />
