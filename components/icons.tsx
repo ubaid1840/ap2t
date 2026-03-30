@@ -16,6 +16,7 @@ import { MdDashboard } from "react-icons/md";
 import { TbCreditCardFilled } from "react-icons/tb";
 import { GiGraduateCap } from "react-icons/gi";
 import type { IconType } from "react-icons";
+import { RiComputerLine } from 'react-icons/ri';
 
 export const Icons: Record<string, IconType> = {
   parents : HiUsers,
@@ -24,6 +25,7 @@ export const Icons: Record<string, IconType> = {
   players : GiPlayerBase,
   sessions : IoCalendarClear,
   promotions : FaTag,
+  front_desk: RiComputerLine,
 payments : TbCreditCardFilled,
 reports : FaChartColumn,
 settings : IoMdSettings,

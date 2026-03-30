@@ -57,6 +57,13 @@ export const admin_nav_items = [
     
     shortcut: ['d', 'a', 's', 'h'],
   },
+  {
+    title: 'Front Desk',
+    url: '/portal/admin/front-desk',
+    icon: 'front_desk',
+    
+    shortcut: ['d', 'a', 's', 'h'],
+  },
     {
     title: 'Settings',
     url: '/portal/admin/settings',
