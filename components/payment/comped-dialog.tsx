@@ -55,7 +55,7 @@ export function CompedDialog({
         comped_category: values.comped_category,
         comped_reason: values.comped_reason,
         status: "comped",
-        method: "Null",
+        method: "Nill",
         paid_at: new Date(),
       });
       await onRefresh();
