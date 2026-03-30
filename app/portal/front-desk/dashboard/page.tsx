@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowUpDown } from "lucide-react";
 import { ColumnDef } from "@tanstack/react-table";
 import axiosInstance from "@/lib/axios";
+import moment from "moment";
 
 
 export type FrontDeskActionData = {
@@ -88,7 +89,7 @@ export default function Page() {
         console.log(row.original.end_date);
          return(
         <div className="leading-tight">
-          <div className="text-[#D1D5DC]">{row.original.date}-{row.original.end_date}</div>
+          <div className="text-[#D1D5DC]">{moment(new Date(row.original.date)).format("YYYY-MM-DD")} - {moment(new Date(row.original.end_date)).format("YYYY-MM-DD")}</div>
           <div className="text-xs text-[#9CA3AF]">{row.original.start_time} - {row.original.end_time}</div>
         </div>
       )
@@ -155,13 +156,13 @@ export default function Page() {
     if (action === "approval") {
       return (
         <span className="font-medium text-[#D1D5DC]">
-          Requires Approval..
+          Requires Approval
         </span>
       );
     } else if (action === "cash") {
       return (
         <span className="font-medium text-[#D1D5DC]">
-          Requires Cash Confirmation..
+          Requires Cash Confirmation
         </span>
       );
     }}
@@ -179,7 +180,7 @@ export default function Page() {
         <div className="flex gap-2">
             
           <Button onClick={()=>handleSubmit(row.original.id,"accepted")}>Approve</Button>
-          <Button onClick={()=>handleSubmit(row.original.id,"rejected")}>Disapprove</Button>
+          <Button variant={"outline"} className="text-red-500" onClick={()=>handleSubmit(row.original.id,"rejected")}>Disapprove</Button>
         </div>
       );
     }
@@ -188,7 +189,7 @@ export default function Page() {
       return (
         <div className="flex gap-2">
           <Button onClick={()=>handleSubmit(row.original.id,"accepted")}>Received</Button>
-          <Button onClick={()=>handleSubmit(row.original.id,"rejected")}>Not Received</Button>
+          <Button variant={"outline"} className="text-red-500" onClick={()=>handleSubmit(row.original.id,"rejected")}>Not Received</Button>
         </div>
       );
     }
