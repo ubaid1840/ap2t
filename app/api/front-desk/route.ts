@@ -1,4 +1,7 @@
 import pool from "@/lib/db";
+import { TriggerFirebaseApprovals } from "@/lib/triggerFirebase";
+import moment from "moment";
+import { NextRequest } from "next/server";
 
 export async function GET() {
   try {
@@ -17,7 +20,7 @@ export async function GET() {
 FROM front_desk_actions fda
 JOIN sessions s ON fda.session_id = s.id
 JOIN users u ON fda.user_id = u.id
-WHERE fda.status = 'waiting';`);
+;`);
     return new Response(JSON.stringify(response.rows), {
       status: 200,
       headers: { "Content-Type": "application/json" },
@@ -31,8 +34,10 @@ WHERE fda.status = 'waiting';`);
   }
 }
 
-export async function PUT(req: Request) {
+export async function PUT(req: NextRequest) {
   try {
+    const searchParams = req.nextUrl.searchParams
+    const type = searchParams.get(`type`)
     const body = await req.json();
     const { id, status } = body;
 
@@ -65,6 +70,20 @@ export async function PUT(req: Request) {
         { status: 404 }
       );
     }
+
+    if (type === "cash") {
+      const updatingRow = result.rows?.[0] ?? null
+      if (updatingRow) {
+        await pool.query(`
+  UPDATE payments
+  SET method = 'Cash', status = 'paid', paid_at = $1, paid_by = $2, transaction_id = $3 
+  WHERE user_id = $4 AND session_id = $5
+`, [new Date(), updatingRow?.user_id, moment().valueOf().toString(), updatingRow?.user_id, updatingRow?.session_id])
+      }
+    }
+
+    await TriggerFirebaseApprovals("user")
+    await TriggerFirebaseApprovals("admin")
 
     return new Response(
       JSON.stringify({
