@@ -90,7 +90,7 @@ export function ViewDialog({ data } : {data : PaymentItem}) {
           <div className="space-y-2">
             <h1 className="text-lg text-[#E5E7EB]">Payment Method</h1>
             <div className="bg-[#1A1A1A] border border-border rounded-[10px] flex justify-between p-4">
-              <div className="flex gap-2">
+              <div className="flex gap-2 items-center">
                 <div className="bg-info-bg text-info-text p-2 rounded-[10px]">
                   <CreditCard />
                 </div>
@@ -99,10 +99,12 @@ export function ViewDialog({ data } : {data : PaymentItem}) {
                   {/* <p className="text-xs text-[#99A1AF]">{data.methodDetail}</p> */}
                 </div>
               </div>
+              {data?.method !== 'Cash' &&
               <div className="space-y-0">
                 <p className="text-xs text-ghost-text">Processed via</p>
                 <h1 className="text-[#E5E7EB]">Square</h1>
               </div>
+}
             </div>
           </div>
           <div className="space-y-2">

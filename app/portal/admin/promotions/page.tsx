@@ -1,53 +1,24 @@
 "use client";
-import AppCalendar from "@/components/app-calendar";
-import { AssignCoachDialog } from "@/components/sessions/assign-coach-dialog";
-import { TimePicker } from "@/components/time-picker";
+import { CreateSessionDialog } from "@/components/sessions/create-session-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Checkbox } from "@/components/ui/checkbox";
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
-import { Spinner } from "@/components/ui/spinner";
-import { Textarea } from "@/components/ui/textarea";
 import { useAuth } from "@/contexts/auth-context";
-import axios from "@/lib/axios"
+import axios from "@/lib/axios";
 import { calcualteRevenu, joinNames } from "@/lib/functions";
 import {
-  Archive,
   Calendar,
   DollarSign,
-  Edit,
-  ExternalLink,
-  Eye,
-  Image,
-  Link,
-  MapPin,
-  Plus,
-  RefreshCcw,
   ShoppingBag,
   Tag,
   TrendingUp,
   Users
 } from "lucide-react";
 import moment from "moment";
+import NextLink from "next/link";
 import { ReactNode, useEffect, useState } from "react";
 import { GoDotFill } from "react-icons/go";
-import { toast } from "sonner";
-import NextLink from "next/link";
-import { TimePickerFixed } from "@/components/time-picker-fixed";
-import { CreateSessionDialog } from "@/components/sessions/create-session-dialog";
-import { EditSessionDialog } from "@/components/sessions/edit-session-dialog";
 
 
 

@@ -136,7 +136,7 @@ export function CreateSessionDialog({
   coach_id?: string | null;
   onRefresh: () => Promise<void>;
   promotion?: boolean;
-  all_sessions:any[]
+  all_sessions?:any[]
 }) {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);

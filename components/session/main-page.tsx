@@ -54,6 +54,7 @@ import {
 } from "lucide-react";
 import moment from "moment";
 import { useEffect, useState } from "react";
+import { DiscountDialog } from "../payment/apply-discount";
 
 type noteType = {
   id: string;
@@ -107,7 +108,7 @@ export default function SessionMainPage({ id, back, back_title, admin = false }:
           time: `${d.start_time} - ${d.end_time}`,
           coachName: joinNames([d.coach_first_name, d.coach_last_name]),
           status: d.status,
-          price: d?.apply_promotion ? d.promotion_price : d.price,
+          price: d.price,
           promotion_price: d.promotion_price,
           max_players: d.max_players,
           location: d.location,
@@ -150,6 +151,7 @@ export default function SessionMainPage({ id, back, back_title, admin = false }:
     }
   };
 
+
   const fetchPayments = async () => {
     try {
       const response = await axios.get(`/admin/sessions/${id}/payments`);
@@ -158,6 +160,7 @@ export default function SessionMainPage({ id, back, back_title, admin = false }:
       console.error("Error fetching payments", error);
     }
   };
+
   const fetchNotes = async () => {
     try {
       const result = await axios.get(`/admin/sessions/${id}/note`)
@@ -222,12 +225,12 @@ export default function SessionMainPage({ id, back, back_title, admin = false }:
       icon: <Users />,
       type: "info",
     },
-    {
-      h: `$${paymentStats.total_revenue.toFixed(2)}`,
-      p: "Expected Revenue",
-      icon: <DollarSign />,
-      type: "success",
-    },
+    // {
+    //   h: `$${paymentStats.total_revenue.toFixed(2)}`,
+    //   p: "Expected Revenue",
+    //   icon: <DollarSign />,
+    //   type: "success",
+    // },
     {
       h: `$${paymentStats.paid_amount.toFixed(2)}`,
       p: "Paid",
@@ -453,7 +456,7 @@ export default function SessionMainPage({ id, back, back_title, admin = false }:
                 <Card key={i} className="bg-[#1A1A1A] border border-border">
                   <CardContent className="space-y-2">
                     <div className="flex gap-2 items-center">
-                      <h1>{payment.payer_first_name} {payment.payer_last_name}</h1>
+                      <h1>{payment.player_first_name} {payment.player_last_name}</h1>
                       <CardStatus
                         value={payment.status}
                       />
@@ -478,6 +481,8 @@ export default function SessionMainPage({ id, back, back_title, admin = false }:
                         <p className="text-[#D1D5DC]">{payment.transaction_id}</p>
                       </div>
                     </div>
+
+                    <DiscountDialog onRefresh={fetchPayments} original={data?.price || "0"} data={payment}/>
                   </CardContent>
                 </Card>
               ))

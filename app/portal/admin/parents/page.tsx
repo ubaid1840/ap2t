@@ -80,14 +80,17 @@ const debouncedZip = useDebounce(zipCodeSearch, 300);
 
  const filteredData = parents.filter((item) => {
   const text = `${item.name} ${item.email} ${item.number}`.toLowerCase();
-  // const payment = `${item.payment_status ?? ""}`.toLowerCase();
   const zip = `${item.zip_code ?? ""}`.toLowerCase();
 
-  const matchesSearch =
-    !debouncedSearch || text.includes(debouncedSearch.toLowerCase());
+  const searchWords = debouncedSearch
+    ?.toLowerCase()
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean); // remove empty strings
 
-  // const matchesPayment =
-  //   !debouncedPayment || payment.includes(debouncedPayment.toLowerCase());
+  const matchesSearch =
+    !searchWords?.length ||
+    searchWords.every((word : string) => text.includes(word));
 
   const matchesZip =
     !debouncedZip || zip.includes(debouncedZip.toLowerCase());

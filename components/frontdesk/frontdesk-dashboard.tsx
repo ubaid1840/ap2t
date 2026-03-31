@@ -5,10 +5,12 @@ import { useApproval } from "@/components/frontdesk/use-approval";
 import { Button } from "@/components/ui/button";
 import axios from "@/lib/axios";
 import { ColumnDef } from "@tanstack/react-table";
-import { ArrowUpDown, CircleCheck, Loader2 } from "lucide-react";
+import { ArrowUpDown, CircleCheck, Filter, Loader2 } from "lucide-react";
 import moment from "moment";
 import { useState } from "react";
 import { RxCrossCircled } from "react-icons/rx";
+import InputWithIcon from "../input-with-icon";
+import { useDebounce } from "@/hooks/use-debounce";
 
 
 export type FrontDeskActionData = {
@@ -31,6 +33,8 @@ export default function FrontdeskDashboard() {
   const [loadingId, setLoadingId] = useState<number | null>()
   const [loadingType, setLoadingType] = useState<string | null>()
   const { approvals: sessions, loading } = useApproval()
+  const [search, setSearch] = useState("")
+  const debouncedSearch = useDebounce(search, 300);
 
 
   const FRONT_DESK_SESSION_COLUMNS: ColumnDef<FrontDeskActionData>[] = [
@@ -154,28 +158,28 @@ export default function FrontdeskDashboard() {
       cell: ({ row }) => {
         const action = row.original.action;
         const status = row.original?.status
-        if (action === "approval" && status !== 'accepted' && status !== 'rejected') {
+        if (action === "approval" && status === 'waiting') {
           return (
             <span className="font-medium text-[#D1D5DC]">
               Requires Approval
             </span>
           );
         }
-        else if (action === "approval" && status === 'accepted' || status === 'rejected') {
+        else if (action === "approval" && status !== 'waiting') {
           return (
             <span className="font-medium text-green-500">
               Done
             </span>
           );
         }
-        else if (action === "cash" && status !== 'accepted' && status !== 'rejected') {
+        else if (action === "cash" && status === 'waiting') {
           return (
             <span className="font-medium text-[#D1D5DC]">
               Requires Cash Confirmation
             </span>
           );
         }
-        else if(action === "cash" && status !== 'accepted' || status !== 'rejected') {
+        else if (action === "cash" && status !== 'waiting') {
           return (
             <span className="font-medium text-green-500">
               Done
@@ -190,79 +194,70 @@ export default function FrontdeskDashboard() {
       header: () => <div className="text-[#99A1AF] text-[12px] tracking-wider dark:hover:bg-transparent dark:hover:text-white/50">ACTIONS</div>,
 
       cell: ({ row }) => {
-        const action = row.original.action;
-        const status = row.original?.status
+        const { action, status, id } = row.original;
 
-        const isAcceptedLoading =
-          loadingId === row.original.id && loadingType === "accepted";
+        const isAcceptedLoading = loadingId === id && loadingType === "accepted";
+        const isRejectedLoading = loadingId === id && loadingType === "rejected";
 
-        const isRejectedLoading =
-          loadingId === row.original.id && loadingType === "rejected";
-        if (status === 'accepted' || status === 'rejected') {
-          if(status==="accepted"){
+        if (status === "accepted" || status === "rejected") {
+          const isAccepted = status === "accepted";
 
-            return <p className="text-sm text-primary flex gap-2 items-center"><CircleCheck className="w-4 h-4"/> {status}</p>
-          }else if(status==='rejected'){
-            return <p className="text-sm text-danger-text flex gap-2 items-center"><RxCrossCircled className="w-4 h-4"/> {status}</p>
-          }
-        }
-        else if (action === "approval") {
           return (
-            <div className="flex gap-2">
-              <Button
-                disabled={loadingId === row.original.id}
-                onClick={() => handleSubmit(row.original.id, "accepted", "approval")}
-              >
-                {isAcceptedLoading ? (
-                  <Loader2 className="animate-spin w-4 h-4" />
-                ) : (
-                  "Approve"
-                )}
-              </Button>
-
-              <Button
-                disabled={loadingId === row.original.id}
-                variant="destructive"
-                onClick={() => handleSubmit(row.original.id, "rejected")}
-              >
-                {isRejectedLoading ? (
-                  <Loader2 className="animate-spin w-4 h-4" />
-                ) : (
-                  "Disapprove"
-                )}
-              </Button>
-            </div>
+            <p
+              className={`text-sm flex gap-2 items-center ${isAccepted ? "text-primary" : "text-danger-text"
+                }`}
+            >
+              {isAccepted ? (
+                <CircleCheck className="w-4 h-4" />
+              ) : (
+                <RxCrossCircled className="w-4 h-4" />
+              )}
+              {status?.charAt(0)?.toUpperCase() + status?.slice(1)}
+            </p>
           );
         }
+        const config = {
+          approval: {
+            acceptText: "Approve",
+            rejectText: "Disapprove",
+            acceptType: "approval",
+          },
+          cash: {
+            acceptText: "Received",
+            rejectText: "Not Received",
+            acceptType: "cash",
+          },
+        };
 
-        else if (action === "cash") {
-          return (
-            <div className="flex gap-2">
-              <Button
-                disabled={loadingId === row.original.id}
-                onClick={() => handleSubmit(row.original.id, "accepted", "cash")}
-              >
-                {isAcceptedLoading ? (
-                  <Loader2 className="animate-spin w-4 h-4" />
-                ) : (
-                  "Received"
-                )}
-              </Button>
+        const current = config[action];
+        if (!current) return null;
 
-              <Button
-                disabled={loadingId === row.original.id}
-                variant="destructive"
-                onClick={() => handleSubmit(row.original.id, "rejected")}
-              >
-                {isRejectedLoading ? (
-                  <Loader2 className="animate-spin w-4 h-4" />
-                ) : (
-                  "Not Received"
-                )}
-              </Button>
-            </div>
-          );
-        }
+        return (
+          <div className="flex gap-2">
+            <Button
+              disabled={loadingId === id}
+              onClick={() => handleSubmit(id, "accepted", current.acceptType)}
+            >
+              {isAcceptedLoading ? (
+                <Loader2 className="animate-spin w-4 h-4" />
+              ) : (
+                current.acceptText
+              )}
+            </Button>
+
+            <Button
+              disabled={loadingId === id}
+              variant="destructive"
+              onClick={() => handleSubmit(id, "rejected")}
+            >
+              {isRejectedLoading ? (
+                <Loader2 className="animate-spin w-4 h-4" />
+              ) : (
+                current.rejectText
+              )}
+            </Button>
+          </div>
+        );
       }
     }
 
@@ -286,14 +281,53 @@ export default function FrontdeskDashboard() {
     }
   }
 
+
+  const filteredData = sessions.filter((item: any) => {
+    const text = `${item?.session_name} ${item?.player_name} `.toLowerCase();
+
+    const searchWords = debouncedSearch
+      ?.toLowerCase()
+      .trim()
+      .split(/\s+/)
+      .filter(Boolean);
+
+    const matchesSearch =
+      !searchWords?.length ||
+      searchWords.every((word: string) => text.includes(word));
+
+
+
+    return matchesSearch
+  });
+
   return (
-    <div className="p-4">
-      <h1 className="text-2xl font-semibold mb-4 text-gray-100">Front Desk Sessions</h1>
+    <div className="flex flex-col w-full gap-4">
+      <div className="flex w-full gap-4 justify-between flex-wrap items-center">
+        <div className="space-y-1">
+          <p className="text-xl">Front Desk Sessions</p>
+          <span className="text-xs text-muted-foreground flex items-center">
+            <span>Manage check-ins and approvals</span>
+          </span>
+        </div>
+      </div>
+
+      <div className="flex flex-col gap-4 rounded-[14px] bg-#252525 border border-[#3A3A3A] p-4 bg-[#252525]">
+        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+          <div className="w-full">
+            <InputWithIcon value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search by name or session..." />
+          </div>
+
+
+        </div>
+
+
+      </div>
+
+
       <PageTable
         loading={loading}
-        headerClassName="rounded-4xl"
         columns={FRONT_DESK_SESSION_COLUMNS}
-        data={sessions}
+        data={filteredData}
         onRowClick={() => { }}
       />
     </div>

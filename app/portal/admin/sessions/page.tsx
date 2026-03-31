@@ -73,17 +73,27 @@ export default function Page() {
   }
 
   const filteredData = sessions.filter((item) => {
+  const sessionText = item?.sessionName?.toLowerCase() ?? "";
+  const coachText = item?.coachName?.toLowerCase() ?? "";
+  const typeText = item?.type?.toLowerCase() ?? "";
+  const sessionWords = search.main?.toLowerCase().trim().split(/\s+/).filter(Boolean) || [];
+  const coachWords = search.coach?.toLowerCase().trim().split(/\s+/).filter(Boolean) || [];
+  const typeWords = search.type?.toLowerCase().trim().split(/\s+/).filter(Boolean) || [];
 
-    const sessionSearch = item?.sessionName?.toLowerCase()
-    const coachSearch = `${item?.coachName}`.toLowerCase()
-    const typeSearch = item?.type?.toLowerCase()
+  const matchesSession =
+    !sessionWords.length ||
+    sessionWords.every((word) => sessionText.includes(word));
 
-    const matchSessions = search.main ? sessionSearch.includes(search.main.toLocaleLowerCase()) : true
+  const matchesCoach =
+    !coachWords.length ||
+    coachWords.every((word) => coachText.includes(word));
 
-    const matchesCoach = search.coach ? coachSearch.includes(search.coach.toLowerCase()) : true;
-    const matchesType = search.type ? typeSearch.includes(search.type.toLowerCase()) : true;
-    return matchSessions && matchesCoach && matchesType;
-  });
+  const matchesType =
+    !typeWords.length ||
+    typeWords.every((word) => typeText.includes(word));
+
+  return matchesSession && matchesCoach && matchesType;
+});
 
 
   return (

@@ -84,10 +84,10 @@ export default function Page() {
   const [payments, setPayments] = useState<PaymentsSummaryResponse | undefined>()
   const [visible, setVisible] = useState<{ show: string, data: any }>({ show: "", data: null })
   const debouncedSearch = useDebounce(search, 300);
-  const {connected} = useSquareConnection()
+  const { connected } = useSquareConnection()
 
 
-   useEffect(() => {
+  useEffect(() => {
     if (user?.id)
       fetchData();
   }, [user]);
@@ -133,23 +133,25 @@ export default function Page() {
     },
   ];
 
- 
 
-const filteredData = useMemo(() => {
+
+  const filteredData = useMemo(() => {
   if (!payments?.paymentsData) return [];
 
-  const searchLower = debouncedSearch.toLowerCase();
+  const searchWords = debouncedSearch
+    .toLowerCase()
+    .trim()
+    .split(/\s+/);
 
   return payments.paymentsData.filter((item) => {
     const statusMatch =
       filter === "All" ||
       item?.status?.toLowerCase() === filter.toLowerCase();
 
+    const toSearch = `${item.player_name} ${item.parent_name} ${item.session_name}`.toLowerCase();
     const searchMatch =
-      !searchLower ||
-      `${item.player_name} ${item.parent_name} ${item.session_name}`
-        .toLowerCase()
-        .includes(searchLower);
+      !searchWords.length ||
+      searchWords.every((word : string) => toSearch.includes(word));
 
     return statusMatch && searchMatch;
   });
@@ -359,7 +361,7 @@ const filteredData = useMemo(() => {
                     <Send size={16} />
                   </Button>
 
-                 <Button onClick={() => setVisible({ show: "override", data: row.original })} className="text-muted-foreground hover:dark:bg-primary hover:dark:text-black" size="icon" variant="ghost">
+                  <Button onClick={() => setVisible({ show: "override", data: row.original })} className="text-muted-foreground hover:dark:bg-primary hover:dark:text-black" size="icon" variant="ghost">
                     <CheckCircle size={16} />
                   </Button>
                 </>}
@@ -399,7 +401,7 @@ const filteredData = useMemo(() => {
                 <h1 className="text-[#99A1AF] text-xs">Square Integration</h1>
                 <div className="flex items-center gap-2 text-sm">
                   <GoDotFill className={connected ? "text-active-text" : "text-warning-text"} />
-                  <h1 className={connected ? "text-active-text" : "text-warning-text"}>{connected ? "Connected"  : "Disconnected"}</h1> 
+                  <h1 className={connected ? "text-active-text" : "text-warning-text"}>{connected ? "Connected" : "Disconnected"}</h1>
                 </div>
               </div>
             </CardContent>

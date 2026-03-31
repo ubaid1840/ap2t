@@ -42,6 +42,7 @@ import { Skeleton } from "../ui/skeleton";
 import { AddParentDialog } from "./add-parents";
 import PaymentMethodSteps from "../square/payment-method-steps";
 import { SquareSavedCard } from "@/lib/types";
+import { DiscountDialog } from "../payment/apply-discount";
 
 export interface PlayerResponse {
   id: number;
@@ -132,6 +133,7 @@ export interface Payment {
   status: string;
   amount?: string | number;
   created_at?: string;
+  original_price?: string | number;
 }
 
 export interface SessionNote {
@@ -219,11 +221,14 @@ export default function MainPlayerPage({
     setLoading(true);
     try {
       const result = await axios.get(`/admin/players/${id}`);
+
       setData(result.data);
     } finally {
       setLoading(false);
     }
   };
+
+
 
   function pendingString() {
     const totalPendingCount = calculateTotalPendingPayments(
@@ -568,11 +573,15 @@ export default function MainPlayerPage({
                           value={item.payment_detail?.status || "pending"}
                         />
                       </div>
-                      <p className="text-md">
-                        {item.payment_detail?.status === "comped"
-                          ? "Free"
-                          : `$${item?.apply_promotion ? item?.promotion_price : item?.price}`}
-                      </p>
+                      <span className="flex gap-1 items-center">
+                        <p className="text-md">
+                          {item?.payment_detail?.status === "comped"
+                            ? "Free"
+                            : `$${item?.payment_detail?.amount}`}
+                        </p>
+                        {item?.payment_detail?.original_price && <span className="text-sm line-through text-muted-foreground">${item?.payment_detail?.original_price}</span>}
+                      </span>
+
                     </div>
 
                     <div className="flex gap-2 items-center text-xs text-muted-foreground flex-wrap">
@@ -610,6 +619,8 @@ export default function MainPlayerPage({
                           </div>
                         </div>
                       ))}
+
+
                   </CardContent>
                 </Card>
               ))}
@@ -663,7 +674,7 @@ export default function MainPlayerPage({
                       >
                         {item.payment_detail?.status === "comped"
                           ? "Free"
-                          : `$${item?.apply_promotion ? item?.promotion_price : item?.price}`}
+                          : `$${item?.payment_detail?.amount}`}
                       </p>
                     </div>
 
@@ -685,7 +696,10 @@ export default function MainPlayerPage({
                           ])}
                         </p>
                       </div>
+
+
                     </div>
+                   <DiscountDialog data={item?.payment_detail} onRefresh={fetchData} original={item?.price}/>
                   </CardContent>
                 </Card>
               ))}
@@ -814,11 +828,9 @@ function calculatePendingStats(sessions: SessionData[] | undefined) {
 
     if (!isPending) return total;
     const amount =
-      session.apply_promotion && session.promotion_price
-        ? Number(session.promotion_price)
-        : Number(session.price);
+      session?.payment_detail?.amount;
 
-    return total + amount;
+    return total + Number(amount || 0);
   }, 0);
 }
 
@@ -861,7 +873,7 @@ function generate12WeekCheckins(sessions: SessionData[] | undefined) {
   const now = moment();
 
   const validSessions = sessions.filter((session) => {
-    if (session.status !== "completed") return false;
+    // if (session.status !== "completed") return false;
 
     const attendance = session.attendance_detail || [];
     return attendance.some((a: any) => a.status === "present");

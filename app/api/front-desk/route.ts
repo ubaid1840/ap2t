@@ -20,17 +20,13 @@ export async function GET() {
 FROM front_desk_actions fda
 JOIN sessions s ON fda.session_id = s.id
 JOIN users u ON fda.user_id = u.id
+ORDER by fda.created_at DESC
 ;`);
-    return new Response(JSON.stringify(response.rows), {
-      status: 200,
-      headers: { "Content-Type": "application/json" },
-    });
-  } catch (error) {
+    return NextResponse.json(response.rows, { status: 200 })
+
+  } catch (error: any) {
     console.error(error);
-    return new Response(JSON.stringify({ error: "Failed to fetch data" }), {
-      status: 500,
-      headers: { "Content-Type": "application/json" },
-    });
+    return NextResponse.json({ message: error?.message || "Server error" }, { status: 500 })
   }
 }
 
@@ -81,7 +77,7 @@ export async function PUT(req: NextRequest) {
           /* ---------------- SESSION ---------------- */
 
           const sessionResult = await client.query(
-            `SELECT id, price, apply_promotion, promotion_price, comped, max_players
+            `SELECT id, price, apply_promotion, promotion_price, comped, max_players, promotion_end
        FROM sessions
        WHERE id = $1
        FOR UPDATE`,
@@ -146,7 +142,7 @@ export async function PUT(req: NextRequest) {
               session.apply_promotion &&
               session.promotion_price &&
               session.promotion_end &&
-              moment(session.promotion_end).isAfter(now)
+              moment(new Date(session.promotion_end)).isAfter(now)
             ) {
               amount = session.promotion_price;
             }
@@ -208,7 +204,9 @@ export async function PUT(req: NextRequest) {
         }
       }
 
+      console.log(type)
       if (type === "cash") {
+        console.log("called")
         await pool.query(`
   UPDATE payments
   SET method = 'Cash', status = 'paid', paid_at = $1, paid_by = $2, transaction_id = $3 

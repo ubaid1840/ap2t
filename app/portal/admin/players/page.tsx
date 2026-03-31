@@ -13,7 +13,7 @@ import { Separator } from "@/components/ui/separator"
 import { useAuth } from "@/contexts/auth-context"
 import axios from "@/lib/axios"
 import { getYear, joinNames } from "@/lib/functions"
-import { Download, Filter } from "lucide-react"
+import { Filter } from "lucide-react"
 import moment from "moment"
 import { useEffect, useState } from "react"
 
@@ -21,14 +21,14 @@ export interface PlayerData {
     id: number | string;
     name: string;
     coach_name: string;
-    age: string ;
+    age: string;
     position: string;
     phone: string | null;
     parent: string;
     last_session: string;
-    last_session_date: string; 
+    last_session_date: string;
     attendance: string;
-    joining_date: string | Date | null; 
+    joining_date: string | Date | null;
 }
 
 export default function Page() {
@@ -39,7 +39,7 @@ export default function Page() {
     const [search, setSearch] = useState("")
     const [coachSearch, setCoachSearch] = useState("")
     const [typeSearch, setTypeSearch] = useState("")
-    const [ageSearch,setAgeSearch]=useState("")
+    const [ageSearch, setAgeSearch] = useState("")
     const { user } = useAuth()
 
     useEffect((() => {
@@ -73,18 +73,34 @@ export default function Page() {
         }
     }
 
-    const filteredData = players.filter((item) => {
-        
-        const playerSearch = `${item?.name} ${item?.parent} ${item?.position}`.toLowerCase();
-        const coachSearchLower = `${item?.coach_name}`.toLowerCase();
-        const typeSearchLower = `${item?.last_session}`.toLowerCase();
-        const playerAge=   `${item?.age}`
-        const matchesPlayer = search ? playerSearch.includes(search.toLowerCase()) : true;
-        const matchesCoach = coachSearch ? coachSearchLower.includes(coachSearch.toLowerCase()) : true;
-        const matchesType = typeSearch ? typeSearchLower.includes(typeSearch.toLowerCase()) : true;
-        const matchesAge= ageSearch ? ageSearch>playerAge:true
-        return matchesPlayer && matchesCoach && matchesType && matchesAge;
-    });
+  const filteredData = players.filter((item) => {
+  const playerSearchText = `${item?.name} ${item?.parent} ${item?.position}`.toLowerCase();
+  const coachSearchText = `${item?.coach_name ?? ""}`.toLowerCase();
+  const typeSearchText = `${item?.last_session ?? ""}`.toLowerCase();
+  const playerAge = Number(item?.age ?? 0);
+
+  // Split search into words for more flexible matching
+  const playerSearchWords = search?.toLowerCase().trim().split(/\s+/).filter(Boolean) || [];
+  const coachSearchWords = coachSearch?.toLowerCase().trim().split(/\s+/).filter(Boolean) || [];
+  const typeSearchWords = typeSearch?.toLowerCase().trim().split(/\s+/).filter(Boolean) || [];
+
+  const matchesPlayer =
+    !playerSearchWords.length ||
+    playerSearchWords.every((word) => playerSearchText.includes(word));
+
+  const matchesCoach =
+    !coachSearchWords.length ||
+    coachSearchWords.every((word) => coachSearchText.includes(word));
+
+  const matchesType =
+    !typeSearchWords.length ||
+    typeSearchWords.every((word) => typeSearchText.includes(word));
+
+  const matchesAge =
+    !ageSearch || playerAge <= Number(ageSearch); 
+
+  return matchesPlayer && matchesCoach && matchesType && matchesAge;
+});
 
 
     return (
@@ -92,16 +108,16 @@ export default function Page() {
         <div className="flex flex-col w-full gap-6">
             <Header length={players.length}>
                 <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
-                    <ExportExcel header={["Name", "Coach Name", "Age", "Position", "Parent Name", "Last Session", "Last Session Date", "Attendance"]} fileName="players_data.xlsx" data={players.map((item)=>[
-                               item?.name || "",
-                               item?.coach_name,
-                               item?.age,
-                               item?.position,
-                               item?.parent,
-                               item?.last_session,
-                               item?.last_session_date,
-                               item?.attendance
-                             ])}/>
+                    <ExportExcel header={["Name", "Coach Name", "Age", "Position", "Parent Name", "Last Session", "Last Session Date", "Attendance"]} fileName="players_data.xlsx" data={players.map((item) => [
+                        item?.name || "",
+                        item?.coach_name,
+                        item?.age,
+                        item?.position,
+                        item?.parent,
+                        item?.last_session,
+                        item?.last_session_date,
+                        item?.attendance
+                    ])} />
 
                     <CreatePlayer onRefresh={async () => {
                         await fetchData()
@@ -138,7 +154,7 @@ export default function Page() {
 
                             <div className="flex flex-1 flex-col gap-2">
                                 <Label className="text-muted-foreground font-normal">age</Label>
-                                <Input className="rounded-[8px] dark:bg-black" value={ageSearch} onChange={(e)=>setAgeSearch(e.target.value)}/>
+                                <Input className="rounded-[8px] dark:bg-black" value={ageSearch} onChange={(e) => setAgeSearch(e.target.value)} />
                             </div>
                         </div>
                     </div>}

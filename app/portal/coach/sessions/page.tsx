@@ -29,6 +29,7 @@ export type SessionProps = {
   price: string | number;
   status: string;
   original : any
+  end_date : string
 };
 
 export default function Page() {
@@ -100,23 +101,23 @@ export default function Page() {
     setSearch((prev) => ({ ...prev, [key]: val }));
   }
 
-  const filteredData = sessions.filter((item) => {
-    const sessionSearch = item?.sessionName?.toLowerCase();
-    const coachSearch = `${item?.coachName}`.toLowerCase();
-    const typeSearch = item?.type?.toLowerCase();
+ const filteredData = sessions.filter((item) => {
+  const sessionText = item?.sessionName?.toLowerCase() ?? "";
+  const coachText = item?.coachName?.toLowerCase() ?? "";
+  const typeText = item?.type?.toLowerCase() ?? "";
 
-    const matchSessions = search.main
-      ? sessionSearch.includes(search.main.toLocaleLowerCase())
-      : true;
+ 
+  const sessionWords = search.main?.toLowerCase().trim().split(/\s+/).filter(Boolean) || [];
+  const coachWords = search.coach?.toLowerCase().trim().split(/\s+/).filter(Boolean) || [];
+  const typeWords = search.type?.toLowerCase().trim().split(/\s+/).filter(Boolean) || [];
 
-    const matchesCoach = search.coach
-      ? coachSearch.includes(search.coach.toLowerCase())
-      : true;
-    const matchesType = search.type
-      ? typeSearch.includes(search.type.toLowerCase())
-      : true;
-    return matchSessions && matchesCoach && matchesType;
-  });
+  
+  const matchesSession = !sessionWords.length || sessionWords.every((word) => sessionText.includes(word));
+  const matchesCoach = !coachWords.length || coachWords.every((word) => coachText.includes(word));
+  const matchesType = !typeWords.length || typeWords.every((word) => typeText.includes(word));
+
+  return matchesSession && matchesCoach && matchesType;
+});
 
   return (
     <div className="flex flex-col w-full gap-4">

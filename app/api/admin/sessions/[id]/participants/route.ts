@@ -1,4 +1,5 @@
 import pool from "@/lib/db";
+import moment from "moment";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(
@@ -51,6 +52,8 @@ export async function POST(
   [session_id]
 );
 
+const now = moment()
+
 const amountQueryResult = amountQuery.rows[0];
 
 if (!amountQueryResult) {
@@ -62,13 +65,14 @@ if (!amountQueryResult) {
 
 let amount = amountQueryResult.price;
 
-
-if (
+if(amountQueryResult.comped){
+  amount = 0
+}
+else if (
   amountQueryResult.apply_promotion &&
   amountQueryResult.promotion_start &&
   amountQueryResult.promotion_end &&
-  new Date() >= new Date(amountQueryResult.promotion_start) &&
-  new Date() <= new Date(amountQueryResult.promotion_end)
+  moment(amountQueryResult.promotion_end).isAfter(now)
 ) {
   amount = amountQueryResult.promotion_price;
 }
@@ -122,8 +126,8 @@ export async function GET(
 ) {
   const { id: session_id } = await params;
   try {
-    const result = await pool.query(
-      `
+   const result = await pool.query(
+  `
   SELECT
     sp.created_at,
     p.user_id AS player_id,
@@ -131,33 +135,48 @@ export async function GET(
     u.last_name,
     u.email,
     u.phone_no,
-    p.position,
-
-    COALESCE(a.status, 'pending') AS status,
-
-    CASE
-      WHEN COALESCE(a.status, 'pending') = 'present' THEN 'success'
-      WHEN COALESCE(a.status, 'pending') = 'absent' THEN 'danger'
-      ELSE 'warning'
-    END AS status_type
+    p.position
 
   FROM session_players sp
   INNER JOIN players p ON p.user_id = sp.user_id
   INNER JOIN users u ON u.id = p.user_id
 
-  LEFT JOIN attendance a 
-    ON a.session_id = sp.session_id 
-    AND a.user_id = sp.user_id
-    AND DATE(a.created_at) = CURRENT_DATE
-
   WHERE sp.session_id = $1
   `,
-      [session_id]
-    );
+  [session_id]
+);
+
+const attendanceRes = await pool.query(
+  `
+  SELECT user_id, status
+  FROM attendance
+  WHERE session_id = $1
+    AND DATE(created_at) = CURRENT_DATE
+  `,
+  [session_id]
+);
+const attendanceMap : any = {};
+
+for (const a of attendanceRes.rows) {
+  attendanceMap[a.user_id] = a.status;
+}
+
+const finalData = result.rows.map((player) => {
+  const status = attendanceMap[player.player_id] || "pending";
+
+  let status_type = "warning";
+  if (status === "present") status_type = "success";
+  else if (status === "absent") status_type = "danger";
+
+  return {
+    ...player,
+    status,
+    status_type,
+  };
+});
 
 
-
-    return NextResponse.json(result.rows);
+    return NextResponse.json(finalData);
   } catch (error) {
     console.error("GET /api/admin/sessions/[id]/participants error:", error);
 

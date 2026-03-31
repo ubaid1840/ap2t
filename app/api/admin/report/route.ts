@@ -14,6 +14,7 @@ export async function GET(req: NextRequest) {
     const startDate = startParam ? moment(startParam).startOf("day").toISOString() : moment().subtract(6, "months").startOf("day").toISOString();
     const endDate = endParam ? moment(endParam).endOf("day").toISOString() : moment().endOf("day").toISOString();
 
+    console.log(startDate, endDate)
 
     if (!filter) {
 
