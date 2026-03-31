@@ -43,16 +43,35 @@ export async function POST(
       );
     }
 
-    const amountQuery = await pool.query(`SELECT price, apply_promotion, promotion_price, comped from sessions WHERE id = $1 LIMIT 1`, [session_id])
-    let amount = 0
-    const amountQueryResult = amountQuery.rows[0] ?? null
+   const amountQuery = await pool.query(
+  `SELECT price, apply_promotion, promotion_price, promotion_start, promotion_end, comped 
+   FROM sessions 
+   WHERE id = $1 
+   LIMIT 1`,
+  [session_id]
+);
 
-    if (!amountQueryResult) {
-      return NextResponse.json({ message: "Session not found" }, { status: 400 })
-    }
+const amountQueryResult = amountQuery.rows[0];
 
-    amount = amountQueryResult?.apply_promotion ? amountQueryResult?.promotion_price : amountQueryResult?.price
+if (!amountQueryResult) {
+  return NextResponse.json(
+    { message: "Session not found" },
+    { status: 400 }
+  );
+}
 
+let amount = amountQueryResult.price;
+
+
+if (
+  amountQueryResult.apply_promotion &&
+  amountQueryResult.promotion_start &&
+  amountQueryResult.promotion_end &&
+  new Date() >= new Date(amountQueryResult.promotion_start) &&
+  new Date() <= new Date(amountQueryResult.promotion_end)
+) {
+  amount = amountQueryResult.promotion_price;
+}
     await pool.query(
       `INSERT INTO session_players
       (session_id, user_id)

@@ -5,9 +5,10 @@ import { useApproval } from "@/components/frontdesk/use-approval";
 import { Button } from "@/components/ui/button";
 import axios from "@/lib/axios";
 import { ColumnDef } from "@tanstack/react-table";
-import { ArrowUpDown, Loader2 } from "lucide-react";
+import { ArrowUpDown, CircleCheck, Loader2 } from "lucide-react";
 import moment from "moment";
 import { useState } from "react";
+import { RxCrossCircled } from "react-icons/rx";
 
 
 export type FrontDeskActionData = {
@@ -159,10 +160,25 @@ export default function FrontdeskDashboard() {
               Requires Approval
             </span>
           );
-        } else if (action === "cash" && status !== 'accepted' && status !== 'rejected') {
+        }
+        else if (action === "approval" && status === 'accepted' || status === 'rejected') {
+          return (
+            <span className="font-medium text-green-500">
+              Done
+            </span>
+          );
+        }
+        else if (action === "cash" && status !== 'accepted' && status !== 'rejected') {
           return (
             <span className="font-medium text-[#D1D5DC]">
               Requires Cash Confirmation
+            </span>
+          );
+        }
+        else if(action === "cash" && status !== 'accepted' || status !== 'rejected') {
+          return (
+            <span className="font-medium text-green-500">
+              Done
             </span>
           );
         }
@@ -183,7 +199,12 @@ export default function FrontdeskDashboard() {
         const isRejectedLoading =
           loadingId === row.original.id && loadingType === "rejected";
         if (status === 'accepted' || status === 'rejected') {
-          return <p>{status}</p>
+          if(status==="accepted"){
+
+            return <p className="text-sm text-primary flex gap-2 items-center"><CircleCheck className="w-4 h-4"/> {status}</p>
+          }else if(status==='rejected'){
+            return <p className="text-sm text-danger-text flex gap-2 items-center"><RxCrossCircled className="w-4 h-4"/> {status}</p>
+          }
         }
         else if (action === "approval") {
           return (

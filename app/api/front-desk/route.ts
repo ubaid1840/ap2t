@@ -68,7 +68,7 @@ export async function PUT(req: NextRequest) {
 
     const updatingRow = result.rows?.[0] ?? null
     if (updatingRow) {
-      if (type === 'cash' || type === 'aproval') {
+      if (type === 'cash' || type === 'approval') {
         const user_id = updatingRow?.user_id
         const session_id = updatingRow?.session_id
         let amount = 0
