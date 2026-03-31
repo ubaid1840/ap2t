@@ -24,7 +24,7 @@ export async function POST(
             [session_id, data.player_id]
         );
     
-        if (present_today) {   
+        if (present_today.rows[0].is_present) {   
             return NextResponse.json({ message: "Already present in the session today" }, { status: 200 });
         }else{
             const fields = Object.keys(data);
