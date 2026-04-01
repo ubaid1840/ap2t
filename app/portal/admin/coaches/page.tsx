@@ -89,7 +89,7 @@ export default function Page() {
       setLoading(true)
       const result = await axios.get("/admin/users?role=coach")
       const mappedCoaches = result?.data?.data?.map((coach: any) => (
-        { 
+        {
           name: joinNames([coach.first_name, coach.last_name]),
           email: coach.email,
           phoneNo: coach.phone_no,
@@ -117,11 +117,11 @@ export default function Page() {
     <div className="flex flex-col w-full gap-4">
       <Header>
         <div className="flex flex-wrap gap-4">
-          <Button>
-            <Link href={"/portal/admin/coaches/stats"}>
-            Veiw stats
-            </Link>
-          </Button>
+          <Link href={"/portal/admin/coaches/stats"}>
+            <Button>
+              Open Stats
+            </Button>
+          </Link>
           <CreateCoach onRefresh={async () => {
             await fetchData()
           }} />

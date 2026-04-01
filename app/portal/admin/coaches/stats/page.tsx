@@ -1,12 +1,24 @@
 "use client";
 import AppCalendar from "@/components/app-calendar";
+import PageTable from "@/components/app-table";
 import { BarChart } from "@/components/charts/bar-chart";
+import LineChart from "@/components/charts/line-chart-dots";
 import PieChart from "@/components/charts/pie-chart";
 import { AssignCoachDialog } from "@/components/sessions/assign-coach-dialog";
+import { PLAYER_ATTENDANCE_DATA_COLUMNS, ZIP_REVENUE_DATA_COLUMNS } from "@/components/settings/columns";
+import { MONTHLY_SESSIONS_CONFIG, SESSION_TYPE_CHART_CONFIG } from "@/components/settings/constants";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useSidebar } from "@/components/ui/sidebar";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Spinner } from "@/components/ui/spinner";
+import { useAuth } from "@/contexts/auth-context";
+import { useIsMobile } from "@/hooks/use-mobile";
+import axios from "@/lib/axios";
+import { exportDashboardToExcel, exportToExcel } from "@/lib/functions";
+
 import {
   ChartColumn,
   DollarSign,
@@ -14,177 +26,314 @@ import {
   FileText,
   Filter,
   LucideProps,
+  MapPin,
+  TrendingUp
 } from "lucide-react";
-import { ReactNode, useState } from "react";
+import moment from "moment";
+import { ReactNode, useEffect, useState } from "react";
+
+
+// ----------------------------
+// Totals Section
+// ----------------------------
+export type Totals = {
+  totalRevenue: number;      // sum of all paid payments
+  totalSessions: number;     // total sessions
+  totalPending: number;      // total payments with status 'pending'
+  totalComped: number;       // total payments with status 'comped'
+  averageAttendance: number; // average attendance percentage across all sessions
+};
+
+// ----------------------------
+// Revenue By Coach
+// ----------------------------
+export type RevenueBySessionItem = {
+  coach: string;  // e.g., "Coach Ali"
+  value: number;  // revenue sum
+};
+
+// ----------------------------
+// Sessions by Type
+// ----------------------------
+export type SessionTypeItem = {
+  name: string;   // e.g., "Private Session"
+  value: number;  // count of sessions of this type
+  fill: string;   // chart color variable
+};
+
+// ----------------------------
+// Monthly Revenue Trend
+// ----------------------------
+export type MonthlyRevenueItem = {
+  month: string;  // e.g., "July"
+  value: number;  // revenue sum for the month
+};
+
+// ----------------------------
+// Player Attendance Data
+// ----------------------------
+export type PlayerAttendanceItem = {
+  id: number;           // unique ID assigned in the response
+  name: string;         // player's full name
+  sessions: number;     // total sessions enrolled
+  attended: number;     // sessions attended
+  missed: number;       // sessions missed
+  attendance_rate: number; // attendance percentage
+};
+
+export type ZipcodeItem = {
+  avg_revenue: string
+  total_revenue: string
+  total_users: string
+  zip_code: string
+}
+
+// ----------------------------
+// Full Response Type
+// ----------------------------
+export type DashboardDataResponse = {
+  totals: Totals;
+  revenueBySession: RevenueBySessionItem[];
+  sessionTypeData: SessionTypeItem[];
+  monthlyRevenueTrend: MonthlyRevenueItem[];
+  playerAttendanceData: PlayerAttendanceItem[];
+  zipcodeData: ZipcodeItem[]
+};
+
 
 export default function Page() {
-  const [stats, setStats] = useState();
-  const [dates, setDates] = useState<{
-    start: Date | undefined;
-    end: Date | undefined;
-  }>({
+
+  const { open } = useSidebar()
+  const isMobile = useIsMobile()
+  const [loading, setLoading] = useState(false)
+  const [reports, setReports] = useState<DashboardDataResponse | undefined>()
+  const [filterLoading, setFilterLoading] = useState(false)
+  const [coach, setCoach] = useState<{ id: null | number, name: string }>({ id: null, name: "" })
+
+  const [dates, setDates] = useState<{ start: Date | undefined; end: Date | undefined }>({
     start: undefined,
     end: undefined,
   });
-  const [filter, setFilter] = useState(true);
-  const [filterLoading, setFilterLoading] = useState(false);
-  const [coachId, setCoachId] = useState<number | undefined>();
-  const [coachName, setCoachName] = useState<string | undefined>();
+
+
+  async function filterData(start: Date | undefined, end: Date | undefined) {
+
+    const startDate = start ? moment(start).format("YYYY-MM-DD") : null
+    const endDate = end ? moment(end).format("YYYY-MM-DD") : null
+
+    if (!startDate || !endDate) return
+
+    setFilterLoading(true)
+    try {
+      const response = await axios.get(`/coach/stats?filter=true&start=${startDate}&end=${endDate}&coach=${coach.id}`)
+      setReports(response.data)
+    } finally {
+      setFilterLoading(false)
+    }
+  }
+
+
   const data = [
     {
       title: "Total Revenue",
-      value: `$${stats?.totals?.totalRevenue || 0}`,
-      Icon: (props: LucideProps) => <DollarSign {...props} />,
-      color: "active",
+      value: `$${reports?.totals?.totalRevenue || 0}`,
+      Icon: (props: LucideProps) => <DollarSign  {...props} />,
+      color: "active"
     },
 
     {
       title: "Total Sessions",
-      value: stats?.totals?.totalSessions || 0,
-      Icon: (props: LucideProps) => <ChartColumn {...props} />,
-      color: "info",
+      value: reports?.totals?.totalSessions || 0,
+      Icon: (props: LucideProps) => <ChartColumn  {...props} />,
+      color: "info"
     },
 
     {
       title: "Outstanding",
-      value: stats?.totals?.totalPending || 0,
-      Icon: (props: LucideProps) => <FileText {...props} />,
-      color: "warning",
+      value: reports?.totals?.totalPending || 0,
+      Icon: (props: LucideProps) => <FileText  {...props} />,
+      color: "warning"
     },
 
     {
       title: "Comped",
-      value: stats?.totals?.totalComped || 0,
-      Icon: (props: LucideProps) => <FileText {...props} />,
-      color: "other",
+      value: reports?.totals?.totalComped || 0,
+      Icon: (props: LucideProps) => <FileText  {...props} />,
+      color: "other"
     },
-  ];
+  ]
+
+  const totalsSheet = {
+    sheetName: "Overview",
+    headers: ["Metric", "Value"],
+    rows: [
+      ["Total Revenue", reports?.totals.totalRevenue ?? 0],
+      ["Total Sessions", reports?.totals.totalSessions ?? 0],
+      ["Pending Payments", reports?.totals.totalPending ?? 0],
+      ["Comped Payments", reports?.totals.totalComped ?? 0],
+      ["Avg Attendance (%)", reports?.totals.averageAttendance ?? 0],
+    ],
+  };
+
+  const revenueBySession = {
+    sheetName: "Revenue by Coach",
+    headers: ["Coach", "Revenue"],
+    rows:
+      reports?.revenueBySession?.map((r) => [
+        r.coach,
+        String(r.value),
+      ]) ?? [],
+  };
+
+  const sessionTypesSheet = {
+    sheetName: "Session Types",
+    headers: ["Session Type", "Count"],
+    rows:
+      reports?.sessionTypeData.map((s) => [
+        s.name,
+        String(s.value),
+      ]) ?? [],
+  };
+
+
+
+  if (loading) {
+    return (
+      <div className="flex flex-col w-full gap-4">
+        <Header>
+          {null}
+        </Header>
+
+        <DashboardLoader />
+      </div>
+    )
+  }
+
   return (
     <div className="flex flex-col w-full gap-4">
       <Header>
-        <Button>
+        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+          <Button onClick={() => {
+            exportDashboardToExcel(
+              [
+                totalsSheet,
+                revenueBySession,
+                sessionTypesSheet,
+              ],
+              "dashboard-report.xlsx"
+            )
+          }}>
             <Download /> Export All Data
-        </Button>
+          </Button>
+        </div>
       </Header>
+
+
       <div className="mt-4 flex w-full flex-wrap gap-4 justify-center">
         {data.map((item, i) => (
-          <HeaderCard
-            key={i}
-            title={String(item.value)}
-            description={item.title}
+          <HeaderCard key={i} title={String(item.value)} description={item.title}
             icon={
-              <div
-                className={`rounded-[8px] flex w-7 h-7 items-center justify-center bg-${item.color}-bg  border-${item.color}-text/32`}
-              >
+              <div className={`rounded-[8px] flex w-7 h-7 items-center justify-center bg-${item.color}-bg  border-${item.color}-text/32`}>
                 <item.Icon className={`text-${item.color}-text`} size={16} />
-              </div>
-            }
-          />
+              </div>} />
         ))}
       </div>
-
-      {filter && (
+      
         <Card>
           <CardContent className="space-y-4">
+
             <div className="text-sm flex gap-2 items-center">
               <Filter className="text-primary" size={16} /> Filters
             </div>
 
+
+
+
             <div className="flex flex-col w-full gap-4">
+
+
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+
                 <div className="flex flex-1 flex-col gap-2">
-                  <Label className="text-muted-foreground font-normal text-xs">
-                    Start Date
-                  </Label>
-                  <AppCalendar
-                    date={dates.start}
-                    onChange={(d) =>
-                      setDates((prevState) => ({ ...prevState, start: d }))
-                    }
-                  />
+                  <Label className="text-muted-foreground font-normal text-xs">Start Date</Label>
+                  <AppCalendar date={dates.start} onChange={(d) => setDates((prevState) => ({ ...prevState, start: d }))} />
+                </div>
+
+
+                <div className="flex flex-1 flex-col gap-2">
+                  <Label className="text-muted-foreground font-normal text-xs">End Date</Label>
+                  <AppCalendar date={dates.end} onChange={(d) => setDates((prevState) => ({ ...prevState, end: d }))} />
                 </div>
 
                 <div className="flex flex-1 flex-col gap-2">
-                  <Label className="text-muted-foreground font-normal text-xs">
-                    End Date
-                  </Label>
-                  <AppCalendar
-                    date={dates.end}
-                    onChange={(d) =>
-                      setDates((prevState) => ({ ...prevState, end: d }))
-                    }
+                  <Label className="text-muted-foreground font-normal text-xs">Select Coach</Label>
+                  <AssignCoachDialog
+                  placeholder={coach?.name ? coach.name :"Select Coach"}
+                    onSelect={(coach) => {
+                      setCoach({
+                        name:
+                          `${coach.first_name} ${coach.last_name}`,
+                        id: coach.id
+                      });
+                    }}
                   />
                 </div>
-                {
-                    <div className="flex flex-1 flex-col gap-2">
-                        <Label className="text-muted-foreground font-normal text-xs">
-                    Select coach
-                        </Label>
 
-                        <AssignCoachDialog
-                          onSelect={(coach) => {
-                            setCoachId(coach.id);
-                            setCoachName(`${coach.first_name} ${coach.last_name}`);
-                          }}
-                        />
-                    </div>
-                }
+
               </div>
-              <Button
-                disabled={filterLoading || !dates.start || !dates.end}
-                onClick={() => {
-                  setFilterLoading(true);
-                }}
-              >
-                {filterLoading && <Spinner className="text-black" />}Apply
-                Filter
-              </Button>
+              <Button disabled={filterLoading || !dates.start || !dates.end || !coach?.id} onClick={() => {
+                setFilterLoading(true)
+                filterData(dates.start, dates.end)
+              }}>{filterLoading && <Spinner className="text-black" />}Apply Filter</Button>
+            </div>
+
+          </CardContent>
+        </Card>
+      
+
+      <div className="grid sm:grid-cols-2 grid-cols-1 gap-4">
+        <Card>
+          <CardContent className="space-y-2">
+
+            <div className="flex justify-between items-center">
+              <div className="space-y-2">
+
+                <p className="text-sm">Revenue by Session</p>
+                <p className="text-xs text-muted-foreground">Total earnings per session</p>
+              </div>
+              <Button onClick={() => {
+                exportToExcel(revenueBySession.headers, revenueBySession.rows, revenueBySession.sheetName + ".xlsx")
+              }} variant={"outline"} size={"icon-sm"} className="h-6 w-6 rounded-sm text-[10px] text-muted-foreground"><Download /></Button>
+            </div>
+
+            <BarChart chartData={reports?.revenueBySession || []} xaxis="coach" yaxis="value" />
+
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="space-y-2">
+
+            <div className="flex justify-between items-center">
+              <div className="space-y-2">
+
+                <p className="text-sm">Session by Type</p>
+                <p className="text-xs text-muted-foreground">Distribution on session types</p>
+              </div>
+              <Button onClick={() => {
+                exportToExcel(sessionTypesSheet.headers, sessionTypesSheet.rows, sessionTypesSheet.sheetName + ".xlsx")
+              }} variant={"outline"} size={"icon-sm"} className="h-6 w-6 rounded-sm text-[10px] text-muted-foreground"><Download /></Button>
+            </div>
+
+
+            <div className="h-70">
+              <PieChart
+                data={reports?.sessionTypeData || []}
+                config={SESSION_TYPE_CHART_CONFIG} />
             </div>
           </CardContent>
         </Card>
-      )}
-
-      <div className="grid sm:grid-cols-2 grid-cols-1 gap-4">
-              <Card>
-                <CardContent className="space-y-2">
-      
-                  <div className="flex justify-between items-center">
-                    <div className="space-y-2">
-      
-                      <p className="text-sm">Revenue by Coach</p>
-                      <p className="text-xs text-muted-foreground">Total earnings per coach</p>
-                    </div>
-                    <Button variant={"outline"} size={"icon-sm"} className="h-6 w-6 rounded-sm text-[10px] text-muted-foreground"><Download /></Button>
-                  </div>
-      
-                  <BarChart chartData={stats?.revenueByCoach || []} xaxis="coach" yaxis="value" />
-      
-                </CardContent>
-              </Card>
-      
-              <Card>
-                <CardContent className="space-y-2">
-      
-                  <div className="flex justify-between items-center">
-                    <div className="space-y-2">
-      
-                      <p className="text-sm">Session by Type</p>
-                      <p className="text-xs text-muted-foreground">Distribution on session types</p>
-                    </div>
-                    <Button variant={"outline"} size={"icon-sm"} className="h-6 w-6 rounded-sm text-[10px] text-muted-foreground"><Download /></Button>
-                  </div>
-      
-      
-                  <div className="h-70">
-                    {/* <PieChart
-                      data={stats?.sessionTypeData || []}
-                      config={SESSION_TYPE_CHART_CONFIG} /> */}
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-
-
+      </div>
     </div>
   );
 }
@@ -195,33 +344,78 @@ const Header = ({ children }: { children: ReactNode }) => {
       <div className="space-y-1">
         <p className="text-xl">Coach Analytics</p>
         <span className="text-xs text-muted-foreground flex items-center">
-          <span>Filter, analyze, and coaches status</span>
+          <span>Filter, analyze, and export coach data</span>
         </span>
       </div>
+
       {children}
     </div>
   );
 };
-const HeaderCard = ({
-  title = "",
-  description = "",
-  icon = null,
-}: {
-  title: string;
-  description: string;
-  icon: ReactNode;
-}) => {
+
+const HeaderCard = ({ title = "", description = "", icon = null }: { title: string, description: string, icon: ReactNode }) => {
+
   return (
     <Card className="flex-1 rounded-[10px] bg-[#1A1A1A] border-[#3A3A3A] sm:w-[204px] w-full p-0 py-2 px-4">
       <CardContent className="p-0 py-2 space-y-2">
         <div className="flex gap-2 items-center">
           {icon}
           <div className="space-y-0">
-            <p className="text-muted-foreground text-[12px] ">{description}</p>
+
+            <p className="text-muted-foreground text-[12px] ">
+              {description}
+            </p>
+
+
           </div>
         </div>
-        <p className="text-[24px] text-white leading-tight">{title}</p>
+        <p className="text-[24px] text-white leading-tight">
+          {title}
+        </p>
+
       </CardContent>
     </Card>
+  )
+}
+
+
+export function DashboardLoader() {
+  return (
+    <div className="flex flex-col w-full gap-4">
+
+
+
+      <div className="mt-4 flex w-full flex-wrap gap-4 justify-center">
+        {Array.from({ length: 5 }).map((_, i) => (
+          <Skeleton key={i} className="h-[100px] flex flex-1 bg-secondary rounded-sm" />
+
+        ))}
+      </div>
+
+
+
+      <div className="grid sm:grid-cols-2 grid-cols-1 gap-4">
+        {Array.from({ length: 2 }).map((_, i) => (
+          <Skeleton key={i} className="h-[300px] flex flex-1 bg-secondary rounded-sm" />
+        ))}
+      </div>
+
+      <Skeleton className="h-[300px] flex flex-1 bg-secondary rounded-sm" />
+      <Skeleton className="h-[300px] flex w-full bg-secondary rounded-sm" />
+      <Skeleton className="h-[300px] flex w-full bg-secondary rounded-sm" />
+      <Skeleton className="h-[300px] flex w-full bg-secondary rounded-sm" />
+
+
+    </div>
   );
-};
+}
+
+
+
+
+
+
+
+
+
+

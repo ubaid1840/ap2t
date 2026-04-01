@@ -29,10 +29,11 @@ interface AssignCoachDialogProps {
   onSelect: (coach: { id: number; first_name: string; last_name: string; 
   }) => void;
   already?: boolean
+  placeholder ?: string
 }
 
 
-export function AssignCoachDialog({ onSelect, already = false }: AssignCoachDialogProps) {
+export function AssignCoachDialog({ onSelect, already = false, placeholder = "Select Coach"  }: AssignCoachDialogProps) {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [results, setResults] = useState<Coach[]>([]);
@@ -72,8 +73,8 @@ export function AssignCoachDialog({ onSelect, already = false }: AssignCoachDial
       <DialogTrigger asChild>
         <Button>
           <Plus  />
-          {already ? "Change" :
-            "Assign"} Coach
+          {already ? "Change Coach" :
+            placeholder}
         </Button>
       </DialogTrigger>
       <DialogContent className="bg-[#252525] border-[#3A3A3A] max-w-5xl p-0 gap-0">
