@@ -61,7 +61,6 @@ export async function PUT(req: NextRequest) {
       );
     }
 
-
     const updatingRow = result.rows?.[0] ?? null
     if (updatingRow) {
       if (type === 'cash' || type === 'approval') {
@@ -126,13 +125,13 @@ export async function PUT(req: NextRequest) {
 
             if (currentPlayers >= maxPlayers) {
               await client.query("ROLLBACK")
-
               return NextResponse.json(
                 { message: "Max players added in the session can not add more" },
                 { status: 409 }
               )
             }
 
+            /* ---------------- CALCULATE AMOUNT ---------------- */
 
             amount = session.price
             const now = moment();
@@ -147,65 +146,73 @@ export async function PUT(req: NextRequest) {
               amount = session.promotion_price;
             }
 
-            const parent_data = await pool.query(
-  `SELECT parent_id FROM players WHERE user_id = $1`,
-  [user_id]
-);
+            /* ---------------- SIBLING DISCOUNT ---------------- */
 
-const parent_id = parent_data.rows[0]?.parent_id;
+            const parent_data = await client.query(
+              `SELECT parent_id FROM players WHERE user_id = $1`,
+              [user_id]
+            );
 
-if (parent_id !== null && parent_id !== undefined) {
-  const siblings_data = await pool.query(
-    `SELECT COUNT(*) 
-     FROM players 
-     WHERE parent_id = $1 
-       AND user_id IN (
-         SELECT DISTINCT user_id 
-         FROM session_players 
-         WHERE session_id = $2
-       )`,
-    [parent_id, session_id]
-  );
+            const parent_id = parent_data.rows[0]?.parent_id;
+            let hasSiblingDiscount = false;
 
-  const siblingCount = parseInt(siblings_data.rows[0].count, 10);
+            if (parent_id !== null && parent_id !== undefined) {
 
-  if (siblingCount >= 1) {
-    amount = amount * 0.9;
-    await pool.query(
-      `UPDATE payments
-       SET amount = amount * 0.9
-       WHERE session_id = $1
-         AND status = 'pending'
-         AND user_id IN (
-           SELECT user_id FROM players
-           WHERE parent_id = $2
-         )`,
-      [session_id, parent_id]
-    );
-  }
+              const siblings_data = await client.query(
+                `SELECT COUNT(*)
+                 FROM players
+                 WHERE parent_id = $1
+                   AND user_id IN (
+                     SELECT DISTINCT user_id
+                     FROM session_players
+                     WHERE session_id = $2
+                   )`,
+                [parent_id, session_id]
+              );
 
-}
+              const siblingCount = parseInt(siblings_data.rows[0].count, 10);
+
+              if (siblingCount >= 1) {
+                hasSiblingDiscount = true;
+                amount = amount * 0.9;
+                await client.query(
+                  `UPDATE payments
+                   SET amount = amount * 0.9,
+                       siblings_discount = true
+                   WHERE session_id = $1
+                     AND status = 'pending'
+                     AND user_id != $3
+                     AND user_id IN (
+                       SELECT user_id
+                       FROM players
+                       WHERE parent_id = $2
+                     )`,
+                  [session_id, parent_id, user_id]
+                );
+              }
+            }
 
             /* ---------------- INSERT PLAYER ---------------- */
+
             await client.query(
               `INSERT INTO session_players (session_id, user_id)
-         VALUES ($1, $2)`,
+               VALUES ($1, $2)`,
               [session_id, user_id]
             )
 
             if (session.comped) {
               await client.query(
                 `INSERT INTO payments
-           (session_id, user_id, amount, status, paid_at, method)
-           VALUES ($1,$2,$3,$4,$5,$6)`,
-                [session_id, user_id, amount, "comped", new Date(), "Nil"]
+                 (session_id, user_id, amount, status, paid_at, method, siblings_discount)
+                 VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+                [session_id, user_id, amount, "comped", new Date(), "Nil", hasSiblingDiscount]
               )
             } else {
               await client.query(
                 `INSERT INTO payments
-           (session_id, user_id, amount, status)
-           VALUES ($1,$2,$3,$4)`,
-                [session_id, user_id, amount, "pending"]
+                 (session_id, user_id, amount, status, siblings_discount)
+                 VALUES ($1, $2, $3, $4, $5)`,
+                [session_id, user_id, amount, "pending", hasSiblingDiscount]
               )
             }
           }
@@ -226,9 +233,7 @@ if (parent_id !== null && parent_id !== undefined) {
 
         } catch (error: any) {
           await client.query("ROLLBACK")
-
           console.log("Error:", error)
-
           return NextResponse.json(
             {
               message:
@@ -247,10 +252,10 @@ if (parent_id !== null && parent_id !== undefined) {
       if (type === "cash") {
         console.log("called")
         await pool.query(`
-  UPDATE payments
-  SET method = 'Cash', status = 'paid', paid_at = $1, paid_by = $2, transaction_id = $3 
-  WHERE user_id = $4 AND session_id = $5
-`, [new Date(), updatingRow?.user_id, moment().valueOf().toString(), updatingRow?.user_id, updatingRow?.session_id])
+          UPDATE payments
+          SET method = 'Cash', status = 'paid', paid_at = $1, paid_by = $2, transaction_id = $3
+          WHERE user_id = $4 AND session_id = $5
+        `, [new Date(), updatingRow?.user_id, moment().valueOf().toString(), updatingRow?.user_id, updatingRow?.session_id])
       }
 
       await TriggerFirebaseApprovals("user")
