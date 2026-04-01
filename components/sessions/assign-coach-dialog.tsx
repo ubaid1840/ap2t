@@ -79,7 +79,7 @@ export function AssignCoachDialog({ onSelect, already = false }: AssignCoachDial
       <DialogContent className="bg-[#252525] border-[#3A3A3A] max-w-5xl p-0 gap-0">
         <DialogHeader className="border-b border-[#3A3A3A] p-4">
           <DialogTitle className="text-[#F3F4F6] font-semibold text-lg">
-            Assign Coach
+            Select Coach
           </DialogTitle>
         </DialogHeader>
         <div className="p-4 space-y-4">

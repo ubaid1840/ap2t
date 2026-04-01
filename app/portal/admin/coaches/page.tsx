@@ -117,7 +117,11 @@ export default function Page() {
     <div className="flex flex-col w-full gap-4">
       <Header>
         <div className="flex flex-wrap gap-4">
-
+          <Button>
+            <Link href={"/portal/admin/coaches/stats"}>
+            Veiw stats
+            </Link>
+          </Button>
           <CreateCoach onRefresh={async () => {
             await fetchData()
           }} />
