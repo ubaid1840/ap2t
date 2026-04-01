@@ -45,7 +45,7 @@ export default function CampsAndClinicsDetail({
   const currentCamp = data
     ? {
         id: data.id,
-        badge: data.type.toUpperCase() as "CAMP" | "CLINIC",
+        badge: data.session_type.toUpperCase() as "CAMP" | "CLINIC",
         title: data.name,
         description: data.description,
         price: Number(data.apply_promotion ? data.promotion_price : data.price),

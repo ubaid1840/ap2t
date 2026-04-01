@@ -67,7 +67,9 @@ export default function SessionCalendar({ currentMonth, setCurrentMonth, session
     isMultiDay: Boolean(endDate),
     end_date : endDate,
     start_date : startDate,
-    price : session?.price
+    price : session?.price,
+    promotion:session?.promotion,
+    original_price:session?.original_price
   }))
 })
 

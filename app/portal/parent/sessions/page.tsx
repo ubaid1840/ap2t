@@ -41,18 +41,27 @@ export default function Page() {
   }
       );
       if (result.data) {
-        const mappedSessions = result.data.map((s: any) => ({
+        const mappedSessions = result.data.map((s: any) => {
+          let finalPrice=s.price
+          let promotion=false
+          if(s.apply_promotion){
+            promotion=true
+            finalPrice=s.promotion_price
+          }
+          return({
           id: s.id,
           sessionName: s.name,
           type: s.session_type,
           date: moment(new Date(s.date)).format("YYYY-MM-DD"),
           time: `${s.start_time} - ${s.end_time}`,
           coachName: joinNames([s.coach_first_name, s.coach_last_name]),
-          price: s?.apply_promotion ? s?.promotion_price : s.price,
+          price: finalPrice,
+          original_price:s.price,
+          promotion:promotion,
           status: s?.status || 'upcoming',
           children: s?.children || [],
           end_date : s?.end_date ? moment(new Date(s.end_date)).format("YYYY-MM-DD") : null
-        }));
+        })});
 
         setSessions(mappedSessions);
       }

@@ -16,6 +16,7 @@ export type CalendarEvent = {
   originalId : string
   price : string | number
   original_price:string | number
+  promotion:boolean
 }
 
 export type CustomCalendarProps = {

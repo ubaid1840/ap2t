@@ -209,7 +209,7 @@ export const transformCampClinics = (
 ): CampClinicCard[] => {
     return sessions.map((s) => ({
         id: s.id,
-        badge: s.type.toUpperCase() as "CAMP" | "CLINIC",
+        badge: s.session_type.toUpperCase() as "CAMP" | "CLINIC",
         title: s.name,
         description: s.description,
         price: Number(s.apply_promotion ? s.promotion_price : s.price),
