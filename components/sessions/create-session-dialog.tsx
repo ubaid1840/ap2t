@@ -1,5 +1,6 @@
 "use client";
 import axios from "@/lib/axios";
+import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Calendar,
   DollarSign,
@@ -10,11 +11,17 @@ import {
   Tag,
   Users,
 } from "lucide-react";
+import moment from "moment";
 import { useEffect, useState } from "react";
+import { Controller, useForm } from "react-hook-form";
+import { toast } from "sonner";
+import z from "zod";
 import AppCalendar from "../app-calendar";
 import SelectSessionType from "../players/select-session-type";
+import { RequiredStar } from "../required-star";
 import { TimePickerFixed } from "../time-picker-fixed";
 import { Button } from "../ui/button";
+import { Checkbox } from "../ui/checkbox";
 import {
   Dialog,
   DialogClose,
@@ -22,6 +29,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "../ui/dialog";
+import { Field, FieldError } from "../ui/field";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { ScrollArea } from "../ui/scroll-area";
@@ -36,16 +44,7 @@ import {
 } from "../ui/select";
 import { Separator } from "../ui/separator";
 import { Spinner } from "../ui/spinner";
-import { Textarea } from "../ui/textarea";
 import { AssignCoachDialog } from "./assign-coach-dialog";
-import { Checkbox } from "../ui/checkbox";
-import z from "zod";
-import { Controller, useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Field, FieldError } from "../ui/field";
-import { RequiredStar } from "../required-star";
-import { toast } from "sonner";
-import moment from "moment";
 
 export type SessionType = {
   name: string;
@@ -80,49 +79,28 @@ type BookedSession = {
 
 export const sessionSchema = z.object({
   name: z.string().min(2, "Session name is required"),
-
   description: z.string().min(2, "Description is required"),
-
   type: z.enum(["camp", "comped"], {
     message: "Type is required",
   }),
-
   age_limit: z.string().min(1, "Age limit is required"),
-
   session_type: z.string().min(1, "Session type is required"),
-
   coach_id: z.number().nullable(),
-
   location: z.string().min(2, "Location is required"),
-
-  date: z.date({
-    required_error: "Start date is required",
-  }),
-
-  end_date: z.date({
-    required_error: "End date is required",
-  }),
-
+  date: z.coerce.date({ error: "Start date is required" }),
+  end_date: z.coerce.date({ error: "End date is required" }),
   start_time: z.string().min(1, "Start time required"),
-
   end_time: z.string().min(1, "End time required"),
-
   price: z.coerce.number().min(0, "Price required"),
-
   max_players: z.coerce.number().min(1, "Max players required"),
-
   apply_promotion: z.boolean().default(false),
-
   image: z.string().optional(),
-
   promotion_start: z.date().optional(),
-
   promotion_end: z.date().optional(),
-
   promotion_price: z.coerce.number().optional(),
-
   show_storefront: z.boolean().default(false),
 });
+
 type SessionSchemaValues = z.infer<typeof sessionSchema>;
 
 export function CreateSessionDialog({
@@ -177,7 +155,7 @@ export function CreateSessionDialog({
     defaultValues: {
       name: "",
       description: "",
-      type: undefined,
+      type: "camp",
       age_limit: "",
       session_type: "",
       coach_id: coach_id ? Number(coach_id) : null,
@@ -185,7 +163,7 @@ export function CreateSessionDialog({
       start_time: "",
       end_time: "",
       price: 0,
-      max_players: 0,
+      max_players: 1,
       apply_promotion: promotion,
       show_storefront: false,
       date: undefined,
@@ -194,6 +172,7 @@ export function CreateSessionDialog({
       image: "",
       promotion_start: undefined,
       promotion_end: undefined,
+      
     },
   });
 
@@ -279,7 +258,7 @@ export function CreateSessionDialog({
   };
 
   const CreateSession = async (values: SessionSchemaValues) => {
-    setLoading(true);
+    // setLoading(true);
     const conflicts=checkAvailability({
       date: values.date,
       end_date: values.end_date,
@@ -478,6 +457,7 @@ export function CreateSessionDialog({
                       {
                         <AssignCoachDialog
                           onSelect={(coach) => {
+                            console.log(coach)
                             form.setValue("coach_id", coach.id, {
                               shouldValidate: true,
                             });

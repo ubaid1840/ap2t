@@ -10,8 +10,10 @@ export async function GET(req: NextRequest) {
   u.first_name,
   u.last_name,
   u.email,
-  u.picture
+  u.picture,
+  c.schedule_preference AS schedule
 FROM users u
+INNER JOIN coaches c ON c.user_id = u.id
 WHERE u.role = 'coach';`,
     );
 

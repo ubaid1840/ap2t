@@ -24,9 +24,10 @@ type Coach = {
   last_name: string;
   email:string;
   picture:string;
+  schedule : any
 };
 interface AssignCoachDialogProps {
-  onSelect: (coach: { id: number; first_name: string; last_name: string; 
+  onSelect: (coach: { id: number; first_name: string; last_name: string; schedule : any 
   }) => void;
   already?: boolean
   placeholder ?: string
@@ -113,6 +114,7 @@ export function AssignCoachDialog({ onSelect, already = false, placeholder = "Se
                         id: coach.id,
                         first_name: coach.first_name,
                         last_name: coach.last_name,
+                        schedule : coach?.schedule
                       });
                       setOpen(false); 
                     }}
