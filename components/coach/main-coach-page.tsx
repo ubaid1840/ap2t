@@ -136,6 +136,7 @@ export default function MainCoachPage({
       title: session.name,
       date: moment(new Date(session.date)).format("YYYY-MM-DD"),
       time: session.start_time,
+      end_time : session.end_time,
       status: "Booked",
     }))
     : [];
@@ -150,6 +151,7 @@ export default function MainCoachPage({
           title: "",
           date: m.format("YYYY-MM-DD"),
           time: m.format("HH:mm"),
+          end_time : "",
           status: "Blocked",
         });
       }
@@ -158,6 +160,7 @@ export default function MainCoachPage({
 
   const combinedEvents = blockedEvents ? [...weeklyEvents, ...blockedEvents] : weeklyEvents;
 
+  
   if (loading) {
     return (
       <div className="flex flex-col w-full gap-6">

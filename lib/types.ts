@@ -52,6 +52,7 @@ export interface Event {
   title: string;
   date: string; 
   time: string; 
+  end_time : string;
   status: "Available" | "Booked" | "Blocked" | string;
 }
 

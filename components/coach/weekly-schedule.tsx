@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import moment from "moment";
 import { Button } from "../ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
@@ -18,20 +18,20 @@ import axios from "@/lib/axios";
 import { WeeklyScheduleProps } from "@/lib/types";
 
 const timeSlots = [
-  "09:00",
-  "10:00",
-  "11:00",
-  "12:00",
-  "01:00",
-  "02:00",
-  "03:00",
-  "04:00",
-  "05:00"
+  "09:00 AM",
+  "10:00 AM",
+  "11:00 AM",
+  "12:00 PM",
+  "01:00 PM",
+  "02:00 PM",
+  "03:00 PM",
+  "04:00 PM",
+  "05:00 PM"
 ];
 
 export const WeeklySchedule: React.FC<WeeklyScheduleProps> = ({ events, id, preference }) => {
 
-  const [currentWeekStart, setCurrentWeekStart] = useState(moment().startOf("week").add(1, "days")); 
+  const [currentWeekStart, setCurrentWeekStart] = useState(moment().startOf("week").add(1, "days"));
   const isMobile = useIsMobile();
   const [contextMenu, setContextMenu] = useState<{
     x: number;
@@ -40,7 +40,7 @@ export const WeeklySchedule: React.FC<WeeklyScheduleProps> = ({ events, id, pref
     isBlocked: boolean;
   } | null>(null);
 
-  
+
   const [localPreference, setLocalPreference] = useState<Record<string, string>>(preference || {});
 
   const weekDates = Array.from({ length: 7 }).map((_, i) =>
@@ -51,20 +51,50 @@ export const WeeklySchedule: React.FC<WeeklyScheduleProps> = ({ events, id, pref
   const nextWeek = () => setCurrentWeekStart(moment(currentWeekStart).add(7, "days"));
 
   const getEventForCell = (date: moment.Moment, time: string) => {
-    const dt = moment(date).set({
-      hour: parseInt(time.split(":")[0]),
-      minute: parseInt(time.split(":")[1] || "0"),
-      second: 0,
-      millisecond: 0,
-    }).toISOString();
+    const cellTime = moment(date)
+      .set({
+        hour: parseInt(time.split(":")[0]) + (time.includes("PM") && parseInt(time.split(":")[0]) !== 12 ? 12 : 0),
+        minute: parseInt(time.split(":")[1] || "0"),
+        second: 0,
+        millisecond: 0,
+      });
 
-    if (localPreference[dt] === "blocked") {
+    // Check if the slot is blocked in local preference
+    const dtISO = cellTime.toISOString();
+    if (localPreference[dtISO] === "blocked") {
       return { title: "", date: date.format("YYYY-MM-DD"), time, status: "Blocked" };
     }
-    return events.find(e => e.date === date.format("YYYY-MM-DD") && e.time === time);
+
+    // Find an event that spans this slot
+    const event = events.find(e => {
+      if (e.date !== date.format("YYYY-MM-DD")) return false;
+
+      // Parse event start time
+      const startTime = moment(date).set({
+        hour: parseInt(e.time.split(":")[0]) + (e.time.includes("PM") && parseInt(e.time.split(":")[0]) !== 12 ? 12 : 0),
+        minute: parseInt(e.time.split(":")[1] || "0"),
+        second: 0,
+        millisecond: 0,
+      });
+
+      // Parse event end time (if not provided, assume 1 hour)
+      const endTime = e.end_time
+        ? moment(date).set({
+          hour: parseInt(e.end_time.split(":")[0]) + (e.end_time.includes("PM") && parseInt(e.end_time.split(":")[0]) !== 12 ? 12 : 0),
+          minute: parseInt(e.end_time.split(":")[1] || "0"),
+          second: 0,
+          millisecond: 0,
+        })
+        : moment(startTime).add(1, "hour");
+
+      return cellTime.isSameOrAfter(startTime) && cellTime.isBefore(endTime);
+    });
+
+    if (event) return event;
+    return { title: "", date: date.format("YYYY-MM-DD"), time, status: "Available" };
   };
 
-  const handleRightClick = (e: React.MouseEvent, date: moment.Moment, time: string, event : any) => {
+  const handleRightClick = (e: React.MouseEvent, date: moment.Moment, time: string, event: any) => {
     e.preventDefault();
 
     const dateTime = moment(date).set({
@@ -75,9 +105,7 @@ export const WeeklySchedule: React.FC<WeeklyScheduleProps> = ({ events, id, pref
     }).toISOString();
 
     const isBlocked = localPreference[dateTime] === "blocked";
-
-    if(event && event.status !== "Blocked") return
-
+    if (event && event.status === "Booked") return
     setContextMenu({
       x: e.clientX,
       y: e.clientY,
@@ -86,14 +114,15 @@ export const WeeklySchedule: React.FC<WeeklyScheduleProps> = ({ events, id, pref
     });
   };
 
+
   const handleToggleBlock = async () => {
     if (!contextMenu) return;
 
     const updated = { ...localPreference };
     if (contextMenu.isBlocked) {
-      delete updated[contextMenu.dateTime]; 
+      delete updated[contextMenu.dateTime];
     } else {
-      updated[contextMenu.dateTime] = "blocked"; 
+      updated[contextMenu.dateTime] = "blocked";
     }
 
     setLocalPreference(updated);
@@ -101,7 +130,7 @@ export const WeeklySchedule: React.FC<WeeklyScheduleProps> = ({ events, id, pref
 
     if (!id) return;
 
-    
+
     await axios.put(`/admin/coaches/${id}`, {
       id,
       schedule_preference: updated,
@@ -125,6 +154,9 @@ export const WeeklySchedule: React.FC<WeeklyScheduleProps> = ({ events, id, pref
     }
   };
 
+  useEffect(() => {
+    console.log(contextMenu)
+  }, [contextMenu])
   return (
     <div className="flex flex-1 flex-col p-4 gap-4">
       {/* Week navigation */}

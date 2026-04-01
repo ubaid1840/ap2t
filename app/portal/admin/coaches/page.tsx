@@ -2,12 +2,14 @@
 
 import CardStatus from "@/components/card-status";
 import CreateCoach from "@/components/coach/CreateCoach";
+import InputWithIcon from "@/components/input-with-icon";
 import getInitials from "@/components/parents/get-initials";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Spinner } from "@/components/ui/spinner";
 import { useAuth } from "@/contexts/auth-context";
+import { useDebounce } from "@/hooks/use-debounce";
 import axios from "@/lib/axios";
 import { joinNames } from "@/lib/functions";
 import { cn } from "@/lib/utils";
@@ -48,6 +50,8 @@ export default function Page() {
   const { user } = useAuth()
   const [coaches, setCoaches] = useState<{ data: coachinfoType[], stats: { total_active_coaches: string, total_coaches: string, total_players: string, total_sessions: string } }>()
   const [loading, setLoading] = useState(true)
+  const [search, setSearch] = useState("")
+    const debouncedSearch = useDebounce(search, 300);
   const localData = [
     {
       Icon: <User />,
@@ -112,6 +116,25 @@ export default function Page() {
     }
   }
 
+  const filteredData = coaches?.data?.filter((item) => {
+  const text = `${item.name} ${item.email}`.toLowerCase();
+  
+
+  const searchWords = debouncedSearch
+    ?.toLowerCase()
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean); // remove empty strings
+
+  const matchesSearch =
+    !searchWords?.length ||
+    searchWords.every((word : string) => text.includes(word));
+
+ 
+
+  return matchesSearch;
+});
+
 
   return (
     <div className="flex flex-col w-full gap-4">
@@ -152,13 +175,17 @@ export default function Page() {
         ))}
       </div>
 
+      <div className="w-full">
+        <InputWithIcon value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search by coach..." />
+      </div>
+
       {loading ? (
         <div className="flex justify-center items-center py-20">
           <Spinner />
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {coaches?.data?.map((coach) => {
+          {filteredData?.map((coach) => {
             return (
               <Card className="bg-[#252525]" key={coach.id}>
                 <CardHeader className="flex justify-between">

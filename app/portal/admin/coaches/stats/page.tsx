@@ -1,6 +1,7 @@
 "use client";
 import AppCalendar from "@/components/app-calendar";
 import PageTable from "@/components/app-table";
+import BackButton from "@/components/back-button";
 import { BarChart } from "@/components/charts/bar-chart";
 import LineChart from "@/components/charts/line-chart-dots";
 import PieChart from "@/components/charts/pie-chart";
@@ -41,14 +42,13 @@ export type Totals = {
   totalSessions: number;     // total sessions
   totalPending: number;      // total payments with status 'pending'
   totalComped: number;       // total payments with status 'comped'
-  averageAttendance: number; // average attendance percentage across all sessions
 };
 
 // ----------------------------
 // Revenue By Coach
 // ----------------------------
 export type RevenueBySessionItem = {
-  coach: string;  // e.g., "Coach Ali"
+  session_name: string;  // e.g., "Coach Ali"
   value: number;  // revenue sum
 };
 
@@ -171,16 +171,15 @@ export default function Page() {
       ["Total Sessions", reports?.totals.totalSessions ?? 0],
       ["Pending Payments", reports?.totals.totalPending ?? 0],
       ["Comped Payments", reports?.totals.totalComped ?? 0],
-      ["Avg Attendance (%)", reports?.totals.averageAttendance ?? 0],
     ],
   };
 
   const revenueBySession = {
-    sheetName: "Revenue by Coach",
-    headers: ["Coach", "Revenue"],
+    sheetName: "Revenue by Session",
+    headers: ["Session", "Revenue"],
     rows:
       reports?.revenueBySession?.map((r) => [
-        r.coach,
+        r.session_name,
         String(r.value),
       ]) ?? [],
   };
@@ -195,6 +194,7 @@ export default function Page() {
       ]) ?? [],
   };
 
+  console.log(reports)
 
 
   if (loading) {
@@ -211,6 +211,7 @@ export default function Page() {
 
   return (
     <div className="flex flex-col w-full gap-4">
+       <BackButton title="Back to coaches" route="/portal/admin/coaches" />
       <Header>
         <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
           <Button onClick={() => {
@@ -220,7 +221,7 @@ export default function Page() {
                 revenueBySession,
                 sessionTypesSheet,
               ],
-              "dashboard-report.xlsx"
+              `${coach.name || "Coach"}-report.xlsx`
             )
           }}>
             <Download /> Export All Data
