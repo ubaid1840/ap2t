@@ -141,6 +141,8 @@ export async function PUT(req: NextRequest) {
               session.apply_promotion &&
               session.promotion_price &&
               session.promotion_end &&
+              session.promotion_start&&
+               moment(new Date(session.promotion_start)).isBefore(now)&&
               moment(new Date(session.promotion_end)).isAfter(now)
             ) {
               amount = session.promotion_price;
@@ -175,20 +177,20 @@ export async function PUT(req: NextRequest) {
               if (siblingCount >= 1) {
                 hasSiblingDiscount = true;
                 amount = amount * 0.9;
-                await client.query(
-                  `UPDATE payments
-                   SET amount = amount * 0.9,
-                       siblings_discount = true
-                   WHERE session_id = $1
-                     AND status = 'pending'
-                     AND user_id != $3
-                     AND user_id IN (
-                       SELECT user_id
-                       FROM players
-                       WHERE parent_id = $2
-                     )`,
-                  [session_id, parent_id, user_id]
-                );
+                // await client.query(
+                //   `UPDATE payments
+                //    SET amount = amount * 0.9,
+                //        siblings_discount = true
+                //    WHERE session_id = $1
+                //      AND status = 'pending'
+                //      AND user_id != $3
+                //      AND user_id IN (
+                //        SELECT user_id
+                //        FROM players
+                //        WHERE parent_id = $2
+                //      )`,
+                //   [session_id, parent_id, user_id]
+                // );
               }
             }
 
