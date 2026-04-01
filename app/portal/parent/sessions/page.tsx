@@ -44,10 +44,17 @@ export default function Page() {
         const mappedSessions = result.data.map((s: any) => {
           let finalPrice=s.price
           let promotion=false
-          if(s.apply_promotion){
-            promotion=true
-            finalPrice=s.promotion_price
-          }
+          if (
+          s.apply_promotion &&
+          s.promotion_price &&
+          s.promotion_start &&
+          s.promotion_end &&
+          moment(s.promotion_start).isBefore(moment()) &&
+          moment(s.promotion_end).isAfter(moment())
+        ) {
+          finalPrice = s.promotion_price;
+          promotion=true
+        }
           return({
           id: s.id,
           sessionName: s.name,

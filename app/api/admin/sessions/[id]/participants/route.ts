@@ -117,19 +117,19 @@ export async function POST(
         amount = amount * 0.9;
 
      
-        await client.query(
-          `UPDATE payments
-           SET amount = amount * 0.9,
-               siblings_discount = true
-           WHERE session_id = $1
-             AND status = 'pending'
-             AND user_id != $3
-             AND user_id IN (
-               SELECT user_id FROM players
-               WHERE parent_id = $2
-             )`,
-          [session_id, parent_id, player_id]
-        );
+        // await client.query(
+        //   `UPDATE payments
+        //    SET amount = amount * 0.9,
+        //        siblings_discount = true
+        //    WHERE session_id = $1
+        //      AND status = 'pending'
+        //      AND user_id != $3
+        //      AND user_id IN (
+        //        SELECT user_id FROM players
+        //        WHERE parent_id = $2
+        //      )`,
+        //   [session_id, parent_id, player_id]
+        // );
       }
     }
 
