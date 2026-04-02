@@ -225,13 +225,11 @@ export const sendAdminNewSignupEmail = async ({
   fullName,
   userEmail,
   role = "User",
-  signupDate,
 }: {
  
   fullName: string,
   userEmail: string,
   role: string,
-  signupDate: string,
 }): Promise<void> => {
   const subject = "New User Signup – Advanced Physical and Technical Training";
 
@@ -265,10 +263,6 @@ export const sendAdminNewSignupEmail = async ({
           <td style="padding:8px; font-weight:bold;">Role</td>
           <td style="padding:8px;">${role}</td>
         </tr>
-        <tr>
-          <td style="padding:8px; font-weight:bold;">Signup Date</td>
-          <td style="padding:8px;">${signupDate}</td>
-        </tr>
       </table>
 
       <p style="margin-top:24px; font-size:16px;">
@@ -285,13 +279,27 @@ export const sendAdminNewSignupEmail = async ({
 </html>
 `;
 
-  const admins = await pool.query(`SELECT email FROM users WHERE role = 'admin'`)
+  const admins = await pool.query(`SELECTSELECT 
+  u.id AS user_id,
+  u.email,
+  s.new_booking,
+  s.payment_receive,
+  s.session_cancel,
+  s.promotion_purchase,
+  s.email_notification,
+  s.sms_notification
+FROM users u
+JOIN settings s ON s.user_id = u.id
+WHERE u.role = 'admin';`)
 
   const allAdmins = admins.rows
 
   await Promise.all(
-    allAdmins.map(admin =>
-      sendSingleEmail(message, subject, admin.email).catch(err => console.log(err))
+    allAdmins.map(admin =>{
+      if(admin.email_notification){
+        sendSingleEmail(message, subject, admin.email).catch(err => console.log(err))
+      }
+    }
     )
   );
 
@@ -379,8 +387,170 @@ export const sendAdminSessionEnrollmentEmail = async ({
 
   await sendSingleEmail(message, subject, adminEmail);
 };
+export const sendCoachNewSessionEmail = async ({
+  coachEmail,
+  coachName,
+  sessionName,
+  sessionDate = "To Be Confirmed",
+  sessionTime = "To Be Confirmed",
+  location = "To Be Announced",
+  createdBy = "Admin",
+  createdDate = new Date().toLocaleString(),
+}: {
+  coachEmail: string;
+  coachName: string;
+  sessionName: string;
+  sessionDate?: string;
+  sessionTime?: string;
+  location?: string;
+  createdBy?: string;
+  createdDate?: string;
+}): Promise<void> => {
+  const subject = "New Session Assigned to You";
 
+  const message = `
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>New Session Assigned</title>
+  </head>
+  <body style="font-family: Arial, sans-serif; background-color:#f9fafb; padding:20px; color:#111827;">
+    <div style="max-width:600px;margin:0 auto;background:#ffffff;padding:30px;border-radius:8px;">
 
+      <h2>New Session Assigned 🎯</h2>
+
+      <p style="font-size:16px; line-height:1.6;">
+        Hello <strong>${coachName}</strong>,
+      </p>
+
+      <p style="font-size:16px; line-height:1.6;">
+        A new session has been assigned to you in 
+        <strong>Advanced Physical and Technical Training</strong>.
+      </p>
+
+      <table style="width:100%; border-collapse:collapse; margin-top:20px;">
+        <tr>
+          <td style="padding:8px; font-weight:bold;">Session Name</td>
+          <td style="padding:8px;">${sessionName}</td>
+        </tr>
+        <tr>
+          <td style="padding:8px; font-weight:bold;">Date</td>
+          <td style="padding:8px;">${sessionDate}</td>
+        </tr>
+        <tr>
+          <td style="padding:8px; font-weight:bold;">Time</td>
+          <td style="padding:8px;">${sessionTime}</td>
+        </tr>
+        <tr>
+          <td style="padding:8px; font-weight:bold;">Location</td>
+          <td style="padding:8px;">${location}</td>
+        </tr>
+        <tr>
+          <td style="padding:8px; font-weight:bold;">Assigned By</td>
+          <td style="padding:8px;">${createdBy}</td>
+        </tr>
+        <tr>
+          <td style="padding:8px; font-weight:bold;">Assigned On</td>
+          <td style="padding:8px;">${createdDate}</td>
+        </tr>
+      </table>
+
+      <p style="margin-top:24px; font-size:16px;">
+        Please review the session details and prepare accordingly.
+      </p>
+
+      <p style="margin-top:30px; font-size:16px; font-weight:bold;">
+        — System Notification<br/>
+        Advanced Physical and Technical Training
+      </p>
+
+    </div>
+  </body>
+</html>
+`;
+
+  await sendSingleEmail(message, subject, coachEmail);
+};
+export const sendCoachPlayerEnrollmentEmail = async ({
+  coachEmail,
+  coachName,
+  playerName,
+  playerEmail,
+  sessionName,
+  sessionDate = "To Be Confirmed",
+  enrollmentDate = new Date().toLocaleString(),
+}: {
+  coachEmail: string;
+  coachName: string;
+  playerName: string;
+  playerEmail: string;
+  sessionName: string;
+  sessionDate?: string;
+  enrollmentDate?: string;
+}): Promise<void> => {
+  const subject = "New Player Enrolled in Your Session";
+
+  const message = `
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Player Enrollment Notification</title>
+  </head>
+  <body style="font-family: Arial, sans-serif; background-color:#f9fafb; padding:20px; color:#111827;">
+    <div style="max-width:600px;margin:0 auto;background:#ffffff;padding:30px;border-radius:8px;">
+
+      <h2>New Player Enrolled ⚽</h2>
+
+      <p style="font-size:16px; line-height:1.6;">
+        Hello <strong>${coachName}</strong>,
+      </p>
+
+      <p style="font-size:16px; line-height:1.6;">
+        A new player has enrolled in your session 
+        <strong>${sessionName}</strong>.
+      </p>
+
+      <table style="width:100%; border-collapse:collapse; margin-top:20px;">
+        <tr>
+          <td style="padding:8px; font-weight:bold;">Player Name</td>
+          <td style="padding:8px;">${playerName}</td>
+        </tr>
+        <tr>
+          <td style="padding:8px; font-weight:bold;">Player Email</td>
+          <td style="padding:8px;">${playerEmail}</td>
+        </tr>
+        <tr>
+          <td style="padding:8px; font-weight:bold;">Session</td>
+          <td style="padding:8px;">${sessionName}</td>
+        </tr>
+        <tr>
+          <td style="padding:8px; font-weight:bold;">Session Date</td>
+          <td style="padding:8px;">${sessionDate}</td>
+        </tr>
+        <tr>
+          <td style="padding:8px; font-weight:bold;">Enrollment Date</td>
+          <td style="padding:8px;">${enrollmentDate}</td>
+        </tr>
+      </table>
+
+      <p style="margin-top:24px; font-size:16px;">
+        Please keep track of your session capacity and prepare accordingly.
+      </p>
+
+      <p style="margin-top:30px; font-size:16px; font-weight:bold;">
+        — System Notification<br/>
+        Advanced Physical and Technical Training
+      </p>
+
+    </div>
+  </body>
+</html>
+`;
+
+  await sendSingleEmail(message, subject, coachEmail);
+};
 // new function to send email to coach for new session
 // payment email to admin and player on kioskik side
 // user signup email to admin to be checked

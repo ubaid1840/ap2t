@@ -2,7 +2,7 @@ import pool from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
 import admin from "@/lib/firebase-admin";
 import { getSquareClient } from "@/lib/square";
-import { sendNewJoiningEmail } from "@/lib/email-templates";
+import { sendAdminNewSignupEmail, sendNewJoiningEmail } from "@/lib/email-templates";
 
 export async function PUT(req: NextRequest) {
     try {
@@ -260,7 +260,12 @@ export async function createUserWithFirebase(
         password
     }
     await sendNewJoiningEmail(emaiNotificationData)
-
+    const adminEmailProps={
+        email:email,
+        fullName:`${rest?.first_name} ${rest?.last_name}`,
+        role:"user"
+    }
+    await sendAdminNewSignupEmail(adminEmailProps)
 
     let squareCustomerId: string | null = null;
     let squareCardId: string | null = null;
