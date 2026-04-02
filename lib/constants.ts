@@ -162,6 +162,13 @@ export const front_desk_items=[
    
     shortcut: ['d', 'a', 's', 'h'],
   },
+  {
+    title: 'settings',
+    url: '/portal/front-desk/settings',
+    icon: 'settings',
+   
+    shortcut: ['d', 'a', 's', 'h'],
+  },
 ]
 
 export const EVENT_STYLES = {
