@@ -1,11 +1,8 @@
 import { toast } from "sonner";
 import { Button } from "../ui/button";
 import {
-  Dialog,
-  DialogClose,
   DialogContent,
-  DialogHeader,
-  DialogTitle,
+  DialogTitle
 } from "../ui/dialog";
 export default function GetSupportDialog() {
   const handleSubmit = () => {

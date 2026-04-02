@@ -9,24 +9,23 @@ import {
   StepperSeparator,
   StepperTrigger,
 } from "@/components/ui/stepper";
+import axios from "@/lib/axios";
+import { DARKMODECARDSTYLE } from "@/lib/constants";
+import { auth } from "@/lib/firebase";
+import { GetSquare } from "@/lib/square-creds";
+import { signInWithEmailAndPassword } from "firebase/auth";
 import { File, FileWarning, User, Wallet } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { toast } from "sonner";
 import AppCalendar from "../app-calendar";
 import GradientIcon from "../landing/icon-container";
+import { RequiredStar } from "../required-star";
 import { Button } from "../ui/button";
 import { Checkbox } from "../ui/checkbox";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
-import axios from "@/lib/axios";
-import { useRouter } from "next/navigation";
-import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from "@/lib/firebase";
 import { Separator } from "../ui/separator";
-import { toast } from "sonner";
 import { Spinner } from "../ui/spinner";
-import { RequiredStar } from "../required-star";
-import { DARKMODECARDSTYLE } from "@/lib/constants";
-import { GetSquare } from "@/lib/square-creds";
 
 
 

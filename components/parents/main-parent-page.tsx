@@ -165,7 +165,6 @@ export default function MainParentPage({
 
   async function fetchCardInformation(){
     const result = await axios.get(`/user/card?id=${id}`);
-    console.log(result.data)
     setCardInformation(result.data)
   }
 

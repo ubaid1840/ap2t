@@ -33,6 +33,7 @@ settings2 : Settings2,
   login: LogIn,
   close: X,
   spinner: Loader2,
+  register : LogIn,
   gitHub: ({ ...props }) => (
     <svg
       aria-hidden='true'

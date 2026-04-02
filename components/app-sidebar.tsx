@@ -38,6 +38,7 @@ export default function AppSidebar() {
   const isMobile = useIsMobile();
   const { toggleSidebar, state } = useSidebar();
   const [navItems, setNavItems] = useState<any[]>([])
+  const { user } = useAuth()
 
   useEffect(() => {
     if (pathname.startsWith("/portal/admin")) {
@@ -59,6 +60,8 @@ export default function AppSidebar() {
       setNavItems([...front_desk_items])
     }
   }, [pathname])
+
+  const showSupport = user?.role === "parent" || user?.role === "player";
 
   return (
     <Sidebar collapsible="icon">
@@ -120,7 +123,7 @@ export default function AppSidebar() {
         </ScrollArea>
       </SidebarContent>
 
-      {state === "expanded" &&
+      {state === "expanded" && showSupport &&
 
         <SidebarFooter className="border-t py-5">
           <SidebarMenu>
@@ -131,12 +134,12 @@ export default function AppSidebar() {
                 <Dialog>
                   <DialogTrigger asChild>
 
-                <Button className="bg-black text-primary rounded-xl">
-                  Get Support
+                    <Button className="bg-black text-primary rounded-xl">
+                      Get Support
 
-                </Button>
+                    </Button>
                   </DialogTrigger>
-                  <GetSupportDialog/>
+                  <GetSupportDialog />
                 </Dialog>
               </div>
             </SidebarMenuItem>

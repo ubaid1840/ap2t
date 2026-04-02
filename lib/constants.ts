@@ -163,7 +163,14 @@ export const front_desk_items=[
     shortcut: ['d', 'a', 's', 'h'],
   },
   {
-    title: 'settings',
+    title: 'Registration',
+    url: '/portal/front-desk/register',
+    icon: 'register',
+   
+    shortcut: ['d', 'a', 's', 'h'],
+  },
+  {
+    title: 'Settings',
     url: '/portal/front-desk/settings',
     icon: 'settings',
    

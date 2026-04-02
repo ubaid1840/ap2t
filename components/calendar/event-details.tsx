@@ -33,7 +33,6 @@ const EventDetail = ({
                         Event details
                     </DialogTitle>
                 </DialogHeader>
-
                 <ScrollArea className="h-[70dvh] px-4 py-3">
                     <div className="space-y-3">
                         {events.length === 0 && (
@@ -42,14 +41,14 @@ const EventDetail = ({
                             </div>
                         )}
                         <div className="bg-[#FF69001A] border border-[#FF690033] rounded-[10px] flex gap-2 text-warning-text p-4">
-                                                            <OctagonAlert className="h-5 w-5" />
-                                                            <div className="space-y-1">
-                                                              <h1 className="text-warning-text">Reminder</h1>
-                                                              <p className="text-sm text-[#D1D5DC]">
-                                                                Siblings in session get 10% off.
-                                                              </p>
-                                                            </div>
-                                                          </div>
+                            <OctagonAlert className="h-5 w-5" />
+                            <div className="space-y-1">
+                                <h1 className="text-warning-text">Reminder</h1>
+                                <p className="text-sm text-[#D1D5DC]">
+                                    Siblings in session get 10% off.
+                                </p>
+                            </div>
+                        </div>
 
                         {events.map((event) => (
                             <div
@@ -77,7 +76,7 @@ const EventDetail = ({
                                     </div>
 
                                     <div className="flex flex-col items-start sm:items-end gap-2">
-                                        {event?.promotion&&<span className="text-sm line-through text-muted-foreground">${event?.original_price}</span>}
+                                        {event?.promotion && <span className="text-sm line-through text-muted-foreground">${event?.original_price}</span>}
                                         <div className="p-2 bg-active-bg text-active-text border border-active-text/32 rounded-md">
                                             <p className="text-md font-medium leading-none">${Number(event?.price || 0).toFixed(0)}</p>
                                         </div>
