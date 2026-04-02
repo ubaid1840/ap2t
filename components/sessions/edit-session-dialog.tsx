@@ -1,25 +1,30 @@
 "use client";
+import axios from "@/lib/axios";
+import { zodResolver } from "@hookform/resolvers/zod";
 import {
-  Ban,
   Calendar,
-  Check,
-  CircleAlert,
   DollarSign,
   Eye,
-  Gift,
   Image,
-  Info,
-  Loader2,
   MapPin,
-  Save,
   SquarePen,
   Tag,
-  Trash,
   Trash2,
-  Users,
+  Users
 } from "lucide-react";
+import moment from "moment";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { Controller, useForm } from "react-hook-form";
+import { toast } from "sonner";
+import z from "zod";
+import ConfirmationDialog from "../alert-dialog";
+import AppCalendar from "../app-calendar";
+import SelectSessionType from "../players/select-session-type";
+import { RequiredStar } from "../required-star";
+import { TimePickerFixed } from "../time-picker-fixed";
 import { Button } from "../ui/button";
+import { Checkbox } from "../ui/checkbox";
 import {
   Dialog,
   DialogClose,
@@ -27,19 +32,10 @@ import {
   DialogHeader,
   DialogTitle,
 } from "../ui/dialog";
+import { Field, FieldError } from "../ui/field";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { ScrollArea } from "../ui/scroll-area";
-import { Textarea } from "../ui/textarea";
-import { Card, CardContent } from "../ui/card";
-import axios from "@/lib/axios";
-import { AssignCoachDialog } from "./assign-coach-dialog";
-import { useRouter } from "next/navigation";
-import { toast } from "sonner";
-import AppCalendar from "../app-calendar";
-import { TimePicker } from "../time-picker";
-import { SessionType } from "./create-session-dialog";
-import { Separator } from "../ui/separator";
 import {
   Select,
   SelectContent,
@@ -49,17 +45,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
+import { Separator } from "../ui/separator";
 import { Spinner } from "../ui/spinner";
-import ConfirmationDialog from "../alert-dialog";
-import { TimePickerFixed } from "../time-picker-fixed";
-import SelectSessionType from "../players/select-session-type";
-import { Checkbox } from "../ui/checkbox";
-import z from "zod";
-import { Controller, useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Field, FieldError } from "../ui/field";
-import { RequiredStar } from "../required-star";
-import moment from "moment";
+import { AssignCoachDialog } from "./assign-coach-dialog";
+import { SessionType } from "./create-session-dialog";
 
 type BookedSession = {
   name: string;
@@ -143,6 +132,9 @@ export function EditSessionDialog({
   const [coach_Name, setCoach_name] = useState<string | null>(null);
   const [notAvailableSessions, setNotAvailableSessions] = useState<BookedSession[]>([]);
   const [booked, setBooked] = useState(false);
+    const [coachSchedule,setCoachSchedule]=useState<{string:string}|{}>({})
+    const [blocked,setBlocked]=useState(false)
+    const [blockedHours,setBlockedHours]=useState([])
   const router = useRouter();
 
   function to24Hour(timeStr: string): string {
@@ -162,7 +154,7 @@ export function EditSessionDialog({
         (session) =>
           (session.status === "upcoming" || session.status === "ongoing") &&
           coachId === session.original.coach_id &&
-          session.original.id !== sessionId, // exclude the session being edited
+          session.original.id !== sessionId, 
       )
       .map((session) => {
         const [start_time, end_time] = session.time.split(" - ");
@@ -176,7 +168,7 @@ export function EditSessionDialog({
       });
   }
 
-  const checkAvailability = (
+  const getSessionsConflicts = (
     overrides: { start_time?: string; end_time?: string; date?: Date; end_date?: Date } = {},
   ):BookedSession[] => {
     const selectedDate = overrides.date ?? form.getValues("date");
@@ -215,7 +207,33 @@ export function EditSessionDialog({
     setBooked(conflicts.length > 0);
     return conflicts
   };
-
+  function getBlockedConflict(values: SessionSchemaValues) {
+    console.log(coachSchedule)
+    const conflicts = Object.entries(coachSchedule).filter(
+      ([blockedDateTime, status]) => {
+        if (status !== "blocked") return false;
+  
+        
+        const [blockedDateStr, blockedTimePart] = blockedDateTime.split("_");
+  
+        const selStartStr = moment(values.date).format("YYYY-MM-DD");
+        const selEndStr = moment(values.end_date).format("YYYY-MM-DD");
+  
+        if (blockedDateStr < selStartStr || blockedDateStr > selEndStr) return false;
+  
+        
+        const blockedTime24 = to24Hour(blockedTimePart);
+        const newStart = to24Hour(values.start_time);
+        const newEnd = to24Hour(values.end_time);
+  
+        return blockedTime24 >= newStart && blockedTime24 < newEnd;
+      }
+    );
+  
+    setBlocked(conflicts.length > 0);
+    setBlockedHours(conflicts);
+    return conflicts;
+  }
   const form = useForm<SessionSchemaValues>({
     resolver: zodResolver(sessionSchema),
     defaultValues: {
@@ -246,6 +264,7 @@ export function EditSessionDialog({
   const selectedCoachId = form.watch("coach_id");
 
   useEffect(() => {
+    console.log(sessionData)
     if (open && sessionData) {
       form.reset({
         name: sessionData.name,
@@ -273,6 +292,7 @@ export function EditSessionDialog({
         show_storefront: (sessionData.show_storefront as boolean) ?? false,
       });
       setCoach_name(`${sessionData?.coach_first_name} ${sessionData?.coach_last_name}`)
+      setCoachSchedule(sessionData?.coach_schedule_preference?? {})
     }
   }, [open, sessionData]);
 
@@ -281,17 +301,27 @@ export function EditSessionDialog({
       toast.error("Session ID is required");
       return;
     }
-    const conflicts=checkAvailability({
+    const sessionConflicts=getSessionsConflicts({
       date: values.date,
       end_date: values.end_date,
       start_time: values.start_time,
       end_time: values.end_time,
     });
-    if (conflicts?.length>0) {
-      toast.error("Can't update session because coach is already booked at this time and date");
-      return;
-    }
+
+    const hasSessionConflict = sessionConflicts.length > 0;
     setLoading(true);
+        const blockedConflict = getBlockedConflict(values)
+        const hasBlockedConflict=blockedConflict.length>0
+        if(hasSessionConflict){
+          toast.error("Can't update session because coach is already booked at this time and date")
+          setLoading(false)
+          return
+        }
+        if(hasBlockedConflict){
+          toast.error("Can't update session because coach has blocked his scedule.")
+          setLoading(false)
+          return
+        }
     try {
       await axios.put(`/admin/sessions`, { ...values, id: sessionId });
 
@@ -495,6 +525,7 @@ export function EditSessionDialog({
                             setCoach_name(
                               `${coach.first_name} ${coach.last_name}`,
                             );
+                            setCoachScedule(coach.schedule)
                           }}
                         />
                       )}
@@ -610,6 +641,15 @@ export function EditSessionDialog({
                     {moment(notAvailableSessions[0].end_date).format("YYYY-MM-DD")} at time{" "}
                     {notAvailableSessions[0].start_time} till{" "}
                     {notAvailableSessions[0].end_time}
+                  </p>
+                )}
+                {blocked && blockedHours.length > 0 && (
+                  <p className="text-sm text-red-500">
+                    Coach has blocked their schedule on:{" "}
+                    {blockedHours.map(([blockedDateTime]) => {
+                      const [date, time] = blockedDateTime.split("_");
+                      return `${date} at ${time}`;
+                    }).join(", ")}
                   </p>
                 )}
 
