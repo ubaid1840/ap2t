@@ -60,10 +60,10 @@ export const WeeklySchedule: React.FC<WeeklyScheduleProps> = ({ events, id, pref
       });
 
     // Check if the slot is blocked in local preference
-    const dtISO = cellTime.toISOString();
-    if (localPreference[dtISO] === "blocked") {
-      return { title: "", date: date.format("YYYY-MM-DD"), time, status: "Blocked" };
-    }
+    const key = `${date.format("YYYY-MM-DD")}_${time}`;
+if (localPreference[key] === "blocked") {
+  return { title: "", date: date.format("YYYY-MM-DD"), time, status: "Blocked" };
+}
 
     // Find an event that spans this slot
     const event = events.find(e => {
@@ -97,12 +97,7 @@ export const WeeklySchedule: React.FC<WeeklyScheduleProps> = ({ events, id, pref
   const handleRightClick = (e: React.MouseEvent, date: moment.Moment, time: string, event: any) => {
     e.preventDefault();
 
-    const dateTime = moment(date).set({
-      hour: parseInt(time.split(":")[0]),
-      minute: parseInt(time.split(":")[1] || "0"),
-      second: 0,
-      millisecond: 0,
-    }).toISOString();
+    const dateTime = `${date.format("YYYY-MM-DD")}_${time}`;
 
     const isBlocked = localPreference[dateTime] === "blocked";
     if (event && event.status === "Booked") return
@@ -135,8 +130,6 @@ export const WeeklySchedule: React.FC<WeeklyScheduleProps> = ({ events, id, pref
       id,
       schedule_preference: updated,
     });
-
-    console.log("Updated schedule preference:", updated);
   };
 
   React.useEffect(() => {
@@ -154,9 +147,6 @@ export const WeeklySchedule: React.FC<WeeklyScheduleProps> = ({ events, id, pref
     }
   };
 
-  useEffect(() => {
-    console.log(contextMenu)
-  }, [contextMenu])
   return (
     <div className="flex flex-1 flex-col p-4 gap-4">
       {/* Week navigation */}

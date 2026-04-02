@@ -123,16 +123,16 @@ const Continue = () => {
         </span>
         <span className="h-px flex-1 bg-border" />
       </div>
-      <div className="flex justify-center items-center gap-10">
+      <div className="flex justify-center items-center gap-10 mt-2">
         <button><GradientIcon onClick={() => console.log("google")}>
           <FaGoogle className="text-primary" size={18} />
         </GradientIcon></button>
-        <button><GradientIcon onClick={() => console.log("facebook")}>
+        {/* <button><GradientIcon onClick={() => console.log("facebook")}>
           <FaFacebook className="text-primary" size={18} />
         </GradientIcon></button>
         <button><GradientIcon onClick={() => console.log("apple")}>
           <FaApple className="text-primary" size={18} />
-        </GradientIcon></button>
+        </GradientIcon></button> */}
       </div>
     </>
   )
