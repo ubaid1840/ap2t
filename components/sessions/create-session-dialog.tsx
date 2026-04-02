@@ -285,7 +285,7 @@ return conflicts
 }
 
   const CreateSession = async (values: SessionSchemaValues) => {
-    // setLoading(true);
+    setLoading(true);
     const sessionConflicts=getSessionsConflicts({
       date: values.date,
       end_date: values.end_date,
@@ -306,13 +306,13 @@ return conflicts
       return
     }
     try {
-      // await axios.post("/admin/sessions", {
-      //   ...values,
-      // });
+      await axios.post("/admin/sessions", {
+        ...values,
+      });
 
-      // await onRefresh();
-      // form.reset();
-      // setOpen(false);
+      await onRefresh();
+      form.reset();
+      setOpen(false);
     } finally {
       setLoading(false);
     }
