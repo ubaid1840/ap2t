@@ -1,25 +1,30 @@
 "use client";
+import axios from "@/lib/axios";
+import { zodResolver } from "@hookform/resolvers/zod";
 import {
-  Ban,
   Calendar,
-  Check,
-  CircleAlert,
   DollarSign,
   Eye,
-  Gift,
   Image,
-  Info,
-  Loader2,
   MapPin,
-  Save,
   SquarePen,
   Tag,
-  Trash,
   Trash2,
-  Users,
+  Users
 } from "lucide-react";
+import moment from "moment";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { Controller, useForm } from "react-hook-form";
+import { toast } from "sonner";
+import z from "zod";
+import ConfirmationDialog from "../alert-dialog";
+import AppCalendar from "../app-calendar";
+import SelectSessionType from "../players/select-session-type";
+import { RequiredStar } from "../required-star";
+import { TimePickerFixed } from "../time-picker-fixed";
 import { Button } from "../ui/button";
+import { Checkbox } from "../ui/checkbox";
 import {
   Dialog,
   DialogClose,
@@ -27,19 +32,10 @@ import {
   DialogHeader,
   DialogTitle,
 } from "../ui/dialog";
+import { Field, FieldError } from "../ui/field";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { ScrollArea } from "../ui/scroll-area";
-import { Textarea } from "../ui/textarea";
-import { Card, CardContent } from "../ui/card";
-import axios from "@/lib/axios";
-import { AssignCoachDialog } from "./assign-coach-dialog";
-import { useRouter } from "next/navigation";
-import { toast } from "sonner";
-import AppCalendar from "../app-calendar";
-import { TimePicker } from "../time-picker";
-import { SessionType } from "./create-session-dialog";
-import { Separator } from "../ui/separator";
 import {
   Select,
   SelectContent,
@@ -49,17 +45,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
+import { Separator } from "../ui/separator";
 import { Spinner } from "../ui/spinner";
-import ConfirmationDialog from "../alert-dialog";
-import { TimePickerFixed } from "../time-picker-fixed";
-import SelectSessionType from "../players/select-session-type";
-import { Checkbox } from "../ui/checkbox";
-import z from "zod";
-import { Controller, useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Field, FieldError } from "../ui/field";
-import { RequiredStar } from "../required-star";
-import moment from "moment";
+import { AssignCoachDialog } from "./assign-coach-dialog";
+import { SessionType } from "./create-session-dialog";
 
 type BookedSession = {
   name: string;
@@ -320,7 +309,7 @@ export function EditSessionDialog({
     });
 
     const hasSessionConflict = sessionConflicts.length > 0;
-    // setLoading(true);
+    setLoading(true);
         const blockedConflict = getBlockedConflict(values)
         const hasBlockedConflict=blockedConflict.length>0
         if(hasSessionConflict){
@@ -334,14 +323,14 @@ export function EditSessionDialog({
           return
         }
     try {
-      // await axios.put(`/admin/sessions`, { ...values, id: sessionId });
+      await axios.put(`/admin/sessions`, { ...values, id: sessionId });
 
-      // toast.success("Session updated successfully");
-      // setOpen(false);
+      toast.success("Session updated successfully");
+      setOpen(false);
 
-      // if (onSuccess) {
-      //   onSuccess();
-      // }
+      if (onSuccess) {
+        onSuccess();
+      }
     } finally {
       setLoading(false);
     }
