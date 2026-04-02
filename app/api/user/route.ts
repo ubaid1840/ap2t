@@ -201,6 +201,13 @@ export async function POST(req: NextRequest) {
 
             await pool.query("COMMIT");
 
+            const emaiNotificationData = {
+                email,
+                fullName: `${data?.first_name} ${data?.last_name}`,
+                password
+            }
+            await sendNewJoiningEmail(emaiNotificationData)
+
             return NextResponse.json(
                 { message: "Data saved" },
                 { status: 201 }
@@ -238,12 +245,7 @@ export async function createUserWithFirebase(
 
     try {
         await admin.auth().createUser({ email, password });
-        const emaiNotificationData = {
-            email,
-            fullName: `${rest?.first_name} ${rest?.last_name}`,
-            password
-        }
-        await sendNewJoiningEmail(emaiNotificationData)
+
     } catch (error: any) {
         if (error.code === "auth/email-already-exists") {
             console.warn(`Email ${email} already exists, continuing...`);
@@ -251,6 +253,13 @@ export async function createUserWithFirebase(
             throw error;
         }
     }
+
+    const emaiNotificationData = {
+        email,
+        fullName: `${rest?.first_name} ${rest?.last_name}`,
+        password
+    }
+    await sendNewJoiningEmail(emaiNotificationData)
 
 
     let squareCustomerId: string | null = null;

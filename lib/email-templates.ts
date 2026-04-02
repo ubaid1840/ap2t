@@ -1,13 +1,12 @@
+import pool from "./db";
 import { sendSingleEmail } from "./notification-service";
-
-
 
 export const sendNewJoiningEmail = async ({ email, fullName, password }: { email: string, fullName: string, password: string }): Promise<void> => {
 
   try {
     const subject = "Your Account Has Been Created – Advanced Physical and Technical Training";
 
-  const message = `
+    const message = `
 <!DOCTYPE html>
 <html>
   <head>
@@ -54,56 +53,12 @@ export const sendNewJoiningEmail = async ({ email, fullName, password }: { email
 </html>
 `;
 
-  await sendSingleEmail(message, subject, email);
-  } catch (error : any) {
+    await sendSingleEmail(message, subject, email);
+  } catch (error: any) {
     console.log(error?.message)
   }
 
-  
-};
 
-export const sendWelcomeEmail = async ({ email, fullName }: { email: string, fullName: string }): Promise<void> => {
-  const subject = "Welcome to Advanced Physical and Technical Training 🎉";
-
-  const message = `
-<!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="UTF-8" />
-    <title>Welcome</title>
-  </head>
-  <body style="font-family: Arial, sans-serif; background-color:#f9fafb; padding:20px; color:#111827;">
-    <div style="max-width:600px;margin:0 auto;background:#ffffff;padding:30px;border-radius:8px;">
-      
-      <h2>Welcome to the Team, ${fullName}! 🚀</h2>
-
-      <p style="font-size:16px; line-height:1.6;">
-        We’re excited to have you at 
-        <strong>Advanced Physical and Technical Training</strong>.
-      </p>
-
-      <p style="font-size:16px; line-height:1.6;">
-        Our platform is designed to help you improve performance, track progress, 
-        and get the most out of your training sessions.
-      </p>
-
-      <p style="font-size:16px; line-height:1.6;">
-        Log in anytime to view your schedule, sessions, and updates.
-      </p>
-
-      <p style="margin-top:30px; font-size:16px; font-weight:bold;">
-        Let’s grow stronger together 💪
-      </p>
-
-      <p style="font-size:16px; font-weight:bold;">
-        — Advanced Physical and Technical Training Team
-      </p>
-    </div>
-  </body>
-</html>
-`;
-
-  await sendSingleEmail(message, subject, email);
 };
 
 export const sendPaymentReceiptEmail = async ({
@@ -175,74 +130,7 @@ export const sendPaymentReceiptEmail = async ({
 `;
 
   await sendSingleEmail(message, subject, email);
-};
-
-export const sendAdminNewSignupEmail = async ({
-  adminEmail,
-  fullName,
-  userEmail,
-  role = "User",
-  signupDate,
-}: {
-  adminEmail: string,
-  fullName: string,
-  userEmail: string,
-  role: string,
-  signupDate: string,
-}): Promise<void> => {
-  const subject = "New User Signup – Advanced Physical and Technical Training";
-
-  const message = `
-<!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="UTF-8" />
-    <title>New User Signup</title>
-  </head>
-  <body style="font-family: Arial, sans-serif; background-color:#f9fafb; padding:20px; color:#111827;">
-    <div style="max-width:600px;margin:0 auto;background:#ffffff;padding:30px;border-radius:8px;">
-
-      <h2>New User Joined 🚀</h2>
-
-      <p style="font-size:16px; line-height:1.6;">
-        A new user has successfully signed up on 
-        <strong>Advanced Physical and Technical Training</strong>.
-      </p>
-
-      <table style="width:100%; border-collapse:collapse; margin-top:20px;">
-        <tr>
-          <td style="padding:8px; font-weight:bold;">Full Name</td>
-          <td style="padding:8px;">${fullName}</td>
-        </tr>
-        <tr>
-          <td style="padding:8px; font-weight:bold;">Email</td>
-          <td style="padding:8px;">${userEmail}</td>
-        </tr>
-        <tr>
-          <td style="padding:8px; font-weight:bold;">Role</td>
-          <td style="padding:8px;">${role}</td>
-        </tr>
-        <tr>
-          <td style="padding:8px; font-weight:bold;">Signup Date</td>
-          <td style="padding:8px;">${signupDate}</td>
-        </tr>
-      </table>
-
-      <p style="margin-top:24px; font-size:16px;">
-        You may review this user, assign sessions, or take any required action from the admin panel.
-      </p>
-
-      <p style="margin-top:30px; font-size:16px; font-weight:bold;">
-        — System Notification<br/>
-        Advanced Physical and Technical Training
-      </p>
-
-    </div>
-  </body>
-</html>
-`;
-
-  await sendSingleEmail(message, subject, adminEmail);
+ 
 };
 
 export const sendAdminPaymentNotificationEmail = async ({
@@ -332,6 +220,83 @@ export const sendAdminPaymentNotificationEmail = async ({
   await sendSingleEmail(message, subject, adminEmail);
 };
 
+export const sendAdminNewSignupEmail = async ({
+  
+  fullName,
+  userEmail,
+  role = "User",
+  signupDate,
+}: {
+ 
+  fullName: string,
+  userEmail: string,
+  role: string,
+  signupDate: string,
+}): Promise<void> => {
+  const subject = "New User Signup – Advanced Physical and Technical Training";
+
+  const message = `
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>New User Signup</title>
+  </head>
+  <body style="font-family: Arial, sans-serif; background-color:#f9fafb; padding:20px; color:#111827;">
+    <div style="max-width:600px;margin:0 auto;background:#ffffff;padding:30px;border-radius:8px;">
+
+      <h2>New User Joined 🚀</h2>
+
+      <p style="font-size:16px; line-height:1.6;">
+        A new user has successfully signed up on 
+        <strong>Advanced Physical and Technical Training</strong>.
+      </p>
+
+      <table style="width:100%; border-collapse:collapse; margin-top:20px;">
+        <tr>
+          <td style="padding:8px; font-weight:bold;">Full Name</td>
+          <td style="padding:8px;">${fullName}</td>
+        </tr>
+        <tr>
+          <td style="padding:8px; font-weight:bold;">Email</td>
+          <td style="padding:8px;">${userEmail}</td>
+        </tr>
+        <tr>
+          <td style="padding:8px; font-weight:bold;">Role</td>
+          <td style="padding:8px;">${role}</td>
+        </tr>
+        <tr>
+          <td style="padding:8px; font-weight:bold;">Signup Date</td>
+          <td style="padding:8px;">${signupDate}</td>
+        </tr>
+      </table>
+
+      <p style="margin-top:24px; font-size:16px;">
+        You may review this user, assign sessions, or take any required action from the admin panel.
+      </p>
+
+      <p style="margin-top:30px; font-size:16px; font-weight:bold;">
+        — System Notification<br/>
+        Advanced Physical and Technical Training
+      </p>
+
+    </div>
+  </body>
+</html>
+`;
+
+  const admins = await pool.query(`SELECT email FROM users WHERE role = 'admin'`)
+
+  const allAdmins = admins.rows
+
+  await Promise.all(
+    allAdmins.map(admin =>
+      sendSingleEmail(message, subject, admin.email).catch(err => console.log(err))
+    )
+  );
+
+
+};
 
 
 export const sendAdminSessionEnrollmentEmail = async ({
@@ -414,3 +379,9 @@ export const sendAdminSessionEnrollmentEmail = async ({
 
   await sendSingleEmail(message, subject, adminEmail);
 };
+
+
+// new function to send email to coach for new session
+// payment email to admin and player on kioskik side
+// user signup email to admin to be checked
+// session enrollments to both admin and coach of that session

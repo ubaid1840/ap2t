@@ -1,5 +1,6 @@
 import pool from "@/lib/db";
 import { GetProfileImage, joinNames } from "@/lib/functions";
+import { sendPaymentReciept } from "@/lib/notification-service";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET() {
@@ -96,6 +97,8 @@ export async function PUT(req: NextRequest) {
       `;
 
         await pool.query(query, values);
+
+        await sendPaymentReciept(data)
 
 
         return NextResponse.json({ message: "Updated successfully" }, { status: 200 });

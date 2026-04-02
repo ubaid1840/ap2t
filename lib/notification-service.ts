@@ -1,6 +1,7 @@
 import nodemailer from 'nodemailer';
 import SMTPConnection from 'nodemailer/lib/smtp-connection';
 import pool from './db';
+import { sendAdminPaymentNotificationEmail, sendPaymentReceiptEmail } from './email-templates';
 
 
 const twilioClient = require('twilio')(process.env.TWILIO_SID, process.env.TWILIO_TOKEN);
@@ -19,6 +20,7 @@ const transporter = nodemailer.createTransport({
 
 
 export const sendSingleEmail = async (message: string, subject: string, email: string) => {
+
   try {
 
     if (email) {
@@ -31,24 +33,23 @@ export const sendSingleEmail = async (message: string, subject: string, email: s
       });
 
       console.log(`Email sent successfully to ${email}`);
-    } else {
-      throw new Error(`email missing`);
     }
+
   } catch (error: any) {
     throw new Error(error?.message || "Error sending email");
   }
 };
 
-export const sendSignupEmail = async (email: string , password : string) => {
+export const sendSignupEmail = async (email: string, password: string) => {
 
-  if(!email || !password) return
+  if (!email || !password) return
 
   const subject = ""
   const htmlMessage = ""
 
   try {
     await sendSingleEmail(htmlMessage, subject, email)
-  } catch (error : any) {
+  } catch (error: any) {
     throw new Error(error?.message);
   }
 };
@@ -59,7 +60,7 @@ export const sendSingleSMS = async (message: string, id: string | number) => {
     const usersQuery = await pool.query('SELECT phone_no FROM users WHERE id = $1 LIMIT 1', [id]);
     const user = usersQuery.rows[0];
 
-    if (user?.phone) {
+    if (user?.phone_no) {
       const response = await twilioClient.messages.create({
         body: message,
         from: process.env.TWILIO_PHONE_NUMBER,
@@ -72,6 +73,92 @@ export const sendSingleSMS = async (message: string, id: string | number) => {
     }
   } catch (error) {
     console.log('Error in sending sms:', error);
+  }
+};
+
+export const sendPaymentReciept = async (data: any) => {
+  if (!data?.id) return;
+
+  try {
+
+    const paymentRes = await pool.query(
+      `SELECT * FROM payments WHERE id = $1`,
+      [data.id]
+    );
+    const payment = paymentRes.rows?.[0];
+    if (!payment) return;
+
+    const { paid_by: userId, session_id, amount, paid_at: payment_date } = payment;
+
+    if (!userId) return
+
+
+    const userRes = await pool.query(
+      `SELECT first_name, last_name, email FROM users WHERE id = $1`,
+      [userId]
+    );
+    const user = userRes.rows?.[0];
+    if (!user) return;
+
+    const { first_name, last_name, email } = user;
+    const fullName = `${first_name} ${last_name}`
+
+
+    const sessionRes = await pool.query(
+      `SELECT name FROM sessions WHERE id = $1`,
+      [session_id]
+    );
+    const session = sessionRes.rows?.[0];
+    const sessionName = session?.name || "N/A";
+
+
+    const paymentDate = new Date(payment_date).toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    });
+
+
+    const emailData = {
+      email,
+      fullName,
+      amount,
+      paymentId: payment.id,
+      sessionName,
+      paymentDate,
+    };
+
+
+
+
+    await sendPaymentReceiptEmail(emailData);
+
+    const admins = await pool.query(`SELECT email FROM users WHERE role = 'admin'`)
+
+    const allAdmins = admins.rows
+
+    await Promise.all(
+      allAdmins.map((admin) => {
+        const adminEmailData = {
+          adminEmail: admin.email,
+          fullName,
+          userEmail: email,
+          amount,
+          paymentId: payment.id,
+          sessionName,
+          paymentMethod: payment.method,
+          paymentDate,
+        };
+
+        return sendAdminPaymentNotificationEmail(adminEmailData).catch((err) => {
+          console.log(`Failed to send to ${admin.email}:`, err);
+        });
+      })
+    );
+
+    console.log(`Payment receipt sent to ${email}`);
+  } catch (error: any) {
+    console.error("Error sending payment receipt:", error.message || error);
   }
 };
 

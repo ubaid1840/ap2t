@@ -62,9 +62,9 @@ export function CreatePlayer({
   parent_id = null,
   onRefresh = async () => {},
 }: CreatePlayerProps) {
+  
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
-
   const form = useForm<PlayerFormValues>({
     resolver: zodResolver(playerSchema),
     defaultValues: {

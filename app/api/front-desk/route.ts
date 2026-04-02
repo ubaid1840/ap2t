@@ -1,4 +1,5 @@
 import pool from "@/lib/db";
+import { sendPaymentReciept } from "@/lib/notification-service";
 import { TriggerFirebaseApprovals } from "@/lib/triggerFirebase";
 import moment from "moment";
 import { NextRequest, NextResponse } from "next/server";
@@ -250,15 +251,17 @@ export async function PUT(req: NextRequest) {
         }
       }
 
-      console.log(type)
       if (type === "cash") {
-        console.log("called")
-        await pool.query(`
+      const ret =  await pool.query(`
           UPDATE payments
           SET method = 'Cash', status = 'paid', paid_at = $1, paid_by = $2, transaction_id = $3
-          WHERE user_id = $4 AND session_id = $5
+          WHERE user_id = $4 AND session_id = $5 RETURNING *
         `, [new Date(), updatingRow?.user_id, moment().valueOf().toString(), updatingRow?.user_id, updatingRow?.session_id])
+
+         await sendPaymentReciept(ret.rows[0])
       }
+
+
 
       await TriggerFirebaseApprovals("user")
       await TriggerFirebaseApprovals("admin")
@@ -279,3 +282,5 @@ export async function PUT(req: NextRequest) {
     );
   }
 }
+
+export const revalidate = 0
