@@ -230,3 +230,4 @@ export async function POST(
     client.release();
   }
 }
+export const revalidate = 0

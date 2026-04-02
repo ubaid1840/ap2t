@@ -30,3 +30,4 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
         );
     }
 }
+export const revalidate = 0

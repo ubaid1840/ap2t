@@ -27,3 +27,4 @@ WHERE u.role = 'coach';`,
     );
   }
 }
+export const revalidate = 0

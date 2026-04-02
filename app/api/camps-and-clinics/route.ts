@@ -40,3 +40,4 @@ const sessionsWithCounts = result.rows.map((r: any) => ({
         return NextResponse.json({ message: error?.message || "Server errror" }, { status: 500 })
     }
 }
+export const revalidate = 0

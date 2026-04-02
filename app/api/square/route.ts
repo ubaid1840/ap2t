@@ -50,3 +50,4 @@ export async function GET() {
         return NextResponse.json({ message: error?.message || "Internal Server Error" }, { status: 500 });
     }
 }
+export const revalidate = 0

@@ -38,3 +38,4 @@ WHERE u.email = $1;`, [email])
         return NextResponse.json({ message: error?.message }, { status: 500 })
     }
 }
+export const revalidate = 0

@@ -64,3 +64,4 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ message: error?.message || "Error sending email" }, { status: 500 })
     }
 }
+export const revalidate = 0

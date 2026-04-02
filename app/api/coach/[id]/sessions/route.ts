@@ -57,3 +57,4 @@ WHERE s.coach_id = $1
     );
   }
 }
+export const revalidate = 0

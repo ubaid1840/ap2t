@@ -27,3 +27,4 @@ ORDER BY s.created_at DESC
     }
 
 }
+export const revalidate = 0

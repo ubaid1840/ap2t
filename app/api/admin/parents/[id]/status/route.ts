@@ -33,3 +33,4 @@ export async function PATCH(
     )
   }
 }
+export const revalidate = 0

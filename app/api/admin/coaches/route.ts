@@ -139,3 +139,4 @@ GROUP BY c.id, u.id;
     );
   }
 }
+export const revalidate = 0
