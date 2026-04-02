@@ -1,10 +1,13 @@
 "use client";
 
-import moment, { Moment } from "moment";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight } from "lucide-react";
-import { Dialog } from "../ui/dialog";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { DialogTrigger } from "@radix-ui/react-dialog";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import moment, { Moment } from "moment";
+import { Dialog } from "../ui/dialog";
+import { ScrollArea, ScrollBar } from "../ui/scroll-area";
+import { useSidebar } from "../ui/sidebar";
 import ShowCalenderSessionDialog from "./show-calender-session-dialog";
 
 type SessionProps = {
@@ -12,7 +15,7 @@ type SessionProps = {
   sessionName: string;
   type: string;
   date: string;
-  end_date:string;
+  end_date: string;
   time: string;
   coachName: string;
   price: string | number;
@@ -30,30 +33,32 @@ export default function SessionSheetCalendar({
   currentMonth,
   setCurrentMonth,
 }: Props) {
-  // const startOfWeek = currentMonth.clone().startOf("week");
 
-const days: Moment[] = [];
-const today = moment(); // current date
+  const { open } = useSidebar()
+  const isMobile = useIsMobile()
 
-for (let i = 0; i < 7; i++) {
-  days.push(today.clone().add(i, "day"));
-}
+  const startOfWeek = currentMonth.clone().startOf("isoWeek");
+
+  const days: Moment[] = [];
+  for (let i = 0; i < 7; i++) {
+    days.push(startOfWeek.clone().add(i, "day"));
+  }
 
   const coaches = [...new Set(sessions.map((s) => s.coachName))];
 
-  const timeSlots: { label: string; start_hour: number ;end_hour:number}[] = [];
+  const timeSlots: { label: string; start_hour: number; end_hour: number }[] = [];
   for (let i = 8; i <= 19; i++) {
     timeSlots.push({
-      label: `${moment({ hour: i }).format("hA")}-${moment({ hour: i+1 }).format("hA")}`,
+      label: `${moment({ hour: i }).format("hA")}-${moment({ hour: i + 1 }).format("hA")}`,
       start_hour: i,
-      end_hour:i+1,
+      end_hour: i + 1,
     });
   }
   const parseHour = (timeStr: string): number => {
     return moment(timeStr.trim(), ["hh:mm A", "h:mm A", "HH:mm"]).hour();
   };
 
-  const getSession = (day: Moment, coach: string, startHour: number,endHour:number) => {
+  const getSession = (day: Moment, coach: string, startHour: number, endHour: number) => {
     return sessions.find((s) => {
       const sessionStartDay = moment(s.date).startOf("day");
       const sessionEndDay = moment(s.end_date).startOf("day");
@@ -74,14 +79,16 @@ for (let i = 0; i < 7; i++) {
     setCurrentMonth(currentMonth.clone().subtract(1, "week"));
 
   return (
-    <div className="flex flex-col gap-6">
-      <div className="flex items-center justify-between">
+    <div className="flex flex-col gap-4">
+
+
+      <div className="flex items-center justify-between bg-[#1A1A1A] border border-border rounded-xl px-4 py-3 shadow-sm">
         <Button variant="outline" size="icon" onClick={prevWeek}>
           <ChevronLeft size={18} />
         </Button>
 
-        <div className="font-semibold text-lg">
-          {days[0].format("MMM D")} - {days[6].format("MMM D")}
+        <div className="font-semibold text-base md:text-lg tracking-tight">
+          {days[0].format("MMM D")} — {days[6].format("MMM D")}
         </div>
 
         <Button variant="outline" size="icon" onClick={nextWeek}>
@@ -89,23 +96,39 @@ for (let i = 0; i < 7; i++) {
         </Button>
       </div>
 
+
       {days.map((day) => (
-        <div key={day.format()} className="border border-border rounded">
-          <div className="bg-primary text-black font-semibold px-3 py-2">
-            {day.format("MMM D dddd")}
+        <div
+          key={day.format()}
+          className="rounded-xl border border-border bg-[#1A1A1A] shadow-sm overflow-hidden"
+        >
+
+
+          <div className="px-4 py-3 border-b border-border flex items-center justify-between">
+            <div className="font-medium text-sm md:text-base">
+              {day.format("dddd")}
+            </div>
+            <div className="text-xs text-muted-foreground">
+              {day.format("MMM D")}
+            </div>
           </div>
 
-          <div className="overflow-auto">
-            <table className="w-full border-collapse text-sm">
-              <thead>
+
+          <ScrollArea className={`overflow-x-auto ${open ? "w-[calc(100dvw-306px)]" : "w-[calc(100dvw)]"} ${isMobile && "w-[calc(100vw-44px)]"}`}>
+            <table className="w-full text-sm border-separate border-spacing-0">
+
+
+              <thead className="sticky top-0 z-20 bg-[#111]">
                 <tr>
-                  <th className="border p-2 w-24 bg-primary text-black">
+
+                  <th className="sticky left-0 z-30 bg-[#111] p-3 text-left text-xs font-medium text-muted-foreground w-24 border-r border-border">
                     Time
                   </th>
+
                   {coaches.map((coach) => (
                     <th
                       key={coach}
-                      className="border p-2 bg-primary text-black min-w-[100px] max-w-[100px]"
+                      className="p-3 text-left text-xs font-medium text-muted-foreground min-w-[200px]"
                     >
                       {coach}
                     </th>
@@ -113,31 +136,51 @@ for (let i = 0; i < 7; i++) {
                 </tr>
               </thead>
 
+
               <tbody>
-                {timeSlots.map((slot) => (
-                  <tr key={slot.start_hour}>
-                    <td className="border p-2 bg-primary/20 font-medium whitespace-nowrap">
+                {timeSlots.map((slot, i) => (
+                  <tr
+                    key={slot.start_hour}
+                    className={i % 2 === 0 ? "bg-[#181818]" : ""}
+                  >
+
+                    <td className="sticky left-0 z-10 bg-[#111] p-3 text-xs font-medium text-muted-foreground whitespace-nowrap border-r border-border">
                       {slot.label}
                     </td>
 
                     {coaches.map((coach) => {
-                      const session = getSession(day, coach, slot.start_hour,slot.end_hour);
+                      const session = getSession(
+                        day,
+                        coach,
+                        slot.start_hour,
+                        slot.end_hour
+                      );
 
                       if (!session) {
-                        return <td key={coach} className="border h-10" />;
+                        return (
+                          <td key={coach} className="p-2">
+                            <div className="h-9 rounded-md border border-dashed border-border opacity-40" />
+                          </td>
+                        );
                       }
 
                       return (
-                        <td key={coach} className="border h-10">
+                        <td key={coach} className="p-2">
                           <Dialog>
                             <DialogTrigger asChild>
-                          <div className="bg-red-500 text-white text-xs p-1 rounded h-full min-h-[2.5rem] cursor-pointer">
-                           {session.sessionName}
-                          </div>
+                              <div className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 transition-all text-white text-xs px-2 py-1.5 rounded-md cursor-pointer shadow-sm hover:shadow-md h-full flex items-center">
+                                {session.sessionName}
+                              </div>
                             </DialogTrigger>
-                            <ShowCalenderSessionDialog session={session.sessionName} coach={coach} time={session.time} start={session.date} end={session.end_date}/>
-                          </Dialog>
 
+                            <ShowCalenderSessionDialog
+                              session={session.sessionName}
+                              coach={coach}
+                              time={session.time}
+                              start={session.date}
+                              end={session.end_date}
+                            />
+                          </Dialog>
                         </td>
                       );
                     })}
@@ -145,7 +188,8 @@ for (let i = 0; i < 7; i++) {
                 ))}
               </tbody>
             </table>
-          </div>
+            <ScrollBar orientation="horizontal" />
+          </ScrollArea>
         </div>
       ))}
     </div>

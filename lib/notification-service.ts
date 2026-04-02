@@ -39,6 +39,19 @@ export const sendSingleEmail = async (message: string, subject: string, email: s
   }
 };
 
+export const sendSignupEmail = async (email: string , password : string) => {
+
+  if(!email || !password) return
+
+  const subject = ""
+  const htmlMessage = ""
+
+  try {
+    await sendSingleEmail(htmlMessage, subject, email)
+  } catch (error : any) {
+    throw new Error(error?.message);
+  }
+};
 
 
 export const sendSingleSMS = async (message: string, id: string | number) => {

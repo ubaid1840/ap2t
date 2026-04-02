@@ -2,6 +2,7 @@ import pool from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
 import admin from "@/lib/firebase-admin";
 import { getSquareClient } from "@/lib/square";
+import { sendNewJoiningEmail } from "@/lib/email-templates";
 
 export async function PUT(req: NextRequest) {
     try {
@@ -61,14 +62,14 @@ export async function POST(req: NextRequest) {
                         `INSERT INTO parents (user_id) VALUES ($1)`,
                         [parent_id]
                     );
-                    try{
-                    await pool.query(
-                        `INSERT INTO settings (user_id) VALUES ($1)`,
-                        [parent_id]
-                    );
-                }catch(error){
-                    console.log("error creating parent's setting",error)
-                }
+                    try {
+                        await pool.query(
+                            `INSERT INTO settings (user_id) VALUES ($1)`,
+                            [parent_id]
+                        );
+                    } catch (error) {
+                        console.log("error creating parent's setting", error)
+                    }
                 }
 
                 const player_id = await createUserWithFirebase(pool, admin, player);
@@ -79,14 +80,14 @@ export async function POST(req: NextRequest) {
                     [player_id, parent_id]
                 );
 
-                try{
+                try {
 
                     await pool.query(
                         `INSERT INTO settings (user_id) VALUES ($1)`,
                         [player_id]
                     );
-                }catch(error){
-                    console.log("error creating player's setting",error)
+                } catch (error) {
+                    console.log("error creating player's setting", error)
                 }
 
                 await pool.query("COMMIT");
@@ -142,14 +143,14 @@ export async function POST(req: NextRequest) {
                     `INSERT INTO parents (user_id) VALUES ($1)`,
                     [user.id]
                 );
-                try{
+                try {
 
                     await pool.query(
                         `INSERT INTO settings (user_id) VALUES ($1)`,
                         [user.id]
                     );
-                }catch(error){
-                    console.log("error creating player's setting",error)
+                } catch (error) {
+                    console.log("error creating player's setting", error)
                 }
             } else if (role === 'player') {
                 await pool.query(
@@ -167,14 +168,14 @@ export async function POST(req: NextRequest) {
                         parent_id
                     ]
                 )
-                try{
+                try {
 
                     await pool.query(
                         `INSERT INTO settings (user_id) VALUES ($1)`,
                         [user.id]
                     );
-                }catch(error){
-                    console.log("error creating player's setting",error)
+                } catch (error) {
+                    console.log("error creating player's setting", error)
                 }
             } else if (role === 'coach') {
                 await pool.query(
@@ -187,14 +188,14 @@ export async function POST(req: NextRequest) {
                     [user.id, bio, 5, career_start],
                 );
 
-                try{
+                try {
 
                     await pool.query(
                         `INSERT INTO settings (user_id) VALUES ($1)`,
                         [user.id]
                     );
-                }catch(error){
-                    console.log("error creating player's setting",error)
+                } catch (error) {
+                    console.log("error creating player's setting", error)
                 }
             }
 
@@ -208,7 +209,7 @@ export async function POST(req: NextRequest) {
 
     } catch (error: any) {
         await pool.query("ROLLBACK");
-        console.log("POST /api/parent error:", error);
+        console.log("POST /api/user error:", error);
         return NextResponse.json(
             { message: error?.message || "Server error" },
             { status: 500 }
@@ -220,7 +221,7 @@ export async function POST(req: NextRequest) {
 export async function createUserWithFirebase(
     pool: any,
     admin: any,
-    data: any
+    data: any,
 ) {
     const { password, email, card_token, cardholder_name, ...rest } = data;
 
@@ -237,6 +238,12 @@ export async function createUserWithFirebase(
 
     try {
         await admin.auth().createUser({ email, password });
+        const emaiNotificationData = {
+            email,
+            fullName: `${rest?.first_name} ${rest?.last_name}`,
+            password
+        }
+        await sendNewJoiningEmail(emaiNotificationData)
     } catch (error: any) {
         if (error.code === "auth/email-already-exists") {
             console.warn(`Email ${email} already exists, continuing...`);
@@ -249,28 +256,28 @@ export async function createUserWithFirebase(
     let squareCustomerId: string | null = null;
     let squareCardId: string | null = null;
 
-      const squareClient = await getSquareClient();
+    const squareClient = await getSquareClient();
 
     if (card_token) {
         try {
-            
+
             const customerRes = await squareClient.customers.create({
                 givenName: rest.first_name,
                 familyName: rest.last_name,
                 emailAddress: email,
                 phoneNumber: rest.phone_no ?? "",
                 idempotencyKey: crypto.randomUUID(),
-            }) 
+            })
 
             squareCustomerId = customerRes.customer?.id ?? null
             if (!squareCustomerId) throw new Error("Failed to create Square customer")
 
             const cardRes = await squareClient.cards.create({
                 idempotencyKey: crypto.randomUUID(),
-                sourceId: card_token,        
+                sourceId: card_token,
                 card: {
                     customerId: squareCustomerId,
-                    cardholderName: cardholder_name, 
+                    cardholderName: cardholder_name,
                 },
             })
 
@@ -279,7 +286,7 @@ export async function createUserWithFirebase(
 
         } catch (error: any) {
             throw new Error("Payment setup failed: " + error.message)
-           
+
         }
     }
 

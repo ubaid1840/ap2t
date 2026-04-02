@@ -2,8 +2,8 @@
 import PageTable from "@/components/app-table";
 import InputWithIcon from "@/components/input-with-icon";
 import { CreateSessionDialog } from "@/components/sessions/create-session-dialog";
-import SessionCalendar from "@/components/calendar/session-calendar";
 import { SESSION_COLUMNS } from "@/components/sessions/session-column";
+import SessionSheetCalendar from "@/components/sessions/session-sheet-calender";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -14,7 +14,6 @@ import { joinNames } from "@/lib/functions";
 import { Calendar, Filter, List } from "lucide-react";
 import moment, { Moment } from "moment";
 import { ReactNode, useEffect, useState } from "react";
-import SessionSheetCalendar from "@/components/sessions/session-sheet-calender";
 
 export type SessionProps = {
   id: number,
@@ -22,11 +21,11 @@ export type SessionProps = {
   type: string,
   date: string,
   time: string,
-  end_date:string,
+  end_date: string,
   coachName: string,
   price: string | number,
   status: string
-  original:any
+  original: any
 }
 
 export default function Page() {
@@ -35,7 +34,7 @@ export default function Page() {
   const [sessions, setSessions] = useState<SessionProps[]>([]);
   const [search, setSearch] = useState({ main: "", coach: "", type: "" })
   const [loading, setLoading] = useState(true);
-   const [currentMonth, setCurrentMonth] = useState<Moment>(moment())
+  const [currentMonth, setCurrentMonth] = useState<Moment>(moment())
   const { user } = useAuth()
 
   useEffect(() => {
@@ -56,10 +55,10 @@ export default function Page() {
           coachName: joinNames([s.coach_first_name, s.coach_last_name]),
           price: s.price,
           status: s?.status || 'upcoming',
-            end_date : s?.end_date ? moment(new Date(s.end_date)).format("YYYY-MM-DD") : null,
-            original:s
+          end_date: s?.end_date ? moment(new Date(s.end_date)).format("YYYY-MM-DD") : null,
+          original: s
         }));
-        setSessions(mappedSessions); 
+        setSessions(mappedSessions);
       }
     } catch (error) {
       console.error("Error fetching sessions", error);
@@ -73,27 +72,27 @@ export default function Page() {
   }
 
   const filteredData = sessions.filter((item) => {
-  const sessionText = item?.sessionName?.toLowerCase() ?? "";
-  const coachText = item?.coachName?.toLowerCase() ?? "";
-  const typeText = item?.type?.toLowerCase() ?? "";
-  const sessionWords = search.main?.toLowerCase().trim().split(/\s+/).filter(Boolean) || [];
-  const coachWords = search.coach?.toLowerCase().trim().split(/\s+/).filter(Boolean) || [];
-  const typeWords = search.type?.toLowerCase().trim().split(/\s+/).filter(Boolean) || [];
+    const sessionText = item?.sessionName?.toLowerCase() ?? "";
+    const coachText = item?.coachName?.toLowerCase() ?? "";
+    const typeText = item?.type?.toLowerCase() ?? "";
+    const sessionWords = search.main?.toLowerCase().trim().split(/\s+/).filter(Boolean) || [];
+    const coachWords = search.coach?.toLowerCase().trim().split(/\s+/).filter(Boolean) || [];
+    const typeWords = search.type?.toLowerCase().trim().split(/\s+/).filter(Boolean) || [];
 
-  const matchesSession =
-    !sessionWords.length ||
-    sessionWords.every((word) => sessionText.includes(word));
+    const matchesSession =
+      !sessionWords.length ||
+      sessionWords.every((word) => sessionText.includes(word));
 
-  const matchesCoach =
-    !coachWords.length ||
-    coachWords.every((word) => coachText.includes(word));
+    const matchesCoach =
+      !coachWords.length ||
+      coachWords.every((word) => coachText.includes(word));
 
-  const matchesType =
-    !typeWords.length ||
-    typeWords.every((word) => typeText.includes(word));
+    const matchesType =
+      !typeWords.length ||
+      typeWords.every((word) => typeText.includes(word));
 
-  return matchesSession && matchesCoach && matchesType;
-});
+    return matchesSession && matchesCoach && matchesType;
+  });
 
 
   return (
@@ -121,8 +120,8 @@ export default function Page() {
             </div>
             <CreateSessionDialog onRefresh={async () => {
               await fetchData()
-            }} 
-            all_sessions={sessions}/>
+            }}
+              all_sessions={sessions} />
           </div>
         </div>
       </Header>
@@ -133,11 +132,12 @@ export default function Page() {
             <InputWithIcon value={search.main} onChange={(e) => handleChangeSearch("main", e.target.value)} placeholder="Search by session..." />
           </div>
 
-          <Button onClick={() => setFilter(!filter)}>
+          {tab === 'table' && <Button onClick={() => setFilter(!filter)}>
             <Filter /> Filters
           </Button>
+          }
         </div>
-        {filter && (
+        {filter && tab === 'table' && (
           <div className="flex flex-col w-full gap-4">
             <Separator />
             <div className="flex flex-col sm:flex-row w-full gap-4">
@@ -177,7 +177,7 @@ export default function Page() {
           onRowClick={() => { }}
         />
       )}
-      {tab === "calendar" && <SessionSheetCalendar sessions={sessions} currentMonth={currentMonth} setCurrentMonth={setCurrentMonth}/>}
+      {tab === "calendar" && <SessionSheetCalendar sessions={sessions} currentMonth={currentMonth} setCurrentMonth={setCurrentMonth} />}
 
 
     </div>

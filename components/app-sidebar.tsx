@@ -128,20 +128,7 @@ export default function AppSidebar() {
         <SidebarFooter className="border-t py-5">
           <SidebarMenu>
             <SidebarMenuItem>
-              <div className="flex flex-col gap-1 w-full bg-primary rounded-xl p-4">
-                <p className="text-xs text-[#282828]">Need Help?</p>
-                <p className="text-md text-[#282828]">Contact Support</p>
-                <Dialog>
-                  <DialogTrigger asChild>
-
-                    <Button className="bg-black text-primary rounded-xl">
-                      Get Support
-
-                    </Button>
-                  </DialogTrigger>
-                  <GetSupportDialog />
-                </Dialog>
-              </div>
+              <GetSupportDialog email={user?.email} />
             </SidebarMenuItem>
           </SidebarMenu>
         </SidebarFooter>

@@ -2,8 +2,10 @@ import { sendSingleEmail } from "./notification-service";
 
 
 
-export const sendNewJoiningEmail = async ({ email, fullName }: { email: string, fullName: string }): Promise<void> => {
-  const subject = "Your Account Has Been Created – Advanced Physical and Technical Training";
+export const sendNewJoiningEmail = async ({ email, fullName, password }: { email: string, fullName: string, password: string }): Promise<void> => {
+
+  try {
+    const subject = "Your Account Has Been Created – Advanced Physical and Technical Training";
 
   const message = `
 <!DOCTYPE html>
@@ -26,6 +28,20 @@ export const sendNewJoiningEmail = async ({ email, fullName }: { email: string, 
         You can now log in, manage your sessions, and access all features available to you.
       </p>
 
+       <div style="margin-top:20px; padding:16px; background:#f3f4f6; border-radius:6px;">
+  <p style="margin:0 0 10px 0; font-size:15px; font-weight:bold;">
+    Login Credentials
+  </p>
+
+  <p style="margin:4px 0; font-size:14px;">
+    <strong>Email:</strong> ${email}
+  </p>
+
+  <p style="margin:4px 0; font-size:14px;">
+    <strong>Password:</strong> ${password}
+  </p>
+</div>
+
       <p style="margin-top:24px; font-size:16px;">
         If you have any questions, feel free to reach out to our support team.
       </p>
@@ -39,6 +55,11 @@ export const sendNewJoiningEmail = async ({ email, fullName }: { email: string, 
 `;
 
   await sendSingleEmail(message, subject, email);
+  } catch (error : any) {
+    console.log(error?.message)
+  }
+
+  
 };
 
 export const sendWelcomeEmail = async ({ email, fullName }: { email: string, fullName: string }): Promise<void> => {
@@ -99,7 +120,7 @@ export const sendPaymentReceiptEmail = async ({
   paymentId: string,
   sessionName: string,
   paymentDate: string,
-}) : Promise<void> => {
+}): Promise<void> => {
   const subject = "Payment Receipt – Advanced Physical and Technical Training";
 
   const message = `
@@ -168,7 +189,7 @@ export const sendAdminNewSignupEmail = async ({
   userEmail: string,
   role: string,
   signupDate: string,
-}) : Promise<void> => {
+}): Promise<void> => {
   const subject = "New User Signup – Advanced Physical and Technical Training";
 
   const message = `
@@ -243,7 +264,7 @@ export const sendAdminPaymentNotificationEmail = async ({
   paymentMethod: string,
   paymentDate: string,
 
-}) : Promise<void> => {
+}): Promise<void> => {
   const subject = "New Payment Received – Advanced Physical and Technical Training";
 
   const message = `

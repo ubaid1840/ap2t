@@ -46,7 +46,7 @@ const playerSchema = z.object({
   location: z.string().min(2, "Location required"),
 
   dob: z.date({
-    required_error: "Date of birth is required",
+    error: "Date of birth is required",
   }),
 
   position: z.string().min(1, "Select a position"),
