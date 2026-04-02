@@ -107,6 +107,7 @@ export default function SessionMainPage({ id, back, back_title, admin = false }:
           end_date:moment(new Date(d.end_date)).format("YYYY-MM-DD"),
           time: `${d.start_time} - ${d.end_time}`,
           coachName: joinNames([d.coach_first_name, d.coach_last_name]),
+          scehedule_preferences:d.coach.schedule_preference,
           status: d.status,
           price: d.price,
           promotion_price: d.promotion_price,

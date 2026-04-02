@@ -259,29 +259,31 @@ const getSessionsConflicts = (
 
   return sessionConflicts;
 };
-function getBlockedConflict(values:SessionSchemaValues){
-  const conflicts=Object.entries(coachScedule).filter(
-  ([blockedDateTime, status]) => {
-    if (status !== "blocked") return false;
-    const blockedDate = moment(blockedDateTime); 
-    const blockedDateStr = blockedDate.format("YYYY-MM-DD"); 
+function getBlockedConflict(values: SessionSchemaValues) {
+  const conflicts = Object.entries(coachScedule).filter(
+    ([blockedDateTime, status]) => {
+      if (status !== "blocked") return false;
 
-    const selStartStr = moment(values.date).format("YYYY-MM-DD");
-    const selEndStr = moment(values.end_date).format("YYYY-MM-DD");
+      
+      const [blockedDateStr, blockedTimePart] = blockedDateTime.split("_");
 
-    if (blockedDateStr < selStartStr || blockedDateStr > selEndStr) return false;
+      const selStartStr = moment(values.date).format("YYYY-MM-DD");
+      const selEndStr = moment(values.end_date).format("YYYY-MM-DD");
 
-    const blockedTime24 = blockedDate.format("HH:mm"); 
-    const newStart = to24Hour(values.start_time);
-    const newEnd = to24Hour(values.end_time);
+      if (blockedDateStr < selStartStr || blockedDateStr > selEndStr) return false;
 
-    return blockedTime24 >= newStart && blockedTime24 < newEnd;
-  }
-  
-);
-setBlocked(conflicts.length > 0); 
-setBlockedHours(conflicts)
-return conflicts
+      
+      const blockedTime24 = to24Hour(blockedTimePart);
+      const newStart = to24Hour(values.start_time);
+      const newEnd = to24Hour(values.end_time);
+
+      return blockedTime24 >= newStart && blockedTime24 < newEnd;
+    }
+  );
+
+  setBlocked(conflicts.length > 0);
+  setBlockedHours(conflicts);
+  return conflicts;
 }
 
   const CreateSession = async (values: SessionSchemaValues) => {
@@ -628,9 +630,10 @@ return conflicts
                 {blocked && blockedHours.length > 0 && (
                   <p className="text-sm text-red-500">
                     Coach has blocked their schedule on:{" "}
-                    {blockedHours.map(([blockedDateTime]) => 
-                      moment(blockedDateTime).format("YYYY-MM-DD hh:mm A")
-                    ).join(", ")}
+                    {blockedHours.map(([blockedDateTime]) => {
+                      const [date, time] = blockedDateTime.split("_");
+                      return `${date} at ${time}`;
+                    }).join(", ")}
                   </p>
                 )}
                 <div className="flex gap-2 text-md ">

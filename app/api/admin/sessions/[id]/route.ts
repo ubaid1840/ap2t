@@ -9,12 +9,14 @@ export async function GET(
   try {
     const result = await pool.query(`
         SELECT
-        s.*,
-        u.first_name AS coach_first_name,
-        u.last_name AS coach_last_name
-      FROM sessions s
-      LEFT JOIN users u ON u.id = s.coach_id
-     WHERE s.id=$1
+  s.*,
+  u.first_name AS coach_first_name,
+  u.last_name AS coach_last_name,
+  c.schedule_preference AS coach_schedule_preference
+FROM sessions s
+LEFT JOIN users u ON u.id = s.coach_id
+LEFT JOIN coaches c ON c.user_id = s.coach_id
+WHERE s.id = $1
         `,
       [session_id]
     )
