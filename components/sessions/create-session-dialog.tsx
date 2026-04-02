@@ -124,6 +124,10 @@ export function CreateSessionDialog({
     BookedSession[]
   >([]);
   const [booked, setBooked] = useState(false);
+  const [coachScedule,setCoachScedule]=useState<{string:string}|{}>({})
+  const [blocked,setBlocked]=useState(false)
+  const [blockedHours,setBlockedHours]=useState([])
+
 
   function getCoachBookedSessions(coachId: number | null): BookedSession[] {
     if (!all_sessions || all_sessions.length === 0 || !coachId) return [];
@@ -201,83 +205,114 @@ export function CreateSessionDialog({
     return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}`;
   }
 
-  const checkAvailability = (
-    overrides: {
-      start_time?: string;
-      end_time?: string;
-      date?: Date;
-      end_date?: Date;
-    } = {},
-  ):BookedSession[] => {
-    const selectedDate = overrides.date ?? form.getValues("date");
-    const selectedEndDate = overrides.end_date ?? form.getValues("end_date");
-    const selectedStartTime =
-      overrides.start_time ?? form.getValues("start_time");
-    const selectedEndTime = overrides.end_time ?? form.getValues("end_time");
+const getSessionsConflicts = (
+  overrides: {
+    start_time?: string;
+    end_time?: string;
+    date?: Date;
+    end_date?: Date;
+  } = {},
+): BookedSession[] => {
+  const selectedDate = overrides.date ?? form.getValues("date");
+  const selectedEndDate = overrides.end_date ?? form.getValues("end_date");
+  const selectedStartTime = overrides.start_time ?? form.getValues("start_time");
+  const selectedEndTime = overrides.end_time ?? form.getValues("end_time");
 
-    if (
-      !selectedDate ||
-      !selectedEndDate ||
-      !selectedStartTime ||
-      !selectedEndTime
-    )
-      return [];
+  if (!selectedDate || !selectedEndDate || !selectedStartTime || !selectedEndTime)
+    return [];
 
-    const coachSessions = getCoachBookedSessions(selectedCoachId);
-    const newStart = to24Hour(selectedStartTime);
-    const newEnd = to24Hour(selectedEndTime);
+  const coachSessions = getCoachBookedSessions(selectedCoachId);
+  const newStart = to24Hour(selectedStartTime);
+  const newEnd = to24Hour(selectedEndTime);
 
-    const toDateOnly = (d: Date | string) => {
-      if (typeof d === "string") return d.slice(0, 10);
-      const year = d.getFullYear();
-      const month = String(d.getMonth() + 1).padStart(2, "0");
-      const day = String(d.getDate()).padStart(2, "0");
-      return `${year}-${month}-${day}`;
-    };
-
-    const selStartStr = toDateOnly(selectedDate);
-    const selEndStr = toDateOnly(selectedEndDate);
-
-    const conflicts = coachSessions.filter((session) => {
-      const sessionStartStr = toDateOnly(session.date);
-      const sessionEndStr = toDateOnly(session.end_date);
-
-      const dateOverlap =
-        sessionStartStr <= selEndStr && sessionEndStr >= selStartStr;
-
-      const sessionStart24 = to24Hour(session.start_time);
-      const sessionEnd24 = to24Hour(session.end_time);
-      const timeOverlap = sessionStart24 < newEnd && sessionEnd24 > newStart;
-
-      return dateOverlap && timeOverlap;
-    });
-    
-    setNotAvailableSessions(conflicts);
-    setBooked(conflicts.length > 0);
-    return conflicts;
+  const toDateOnly = (d: Date | string) => {
+    if (typeof d === "string") return d.slice(0, 10);
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
   };
+
+  const selStartStr = toDateOnly(selectedDate);
+  const selEndStr = toDateOnly(selectedEndDate);
+
+
+  const sessionConflicts = coachSessions.filter((session) => {
+    const sessionStartStr = toDateOnly(session.date);
+    const sessionEndStr = toDateOnly(session.end_date);
+
+    const dateOverlap =
+      sessionStartStr <= selEndStr && sessionEndStr >= selStartStr;
+
+    const sessionStart24 = to24Hour(session.start_time);
+    const sessionEnd24 = to24Hour(session.end_time);
+    const timeOverlap = sessionStart24 < newEnd && sessionEnd24 > newStart;
+
+    return dateOverlap && timeOverlap;
+  });
+
+
+   ;
+
+  setNotAvailableSessions(sessionConflicts);
+  setBooked(sessionConflicts.length > 0); 
+
+  return sessionConflicts;
+};
+function getBlockedConflict(values:SessionSchemaValues){
+  const conflicts=Object.entries(coachScedule).filter(
+  ([blockedDateTime, status]) => {
+    if (status !== "blocked") return false;
+    const blockedDate = moment(blockedDateTime); 
+    const blockedDateStr = blockedDate.format("YYYY-MM-DD"); 
+
+    const selStartStr = moment(values.date).format("YYYY-MM-DD");
+    const selEndStr = moment(values.end_date).format("YYYY-MM-DD");
+
+    if (blockedDateStr < selStartStr || blockedDateStr > selEndStr) return false;
+
+    const blockedTime24 = blockedDate.format("HH:mm"); 
+    const newStart = to24Hour(values.start_time);
+    const newEnd = to24Hour(values.end_time);
+
+    return blockedTime24 >= newStart && blockedTime24 < newEnd;
+  }
+  
+);
+setBlocked(conflicts.length > 0); 
+setBlockedHours(conflicts)
+return conflicts
+}
 
   const CreateSession = async (values: SessionSchemaValues) => {
     // setLoading(true);
-    const conflicts=checkAvailability({
+    const sessionConflicts=getSessionsConflicts({
       date: values.date,
       end_date: values.end_date,
       start_time: values.start_time,
       end_time: values.end_time,
     })
-    if(conflicts.length>0){
+    const hasSessionConflict = sessionConflicts.length > 0;
+    const blockedConflict = getBlockedConflict(values)
+    const hasBlockedConflict=blockedConflict.length>0
+    if(hasSessionConflict){
       toast.error("Can't create session because coach is already booked at this time and date")
       setLoading(false)
       return
     }
+    if(hasBlockedConflict){
+      toast.error("Can't create session because coach has blocked his scedule.")
+      setLoading(false)
+      return
+    }
     try {
-      await axios.post("/admin/sessions", {
-        ...values,
-      });
+      // await axios.post("/admin/sessions", {
+      //   ...values,
+      // });
 
-      await onRefresh();
-      form.reset();
-      setOpen(false);
+      // await onRefresh();
+      // form.reset();
+      // setOpen(false);
     } finally {
       setLoading(false);
     }
@@ -464,6 +499,7 @@ export function CreateSessionDialog({
                             setCoach_name(
                               `${coach.first_name} ${coach.last_name}`,
                             );
+                            setCoachScedule(coach.schedule)
                           }}
                         />
                       }
@@ -587,6 +623,14 @@ export function CreateSessionDialog({
                     {moment(notAvailableSessions[0].end_date).format("YYYY-MM-DD")} at time{" "}
                     {notAvailableSessions[0].start_time} till{" "}
                     {notAvailableSessions[0].end_time}
+                  </p>
+                )}
+                {blocked && blockedHours.length > 0 && (
+                  <p className="text-sm text-red-500">
+                    Coach has blocked their schedule on:{" "}
+                    {blockedHours.map(([blockedDateTime]) => 
+                      moment(blockedDateTime).format("YYYY-MM-DD hh:mm A")
+                    ).join(", ")}
                   </p>
                 )}
                 <div className="flex gap-2 text-md ">
