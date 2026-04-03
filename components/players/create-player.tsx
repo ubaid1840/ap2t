@@ -28,6 +28,7 @@ import { RequiredStar } from "../required-star";
 type CreatePlayerProps = {
   parent_id?: number | null | undefined | string;
   onRefresh?: () => Promise<void>;
+  placeholder ?: string
 };
 
 const playerSchema = z.object({
@@ -61,6 +62,7 @@ type PlayerFormValues = z.infer<typeof playerSchema>;
 export function CreatePlayer({
   parent_id = null,
   onRefresh = async () => {},
+  placeholder = "Add Player"
 }: CreatePlayerProps) {
   
   const [open, setOpen] = useState(false);
@@ -113,7 +115,7 @@ export function CreatePlayer({
   return (
     <>
       <Button onClick={() => setOpen(true)}>
-        <Plus className="" /> Add Player
+        <Plus className="" /> {placeholder}
       </Button>
 
       <Dialog open={open} onOpenChange={setOpen}>

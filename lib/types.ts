@@ -124,7 +124,7 @@ export interface SessionDataCoach {
   show_storefront: boolean;
 
   image: string;
-
+session_rating : number
   created_at: string;
   payment_detail: {
     amount: number
