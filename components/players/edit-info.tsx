@@ -239,7 +239,7 @@ export function EditInfo({
                           {...field}
                           id={field.name}
                           aria-invalid={fieldState.invalid}
-                          placeholder="(555)-292-2492"
+                          placeholder="+1XXXXXXXX"
                           autoComplete="off"
                         />
                         {fieldState.invalid && (
