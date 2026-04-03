@@ -104,10 +104,10 @@ export default function SessionMainPage({ id, back, back_title, admin = false }:
           id: d.id,
           sessionName: d.name,
           date: moment(new Date(d.date)).format("YYYY-MM-DD"),
-          end_date:moment(new Date(d.end_date)).format("YYYY-MM-DD"),
+          end_date: moment(new Date(d.end_date)).format("YYYY-MM-DD"),
           time: `${d.start_time} - ${d.end_time}`,
           coachName: joinNames([d.coach_first_name, d.coach_last_name]),
-          scehedule_preferences:d.coach?.coach_schedule_preference,
+          scehedule_preferences: d.coach?.coach_schedule_preference,
           status: d.status,
           price: d.price,
           promotion_price: d.promotion_price,
@@ -483,7 +483,10 @@ export default function SessionMainPage({ id, back, back_title, admin = false }:
                       </div>
                     </div>
 
-                    <DiscountDialog onRefresh={fetchPayments} original={data?.price || "0"} data={payment}/>
+                    {!['paid', 'comped'].includes(payment?.status) &&
+
+                      <DiscountDialog onRefresh={fetchPayments} original={data?.price || "0"} data={payment} />
+                    }
                   </CardContent>
                 </Card>
               ))
@@ -801,7 +804,7 @@ const AddNoteDialog = ({ session_id, onRefresh }: { session_id: number, onRefres
                 </div>
               </div>
 
-                 <Scrollbar />
+              <Scrollbar />
             </ScrollArea>
             <div className="border-t border-border flex items-center justify-end p-4">
               <div className="flex gap-4">

@@ -103,7 +103,11 @@ export default function Page() {
                         <Skeleton className="h-[400px] w-full bg-secondary rounded-sm" /> :
                         <PaymentAlerts data={data?.paymentAlerts || []}
                             onClickOverride={(item) => setVisible({ show: "comped", data: item })}
-                            onClickPaid={(item) => setVisible({ show: "override", data: item })} />
+                            onClickPaid={(item) => setVisible({ show: "override", data: item })}
+                            onRefresh={async (val) => {
+                                await updateAlert(val)
+                                await fetchData()
+                            }} />
                     }
                 </div>
             </div>
@@ -129,12 +133,12 @@ export default function Page() {
     )
 }
 
-async function updateAlert(data : PaymentRecord) {
-    if(!data?.id) return
-    
-        await axios.post("/admin/payment-alert", {
-            payment_id : data.id
-        })
+async function updateAlert(data: PaymentRecord) {
+    if (!data?.id) return
 
-     
+    await axios.post("/admin/payment-alert", {
+        payment_id: data.id
+    })
+
+
 }

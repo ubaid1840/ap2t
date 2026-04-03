@@ -29,6 +29,7 @@ import moment from "moment";
 import { OverrideDialog } from "@/components/payment/override-dialog";
 import { useDebounce } from "@/hooks/use-debounce";
 import useSquareConnection from "@/hooks/use-square-connection";
+import { CustomEmailDialog } from "@/components/payment/custom-email-dialog";
 
 
 
@@ -357,7 +358,7 @@ export default function Page() {
 
                 <RefreshCcw size={16} />
               </Button> */}
-                  <Button className="text-muted-foreground hover:dark:bg-primary hover:dark:text-black" size="icon" variant="ghost">
+                  <Button onClick={() => setVisible({ show: "email", data: row.original })} className="text-muted-foreground hover:dark:bg-primary hover:dark:text-black" size="icon" variant="ghost">
                     <Send size={16} />
                   </Button>
 
@@ -497,6 +498,10 @@ export default function Page() {
       <OverrideDialog data={visible?.data} open={visible.show === 'override'} onOpenChange={() => {
         setVisible((prevState) => ({ ...prevState, show: "" }))
       }} onRefresh={fetchData} />
+
+       <CustomEmailDialog data={visible?.data} open={visible.show === 'email'} onOpenChange={() => {
+        setVisible((prevState) => ({ ...prevState, show: "" }))
+      }}  />
     </div>
   );
 }

@@ -698,10 +698,10 @@ export default function MainPlayerPage({
                           ])}
                         </p>
                       </div>
-
-
                     </div>
-                    <DiscountDialog data={item?.payment_detail} onRefresh={fetchData} original={item?.price} />
+
+                    {item?.payment_detail?.status &&  !['paid', 'comped'].includes(item?.payment_detail?.status) &&
+                     <DiscountDialog data={item?.payment_detail} onRefresh={fetchData} original={item?.price} />}
                   </CardContent>
                 </Card>
               ))}

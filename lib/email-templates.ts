@@ -578,6 +578,76 @@ export const sendCoachPlayerEnrollmentEmail = async ({
 
 };
 
+export const sendPaymentReminderEmail = async ({
+  email,
+  fullName,
+  amount,
+  sessionName,
+}: {
+  email: string,
+  fullName: string,
+  amount: string,
+  sessionName: string,
+}): Promise<void> => {
+
+  try {
+     const subject = "Payment Reminder – Pending Payment";
+
+  const message = `
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Payment Reminder</title>
+  </head>
+  <body style="font-family: Arial, sans-serif; background-color:#f9fafb; padding:20px; color:#111827;">
+    <div style="max-width:600px;margin:0 auto;background:#ffffff;padding:30px;border-radius:8px;">
+      
+      <h2 style="color:#f59e0b;">Payment Pending ⏳</h2>
+
+      <p style="font-size:16px; line-height:1.6;">
+        Hi ${fullName},
+      </p>
+
+      <p style="font-size:16px; line-height:1.6;">
+        This is a friendly reminder that your payment for the following session is still pending:
+      </p>
+
+      <table style="width:100%; border-collapse:collapse; margin-top:20px;">
+        <tr>
+          <td style="padding:8px; font-weight:bold;">Session</td>
+          <td style="padding:8px;">${sessionName}</td>
+        </tr>
+        <tr>
+          <td style="padding:8px; font-weight:bold;">Amount Due</td>
+          <td style="padding:8px;">${amount}</td>
+        </tr>
+      </table>
+
+      <p style="margin-top:24px; font-size:16px;">
+        Please complete your payment at your earliest convenience.
+      </p>
+
+      <p style="margin-top:16px; font-size:16px;">
+        If you have already made the payment, please ignore this message.
+      </p>
+
+      <p style="margin-top:30px; font-size:16px; font-weight:bold;">
+        — Advanced Physical and Technical Training Team
+      </p>
+    </div>
+  </body>
+</html>
+`;
+
+  await sendSingleEmail(message, subject, email);
+  } catch (error) {
+    console.log(error)
+  }
+
+ 
+};
+
 export async function fetchAllAdmins() {
 
   const admins = await pool.query(`

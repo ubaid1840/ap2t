@@ -5,13 +5,21 @@ import { ScrollArea } from "../ui/scroll-area";
 import { Badge } from '@/components/ui/badge';
 import { PaymentRecord } from "@/app/portal/admin/dashboard/page";
 import { joinNames } from "@/lib/functions";
+import { useState } from "react";
+import { Spinner } from "../ui/spinner";
+import axios from "@/lib/axios";
 
 type PaymentAlertsProps = {
-  data : PaymentRecord[] | []
-  onClickPaid ?: (item  :PaymentRecord) => void
-  onClickOverride ?: (item : PaymentRecord) => void
+  data: PaymentRecord[] | []
+  onClickPaid?: (item: PaymentRecord) => void
+  onClickOverride?: (item: PaymentRecord) => void
+  onRefresh?: (val: PaymentRecord) => Promise<void>
 }
-export function PaymentAlerts({data, onClickPaid, onClickOverride} : PaymentAlertsProps) {
+export function PaymentAlerts({ data, onClickPaid, onClickOverride, onRefresh }: PaymentAlertsProps) {
+
+
+
+
   return (
     <Card className="bg-[#252525] flex-1 border border-[#3A3A3A]">
       <CardHeader className="flex justify-between">
@@ -44,13 +52,13 @@ export function PaymentAlerts({data, onClickPaid, onClickOverride} : PaymentAler
                     </div>
                   </div>
                   <div className="flex flex-wrap gap-4">
-                    <Button onClick={()=>onClickPaid?.(alert)} className="bg-active-bg text-active-text">
+                    <Button onClick={() => onClickPaid?.(alert)} className="bg-active-bg text-active-text">
                       <CircleCheckBig /> Paid
                     </Button>
-                    <Button onClick={()=>onClickOverride?.(alert)} className="bg-ghost-bg text-ghost-text">
+                    <Button onClick={() => onClickOverride?.(alert)} className="bg-ghost-bg text-ghost-text">
                       <CircleX /> Override
                     </Button>
-                    <Button >Remind</Button>
+                    <Reminder alert={alert} onRefresh={onRefresh} />
                   </div>
                 </CardContent>
               </Card>
@@ -59,6 +67,31 @@ export function PaymentAlerts({data, onClickPaid, onClickOverride} : PaymentAler
         </ScrollArea>
       </CardContent>
     </Card>
+  )
+}
+
+const Reminder = ({ alert, onRefresh }: { alert: PaymentRecord, onRefresh?: (val: PaymentRecord) => Promise<void> }) => {
+
+  const [loading, setLoading] = useState(false)
+
+  async function handleReminderEmail() {
+
+    try {
+      setLoading(true)
+
+      await axios.post('/admin/payments/reminder', { id: alert.id })
+      await onRefresh?.(alert)
+
+    } finally {
+      setLoading(false)
+    }
+
+  }
+
+  return (
+    <Button disabled={loading} onClick={handleReminderEmail}>
+      {loading ? <Spinner className="text-black" /> : "Remind"}
+      </Button>
   )
 }
 
