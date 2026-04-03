@@ -1,18 +1,17 @@
 "use client";
 
-import {
-  onAuthStateChanged,
-  User as FirebaseUser,
-  signOut,
-} from "firebase/auth";
-import { createContext, useContext, useEffect, useState } from "react";
 import axios from "@/lib/axios";
 import { auth } from "@/lib/firebase";
-import { usePathname } from "next/navigation";
-import { useRouter } from 'nextjs-toploader/app'
-import { toast } from "sonner";
 import { handleLogout } from "@/lib/logout";
-import { admin_nav_items, coach_nav_items, parent_nav_items, player_nav_items } from "@/lib/constants";
+import {
+  User as FirebaseUser,
+  onAuthStateChanged,
+  signOut,
+} from "firebase/auth";
+import { usePathname } from "next/navigation";
+import { useRouter } from 'nextjs-toploader/app';
+import { createContext, useContext, useEffect, useState } from "react";
+import { toast } from "sonner";
 
 type DBUser = {
   id: string;
@@ -21,21 +20,21 @@ type DBUser = {
   email: string;
   role: string;
   status: string;
-  picture : string
+  picture: string
 };
 
 type AuthContextType = {
   firebaseUser: FirebaseUser | null;
   user: DBUser | null;
   loading: boolean;
-  
+
 };
 
 const AuthContext = createContext<AuthContextType>({
   firebaseUser: null,
   user: null,
   loading: true,
-  
+
 });
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
@@ -43,7 +42,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<DBUser | null>(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
- 
+
   const pathname = usePathname();
 
   useEffect(() => {
@@ -53,14 +52,19 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       if (fbUser?.email) {
         try {
           const res = await axios.get(`/userdetail?email=${fbUser.email}`);
-          setUser(res.data);
           const role = res.data?.role
-          if (!role) {
+          if (res?.data?.status === 'inactive') {
+            router.replace(`/portal/restrict`);
+            return
+          } else if (!role) {
             await handleLogout()
             toast.error("There is no user role...")
+            return
           } else if (!pathname.startsWith(`/portal/${role}`)) {
             router.replace(`/portal/${role}`);
+            return
           }
+          setUser(res.data);
         } catch (err) {
           setUser(null);
           signOut(auth)
