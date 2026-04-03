@@ -241,7 +241,7 @@ const EditCoachProfile = ({
                             {...field}
                             id={field.name}
                             aria-invalid={fieldState.invalid}
-                            placeholder="(187)-189-1038"
+                            placeholder="+1 XXXXXXX"
                             autoComplete="off"
                           />
                           {fieldState.invalid && (
