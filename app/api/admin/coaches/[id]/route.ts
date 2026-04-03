@@ -66,6 +66,13 @@ LEFT JOIN LATERAL (
     SELECT
         s.*,
 
+        COALESCE(
+  ROUND(
+    AVG(sp.rating) FILTER (WHERE sp.rating IS NOT NULL AND sp.rating > 0 AND s.status = 'completed')
+  ::numeric, 2),
+  0
+) AS session_rating,
+
         /* Attach payment details per session */
         COALESCE(
             jsonb_agg(p2) FILTER (WHERE p2.id IS NOT NULL),
@@ -75,7 +82,8 @@ LEFT JOIN LATERAL (
     FROM sessions s
     LEFT JOIN payments p2
         ON p2.session_id = s.id
-
+    LEFT JOIN session_players sp
+    ON sp.session_id = s.id
     WHERE s.coach_id = u.id
     GROUP BY s.id
 ) sess_data ON TRUE

@@ -43,6 +43,8 @@ import { AddParentDialog } from "./add-parents";
 import PaymentMethodSteps from "../square/payment-method-steps";
 import { SquareSavedCard } from "@/lib/types";
 import { DiscountDialog } from "../payment/apply-discount";
+import { Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogOverlay, DialogTitle } from "../ui/dialog";
+import { Spinner } from "../ui/spinner";
 
 export interface PlayerResponse {
   id: number;
@@ -620,6 +622,8 @@ export default function MainPlayerPage({
                         </div>
                       ))}
 
+                      <RenderRating item={item} user_id={id} onRefresh={fetchData}/>
+
 
                   </CardContent>
                 </Card>
@@ -902,4 +906,92 @@ function generate12WeekCheckins(sessions: SessionData[] | undefined) {
     time: `W${index + 1}`,
     checkins: w.checkins,
   }));
+}
+
+
+const RenderRating = ({item, user_id, onRefresh} : {item : SessionData, user_id : number | undefined, onRefresh : ()=> Promise<void>}) => {
+
+  const [open, setOpen] = useState(false)
+  const [rating, setRating] = useState(0)
+  const [loading, setLoading] = useState(false)
+
+  if(item?.status !== 'completed' || !user_id) return null
+
+  async function handleSubmit() {
+
+    if(!item?.id || !user_id) return
+    setLoading(true)
+    try {
+      await axios.put(`/player/${user_id}/sessions/${item.id}/rating`, {rating})
+      await onRefresh()
+      handleClose(false)
+    }  finally {
+    setLoading(false)
+    }
+    
+  }
+
+  function handleClose(val : boolean){
+    setOpen(val)
+    setRating(0)
+  }
+
+  return (
+    <>
+    <Button className="mt-1" onClick={()=> setOpen(true)}>
+      Rate Session
+    </Button>
+
+     <Dialog open={open} onOpenChange={handleClose}>
+        <DialogOverlay />
+        <DialogContent className="sm:max-w-[550px] bg-[#252525]">
+          <DialogHeader className="pb-4 border-b">
+            <DialogTitle className="text-sm font-normal">
+              Rate Your Session
+            </DialogTitle>
+          </DialogHeader>
+
+         
+          
+
+              <div className="grid gap-4">
+
+               
+                
+                <div className="grid gap-2">
+                  <Label htmlFor="performance" className="text-xs text-muted-foreground">
+                    Performance & Rating
+                  </Label>
+                  <div className="flex gap-1">
+                    {Array.from({ length: 5 }).map((_, i) => (
+                      <span
+                        key={i}
+                        onClick={() => setRating(i + 1)}
+                        className="cursor-pointer"
+                      >
+                        {i < rating ? (
+                          <IoIosStar className="text-primary" size={20} />
+                        ) : (
+                          <IoIosStarOutline className="text-muted-foreground" size={20} />
+                        )}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+              </div>
+            
+            <DialogFooter>
+              <DialogClose asChild>
+                <Button type="button" variant="outline">
+                  Cancel
+                </Button>
+              </DialogClose>
+              <Button onClick={handleSubmit} disabled={loading} type="submit">{loading && <Spinner className="text-black" />} Submit</Button>
+            </DialogFooter>
+        
+        </DialogContent>
+      </Dialog>
+    </>
+  )
 }

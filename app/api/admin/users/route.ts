@@ -181,10 +181,11 @@ WHERE u.role = $1;
      FROM session_players sp
      INNER JOIN sessions s ON s.id = sp.session_id
      WHERE s.coach_id = $1
-     AND sp.rating IS NOT NULL`,
+     AND s.status = 'completed'
+     AND sp.rating IS NOT NULL
+     AND sp.rating > 0`,
                 [coach.id]
             );
-
             coach.average_rating = Number(ratingResult.rows[0].average_rating || 0);
         }
         return NextResponse.json({

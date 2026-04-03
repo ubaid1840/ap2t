@@ -38,7 +38,7 @@ import { IoCalendarClear } from "react-icons/io5";
 export default function MainCoachPage({
   id,
   back = null,
-  admin=false
+  admin = false
 }: {
   id: string | undefined;
   back?: ReactNode;
@@ -68,12 +68,14 @@ export default function MainCoachPage({
     setLoading(true)
     try {
       const response = await axios.get(`/admin/coaches/${id}`);
-      
+
       setData(response.data)
     } finally {
       setLoading(false)
     }
   };
+
+  console.log(data)
 
   const fetchSessionTypes = async () => {
     setLoading(true)
@@ -136,7 +138,7 @@ export default function MainCoachPage({
       title: session.name,
       date: moment(new Date(session.date)).format("YYYY-MM-DD"),
       time: session.start_time,
-      end_time : session.end_time,
+      end_time: session.end_time,
       status: "Booked",
     }))
     : [];
@@ -151,7 +153,7 @@ export default function MainCoachPage({
           title: "",
           date: m.format("YYYY-MM-DD"),
           time: m.format("HH:mm"),
-          end_time : "",
+          end_time: "",
           status: "Blocked",
         });
       }
@@ -160,11 +162,11 @@ export default function MainCoachPage({
 
   const combinedEvents = blockedEvents ? [...weeklyEvents, ...blockedEvents] : weeklyEvents;
 
-  
+
   if (loading) {
     return (
       <div className="flex flex-col w-full gap-6">
-    {back}
+        {back}
         <Skeleton className="h-[200px] w-full bg-secondary rounded-sm" />
         <Skeleton className="h-[300px] w-full bg-secondary rounded-sm" />
 
@@ -174,7 +176,7 @@ export default function MainCoachPage({
 
   return (
     <div className="flex flex-col w-full gap-6">
-    {back}
+      {back}
 
       <Card className="w-full rounded-[12px] bg-[#252525]">
         <CardContent className="space-y-4">
@@ -504,7 +506,16 @@ function calculateStats(sessions: SessionDataCoach[] | undefined, payments: Paym
     totalCompleted = sessions.filter((item) => item.status === 'completed').length
     totalUpcoming = sessions.filter((item) => item.status === 'upcoming').length
 
+    const completedRatings = sessions
+      .filter(s => s.status === 'completed' && s.session_rating > 0)
 
+    averageRating =
+      completedRatings.length > 0
+        ? completedRatings.reduce((sum, s) => sum + Number(s.session_rating), 0) /
+        completedRatings.length
+        : 0
+
+   
   }
   if (payments) {
     const filteredPayments = payments.filter((item) => item.status === 'paid')
