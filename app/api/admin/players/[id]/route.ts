@@ -55,7 +55,7 @@ export async function GET(
       `
   SELECT
     s.*,
-
+      sp.rating AS session_rating,
     cu.first_name AS coach_first_name,
     cu.last_name AS coach_last_name,
 
@@ -106,8 +106,8 @@ export async function GET(
       [player_id]
     );
 
-   const allNotes = await pool.query(
-  `
+    const allNotes = await pool.query(
+      `
  SELECT
     n.*,
     u.first_name AS coach_first_name,
@@ -125,8 +125,8 @@ WHERE
 
 ORDER BY n.created_at DESC
   `,
-  [player_id]
-);
+      [player_id]
+    );
 
 
     // ---------------- FINAL RESPONSE ----------------
@@ -150,43 +150,43 @@ ORDER BY n.created_at DESC
 
 
 export async function PUT(req: NextRequest) {
-    try {
-        const data = await req.json();
-        const { id, ...updates } = data;
+  try {
+    const data = await req.json();
+    const { id, ...updates } = data;
 
-        if (!id) {
-            return NextResponse.json({ message: "ID is required" }, { status: 400 });
-        }
+    if (!id) {
+      return NextResponse.json({ message: "ID is required" }, { status: 400 });
+    }
 
-        const fields: any[] = [];
-        const values: any[] = [];
+    const fields: any[] = [];
+    const values: any[] = [];
 
-        Object.entries(updates).forEach(([key, value], index) => {
-            if (value !== undefined) {
-                fields.push(`${key} = $${index + 1}`);
-                values.push(value);
-            }
-        });
+    Object.entries(updates).forEach(([key, value], index) => {
+      if (value !== undefined) {
+        fields.push(`${key} = $${index + 1}`);
+        values.push(value);
+      }
+    });
 
-        if (fields.length === 0) {
-            return NextResponse.json({ message: "No valid data provided for update" }, { status: 400 });
-        }
+    if (fields.length === 0) {
+      return NextResponse.json({ message: "No valid data provided for update" }, { status: 400 });
+    }
 
-        values.push(id);
-        const query = `
+    values.push(id);
+    const query = `
           UPDATE players 
           SET ${fields.join(", ")}
           WHERE user_id = $${values.length}
       `;
 
-        await pool.query(query, values);
+    await pool.query(query, values);
 
 
-        return NextResponse.json({ message: "Updated successfully" }, { status: 200 });
-    } catch (error : any) {
-        console.log("Error updating data:", error?.message);
-        return NextResponse.json({ message:  error?.message || "Internal Server Error" }, { status: 500 });
-    }
+    return NextResponse.json({ message: "Updated successfully" }, { status: 200 });
+  } catch (error: any) {
+    console.log("Error updating data:", error?.message);
+    return NextResponse.json({ message: error?.message || "Internal Server Error" }, { status: 500 });
+  }
 }
 
 

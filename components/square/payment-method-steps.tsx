@@ -18,7 +18,7 @@ export default function PaymentMethodSteps({ id, data, onRefresh }: { id: string
         if (!squareRef.current) return
 
         try {
-            setDeleteLoading(true)
+            setLoading(true)
             const tokendata = await squareRef.current.tokenize()
             if (data?.id) {
                 await axios.put(`/user/card`, { token: tokendata.token, cardholder: tokendata.cardholderName, id, card_id: data?.id, customer_id: data?.customerId })
@@ -31,7 +31,7 @@ export default function PaymentMethodSteps({ id, data, onRefresh }: { id: string
         } catch (error) {
             console.log(error)
         } finally {
-            setDeleteLoading(false)
+            setLoading(false)
         }
 
     }
@@ -47,7 +47,7 @@ export default function PaymentMethodSteps({ id, data, onRefresh }: { id: string
             })
             await onRefresh()
         } finally {
-            setLoading(false)
+            setDeleteLoading(false)
         }
     }
 

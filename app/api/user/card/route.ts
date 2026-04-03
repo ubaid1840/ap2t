@@ -76,7 +76,7 @@ export async function PUT(req: NextRequest) {
 
                 if (!squareCustomerId) throw new Error("Failed to create Square customer")
 
-                await squareClient.cards.disable({ cardId: old_card })
+                // await squareClient.cards.disable({ cardId: old_card })
 
                 const cardRes = await squareClient.cards.create({
                     idempotencyKey: crypto.randomUUID(),
@@ -130,4 +130,6 @@ export async function GET(req: NextRequest) {
 
 
 }
+
+
 export const revalidate = 0
