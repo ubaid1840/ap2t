@@ -308,7 +308,6 @@ WHERE u.role = 'admin';`)
 
 
 export const sendAdminSessionEnrollmentEmail = async ({
-  adminEmail,
   fullName,
   userEmail,
   sessionName,
@@ -316,7 +315,6 @@ export const sendAdminSessionEnrollmentEmail = async ({
   sessionDate = "To Be Confirmed",
   enrollmentDate = new Date().toLocaleString(),
 }: {
-  adminEmail: string;
   fullName: string;
   userEmail: string;
   sessionName: string;
@@ -384,8 +382,30 @@ export const sendAdminSessionEnrollmentEmail = async ({
   </body>
 </html>
 `;
+    const admins = await pool.query(`SELECTSELECT 
+  u.id AS user_id,
+  u.email,
+  s.new_booking,
+  s.payment_receive,
+  s.session_cancel,
+  s.promotion_purchase,
+  s.email_notification,
+  s.sms_notification
+FROM users u
+JOIN settings s ON s.user_id = u.id
+WHERE u.role = 'admin';`)
 
-  await sendSingleEmail(message, subject, adminEmail);
+  const allAdmins = admins.rows
+
+  await Promise.all(
+    allAdmins.map(admin =>{
+      if(admin.new_booking){
+        sendSingleEmail(message, subject, admin.email).catch(err => console.log(err))
+      }
+    }
+    )
+  );
+  
 };
 export const sendCoachNewSessionEmail = async ({
   coachEmail,
@@ -551,6 +571,8 @@ export const sendCoachPlayerEnrollmentEmail = async ({
 
   await sendSingleEmail(message, subject, coachEmail);
 };
+
+
 // new function to send email to coach for new session
 // payment email to admin and player on kioskik side
 // user signup email to admin to be checked

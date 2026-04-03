@@ -86,6 +86,25 @@ export async function POST(req: NextRequest) {
                         `INSERT INTO settings (user_id) VALUES ($1)`,
                         [player_id]
                     );
+                    await pool.query("COMMIT");
+            
+            const emailDataRaw=await pool.query(`SELECT first_name last_name FROM users WHERE id=$1`,[player_id])
+            const emailData=emailDataRaw.rows[0]
+            const playerEmailPayload = {
+                email:player.email,
+                fullName: `${emailData?.first_name} ${emailData?.last_name}`,
+                password:player.password
+            }
+            await sendNewJoiningEmail(playerEmailPayload)
+            const adminEmailPayload={
+                fullName:`${emailData?.first_name} ${emailData?.last_name}`,
+                userEmail:player.email,
+                role:"player",
+
+            }
+            await sendAdminNewSignupEmail(adminEmailPayload)
+
+                
                 } catch (error) {
                     console.log("error creating player's setting", error)
                 }

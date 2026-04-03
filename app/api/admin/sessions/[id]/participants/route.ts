@@ -1,4 +1,5 @@
 import pool from "@/lib/db";
+import { sendAdminSessionEnrollmentEmail } from "@/lib/email-templates";
 import moment from "moment";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -141,6 +142,32 @@ export async function POST(
       [session_id, player_id]
     );
 
+    const emailDataRaw=await pool.query(`SELECT 
+    u.first_name || ' ' || u.last_name AS "fullName",
+    u.email AS "userEmail",
+    s.name AS "sessionName",
+    coach.first_name || ' ' || coach.last_name AS "coachName",
+    s.date AS "sessionDate",
+    NOW() AS "enrollmentDate"
+FROM session_enrollments se
+JOIN users u ON se.user_id = u.id
+JOIN sessions s ON se.session_id = s.id
+JOIN users coach ON s.coach_id = coach.id
+WHERE se.session_id = $1
+  AND se.user_id = $2;`,
+[session_id,player_id]
+)
+    const emailData=emailDataRaw.rows[0]
+    const adminEmailPayload={
+      fullName: emailData.fullName,
+    userEmail: emailData.userEmail,
+    sessionName: emailData.sessionName,
+    coachName: emailData.coachEmail,
+    sessionDate: emailData.sessionDate,
+    enrollmentDate: emailData.enrollmentDate,
+    }
+    await sendAdminSessionEnrollmentEmail(adminEmailPayload)
+
     if (sessionData.comped) {
       await client.query(
         `INSERT INTO payments
@@ -232,3 +259,7 @@ export async function GET(
   }
 }
 export const revalidate = 0
+
+async function sendEmail(id:number){
+  
+}

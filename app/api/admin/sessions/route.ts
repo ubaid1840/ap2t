@@ -1,4 +1,5 @@
 import pool from "@/lib/db";
+import { sendCoachNewSessionEmail } from "@/lib/email-templates";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
@@ -23,6 +24,26 @@ export async function POST(req: NextRequest) {
       values
     );
 
+    const emailDataRaw=await pool.query(`SELCET
+       email,
+       first_name || ' ' || last_name AS "fullName"
+       FROM users
+       WHERE id=$1
+       `,[data.coach_id])
+    
+    const emailData=emailDataRaw.rows[0]
+
+    const coachEmailPayload={
+      coachEmail: `${emailData.email}`,
+    coachName: `${emailData.fullName}`,
+    sessionName: `${data.name}`,
+    sessionDate: `${data.date} - ${data.end_date}`,
+    sessionTime: data.time,
+    location: `${data.location}`,
+    createdBy: "admin",
+    createdDate: `${new Date()}`,
+    }
+    await sendCoachNewSessionEmail(coachEmailPayload)
 
 
     return NextResponse.json(
@@ -134,6 +155,26 @@ export async function PUT(req: NextRequest) {
       `;
 
     await pool.query(query, values);
+        const emailDataRaw=await pool.query(`SELCET
+       email,
+       first_name || ' ' || last_name AS "fullName"
+       FROM users
+       WHERE id=$1
+       `,[data.coach_id])
+    
+    const emailData=emailDataRaw.rows[0]
+
+    const coachEmailPayload={
+      coachEmail: `${emailData.email}`,
+    coachName: `${emailData.fullName}`,
+    sessionName: `${data.name}`,
+    sessionDate: `${data.date} - ${data.end_date}`,
+    sessionTime: data.time,
+    location: `${data.location}`,
+    createdBy: "admin",
+    createdDate: `${new Date()}`,
+    }
+    await sendCoachNewSessionEmail(coachEmailPayload)
 
     return NextResponse.json({ message: "Updated successfully" }, { status: 200 });
   } catch (error) {
