@@ -5,42 +5,42 @@ import { Calendar, DollarSign, Info, User } from "lucide-react"
 
 
 
-export function DashboardOverview({ data }: {data : DashboardStats | undefined}) {
+export function DashboardOverview({ data }: { data: DashboardStats | undefined }) {
 
 
     const localData = [{
-    Icon: <User />,
-    title: "Today's Check-ins",
-    description: data?.totalCheckIns || 0,
-    value: data?.checkInsDifference || 0,
-    type: "success",
-    going: data?.checkInsDifference || 0 >= 0 ? "active" : "danger"
-},
-{
-    Icon: <DollarSign />,
-    title: "Today's Revenue",
-    description: data?.totalRevenue || 0,
-    value: `${data?.revenueChangePercentage || 0}%`,
-    type: "active",
-    going: data?.revenueChangePercentage || 0 >= 0 ? "active" : "danger"
-},
-{
-    Icon: <Info />,
-    title: "Pending Payments",
-    description: data?.pendingToday || 0,
-    value: `${data?.pendingChangePercentage || 0}%`,
-    type: "warning",
-    going: data?.pendingChangePercentage || 0 >= 0 ? "active" : "danger"
-},
-{
-    Icon: <Calendar />,
-    title: "Upcoming Sessions",
-    description: data?.upcomingToday || 0,
-     value: `${data?.upcomingChangePercentage || 0}%`,
-    type: "other",
-    going: data?.upcomingChangePercentage || 0 >= 0 ? "active" : "danger"
-}
-]
+        Icon: <User />,
+        title: "Today's Check-ins",
+        description: data?.totalCheckIns || 0,
+        value: data?.checkInsDifference || 0,
+        type: "success",
+        going: data?.checkInsDifference || 0 >= 0 ? "active" : "danger"
+    },
+    {
+        Icon: <DollarSign />,
+        title: "Today's Revenue",
+        description: data?.totalRevenue || 0,
+        value: `${data?.revenueChangePercentage || 0}%`,
+        type: "active",
+        going: data?.revenueChangePercentage || 0 >= 0 ? "active" : "danger"
+    },
+    {
+        Icon: <Info />,
+        title: "Pending Payments",
+        description: data?.pendingToday || 0,
+        value: `${data?.pendingChangePercentage || 0}%`,
+        type: "warning",
+        going: data?.pendingChangePercentage || 0 >= 0 ? "active" : "danger"
+    },
+    {
+        Icon: <Calendar />,
+        title: "Upcoming Sessions",
+        description: data?.upcomingToday || 0,
+        value: `${data?.upcomingChangePercentage || 0}%`,
+        type: "other",
+        going: data?.upcomingChangePercentage || 0 >= 0 ? "active" : "danger"
+    }
+    ]
 
     return (
         <div className="flex flex-col gap-3">

@@ -289,9 +289,9 @@ export default function MainParentPage({
                 onRefresh={fetchData} />
               {admin && (
                 <>
-                  <Button>
+                  {/* <Button>
                     <Send /> Send Reminder
-                  </Button>
+                  </Button> */}
 
                   {data?.parent?.status === "active" ? (
                     <Button
