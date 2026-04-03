@@ -134,7 +134,6 @@ export const sendPaymentReceiptEmail = async ({
 };
 
 export const sendAdminPaymentNotificationEmail = async ({
-  adminEmail,
   fullName,
   userEmail,
   amount,
@@ -143,7 +142,6 @@ export const sendAdminPaymentNotificationEmail = async ({
   paymentMethod = "Online",
   paymentDate,
 }: {
-  adminEmail: string,
   fullName: string,
   userEmail: string,
   amount: string,
@@ -217,7 +215,16 @@ export const sendAdminPaymentNotificationEmail = async ({
 </html>
 `;
 
-  await sendSingleEmail(message, subject, adminEmail);
+  const allAdmins = await fetchAllAdmins()
+
+    await Promise.all(
+      allAdmins.map(admin => {
+        if (admin.payment_receive) {
+          return sendSingleEmail(message, subject, admin.email).catch(err => console.log(err))
+        }
+      }
+      )
+    );
 };
 
 export const sendAdminNewSignupEmail = async ({

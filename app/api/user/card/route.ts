@@ -1,4 +1,5 @@
 import pool from "@/lib/db";
+import { sendAdminPaymentNotificationEmail, sendPaymentReceiptEmail } from "@/lib/email-templates";
 import { getSquareClient } from "@/lib/square";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -52,6 +53,80 @@ export async function POST(req: NextRequest) {
         }
 
         await pool.query(`UPDATE users SET square_customer_id = $1, square_card_id  = $2, cardholder_name= $3 WHERE id = $4`, [squareCustomerId, squareCardId, cardholder, id])
+       
+       // jhgjhgjh
+const sessionsToBePaidRaw=await pool.query(`
+SELECT 
+    s.id AS "sessionId",
+    s.name AS "sessionName",
+    s.date,
+    s.end_date,
+    p.id AS "paymentId",
+    p.amount,
+    p.status AS "paymentStatus"
+FROM sessions s
+JOIN payments p 
+    ON p.session_id = s.id
+WHERE s.status = 'completed'
+  AND p.user_id = $1
+  AND p.status IN ('pending', 'failed');
+        `,[id])
+const sessionsToBePaid = sessionsToBePaidRaw.rows;
+
+if (!squareCardId) throw new Error("Card not found");
+if (!squareCustomerId) throw new Error("Customer not found");
+
+for (const session of sessionsToBePaid) {
+  try {
+    const paymentRes = await squareClient.payments.create({
+      sourceId: squareCardId,
+      idempotencyKey: crypto.randomUUID(),
+      amountMoney: {
+        amount: BigInt(Math.round(Number(session.amount) * 100)),
+        currency: "USD",
+      },
+      customerId: squareCustomerId ?? undefined,
+    });
+
+    const transactionId = paymentRes.payment?.id;
+
+    await pool.query(
+      `UPDATE payments 
+       SET status = 'paid', paid_at = NOW(), transaction_id = $1 
+       WHERE id = $2`,
+      [transactionId, session.paymentId]
+    );
+
+    await sendPaymentReceiptEmail({
+      email: user.email,
+      fullName: user.first_name + " " + user.last_name,
+      amount: session.amount,
+      paymentId: transactionId, 
+      sessionName: session.sessionName,
+      paymentDate: new Date().toISOString(),
+    });
+
+    await sendAdminPaymentNotificationEmail({
+      fullName: user.first_name + " " + user.last_name,
+      userEmail: user.email,
+      amount: session.amount,
+      sessionName: session.sessionName,
+      paymentId: transactionId,
+      paymentMethod: "debit/credit",
+      paymentDate: new Date().toISOString(),
+    });
+
+  } catch (err) {
+    console.error("Payment failed for session:", session.sessionId);
+
+    await pool.query(
+      `UPDATE payments SET status = 'failed' WHERE id = $1`,
+      [session.paymentId]
+    );
+  }
+}
+
+       
         return NextResponse.json({ message: "Card added successfully" })
 
 
@@ -97,6 +172,85 @@ export async function PUT(req: NextRequest) {
      
 
         await pool.query(`UPDATE users SET  square_card_id  = $1, cardholder_name= $2 WHERE id = $3`, [squareCardId, cardholder, id])
+       
+        //jhk kj 
+
+        const sessionsToBePaidRaw=await pool.query(`
+SELECT 
+    s.id AS "sessionId",
+    s.name AS "sessionName",
+    s.date,
+    s.end_date,
+    p.id AS "paymentId",
+    p.amount,
+    p.status AS "paymentStatus"
+FROM sessions s
+JOIN payments p 
+    ON p.session_id = s.id
+WHERE s.status = 'completed'
+  AND p.user_id = $1
+  AND p.status IN ('pending', 'failed');
+        `,[id])
+const sessionsToBePaid = sessionsToBePaidRaw.rows;
+
+if (!squareCardId) throw new Error("Card not found");
+if (!squareCustomerId) throw new Error("Customer not found");
+
+for (const session of sessionsToBePaid) {
+  try {
+    const paymentRes = await squareClient.payments.create({
+      sourceId: squareCardId,
+      idempotencyKey: crypto.randomUUID(),
+      amountMoney: {
+        amount: BigInt(Math.round(Number(session.amount) * 100)),
+        currency: "USD",
+      },
+      customerId: squareCustomerId ?? undefined,
+    });
+
+    const transactionId = paymentRes.payment?.id;
+
+    await pool.query(
+      `UPDATE payments 
+       SET status = 'paid', paid_at = NOW(), transaction_id = $1 
+       WHERE id = $2`,
+      [transactionId, session.paymentId]
+    );
+
+    const emailDataRaw=await pool.query(`SELECT email, first_name,last_name FROM users WHERE id=$1`,[id])
+    const user=emailDataRaw.rows?.[0] ?? null
+    if(user){
+
+        await sendPaymentReceiptEmail({
+          email: user.email,
+          fullName: user.first_name + " " + user.last_name,
+          amount: session.amount,
+          paymentId: transactionId, 
+          sessionName: session.sessionName,
+          paymentDate: new Date().toISOString(),
+        });
+    
+        await sendAdminPaymentNotificationEmail({
+          fullName: user.first_name + " " + user.last_name,
+          userEmail: user.email,
+          amount: session.amount,
+          sessionName: session.sessionName,
+          paymentId: transactionId,
+          paymentMethod: "debit/credit",
+          paymentDate: new Date().toISOString(),
+        });
+    }
+
+  } catch (err) {
+    console.error("Payment failed for session:", session.sessionId);
+
+    await pool.query(
+      `UPDATE payments SET status = 'failed' WHERE id = $1`,
+      [session.paymentId]
+    );
+  }
+}
+       
         return NextResponse.json({ message: "Card updated successfully" })
 
 
