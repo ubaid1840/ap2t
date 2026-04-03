@@ -421,7 +421,7 @@ function getBlockedConflict(values: SessionSchemaValues) {
                             </SelectTrigger>
                             <SelectContent>
                               <SelectItem value={"camp"}>Camp</SelectItem>
-                              <SelectItem value={"comped"}>Clinic</SelectItem>
+                              <SelectItem value={"clinic"}>Clinic</SelectItem>
                             </SelectContent>
                           </Select>
                           {fieldState.invalid && (
