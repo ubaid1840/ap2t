@@ -90,21 +90,7 @@ export async function POST(req: NextRequest) {
             
             const emailDataRaw=await pool.query(`SELECT first_name last_name FROM users WHERE id=$1`,[player_id])
             const emailData=emailDataRaw.rows[0]
-            const playerEmailPayload = {
-                email:player.email,
-                fullName: `${emailData?.first_name} ${emailData?.last_name}`,
-                password:player.password
-            }
-            await sendNewJoiningEmail(playerEmailPayload)
-            const adminEmailPayload={
-                fullName:`${emailData?.first_name} ${emailData?.last_name}`,
-                userEmail:player.email,
-                role:"player",
-
-            }
-            await sendAdminNewSignupEmail(adminEmailPayload)
-
-                
+           
                 } catch (error) {
                     console.log("error creating player's setting", error)
                 }
@@ -282,7 +268,7 @@ export async function createUserWithFirebase(
     const adminEmailProps={
         email:email,
         fullName:`${rest?.first_name} ${rest?.last_name}`,
-        role:"user"
+        role:data?.role ||  "user"
     }
     await sendAdminNewSignupEmail(adminEmailProps)
 

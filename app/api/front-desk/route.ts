@@ -220,44 +220,7 @@ export async function PUT(req: NextRequest) {
                VALUES ($1, $2)`,
               [session_id, user_id],
             );
-            const EmailDataRaw = await pool.query(
-              `SELECT 
-              u.first_name || ' ' || u.last_name AS "fullName",
-              u.email AS "userEmail",
-              s.name AS "sessionName",
-              coach.email AS "coachEmail",
-              coach.first_name || ' ' || coach.last_name AS "coachName",
-              s.date || ' ' || s.end_date AS "sessionDate",
-              NOW() AS "enrollmentDate"
-              FROM session_enrollments se
-              JOIN users u ON se.user_id = u.id
-              JOIN sessions s ON se.session_id = s.id
-              JOIN users coach ON s.coach_id = coach.id
-              WHERE se.session_id = $1
-                AND se.user_id = $2;`,
-              [session_id, user_id],
-            );
-            const EmailData = EmailDataRaw.rows[0];
-            const adminEmailPayload = {
-              fullName: EmailData.fullName,
-              userEmail: EmailData.userEmail,
-              sessionName: EmailData.sessionName,
-              coachName: EmailData.coachName,
-              sessionDate: EmailData.sessionDate,
-              enrollmentDate: EmailData.enrollmentDate,
-            };
-            await sendAdminSessionEnrollmentEmail(adminEmailPayload);
-            const coachEmailPayload = {
-              coachEmail: EmailData.coachEmail,
-              coachName: EmailData.coachEmail,
-              playerName: EmailData.fullName,
-              playerEmail: EmailData.userEmail,
-              sessionName: EmailData.sessionName,
-              sessionDate: EmailData.sessionDate,
-              enrollmentDate: EmailData.enrollmentDate,
-            };
 
-            await sendCoachPlayerEnrollmentEmail(coachEmailPayload);
 
             if (session.comped) {
               await client.query(
@@ -297,6 +260,63 @@ export async function PUT(req: NextRequest) {
           }
 
           await client.query("COMMIT");
+
+          const EmailDataRaw = await pool.query(
+            `SELECT 
+              u.first_name,
+              u.last_name,
+              u.email AS userEmail,
+              s.name AS sessionName,
+              coach.email AS coachEmail,
+              coach.first_name AS coach_first_name,
+              coach.last_name AS coach_last_name,
+              s.date AS session_start_date,
+              s.end_date AS session_end_date,
+              NOW() AS enrollmentDate
+              FROM session_players se
+              JOIN users u ON se.user_id = u.id
+              JOIN sessions s ON se.session_id = s.id
+              JOIN users coach ON s.coach_id = coach.id
+              WHERE se.session_id = $1
+                AND se.user_id = $2;`,
+            [session_id, user_id],
+          );
+          const EmailData = EmailDataRaw.rows[0];
+
+          if (EmailData) {
+            const sessionStartDate = EmailData?.session_start_date
+              ? moment(EmailData.session_start_date).format("YYYY-MM-DD")
+              : "";
+
+            const sessionEndData = EmailData?.session_end_date
+              ? moment(EmailData.session_end_date).format("YYYY-MM-DD")
+              : "";
+            const adminEmailPayload = {
+              fullName: `${EmailData?.first_name || ""} ${EmailData?.last_name || ""
+                }`,
+              userEmail: EmailData.userEmail,
+              sessionName: EmailData.sessionName,
+              coachName: `${EmailData?.coach_first_name || ""} ${EmailData?.coach_last_name || ""
+                }`,
+              sessionDate: `${sessionStartDate} - ${sessionEndData}`,
+              enrollmentDate: EmailData.enrollmentDate,
+            };
+
+            await sendAdminSessionEnrollmentEmail(adminEmailPayload);
+            const coachEmailPayload = {
+              coachEmail: EmailData.coachEmail,
+              coachName: `${EmailData?.coach_first_name || ""} ${EmailData?.coach_last_name || ""
+                }`,
+              playerName: `${EmailData?.first_name || ""} ${EmailData?.last_name || ""
+                }`,
+              playerEmail: EmailData.userEmail,
+              sessionName: EmailData.sessionName,
+              sessionDate: `${sessionStartDate} - ${sessionEndData}`,
+              enrollmentDate: EmailData.enrollmentDate,
+            };
+
+            await sendCoachPlayerEnrollmentEmail(coachEmailPayload);
+          }
         } catch (error: any) {
           await client.query("ROLLBACK");
           console.log("Error:", error);

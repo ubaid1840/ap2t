@@ -1,7 +1,6 @@
 import pool from "@/lib/db";
-import { NextRequest, NextResponse } from "next/server";
-import { createUserWithFirebase } from "../../user/route";
 import admin from "@/lib/firebase-admin";
+import { NextRequest, NextResponse } from "next/server";
 
 
 export async function GET(req : NextRequest, {params} : {params : {id : string}}) {

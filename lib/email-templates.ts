@@ -130,7 +130,7 @@ export const sendPaymentReceiptEmail = async ({
 `;
 
   await sendSingleEmail(message, subject, email);
- 
+
 };
 
 export const sendAdminPaymentNotificationEmail = async ({
@@ -221,19 +221,21 @@ export const sendAdminPaymentNotificationEmail = async ({
 };
 
 export const sendAdminNewSignupEmail = async ({
-  
+
   fullName,
-  userEmail,
-  role = "User",
+  email,
+  role = "user",
 }: {
- 
+
   fullName: string,
-  userEmail: string,
+  email: string,
   role: string,
 }): Promise<void> => {
-  const subject = "New User Signup – Advanced Physical and Technical Training";
 
-  const message = `
+  try {
+    const subject = "New User Signup – Advanced Physical and Technical Training";
+
+    const message = `
 <!DOCTYPE html>
 <html>
   <head>
@@ -257,7 +259,7 @@ export const sendAdminNewSignupEmail = async ({
         </tr>
         <tr>
           <td style="padding:8px; font-weight:bold;">Email</td>
-          <td style="padding:8px;">${userEmail}</td>
+          <td style="padding:8px;">${email}</td>
         </tr>
         <tr>
           <td style="padding:8px; font-weight:bold;">Role</td>
@@ -279,33 +281,24 @@ export const sendAdminNewSignupEmail = async ({
 </html>
 `;
 
-  const admins = await pool.query(`SELECTSELECT 
-  u.id AS user_id,
-  u.email,
-  s.new_booking,
-  s.payment_receive,
-  s.session_cancel,
-  s.promotion_purchase,
-  s.email_notification,
-  s.sms_notification
-FROM users u
-JOIN settings s ON s.user_id = u.id
-WHERE u.role = 'admin';`)
+    const allAdmins = await fetchAllAdmins()
 
-  const allAdmins = admins.rows
-
-  await Promise.all(
-    allAdmins.map(admin =>{
-      if(admin.email_notification){
-        sendSingleEmail(message, subject, admin.email).catch(err => console.log(err))
+    await Promise.all(
+      allAdmins.map(admin => {
+        if (admin.email_notification) {
+          return sendSingleEmail(message, subject, admin.email).catch(err => console.log(err))
+        }
       }
-    }
-    )
-  );
+      )
+    );
+  } catch (error) {
+    console.log(error)
+  }
+
+
 
 
 };
-
 
 export const sendAdminSessionEnrollmentEmail = async ({
   fullName,
@@ -322,10 +315,15 @@ export const sendAdminSessionEnrollmentEmail = async ({
   sessionDate?: string;
   enrollmentDate?: string;
 }): Promise<void> => {
-  const subject =
-    "New Session Enrollment – Advanced Physical and Technical Training";
 
-  const message = `
+  try {
+
+
+
+    const subject =
+      "New Session Enrollment – Advanced Physical and Technical Training";
+
+    const message = `
 <!DOCTYPE html>
 <html>
   <head>
@@ -382,30 +380,23 @@ export const sendAdminSessionEnrollmentEmail = async ({
   </body>
 </html>
 `;
-    const admins = await pool.query(`SELECTSELECT 
-  u.id AS user_id,
-  u.email,
-  s.new_booking,
-  s.payment_receive,
-  s.session_cancel,
-  s.promotion_purchase,
-  s.email_notification,
-  s.sms_notification
-FROM users u
-JOIN settings s ON s.user_id = u.id
-WHERE u.role = 'admin';`)
 
-  const allAdmins = admins.rows
 
-  await Promise.all(
-    allAdmins.map(admin =>{
-      if(admin.new_booking){
-        sendSingleEmail(message, subject, admin.email).catch(err => console.log(err))
+    const allAdmins = await fetchAllAdmins()
+
+    await Promise.all(
+      allAdmins.map(admin => {
+        if (admin.new_booking) {
+          return sendSingleEmail(message, subject, admin.email).catch(err => console.log(err))
+        }
       }
-    }
-    )
-  );
-  
+      )
+    );
+
+  } catch (error) {
+    console.log(error)
+  }
+
 };
 export const sendCoachNewSessionEmail = async ({
   coachEmail,
@@ -414,7 +405,7 @@ export const sendCoachNewSessionEmail = async ({
   sessionDate = "To Be Confirmed",
   sessionTime = "To Be Confirmed",
   location = "To Be Announced",
-  createdBy = "Admin",
+
   createdDate = new Date().toLocaleString(),
 }: {
   coachEmail: string;
@@ -423,12 +414,13 @@ export const sendCoachNewSessionEmail = async ({
   sessionDate?: string;
   sessionTime?: string;
   location?: string;
-  createdBy?: string;
   createdDate?: string;
 }): Promise<void> => {
-  const subject = "New Session Assigned to You";
 
-  const message = `
+  try {
+    const subject = "New Session Assigned to You";
+
+    const message = `
 <!DOCTYPE html>
 <html>
   <head>
@@ -467,10 +459,6 @@ export const sendCoachNewSessionEmail = async ({
           <td style="padding:8px;">${location}</td>
         </tr>
         <tr>
-          <td style="padding:8px; font-weight:bold;">Assigned By</td>
-          <td style="padding:8px;">${createdBy}</td>
-        </tr>
-        <tr>
           <td style="padding:8px; font-weight:bold;">Assigned On</td>
           <td style="padding:8px;">${createdDate}</td>
         </tr>
@@ -490,7 +478,11 @@ export const sendCoachNewSessionEmail = async ({
 </html>
 `;
 
-  await sendSingleEmail(message, subject, coachEmail);
+    await sendSingleEmail(message, subject, coachEmail);
+  } catch (error) {
+    console.log(error)
+  }
+
 };
 export const sendCoachPlayerEnrollmentEmail = async ({
   coachEmail,
@@ -509,9 +501,12 @@ export const sendCoachPlayerEnrollmentEmail = async ({
   sessionDate?: string;
   enrollmentDate?: string;
 }): Promise<void> => {
-  const subject = "New Player Enrolled in Your Session";
 
-  const message = `
+  try {
+
+    const subject = "New Player Enrolled in Your Session";
+
+    const message = `
 <!DOCTYPE html>
 <html>
   <head>
@@ -569,11 +564,29 @@ export const sendCoachPlayerEnrollmentEmail = async ({
 </html>
 `;
 
-  await sendSingleEmail(message, subject, coachEmail);
+    await sendSingleEmail(message, subject, coachEmail);
+  } catch (error) {
+    console.log(error)
+  }
+
 };
 
+export async function fetchAllAdmins() {
 
-// new function to send email to coach for new session
-// payment email to admin and player on kioskik side
-// user signup email to admin to be checked
-// session enrollments to both admin and coach of that session
+  const admins = await pool.query(`
+  SELECT 
+  u.id AS user_id,
+  u.email,
+  s.new_booking,
+  s.payment_receive,
+  s.session_cancel,
+  s.promotion_purchase,
+  s.email_notification,
+  s.sms_notification
+FROM users u
+JOIN settings s ON s.user_id = u.id
+WHERE u.role = 'admin';`)
+
+  const allAdmins = admins.rows
+  return allAdmins
+}

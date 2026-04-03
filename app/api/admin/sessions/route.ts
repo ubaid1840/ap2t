@@ -1,5 +1,6 @@
 import pool from "@/lib/db";
 import { sendCoachNewSessionEmail } from "@/lib/email-templates";
+import moment from "moment";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
@@ -24,26 +25,34 @@ export async function POST(req: NextRequest) {
       values
     );
 
-    const emailDataRaw=await pool.query(`SELCET
+    const emailDataRaw = await pool.query(`
+      SELCET
        email,
-       first_name || ' ' || last_name AS "fullName"
+       first_name,
+       last_name
        FROM users
        WHERE id=$1
-       `,[data.coach_id])
-    
-    const emailData=emailDataRaw.rows[0]
+       `, [data.coach_id])
 
-    const coachEmailPayload={
-      coachEmail: `${emailData.email}`,
-    coachName: `${emailData.fullName}`,
-    sessionName: `${data.name}`,
-    sessionDate: `${data.date} - ${data.end_date}`,
-    sessionTime: data.time,
-    location: `${data.location}`,
-    createdBy: "admin",
-    createdDate: `${new Date()}`,
+    const emailData = emailDataRaw.rows[0]
+    
+    if (emailData) {
+
+      const sessionStartDate = data?.date ? moment(data?.date).format("YYYY-MM-DD") : "";
+      const sessionEndDate = data?.end_date ? moment(data?.end_date).format("YYYY-MM-DD") : "";;
+      const coachEmailPayload = {
+        coachEmail: `${emailData.email}`,
+        coachName: `${emailData.first_name || ""} ${emailData?.last_name || ""}`,
+        sessionName: `${data?.name}`,
+        sessionDate: `${sessionStartDate} - ${sessionEndDate}`,
+        sessionTime: data?.time,
+        location: `${data.location}`,
+        createdDate: `${new Date()}`,
+      }
+      await sendCoachNewSessionEmail(coachEmailPayload)
     }
-    await sendCoachNewSessionEmail(coachEmailPayload)
+
+
 
 
     return NextResponse.json(
@@ -155,24 +164,24 @@ export async function PUT(req: NextRequest) {
       `;
 
     await pool.query(query, values);
-        const emailDataRaw=await pool.query(`SELCET
+    const emailDataRaw = await pool.query(`SELCET
        email,
        first_name || ' ' || last_name AS "fullName"
        FROM users
        WHERE id=$1
-       `,[data.coach_id])
-    
-    const emailData=emailDataRaw.rows[0]
+       `, [data.coach_id])
 
-    const coachEmailPayload={
+    const emailData = emailDataRaw.rows[0]
+
+    const coachEmailPayload = {
       coachEmail: `${emailData.email}`,
-    coachName: `${emailData.fullName}`,
-    sessionName: `${data.name}`,
-    sessionDate: `${data.date} - ${data.end_date}`,
-    sessionTime: data.time,
-    location: `${data.location}`,
-    createdBy: "admin",
-    createdDate: `${new Date()}`,
+      coachName: `${emailData.fullName}`,
+      sessionName: `${data.name}`,
+      sessionDate: `${data.date} - ${data.end_date}`,
+      sessionTime: data.time,
+      location: `${data.location}`,
+      createdBy: "admin",
+      createdDate: `${new Date()}`,
     }
     await sendCoachNewSessionEmail(coachEmailPayload)
 

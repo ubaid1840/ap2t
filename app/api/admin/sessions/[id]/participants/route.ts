@@ -117,7 +117,7 @@ export async function POST(
         hasSiblingDiscount = true;
         amount = amount * 0.9;
 
-     
+
         // await client.query(
         //   `UPDATE payments
         //    SET amount = amount * 0.9,
@@ -142,32 +142,6 @@ export async function POST(
       [session_id, player_id]
     );
 
-    const emailDataRaw=await pool.query(`SELECT 
-    u.first_name || ' ' || u.last_name AS "fullName",
-    u.email AS "userEmail",
-    s.name AS "sessionName",
-    coach.first_name || ' ' || coach.last_name AS "coachName",
-    s.date AS "sessionDate",
-    NOW() AS "enrollmentDate"
-FROM session_enrollments se
-JOIN users u ON se.user_id = u.id
-JOIN sessions s ON se.session_id = s.id
-JOIN users coach ON s.coach_id = coach.id
-WHERE se.session_id = $1
-  AND se.user_id = $2;`,
-[session_id,player_id]
-)
-    const emailData=emailDataRaw.rows[0]
-    const adminEmailPayload={
-      fullName: emailData.fullName,
-    userEmail: emailData.userEmail,
-    sessionName: emailData.sessionName,
-    coachName: emailData.coachEmail,
-    sessionDate: emailData.sessionDate,
-    enrollmentDate: emailData.enrollmentDate,
-    }
-    await sendAdminSessionEnrollmentEmail(adminEmailPayload)
-
     if (sessionData.comped) {
       await client.query(
         `INSERT INTO payments
@@ -185,6 +159,38 @@ WHERE se.session_id = $1
     }
 
     await client.query("COMMIT");
+
+     const emailDataRaw = await pool.query(`
+      SELECT 
+    u.first_name,
+    u.last_name,
+    u.email AS userEmail,
+    s.name AS sessionName,
+    coach.first_name AS coach_first_name,
+    coach.last_name AS coach_last_name,
+    s.date AS sessionDate,
+    NOW() AS enrollmentDate
+FROM session_players se
+JOIN users u ON se.user_id = u.id
+JOIN sessions s ON se.session_id = s.id
+JOIN users coach ON s.coach_id = coach.id
+WHERE se.session_id = $1
+  AND se.user_id = $2;`,
+      [session_id, player_id]
+    )
+    const emailData = emailDataRaw.rows[0]
+
+    if (emailData) {
+      const adminEmailPayload = {
+        fullName: `${emailData?.first_name || ""} ${emailData?.last_name || ""}`,
+        userEmail: emailData.userEmail,
+        sessionName: emailData.sessionName,
+        coachName: `${emailData?.coach_first_name || ""} ${emailData?.coach_last_name || ""}`,
+        sessionDate: emailData.sessionDate,
+        enrollmentDate: emailData.enrollmentDate,
+      }
+      await sendAdminSessionEnrollmentEmail(adminEmailPayload)
+    }
 
     return NextResponse.json(
       { message: "Done" },
@@ -260,6 +266,6 @@ export async function GET(
 }
 export const revalidate = 0
 
-async function sendEmail(id:number){
-  
+async function sendEmail(id: number) {
+
 }

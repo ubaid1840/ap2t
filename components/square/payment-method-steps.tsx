@@ -12,12 +12,13 @@ export default function PaymentMethodSteps({ id, data, onRefresh }: { id: string
     const [loading, setLoading] = useState(false)
     const [open, setOpen] = useState(false)
     const squareRef = useRef<SquareCardRef>(null)
+    const [deleteLoading, setDeleteLoading] = useState(false)
 
     async function handleCard() {
         if (!squareRef.current) return
 
         try {
-            setLoading(true)
+            setDeleteLoading(true)
             const tokendata = await squareRef.current.tokenize()
             if (data?.id) {
                 await axios.put(`/user/card`, { token: tokendata.token, cardholder: tokendata.cardholderName, id, card_id: data?.id, customer_id: data?.customerId })
@@ -30,9 +31,24 @@ export default function PaymentMethodSteps({ id, data, onRefresh }: { id: string
         } catch (error) {
             console.log(error)
         } finally {
-            setLoading(false)
+            setDeleteLoading(false)
         }
 
+    }
+
+    async function handleDeleteCard(){
+        try {
+            setDeleteLoading(true)
+            await axios.put(`/user`, {
+                id : id,
+                cardholder_name : "",
+                square_card_id : "",
+                card_active : false
+            })
+            await onRefresh()
+        } finally {
+            setLoading(false)
+        }
     }
 
 
@@ -55,9 +71,17 @@ export default function PaymentMethodSteps({ id, data, onRefresh }: { id: string
                     </div>
                 </div>
 
+                <div className="flex gap-2 flex-wrap">
+
+                {data?.id &&
+                    <Button disabled={deleteLoading} onClick={() => handleDeleteCard()} variant="destructive" size="sm">
+                     {deleteLoading && <Spinner className="text-white"/>}   Delete
+                    </Button>
+                }
                 <Button onClick={() => setOpen(!open)} variant="outline" size="sm">
                     {data?.id ? "Update" : "Add"}
                 </Button>
+                </div>
             </div>
 
             {open &&

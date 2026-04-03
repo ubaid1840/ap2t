@@ -1,7 +1,7 @@
 import nodemailer from 'nodemailer';
 import SMTPConnection from 'nodemailer/lib/smtp-connection';
 import pool from './db';
-import { sendAdminPaymentNotificationEmail, sendPaymentReceiptEmail } from './email-templates';
+import { fetchAllAdmins, sendAdminPaymentNotificationEmail, sendPaymentReceiptEmail } from './email-templates';
 
 
 const twilioClient = require('twilio')(process.env.TWILIO_SID, process.env.TWILIO_TOKEN);
@@ -127,26 +127,18 @@ export const sendPaymentReciept = async (data: any) => {
       sessionName,
       paymentDate,
     };
-
-
-
-
     await sendPaymentReceiptEmail(emailData);
-
-    const admins = await pool.query(`SELECT email FROM users WHERE role = 'admin'`)
-
-    const allAdmins = admins.rows
-
+    const allAdmins = await fetchAllAdmins()
     await Promise.all(
-      allAdmins.map((admin) => {
+      allAdmins.map(async (admin) => {
         const adminEmailData = {
           adminEmail: admin.email,
           fullName,
           userEmail: email,
           amount,
-          paymentId: payment.id,
+          paymentId: payment?.transaction_id,
           sessionName,
-          paymentMethod: payment.method,
+          paymentMethod: payment?.method,
           paymentDate,
         };
 
