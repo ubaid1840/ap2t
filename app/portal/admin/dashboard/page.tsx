@@ -72,6 +72,8 @@ export default function Page() {
         }
     }, [user])
 
+    console.log(user)
+
     async function fetchData() {
 
         try {

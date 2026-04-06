@@ -11,11 +11,14 @@ import { useSearchParams } from "next/navigation";
 import * as React from "react";
 import { useEffect } from "react";
 import { FaApple, FaFacebook, FaGoogle } from "react-icons/fa";
+import { useAuth } from "@/contexts/auth-context";
+import { Spinner } from "@/components/ui/spinner";
 
 
 export default function Page() {
   const searchParams = useSearchParams();
   const [tab, setTab] = React.useState<"login" | "signup">("login");
+  const { loading } = useAuth()
 
   useEffect(() => {
     const paramTab = searchParams.get("p");
@@ -40,73 +43,78 @@ export default function Page() {
   return (
     <section className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 sm:py-2">
 
-      <Tabs
-        value={tab}
-        onValueChange={(v) => {
-          routeTo(v)
-        }}
-        className="space-y-8 py-10"
-      >
-        <Link href={"/home"} className="self-start flex gap-4 text-muted items-center">
-          <ArrowLeft size={14} />
-          <p className="text-xs">Back to home</p>
-        </Link>
-        {tab === "login" && (
-          <div className="flex flex-col items-center gap-2">
-
-            <h1 className="font-bold text-5xl text-primary">Login</h1>
-            <p className="text-sm text-muted-foreground text-center">
-              Welcome back! Please log in to access your account.
-            </p>
-          </div>
-        )}
-
-        {tab === "signup" && (
-          <div className="flex flex-col items-center gap-2">
-            <h1 className="font-bold text-5xl text-primary">Sign up</h1>
-            <p className="text-sm text-muted-foreground text-center">
-              Join our community today! Create an account to unlock exclusive
-              features and personalized experiences.
-            </p>
-          </div>
-        )}
-
-        {/* Tabs */}
-        <div className="flex justify-center">
-          <TabsList className="relative w-50 bg-[#282828] border border-[#404040] p-1 rounded-full">
-            <div
-              className={cn(
-                "absolute left-1 top-1 h-[calc(100%-8px)] w-[calc(50%-4px)] rounded-full bg-primary transition-transform duration-300 ease-out",
-                tab === "signup" && "translate-x-full"
-              )}
-            />
-            <TabsTrigger value="login" className="relative z-10 flex-1 rounded-full border-none">
-              Log in
-            </TabsTrigger>
-            <TabsTrigger value="signup" className="relative z-10 flex-1 rounded-full border-none">
-              Sign up
-            </TabsTrigger>
-          </TabsList>
+      {loading ?
+        <div className="flex flex-1 w-full items-center justify-center h-[90dvh]">
+          <Spinner />
         </div>
-
-        <TabsContent value="login" className="w-full max-w-3xl self-center">
-          <LoginForm onClickSignup={() => {
-            routeTo("signup")
-
-          }} />
-        </TabsContent>
-
-        <TabsContent value="signup" className="w-full max-w-3xl self-center">
-          <SignUpForm onClickLogin={() => {
-            routeTo("login")
+        :
+        <Tabs
+          value={tab}
+          onValueChange={(v) => {
+            routeTo(v)
           }}
-          />
-        </TabsContent>
-        <div className="max-w-3xl self-center w-full">
-          <Continue />
-        </div>
-      </Tabs>
+          className="space-y-8 py-10"
+        >
+          <Link href={"/home"} className="self-start flex gap-4 text-muted items-center">
+            <ArrowLeft size={14} />
+            <p className="text-xs">Back to home</p>
+          </Link>
+          {tab === "login" && (
+            <div className="flex flex-col items-center gap-2">
 
+              <h1 className="font-bold text-5xl text-primary">Login</h1>
+              <p className="text-sm text-muted-foreground text-center">
+                Welcome back! Please log in to access your account.
+              </p>
+            </div>
+          )}
+
+          {tab === "signup" && (
+            <div className="flex flex-col items-center gap-2">
+              <h1 className="font-bold text-5xl text-primary">Sign up</h1>
+              <p className="text-sm text-muted-foreground text-center">
+                Join our community today! Create an account to unlock exclusive
+                features and personalized experiences.
+              </p>
+            </div>
+          )}
+
+          <div className="flex justify-center">
+            <TabsList className="relative w-50 bg-[#282828] border border-[#404040] p-1 rounded-full">
+              <div
+                className={cn(
+                  "absolute left-1 top-1 h-[calc(100%-8px)] w-[calc(50%-4px)] rounded-full bg-primary transition-transform duration-300 ease-out",
+                  tab === "signup" && "translate-x-full"
+                )}
+              />
+              <TabsTrigger value="login" className="relative z-10 flex-1 rounded-full border-none">
+                Log in
+              </TabsTrigger>
+              <TabsTrigger value="signup" className="relative z-10 flex-1 rounded-full border-none">
+                Sign up
+              </TabsTrigger>
+            </TabsList>
+          </div>
+
+          <TabsContent value="login" className="w-full max-w-3xl self-center">
+            <LoginForm onClickSignup={() => {
+              routeTo("signup")
+
+            }} />
+          </TabsContent>
+
+          <TabsContent value="signup" className="w-full max-w-3xl self-center">
+            <SignUpForm onClickLogin={() => {
+              routeTo("login")
+            }}
+            />
+          </TabsContent>
+          <div className="max-w-3xl self-center w-full">
+            <Continue />
+          </div>
+        </Tabs>
+
+      }
 
     </section>
   );

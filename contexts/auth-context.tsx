@@ -46,38 +46,51 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const pathname = usePathname();
 
   useEffect(() => {
-    onAuthStateChanged(auth, async (fbUser) => {
+    const unsub = onAuthStateChanged(auth, async (fbUser) => {
       setLoading(true);
       setFirebaseUser(fbUser);
-      if (fbUser?.email) {
-        try {
-          const res = await axios.get(`/userdetail?email=${fbUser.email}`);
-          const role = res.data?.role
-          if (res?.data?.status === 'inactive') {
-            router.replace(`/portal/restrict`);
-            return
-          } else if (!role) {
-            await handleLogout()
-            toast.error("There is no user role...")
-            return
-          } else if (!pathname.startsWith(`/portal/${role}`)) {
-            router.replace(`/portal/${role}`);
-            return
-          }
-          setUser(res.data);
-        } catch (err) {
+
+      try {
+        if (!fbUser?.email) {
           setUser(null);
-          signOut(auth)
-          router.replace("/portal/auth");
+
+          if (!pathname.startsWith("/portal/auth")) {
+            router.replace("/portal/auth");
+          }
+          return;
         }
-      } else {
+
+        const res = await axios.get(`/userdetail?email=${fbUser.email}`);
+        const role = res.data?.role
+        if (res?.data?.status === 'inactive') {
+          router.replace(`/portal/restrict`);
+          return
+        }
+
+        if (!role) {
+          await handleLogout()
+          setUser(null)
+          toast.error("There is no user role...")
+          return
+        }
+        const correctedRoute = `/portal/${role}`
+        if (!pathname.startsWith(correctedRoute)) {
+          router.replace(correctedRoute);
+          return
+        }
+        setUser(res?.data)
+      } catch (error) {
         setUser(null);
+        signOut(auth)
         router.replace("/portal/auth");
+      } finally {
+        setLoading(false)
       }
-      setLoading(false);
     });
 
-  }, []);
+    return () => unsub()
+
+  }, [pathname]);
 
   return (
     <AuthContext.Provider value={{ firebaseUser, user, loading }}>
