@@ -253,7 +253,7 @@ const CreateCoach = ({ onRefresh }: { onRefresh: () => Promise<void> }) => {
                       render={({ field, fieldState }) => (
                         <Field data-invalid={fieldState.invalid}>
                           <Label className="text-sm text-[#99A1AF]">
-                            Biography
+                            Biography <RequiredStar />
                           </Label>
                           <Textarea
                             {...field}

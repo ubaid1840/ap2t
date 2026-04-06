@@ -81,7 +81,7 @@ type BookedSession = {
 export const sessionSchema = z.object({
   name: z.string().min(2, "Session name is required"),
   description: z.string().min(2, "Description is required"),
-  type: z.enum(["camp", "comped"], {
+  type: z.enum(["camp", "clinic"], {
     message: "Type is required",
   }),
   age_limit: z.string().min(1, "Age limit is required"),
