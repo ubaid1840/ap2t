@@ -252,9 +252,6 @@ export function CreateSessionDialog({
       return dateOverlap && timeOverlap;
     });
 
-
-    ;
-
     setNotAvailableSessions(sessionConflicts);
     setBooked(sessionConflicts.length > 0);
 
