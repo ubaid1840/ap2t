@@ -109,7 +109,7 @@ export function AddParticipantDialog({ sessionId, onSuccess, parent_id = null }:
               <Spinner />
             </div>
           ) : results.length > 0 ? (
-            <ScrollArea className="h-[60vh]">
+            <ScrollArea className="h-[calc(100vh-250px)]">
               <div className="space-y-2">
                 {filteredData.map((player) => (
                   <div

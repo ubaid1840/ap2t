@@ -85,7 +85,7 @@ export function CompedDialog({
           </p>
         </DialogHeader>
         <form onSubmit={form.handleSubmit(handleUpdateStatus)}>
-          <ScrollArea className="h-[70dvh]">
+          <ScrollArea className="h-[calc(100vh-250px)]">
             <div className="px-6 py-2 space-y-4">
               <div className="bg-[#1A1A1A] border border-border rounded-[10px] space-y-2 p-6">
                 <div className="flex justify-between">

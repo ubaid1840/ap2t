@@ -24,7 +24,7 @@ export function ViewDialog({ data } : {data : PaymentItem}) {
         <p className="text-sm text-ghost-text">Transaction</p>
         <p className="text-sm text-ghost-text">{data.transaction_id}</p>
       </DialogHeader>
-      <ScrollArea className="h-[65dvh]">
+      <ScrollArea className="h-[calc(100vh-250px)]">
         <div className="px-6 py-2 space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div className="bg-[#1A1A1A] border border-border p-4 space-y-1 rounded-[10px]">

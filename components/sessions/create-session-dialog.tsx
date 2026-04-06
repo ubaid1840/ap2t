@@ -345,7 +345,7 @@ export function CreateSessionDialog({
             </p>
           </DialogHeader>
           <form onSubmit={form.handleSubmit(CreateSession)}>
-            <ScrollArea className=" py-1 space-y-4 px-2 h-[70vh]">
+            <ScrollArea className=" py-1 space-y-4 px-2 h-[calc(100vh-250px)]">
               <div className="space-y-2 px-2 pb-2">
                 <div className="flex gap-2 text-md ">
                   <Tag className="text-primary w-4 w-4" />

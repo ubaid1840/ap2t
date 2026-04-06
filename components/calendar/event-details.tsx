@@ -33,7 +33,7 @@ const EventDetail = ({
                         Event details
                     </DialogTitle>
                 </DialogHeader>
-                <ScrollArea className="h-[70dvh] px-4 py-3">
+                <ScrollArea className="h-[calc(100vh-250px)] px-4 py-3">
                     <div className="space-y-3">
                         {events.length === 0 && (
                             <div className="text-sm text-muted-foreground text-center py-10">

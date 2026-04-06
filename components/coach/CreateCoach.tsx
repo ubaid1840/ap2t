@@ -97,7 +97,7 @@ const CreateCoach = ({ onRefresh }: { onRefresh: () => Promise<void> }) => {
             </DialogTitle>
           </DialogHeader>
           <form onSubmit={form.handleSubmit(addCoach)} className="">
-            <ScrollArea className=" py-1 space-y-4 px-2 h-[65vh]">
+            <ScrollArea className=" py-1 space-y-4 px-2 h-[calc(100vh-250px)]">
               <div className="space-y-2 px-2 pb-2">
                 <div className="grid grid-cols-2 gap-2">
                   <div className="space-y-2">
