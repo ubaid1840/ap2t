@@ -24,6 +24,8 @@ import { useAuth } from "@/contexts/auth-context";
 import { useEffect, useState } from "react";
 import { Dialog, DialogTrigger } from "./ui/dialog";
 import GetSupportDialog from "./get-sport-dialog/getsupportddialog";
+import { useApproval } from "./frontdesk/use-approval";
+import CountBadge from "./count-badge";
 
 
 export const company = {
@@ -39,6 +41,7 @@ export default function AppSidebar() {
   const { toggleSidebar, state } = useSidebar();
   const [navItems, setNavItems] = useState<any[]>([])
   const { user } = useAuth()
+  const { approvalCount } = useApproval()
 
   useEffect(() => {
     if (pathname.startsWith("/portal/admin")) {
@@ -111,7 +114,8 @@ export default function AppSidebar() {
                           className="flex items-center"
                         >
                           <Icon />
-                          <span className="text-[14px]">{item.title}</span>
+                          <span className="text-[14px]">{item.title}  </span>
+                          {item?.title === 'Front Desk' && <CountBadge count={approvalCount}/>}
                         </Link>
                       </SidebarMenuButton>
                     </SidebarMenuItem>

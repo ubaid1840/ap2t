@@ -10,12 +10,15 @@ import { useEffect, useState } from 'react';
 
 export function useApproval() {
     const [approvals, setApprovals] = useState([]);
+    const [approvalCount, setApprovalCount] = useState(0)
     const [loading, setLoading] = useState(true)
     const { user } = useAuth()
 
     const fetchMessages = async () => {
         try {
             const response = await axios.get(`/front-desk`);
+            const needApproval = response.data?.filter((item : any)=> item.status === 'waiting')?.length
+            setApprovalCount(needApproval)
             setApprovals(response.data);
         } finally {
             setLoading(false)
@@ -42,5 +45,5 @@ export function useApproval() {
 
     }, [user]);
 
-    return { approvals, loading };
+    return { approvals, loading, approvalCount };
 }

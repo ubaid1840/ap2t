@@ -316,14 +316,9 @@ export default function FrontdeskDashboard() {
           <div className="w-full">
             <InputWithIcon value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search by name or session..." />
           </div>
-
-
         </div>
-
-
       </div>
-
-
+      
       <PageTable
         loading={loading}
         columns={FRONT_DESK_SESSION_COLUMNS}

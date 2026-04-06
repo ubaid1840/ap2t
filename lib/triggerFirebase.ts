@@ -34,3 +34,11 @@ export async function TriggerFirebaseApprovals(to : string) {
         });
     
 }
+
+export async function TriggerFirebaseForNotifications(id : string | number | null) {
+    if (id) {
+        await setDoc(doc(db, "notifications", `not-${id.toString()}`), {
+            updated: serverTimestamp(),
+        });
+    }
+}
