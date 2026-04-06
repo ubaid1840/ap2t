@@ -151,10 +151,6 @@ export function CreateSessionDialog({
       });
   }
 
-
-
-
-
   const form = useForm<SessionSchemaValues>({
     resolver: zodResolver(sessionSchema),
     defaultValues: {
