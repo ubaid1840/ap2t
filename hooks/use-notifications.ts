@@ -9,12 +9,12 @@ import { useEffect, useState } from 'react';
 
 export type NotificationType = {
     id: number;
-    title : string
+    title: string
     to: number;
     from: number;
     route: string;
     msg: string;
-    to_name : string
+    to_name: string
     read: boolean;
     created_at: string; // ISO date string
 };
@@ -40,7 +40,6 @@ export function useNotifications() {
             console.log(error)
         }
     }
-    console.log(notifications)
     useEffect(() => {
         if (!user?.id) return
 

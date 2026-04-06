@@ -26,7 +26,7 @@ export async function POST(req: NextRequest) {
     );
 
     const emailDataRaw = await pool.query(`
-      SELCET
+      SELECT
        email,
        first_name,
        last_name
@@ -164,7 +164,7 @@ export async function PUT(req: NextRequest) {
       `;
 
     await pool.query(query, values);
-    const emailDataRaw = await pool.query(`SELCET
+    const emailDataRaw = await pool.query(`SELECT
        email,
        first_name || ' ' || last_name AS "fullName"
        FROM users

@@ -97,7 +97,6 @@ export const SESSION_COLUMNS: ColumnDef<SessionData>[] = [
       </Button>
     ),
     cell: ({ row }) =>{
-      console.log(row.original.end_date);
        return(
       <div className="leading-tight">
         <div className="text-[#D1D5DC]">{row.original.date}-{row.original.end_date}</div>

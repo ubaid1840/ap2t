@@ -75,8 +75,6 @@ export default function MainCoachPage({
     }
   };
 
-  console.log(data)
-
   const fetchSessionTypes = async () => {
     setLoading(true)
     try {

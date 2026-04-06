@@ -57,7 +57,7 @@ export default function DashboardHeader({ trigger }: { trigger?: ReactNode }) {
           {showPopup && <PopupSearch />}
         </div>
         <div className="flex gap-4 items-center">
-          <NotificationSheet />
+          {/* <NotificationSheet /> */}
           <Separator orientation="vertical" />
           <div>
             <p className="text-xs text-white text-right">{user?.first_name}</p>

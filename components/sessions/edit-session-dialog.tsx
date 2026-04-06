@@ -88,11 +88,11 @@ export const sessionSchema = z.object({
   location: z.string().min(2, "Location is required"),
 
   date: z.date({
-    required_error: "Start date is required",
+    error: "Start date is required",
   }),
 
   end_date: z.date({
-    required_error: "End date is required",
+    error: "End date is required",
   }),
 
   start_time: z.string().min(1, "Start time required"),
@@ -208,7 +208,6 @@ export function EditSessionDialog({
     return conflicts
   };
   function getBlockedConflict(values: SessionSchemaValues) {
-    console.log(coachSchedule)
     const conflicts = Object.entries(coachSchedule).filter(
       ([blockedDateTime, status]) => {
         if (status !== "blocked") return false;
@@ -264,7 +263,6 @@ export function EditSessionDialog({
   const selectedCoachId = form.watch("coach_id");
 
   useEffect(() => {
-    console.log(sessionData)
     if (open && sessionData) {
       form.reset({
         name: sessionData.name,
@@ -274,8 +272,8 @@ export function EditSessionDialog({
         session_type: sessionData.session_type,
         coach_id: sessionData.coach_id,
         location: sessionData.location,
-        date: new Date(sessionData.date),
-        end_date: new Date(sessionData.end_date),
+        date: sessionData?.date ? new Date(sessionData?.date) : undefined,
+        end_date: sessionData.end_date ? new Date(sessionData.end_date) : undefined,
         start_time: sessionData.start_time,
         end_time: sessionData.end_time,
         price: Number(sessionData.price),
