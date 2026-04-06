@@ -194,7 +194,7 @@ export function CreateParent({
                         {...field}
                         id={field.name}
                         aria-invalid={fieldState.invalid}
-                        placeholder="+1 XXXXXX"
+                        placeholder="+1XXXXXX"
                         autoComplete="off"
                       />
                       {fieldState.invalid && (
