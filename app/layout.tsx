@@ -4,8 +4,8 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono, Inter } from "next/font/google";
 import NextTopLoader from 'nextjs-toploader';
 import { Suspense } from "react";
-import "./globals.css";
 import Script from "next/script";
+import "./globals.css"
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-sans' });
 

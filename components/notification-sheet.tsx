@@ -1,28 +1,28 @@
 "use client"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import {
     Sheet,
-    SheetClose,
     SheetContent,
     SheetDescription,
-    SheetFooter,
     SheetHeader,
     SheetTitle,
-    SheetTrigger,
+    SheetTrigger
 } from "@/components/ui/sheet"
-import { Bell, Calendar, CircleCheckBig, CreditCard, Dot, Filter, Info, Send } from "lucide-react"
-import CardStatus from "./card-status"
-import { GearIcon } from "@radix-ui/react-icons"
-import { Separator } from "./ui/separator"
+import { useNotifications } from "@/hooks/use-notifications"
+import { Bell, Dot } from "lucide-react"
+import moment from "moment"
+import { useRouter } from "nextjs-toploader/app"
 import { ScrollArea } from "./ui/scroll-area"
 
 export default function NotificationSheet() {
+
+    const { notifications, unRead } = useNotifications()
+    const router = useRouter()
+
     return (
         <Sheet>
             <SheetTrigger>
-                <NotificationBadge count={1} />
+                <NotificationBadge count={notifications.length} />
             </SheetTrigger>
             <SheetContent className="bg-[#252525] border-[#3A3A3A] p-0 sm:max-w-[500px] gap-0">
                 <SheetHeader className=" p-4">
@@ -33,7 +33,7 @@ export default function NotificationSheet() {
                         </div>
                         <div className="space-y-0">
                             <SheetTitle className="text-md">Notification Center</SheetTitle>
-                            <SheetDescription className="text-xs text-muted-foreground">0 unread messages</SheetDescription>
+                            <SheetDescription className="text-xs text-muted-foreground">{unRead} unread messages</SheetDescription>
                         </div>
                     </div>
 
@@ -41,75 +41,54 @@ export default function NotificationSheet() {
 
                 <div className="flex w-full gap-4 justify-between px-6 py-4">
                     <Button variant={"outline"} className="flex flex-1">Mark All as Read</Button>
-                    {/* <Button className="flex flex-1 "><GearIcon /> Templates</Button> */}
                 </div>
 
-              
-
-                <div className="flex gap-4 items-center px-4 border-t border-b py-4">
-                    <Filter size={16} />
-
-                    <Button variant={"outline"} className="flex flex-1 ">All Types</Button>
-                    <Button variant={"outline"} className="flex flex-1">Parents</Button>
-
-                </div>
-
-               
                 <ScrollArea className="overflow-y-auto p-4">
-                <div className="px-2 space-y-2">
-                    {notificationData.map((item, i) => {
-                        let Icon = <Info size={14} />
-                        let color = "success"
-                        if (item.type === "payment") {
-                            Icon = <CreditCard size={14} />
-                            color = "warning"
-                        }
-                        else if (item.type === "schedule") {
-                            Icon = <Calendar size={14} />
-                            color = "success"
+                    <div className="px-2 space-y-2">
+                        {notifications.map((item, i) => {
+                            const isRead = item.read;
+                            return (
+                                <div
 
-                        } else if (item.type === "checkin") {
-                            Icon = <CircleCheckBig size={14} />
-                            color = "active"
-                        } else if (item.type === "booking") {
+                                    key={i}
+                                    onClick={() => router.push(item?.route || "#")}
+                                    className={`
+        p-3 border rounded-md cursor-pointer transition-all duration-200 w-full
+        ${isRead
+                                            ? "bg-[#141414] border-[#2A2A2A] opacity-70"
+                                            : "bg-[#1A1A1A] border-[#3A3A3A]"} 
+        hover:bg-[#242424] hover:border-[#4A4A4A] hover:scale-[1.01]
+      `}
+                                >
+                                    <div className="flex gap-2">
+                                        <div className="space-y-1">
+                                            <p className={`text-sm ${isRead ? "text-gray-400" : "text-white"}`}>
+                                                {item?.title}
+                                            </p>
 
-                            Icon = <Calendar size={14} />
-                            color = "info"
-                        } else {
-                            Icon = <Bell size={14} />
-                            color = "other"
-                        }
-                        return (
-                            <div key={i} className="p-3 bg-[#1A1A1A] border border-[#3A3A3A] rounded-md">
-                                <div className="flex gap-2">
-                                    <div className={`rounded-[8px] flex w-8 h-8 items-center justify-center bg-[#252525] text-${color}-text`}>{Icon}
-                                    </div>
-                                    <div className="space-y-1">
-                                        <p className="text-sm">{item.title}</p>
-                                        <p className="text-xs text-[#99A1AF]">{item.description}</p>
-                                        <div className="flex gap-2 items-center">
-                                            <p className="text-xs text-muted-foreground">{item.for}</p>
-                                            <Dot size={10} className="text-muted-foreground" />
-                                            <p className="text-xs text-muted-foreground">{item.date}</p>
-                                            <p className="text-xs text-muted-foreground">{item.time}</p>
-                                            <Dot size={10} className="text-muted-foreground" />
-                                            <p className="text-active-text text-sm">Sent</p>
+                                            <p className="text-xs text-[#99A1AF]">
+                                                {item.msg}
+                                            </p>
+
+                                            <div className="flex gap-2 items-center">
+                                                <p className="text-xs text-muted-foreground">
+                                                    {item?.to_name}
+                                                </p>
+
+                                                <Dot size={10} className="text-muted-foreground" />
+
+                                                <p className="text-xs text-muted-foreground">
+                                                    {moment(item.created_at).format("YYYY-MM-DD hh:mm A")}
+                                                </p>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                                {item.resend && <Button className="mt-2" size={"sm"}><Send /> Resend</Button>}
-                            </div>
-                        )
-                    })}
-                </div>
+                            );
+                        })}
+                    </div>
                 </ScrollArea>
-                {/*                
-                <SheetFooter>
-                    <Button type="submit">Save changes</Button>
-                    <SheetClose asChild>
-                        <Button variant="outline">Close</Button>
-                    </SheetClose>
-                </SheetFooter> */}
+
             </SheetContent>
         </Sheet>
     )
@@ -121,7 +100,7 @@ const NotificationBadge = ({ count }: { count?: number | null }) => {
         <div className="relative inline-block">
             <Bell size={20} />
 
-            {count && count > 0 && (
+            {(count ?? 0) > 0 && (
                 <span className="absolute -top-1 -right-1 block w-2 h-2 bg-red-500 rounded-full" />
             )}
         </div>
