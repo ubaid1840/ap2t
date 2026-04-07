@@ -89,13 +89,13 @@ export function EditSessionDialog({
   const [coach_Name, setCoach_name] = useState<string | null>(null);
   const [notAvailableSessions, setNotAvailableSessions] = useState<BookedSession[]>([]);
   const [booked, setBooked] = useState(false);
-    const [coachSchedule,setCoachSchedule]=useState<Record<string, string>>({})
-    const [blocked,setBlocked]=useState(false)
-    const [blockedHours,setBlockedHours]=useState<any[]>([])
+  const [coachSchedule, setCoachSchedule] = useState<Record<string, string>>({})
+  const [blocked, setBlocked] = useState(false)
+  const [blockedHours, setBlockedHours] = useState<any[]>([])
   const router = useRouter();
-  const {user} = useAuth()
+  const { user } = useAuth()
   const byAdmin = user?.role === 'admin'
- 
+
 
   function to24Hour(timeStr: string): string {
     if (!timeStr) return "";
@@ -114,7 +114,7 @@ export function EditSessionDialog({
         (session) =>
           (session.status === "upcoming" || session.status === "ongoing") &&
           coachId === session.original.coach_id &&
-          session.original.id !== sessionId, 
+          session.original.id !== sessionId,
       )
       .map((session) => {
         const [start_time, end_time] = session.time.split(" - ");
@@ -135,12 +135,12 @@ export function EditSessionDialog({
       date: Date | null;
       end_date: Date | null;
     } = {
-      start_time: "",
+        start_time: "",
         end_time: "",
         date: null,
         end_date: null
       },
-  ):BookedSession[] => {
+  ): BookedSession[] => {
     const selectedDate = overrides.date ?? form.getValues("date");
     const selectedEndDate = overrides.end_date ?? form.getValues("end_date");
     const selectedStartTime = overrides.start_time ?? form.getValues("start_time");
@@ -178,27 +178,27 @@ export function EditSessionDialog({
     return conflicts
   };
   function getBlockedConflict(values: SessionSchemaValues) {
-    const conflicts = Object.entries(coachSchedule||{}).filter(
+    const conflicts = Object.entries(coachSchedule || {}).filter(
       ([blockedDateTime, status]) => {
         if (status !== "blocked") return false;
-  
-        
+
+
         const [blockedDateStr, blockedTimePart] = blockedDateTime.split("_");
-  
+
         const selStartStr = moment(values.date).format("YYYY-MM-DD");
         const selEndStr = moment(values.end_date).format("YYYY-MM-DD");
-  
+
         if (blockedDateStr < selStartStr || blockedDateStr > selEndStr) return false;
-  
-        
+
+
         const blockedTime24 = to24Hour(blockedTimePart);
         const newStart = to24Hour(values.start_time);
         const newEnd = to24Hour(values.end_time);
-  
+
         return blockedTime24 >= newStart && blockedTime24 < newEnd;
       }
     );
-  
+
     setBlocked(conflicts.length > 0);
     setBlockedHours(conflicts);
     return conflicts;
@@ -236,7 +236,7 @@ export function EditSessionDialog({
     if (open && sessionData) {
       form.reset();
       setCoach_name(`${sessionData?.coach_first_name} ${sessionData?.coach_last_name}`)
-      setCoachSchedule(sessionData?.coach_schedule_preference?? {})
+      setCoachSchedule(sessionData?.coach_schedule_preference ?? {})
     }
   }, [open, sessionData]);
 
@@ -245,7 +245,7 @@ export function EditSessionDialog({
       toast.error("Session ID is required");
       return;
     }
-    const sessionConflicts=getSessionsConflicts({
+    const sessionConflicts = getSessionsConflicts({
       date: values.date,
       end_date: values.end_date,
       start_time: values.start_time,
@@ -254,20 +254,20 @@ export function EditSessionDialog({
 
     const hasSessionConflict = sessionConflicts.length > 0;
     setLoading(true);
-        const blockedConflict = getBlockedConflict(values)
-        const hasBlockedConflict=blockedConflict.length>0
-        if(hasSessionConflict){
-          toast.error("Can't update session because coach is already booked at this time and date")
-          setLoading(false)
-          return
-        }
-        if(hasBlockedConflict){
-          toast.error("Can't update session because coach has blocked his scedule.")
-          setLoading(false)
-          return
-        }
+    const blockedConflict = getBlockedConflict(values)
+    const hasBlockedConflict = blockedConflict.length > 0
+    if (hasSessionConflict) {
+      toast.error("Can't update session because coach is already booked at this time and date")
+      setLoading(false)
+      return
+    }
+    if (hasBlockedConflict) {
+      toast.error("Can't update session because coach has blocked his scedule.")
+      setLoading(false)
+      return
+    }
     try {
-      await axios.put(`/admin/sessions`, { ...values, id: sessionId,byAdmin });
+      await axios.put(`/admin/sessions`, { ...values, id: sessionId, byAdmin });
 
       toast.success("Session updated successfully");
       setOpen(false);
@@ -459,7 +459,7 @@ export function EditSessionDialog({
                           Selected Coach: {coach_Name}
                         </p>
                       )}
-                      { (
+                      {(
                         <AssignCoachDialog
                           onSelect={(coach) => {
                             form.setValue("coach_id", coach.id, {
