@@ -49,6 +49,8 @@ import { Separator } from "../ui/separator";
 import { Spinner } from "../ui/spinner";
 import { AssignCoachDialog } from "./assign-coach-dialog";
 import { SessionType } from "./create-session-dialog";
+import { SendInAppNotification } from "@/lib/send-inapp-notification";
+import { useAuth } from "@/contexts/auth-context";
 
 type BookedSession = {
   name: string;
@@ -132,10 +134,16 @@ export function EditSessionDialog({
   const [coach_Name, setCoach_name] = useState<string | null>(null);
   const [notAvailableSessions, setNotAvailableSessions] = useState<BookedSession[]>([]);
   const [booked, setBooked] = useState(false);
-    const [coachSchedule,setCoachSchedule]=useState<{string:string}|{}>({})
+    const [coachSchedule,setCoachSchedule]=useState<Record<string, string>>({})
     const [blocked,setBlocked]=useState(false)
     const [blockedHours,setBlockedHours]=useState([])
+    const [byAdmin,setByAdmin]=useState(true)
   const router = useRouter();
+  useEffect((()=>{
+    if(coach_id){
+      setByAdmin(false)
+    }
+  }),[])
 
   function to24Hour(timeStr: string): string {
     if (!timeStr) return "";
@@ -209,7 +217,7 @@ export function EditSessionDialog({
   };
   function getBlockedConflict(values: SessionSchemaValues) {
     console.log(coachSchedule)
-    const conflicts = Object.entries(coachSchedule).filter(
+    const conflicts = Object.entries(coachSchedule||{}).filter(
       ([blockedDateTime, status]) => {
         if (status !== "blocked") return false;
   
@@ -323,7 +331,7 @@ export function EditSessionDialog({
           return
         }
     try {
-      await axios.put(`/admin/sessions`, { ...values, id: sessionId });
+      await axios.put(`/admin/sessions`, { ...values, id: sessionId,byAdmin });
 
       toast.success("Session updated successfully");
       setOpen(false);
@@ -345,7 +353,7 @@ export function EditSessionDialog({
     setDeleteLoading(true);
 
     try {
-      await axios.delete(`/admin/sessions/${sessionId}`);
+      await axios.delete(`/admin/sessions/${sessionId}?byAdmin=${byAdmin}`);
       toast.success("Session deleted successfully");
       setDeleteLoading(false);
       setSelectedSession(null);

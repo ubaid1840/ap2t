@@ -84,5 +84,34 @@ export async function PUT(req: NextRequest) {
         return NextResponse.json({ message:  error?.message || "Internal Server Error" }, { status: 500 });
     }
 }
+// export async function POST(req: NextRequest) {
+//   try {
+//     const notification = await req.json();
+
+//     const keys = Object.keys(notification);
+//     const values = Object.values(notification);
+
+//     const columns = keys.map((key) => `"${key}"`).join(", ");
+//     const placeholders = keys.map((_, i) => `$${i + 1}`).join(", ");
+
+//     const query = `
+//       INSERT INTO notifications (${columns})
+//       VALUES (${placeholders})
+//       RETURNING *;
+//     `;
+
+//     const result = await pool.query(query, values);
+
+//     TriggerFirebaseForNotifications(notification.to);
+
+//     return NextResponse.json(result.rows[0], { status: 201 });
+//   } catch (error: any) {
+//     console.log("Error Creating data:", error?.message);
+//     return NextResponse.json(
+//       { message: error?.message || "Internal Server Error" },
+//       { status: 500 }
+//     );
+//   }
+// }
 
 export const revalidate = 0

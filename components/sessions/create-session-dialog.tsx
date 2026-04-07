@@ -80,7 +80,7 @@ type BookedSession = {
 export const sessionSchema = z.object({
   name: z.string().min(2, "Session name is required"),
   description: z.string().min(2, "Description is required"),
-  type: z.enum(["camp", "comped"], {
+  type: z.enum(["camp", "clinic"], {
     message: "Type is required",
   }),
   age_limit: z.string().min(1, "Age limit is required"),
@@ -124,9 +124,10 @@ export function CreateSessionDialog({
     BookedSession[]
   >([]);
   const [booked, setBooked] = useState(false);
-  const [coachScedule,setCoachScedule]=useState<{string:string}|{}>({})
+  const [coachScedule, setCoachScedule] = useState<Record<string, string>>({});
   const [blocked,setBlocked]=useState(false)
   const [blockedHours,setBlockedHours]=useState([])
+  const [byAdmin,setByAdmin]=useState(true)
 
 
   function getCoachBookedSessions(coachId: number | null): BookedSession[] {
@@ -183,6 +184,7 @@ export function CreateSessionDialog({
   useEffect(() => {
     if (coach_id) {
       form.setValue("coach_id", Number(coach_id));
+      setByAdmin(false)
     }
 
     if (coach_name) {
@@ -260,7 +262,7 @@ const getSessionsConflicts = (
   return sessionConflicts;
 };
 function getBlockedConflict(values: SessionSchemaValues) {
-  const conflicts = Object.entries(coachScedule).filter(
+  const conflicts = Object.entries(coachScedule ||{}).filter(
     ([blockedDateTime, status]) => {
       if (status !== "blocked") return false;
 
@@ -310,6 +312,7 @@ function getBlockedConflict(values: SessionSchemaValues) {
     try {
       await axios.post("/admin/sessions", {
         ...values,
+        byAdmin
       });
 
       await onRefresh();

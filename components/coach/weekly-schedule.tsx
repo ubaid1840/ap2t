@@ -67,7 +67,7 @@ if (localPreference[key] === "blocked") {
 
     // Find an event that spans this slot
     const event = events.find(e => {
-      if (e.date !== date.format("YYYY-MM-DD")) return false;
+      if (date.isAfter(e.end_date)||date.isBefore(e.date)) return false;
 
       // Parse event start time
       const startTime = moment(date).set({
@@ -87,7 +87,7 @@ if (localPreference[key] === "blocked") {
         })
         : moment(startTime).add(1, "hour");
 
-      return cellTime.isSameOrAfter(startTime) && cellTime.isBefore(endTime);
+      return cellTime.isSameOrAfter(startTime) && cellTime.isBefore(endTime) && date.isBefore(e.end_date) && date.isSameOrAfter(e.date);
     });
 
     if (event) return event;

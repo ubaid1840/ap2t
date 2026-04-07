@@ -1,5 +1,8 @@
 import pool from "@/lib/db";
+import { fetchAllAdmins, sendAdminSessionEnrollmentEmail } from "@/lib/email-templates";
 import admin from "@/lib/firebase-admin";
+import { sendInAppNotificationBackend } from "@/lib/send-inapp-notification";
+import moment from "moment";
 import { NextRequest, NextResponse } from "next/server";
 
 
@@ -142,6 +145,7 @@ export async function POST(
       email: parent.email.trim().toLowerCase(),
       password: parent.password,
     });
+
   } catch (err: any) {
     console.error("Firebase error:", err.message);
     return NextResponse.json(
@@ -202,8 +206,88 @@ export async function POST(
        VALUES ($1, $2)`,
       [id, playerUserId]
     );
+    await client.query(
+  `INSERT INTO payments (session_id, user_id, amount, status)
+   VALUES ($1, $2, $3, $4)`,
+  [id, playerUserId, 0, "pending"]
+);
 
     await client.query("COMMIT");
+         const emailDataRaw = await pool.query(`
+      SELECT 
+  u.first_name,
+  u.last_name,
+  u.email AS userEmail,
+  s.name AS sessionName,
+  s.coach_id,
+  coach.email AS coachEmail,
+  coach.first_name AS coach_first_name,
+  coach.last_name AS coach_last_name,
+  s.date AS session_start_date,
+  s.end_date AS session_end_date,
+  NOW() AS enrollmentDate,
+  p.parent_id 
+FROM session_players se
+JOIN users u ON se.user_id = u.id
+JOIN sessions s ON se.session_id = s.id
+JOIN users coach ON s.coach_id = coach.id
+LEFT JOIN players p ON p.user_id = u.id 
+WHERE se.session_id = $1
+  AND se.user_id = $2`,
+      [id, playerUserId]
+    )
+    const emailData = emailDataRaw.rows[0]
+
+    if (emailData) {
+      const adminEmailPayload = {
+        fullName: `${emailData?.first_name || ""} ${emailData?.last_name || ""}`,
+        userEmail: emailData.useremail,
+        sessionName: emailData.sessionname,
+        coachName: `${emailData?.coach_first_name || ""} ${emailData?.coach_last_name || ""}`,
+        sessionDate: moment(emailData.sessiondate).format("YYYY-MMM-DD"),
+        enrollmentDate: moment(emailData.enrollmentdate).format("YYYY-MMM-DD"),
+      }
+      await sendAdminSessionEnrollmentEmail(adminEmailPayload)
+    }
+    const playerName = `${emailData?.first_name || ""} ${emailData?.last_name || ""}`.trim();
+
+const msg = `${playerName} enrolled in "${emailData.sessionname}".`;
+
+const admins = await fetchAllAdmins();
+const promises = admins.map(admin =>
+  sendInAppNotificationBackend(
+    admin.user_id,
+    msg,
+    `/portal/admin/sessions/${id}`
+  )
+);
+
+await Promise.all(promises);
+await sendInAppNotificationBackend(
+  emailData.coach_id,
+  msg,
+  `/portal/coach/sessions/${id}`
+);
+const paymentMsg = `${playerName} enrolled in "${emailData.sessionname}". Payment: Pending`;
+
+if(emailData.parent_id){
+
+  await sendInAppNotificationBackend(
+    emailData.parent_id,
+    msg,
+    `/portal/parent/sessions/${id}`
+  );
+}
+
+const promises1 = admins.map(admin =>
+  sendInAppNotificationBackend(
+    admin.user_id,
+    paymentMsg,
+    `/portal/admin/payments/`
+  )
+);
+
+await Promise.all(promises1);
 
     return NextResponse.json(
       { success: true, message: "Registered successfully" },

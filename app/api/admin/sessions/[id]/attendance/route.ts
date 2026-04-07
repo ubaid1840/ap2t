@@ -1,4 +1,6 @@
 import pool from "@/lib/db";
+import { fetchAllAdmins } from "@/lib/email-templates";
+import { sendInAppNotificationBackend } from "@/lib/send-inapp-notification";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(
@@ -35,9 +37,61 @@ export async function POST(
             `INSERT INTO attendance (${fields.join(",")}) VALUES (${placeholders})`, 
             values
         );
+        const userInfoRes = await pool.query(
+        `SELECT first_name, last_name, email 
+   FROM users 
+   WHERE id = $1`,
+        [data.user_id],
+      );
+
+      const userInfo = userInfoRes.rows[0];
+      const fullName = `${userInfo.first_name} ${userInfo.last_name}`;
+      const allAdmins = await fetchAllAdmins();
+
+      await Promise.all(
+        allAdmins.map(async (admin) => {
+          const paymentMsg = `${fullName} attendended for "${admin.sessionName}".`;
+
+          await sendInAppNotificationBackend(
+            admin.user_id,
+            paymentMsg,
+            `/portal/admin/sessions/${data.session_id}`,
+          );
+        }),
+      );
+
+      const EmailDataRaw = await pool.query(
+        `SELECT 
+  u.first_name || ' ' || u.last_name AS playerName,
+  s.name AS sessionName,
+  s.coach_id,
+  p.parent_id
+FROM session_players se
+JOIN users u ON se.user_id = u.id
+JOIN sessions s ON se.session_id = s.id
+LEFT JOIN players p ON p.user_id = u.id
+WHERE se.session_id = $1
+  AND se.user_id = $2;`,
+        [data.session_id, data.user_id],
+      );
+      const EmailData = EmailDataRaw.rows[0];
+      const msg = `${EmailData.playername} attended in "${EmailData.sessionname}".`;
+      await sendInAppNotificationBackend(
+        EmailData.coach_id,
+        msg,
+        `/portal/coach/sessions/${data.session_id}`,
+      );
+      if (EmailData.parent_id) {
+        await sendInAppNotificationBackend(
+          EmailData.parent_id,
+          msg,
+          `/portal/parent/sessions/${data.session_id}`,
+        );
+      }
 
         return NextResponse.json({ message: "Attendance Marked" }, { status: 200 });
         }
+        
 
     } catch (error: any) {
         return NextResponse.json(
