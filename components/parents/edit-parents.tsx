@@ -42,17 +42,16 @@ const parentSchema = z.object({
   first_name: z.string().min(2, "First name is required"),
   last_name: z.string().min(2, "Last name is required"),
 
-  phone_no: z.string().min(6, "Phone is required"),
+  phone_no: z.string().min(6, "Phone is required").nullable(),
 
-  zip_code: z.string().min(3, "Zip code required"),
+  zip_code: z.string().min(3, "Zip code required").nullable(),
 
-  location: z.string().min(2, "Location required"),
+  location: z.string().min(2, "Location required").nullable(),
 });
 type parentSchemaValues = z.infer<typeof parentSchema>;
 
 export function EditParents({ parent_id, data, onRefresh }: EditParentsProps) {
   const [open, setOpen] = useState(false);
-  const [localData, setLocalData] = useState<DataProp | undefined>();
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -165,7 +164,9 @@ export function EditParents({ parent_id, data, onRefresh }: EditParentsProps) {
                         phone <RequiredStar />
                       </Label>
                       <Input
-                        {...field}
+                        value={field?.value || ""}
+                        onChange={(e) => field.onChange(e.target.value)}
+                        // {...field}
                         id={field.name}
                         aria-invalid={fieldState.invalid}
                         placeholder="+1XXXXXXX"
@@ -189,7 +190,8 @@ export function EditParents({ parent_id, data, onRefresh }: EditParentsProps) {
                         Zip Code <RequiredStar />
                       </Label>
                       <Input
-                        {...field}
+                        value={field?.value || ""}
+                        onChange={(e) => field.onChange(e.target.value)}
                         id={field.name}
                         aria-invalid={fieldState.invalid}
                         placeholder="1038"
@@ -211,7 +213,8 @@ export function EditParents({ parent_id, data, onRefresh }: EditParentsProps) {
                     <Field data-invalid={fieldState.invalid}>
                       <Label className="text-sm text-[#99A1AF]">Address</Label>
                       <Textarea
-                        {...field}
+                        value={field?.value || ""}
+                        onChange={(e) => field.onChange(e.target.value)}
                         id={field.name}
                         aria-invalid={fieldState.invalid}
                         autoComplete="off"

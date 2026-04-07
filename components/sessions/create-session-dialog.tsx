@@ -53,21 +53,21 @@ export type SessionType = {
   age_limit: string;
   session_type: string;
   coach_id: number | null;
-  coach_name?: string;
+  coach_name: string;
   location: string;
-  date: undefined | Date;
+  date: null | Date;
   start_time: string;
   status: string;
   end_time: string;
   price: number | string;
   max_players: number | string;
-  apply_promotion: boolean;
+  // apply_promotion: boolean;
   promotion_price?: number | string;
-  image?: string;
-  end_date: undefined | Date;
-  promotion_start: string | undefined;
-  promotion_end: string | undefined;
-  show_storefront: boolean | "indeterminate";
+  image: string;
+  end_date: null | Date;
+  promotion_start: null | Date;
+  promotion_end: null | Date;
+  // show_storefront: boolean | "indeterminate";
   coach_schedule_preference?: any
 };
 type BookedSession = {
@@ -88,19 +88,73 @@ export const sessionSchema = z.object({
   session_type: z.string().min(1, "Session type is required"),
   coach_id: z.number().nullable(),
   location: z.string().min(2, "Location is required"),
-  date: z.coerce.date({ error: "Start date is required" }),
-  end_date: z.coerce.date({ error: "End date is required" }),
+  date: z.date({ error: "Start date is required" }).nullable(),
+  end_date: z.date({ error: "End date is required" }).nullable(),
   start_time: z.string().min(1, "Start time required"),
   end_time: z.string().min(1, "End time required"),
-  price: z.coerce.number().min(0, "Price required"),
-  max_players: z.coerce.number().min(1, "Max players required"),
-  apply_promotion: z.boolean().default(false),
-  image: z.string().optional(),
-  promotion_start: z.date().optional(),
-  promotion_end: z.date().optional(),
-  promotion_price: z.coerce.number().optional(),
-  show_storefront: z.boolean().default(false),
-});
+  price: z.number().min(0, "Price required"),
+  max_players: z.number().min(1, "Max players required"),
+  apply_promotion: z.boolean(),
+  image: z.string(),
+  promotion_start: z.date().nullable(),
+  promotion_end: z.date().nullable(),
+  promotion_price: z.number(),
+  show_storefront: z.boolean(),
+})
+.superRefine((data, ctx) => {
+    if (data.date && data.end_date && moment(data.end_date).isBefore(moment(data.date))) {
+      ctx.addIssue({
+        path: ["end_date"],
+        code: z.ZodIssueCode.custom,
+        message: "End date must be after start date",
+      });
+    }
+
+   
+    if (data.apply_promotion) {
+      if (!data.promotion_start) {
+        ctx.addIssue({
+          path: ["promotion_start"],
+          code: z.ZodIssueCode.custom,
+          message: "Promotion start date is required",
+        });
+      }
+      if (!data.promotion_end) {
+        ctx.addIssue({
+          path: ["promotion_end"],
+          code: z.ZodIssueCode.custom,
+          message: "Promotion end date is required",
+        });
+      }
+      if (data.promotion_price === null || data.promotion_price === undefined) {
+        ctx.addIssue({
+          path: ["promotion_price"],
+          code: z.ZodIssueCode.custom,
+          message: "Promotion price is required",
+        });
+      }
+
+      if (!data.image) {
+        ctx.addIssue({
+          path: ["image"],
+          code: z.ZodIssueCode.custom,
+          message: "Image URL is required",
+        });
+      }
+      // 3️⃣ Promotion end must be after promotion start
+      if (
+        data.promotion_start &&
+        data.promotion_end &&
+        moment(data.promotion_end).isBefore(moment(data.promotion_start))
+      ) {
+        ctx.addIssue({
+          path: ["promotion_end"],
+          code: z.ZodIssueCode.custom,
+          message: "Promotion end must be after start",
+        });
+      }
+    }
+  });
 
 type SessionSchemaValues = z.infer<typeof sessionSchema>;
 
@@ -125,9 +179,9 @@ export function CreateSessionDialog({
     BookedSession[]
   >([]);
   const [booked, setBooked] = useState(false);
-  const [coachScedule, setCoachScedule] = useState<{ string: string } | {}>({})
+  const [coachSchedule, setCoachSchedule] = useState<{ string: string } | {}>({})
   const [blocked, setBlocked] = useState(false)
-  const [blockedHours, setBlockedHours] = useState([])
+  const [blockedHours, setBlockedHours] = useState<any[]>([])
 
 
   function getCoachBookedSessions(coachId: number | null): BookedSession[] {
@@ -165,15 +219,14 @@ export function CreateSessionDialog({
       end_time: "",
       price: 0,
       max_players: 1,
-      apply_promotion: promotion,
       show_storefront: false,
-      date: undefined,
-      end_date: undefined,
+      date: null,
+      end_date: null,
       promotion_price: 0,
       image: "",
-      promotion_start: undefined,
-      promotion_end: undefined,
-
+      promotion_start: null,
+      promotion_end: null,
+      apply_promotion : promotion ?? false
     },
   });
 
@@ -204,11 +257,16 @@ export function CreateSessionDialog({
 
   const getSessionsConflicts = (
     overrides: {
-      start_time?: string;
-      end_time?: string;
-      date?: Date;
-      end_date?: Date;
-    } = {},
+      start_time: string;
+      end_time: string;
+      date: Date | null;
+      end_date: Date | null;
+    } = {
+      start_time: "",
+        end_time: "",
+        date: null,
+        end_date: null
+      },
   ): BookedSession[] => {
     const selectedDate = overrides.date ?? form.getValues("date");
     const selectedEndDate = overrides.end_date ?? form.getValues("end_date");
@@ -254,8 +312,8 @@ export function CreateSessionDialog({
     return sessionConflicts;
   };
   function getBlockedConflict(values: SessionSchemaValues) {
-    if (!coachScedule) return []
-    const conflicts = Object.entries(coachScedule).filter(
+    if (!coachSchedule) return []
+    const conflicts = Object.entries(coachSchedule).filter(
       ([blockedDateTime, status]) => {
         if (status !== "blocked") return false;
 
@@ -344,7 +402,9 @@ export function CreateSessionDialog({
                 : "Fill in the details to create a new training session"}
             </p>
           </DialogHeader>
-          <form onSubmit={form.handleSubmit(CreateSession)}>
+          <form onSubmit={form.handleSubmit(CreateSession, (error) => {
+            console.log(error)
+          })}>
             <ScrollArea className=" py-1 space-y-4 px-2 h-[calc(100vh-250px)]">
               <div className="space-y-2 px-2 pb-2">
                 <div className="flex gap-2 text-md ">
@@ -486,7 +546,7 @@ export function CreateSessionDialog({
                           Selected Coach: {coach_Name}
                         </p>
                       )}
-                      {/* !selectedCoachId && for removing assign coach button after its selected */}
+                  
                       {
                         <AssignCoachDialog
                           onSelect={(coach) => {
@@ -496,7 +556,7 @@ export function CreateSessionDialog({
                             setCoach_name(
                               `${coach.first_name} ${coach.last_name}`,
                             );
-                            setCoachScedule(coach.schedule)
+                            setCoachSchedule(coach.schedule)
                           }}
                         />
                       }

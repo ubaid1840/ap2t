@@ -11,28 +11,20 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import axios from "@/lib/axios";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { SquarePen } from "lucide-react";
 import { useEffect, useState } from "react";
-import AppCalendar from "../app-calendar";
-import axios from "@/lib/axios";
-import { useParams } from "next/navigation";
-import { PlayerResponse } from "./main-player-page";
-import { Spinner } from "../ui/spinner";
-import SelectPosition from "./select-position";
-import SelectSkill from "./select-skill";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
+import { z } from "zod";
+import AppCalendar from "../app-calendar";
 import { RequiredStar } from "../required-star";
 import { Field, FieldError } from "../ui/field";
+import { Spinner } from "../ui/spinner";
+import { PlayerResponse } from "./main-player-page";
+import SelectPosition from "./select-position";
+import SelectSkill from "./select-skill";
 type DataProps = {
   first_name: string;
   last_name: string;
@@ -53,7 +45,7 @@ const playerSchema = z.object({
   zip_code: z.string().min(3, "Zip code required"),
 
   dob: z.date({
-    required_error: "Date of birth is required",
+    error: "Date of birth is required",
   }),
 
   position: z.string().min(1, "Select a position"),

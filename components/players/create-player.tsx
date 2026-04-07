@@ -19,11 +19,11 @@ import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 import AppCalendar from "../app-calendar";
+import { RequiredStar } from "../required-star";
+import { Field, FieldError } from "../ui/field";
 import { Spinner } from "../ui/spinner";
 import SelectPosition from "./select-position";
 import SelectSkill from "./select-skill";
-import { Field, FieldError } from "../ui/field";
-import { RequiredStar } from "../required-star";
 
 type CreatePlayerProps = {
   parent_id?: number | null | undefined | string;

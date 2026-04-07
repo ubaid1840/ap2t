@@ -1,16 +1,18 @@
 import { PaymentItem } from "@/app/portal/admin/payments/page";
 import axios from "@/lib/axios";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { DialogClose } from "@radix-ui/react-dialog";
-import { OctagonAlert } from "lucide-react";
-import { useEffect, useState } from "react";
+import moment from "moment";
+import { useState } from "react";
+import { Controller, useForm } from "react-hook-form";
+import z from "zod";
+import { RequiredStar } from "../required-star";
 import { Button } from "../ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
+import { Field, FieldError } from "../ui/field";
+import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { ScrollArea } from "../ui/scroll-area";
-import { Spinner } from "../ui/spinner";
-import { Textarea } from "../ui/textarea";
-import SelectCompCategory from "./select-comp-cateegory";
-import { Input } from "../ui/input";
 import {
   Select,
   SelectContent,
@@ -18,13 +20,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
-import moment from "moment";
-import { toast } from "sonner";
-import z from "zod";
-import { Controller, useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Field, FieldError } from "../ui/field";
-import { RequiredStar } from "../required-star";
+import { Spinner } from "../ui/spinner";
 
 type CompedDialogProps = {
   data: PaymentItem;

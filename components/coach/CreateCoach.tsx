@@ -36,7 +36,7 @@ const coachSchema = z.object({
   // zip_code: z.string().min(3, "Zip code required"),
 
   career_start: z.date({
-    required_error: "Date of birth is required",
+    error: "Date of birth is required",
   }),
 
   bio: z.string().min(2, "Biography required"),

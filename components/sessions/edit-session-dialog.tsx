@@ -48,7 +48,7 @@ import {
 import { Separator } from "../ui/separator";
 import { Spinner } from "../ui/spinner";
 import { AssignCoachDialog } from "./assign-coach-dialog";
-import { SessionType } from "./create-session-dialog";
+import { sessionSchema, SessionType } from "./create-session-dialog";
 
 type BookedSession = {
   name: string;
@@ -70,51 +70,7 @@ interface EditSessionDialogProps {
   all_sessions?: any[];
 }
 
-export const sessionSchema = z.object({
-  name: z.string().min(2, "Session name is required"),
 
-  description: z.string().min(2, "Description is required"),
-
-  type: z.enum(["camp", "comped"], {
-    message: "Type is required",
-  }),
-
-  age_limit: z.string().min(1, "Age limit is required"),
-
-  session_type: z.string().min(1, "Session type is required"),
-
-  coach_id: z.number().nullable(),
-
-  location: z.string().min(2, "Location is required"),
-
-  date: z.date({
-    error: "Start date is required",
-  }),
-
-  end_date: z.date({
-    error: "End date is required",
-  }),
-
-  start_time: z.string().min(1, "Start time required"),
-
-  end_time: z.string().min(1, "End time required"),
-
-  price: z.coerce.number().min(0, "Price required"),
-
-  max_players: z.coerce.number().min(1, "Max players required"),
-
-  apply_promotion: z.boolean().default(false),
-
-  image: z.string().optional(),
-
-  promotion_start: z.date().optional(),
-
-  promotion_end: z.date().optional(),
-
-  promotion_price: z.coerce.number().optional(),
-
-  show_storefront: z.boolean().default(false),
-});
 type SessionSchemaValues = z.infer<typeof sessionSchema>;
 
 export function EditSessionDialog({
@@ -134,7 +90,7 @@ export function EditSessionDialog({
   const [booked, setBooked] = useState(false);
     const [coachSchedule,setCoachSchedule]=useState<{string:string}|{}>({})
     const [blocked,setBlocked]=useState(false)
-    const [blockedHours,setBlockedHours]=useState([])
+    const [blockedHours,setBlockedHours]=useState<any[]>([])
   const router = useRouter();
 
   function to24Hour(timeStr: string): string {
@@ -169,7 +125,17 @@ export function EditSessionDialog({
   }
 
   const getSessionsConflicts = (
-    overrides: { start_time?: string; end_time?: string; date?: Date; end_date?: Date } = {},
+    overrides: {
+      start_time: string;
+      end_time: string;
+      date: Date | null;
+      end_date: Date | null;
+    } = {
+      start_time: "",
+        end_time: "",
+        date: null,
+        end_date: null
+      },
   ):BookedSession[] => {
     const selectedDate = overrides.date ?? form.getValues("date");
     const selectedEndDate = overrides.end_date ?? form.getValues("end_date");
@@ -264,31 +230,7 @@ export function EditSessionDialog({
 
   useEffect(() => {
     if (open && sessionData) {
-      form.reset({
-        name: sessionData.name,
-        description: sessionData.description,
-        type: sessionData.type as "camp" | "comped",
-        age_limit: sessionData.age_limit,
-        session_type: sessionData.session_type,
-        coach_id: sessionData.coach_id,
-        location: sessionData.location,
-        date: sessionData?.date ? new Date(sessionData?.date) : undefined,
-        end_date: sessionData.end_date ? new Date(sessionData.end_date) : undefined,
-        start_time: sessionData.start_time,
-        end_time: sessionData.end_time,
-        price: Number(sessionData.price),
-        max_players: Number(sessionData.max_players),
-        apply_promotion: sessionData.apply_promotion,
-        image: sessionData.image,
-        promotion_price: Number(sessionData.promotion_price),
-        promotion_start: sessionData.promotion_start
-          ? new Date(sessionData.promotion_start)
-          : undefined,
-        promotion_end: sessionData.promotion_end
-          ? new Date(sessionData.promotion_end)
-          : undefined,
-        show_storefront: (sessionData.show_storefront as boolean) ?? false,
-      });
+      form.reset();
       setCoach_name(`${sessionData?.coach_first_name} ${sessionData?.coach_last_name}`)
       setCoachSchedule(sessionData?.coach_schedule_preference?? {})
     }
@@ -513,7 +455,6 @@ export function EditSessionDialog({
                           Selected Coach: {coach_Name}
                         </p>
                       )}
-                      {/* !selectedCoachId && to remove assign coach button after the coach has been selected*/}
                       { (
                         <AssignCoachDialog
                           onSelect={(coach) => {
@@ -523,7 +464,7 @@ export function EditSessionDialog({
                             setCoach_name(
                               `${coach.first_name} ${coach.last_name}`,
                             );
-                            setCoachScedule(coach.schedule)
+                            setCoachSchedule(coach.schedule)
                           }}
                         />
                       )}
