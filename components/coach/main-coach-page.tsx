@@ -75,8 +75,6 @@ export default function MainCoachPage({
     }
   };
 
-  console.log(data)
-
   const fetchSessionTypes = async () => {
     setLoading(true)
     try {
@@ -133,15 +131,28 @@ export default function MainCoachPage({
     // },
   ];
 
-  const weeklyEvents = data?.session_data
-    ? data.session_data.map((session) => ({
-      title: session.name,
-      date: moment(new Date(session.date)).format("YYYY-MM-DD"),
-      time: session.start_time,
-      end_time: session.end_time,
-      status: "Booked",
-    }))
-    : [];
+const weeklyEvents = data?.session_data
+  ? data.session_data.flatMap((session) => {
+      const events = [];
+
+      let current = moment(session.date);
+      const end = moment(session.end_date);
+
+      while (current.isSameOrBefore(end, "day")) {
+        events.push({
+          title: session.name,
+          date: current.format("YYYY-MM-DD"),
+          time: session.start_time,
+          end_time: session.end_time,
+          status: "Booked",
+        });
+
+        current = current.clone().add(1, "day");
+      }
+
+      return events;
+    })
+  : [];
 
   const blockedEvents: Event[] = [];
 

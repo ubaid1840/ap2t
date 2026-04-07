@@ -101,7 +101,7 @@ export function AddParentDialog({ playerId, onSuccess }: AddParentDialogProps) {
               <Spinner />
             </div>
           ) : results.length > 0 ? (
-            <ScrollArea className="h-[60vh]">
+            <ScrollArea className="h-[calc(100vh-250px)]">
               <div className="space-y-2">
                 {filteredData.map((parent) => (
                   <div

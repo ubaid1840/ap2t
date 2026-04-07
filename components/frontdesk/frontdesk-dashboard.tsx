@@ -92,7 +92,6 @@ export default function FrontdeskDashboard() {
         </Button>
       ),
       cell: ({ row }) => {
-        console.log(row.original.end_date);
         return (
           <div className="leading-tight">
             <div className="text-[#D1D5DC]">{moment(new Date(row.original.date)).format("YYYY-MM-DD")} - {moment(new Date(row.original.end_date)).format("YYYY-MM-DD")}</div>

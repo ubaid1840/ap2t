@@ -31,6 +31,7 @@ const timeSlots = [
 
 export const WeeklySchedule: React.FC<WeeklyScheduleProps> = ({ events, id, preference }) => {
 
+
   const [currentWeekStart, setCurrentWeekStart] = useState(moment().startOf("week").add(1, "days"));
   const isMobile = useIsMobile();
   const [contextMenu, setContextMenu] = useState<{
@@ -59,17 +60,15 @@ export const WeeklySchedule: React.FC<WeeklyScheduleProps> = ({ events, id, pref
         millisecond: 0,
       });
 
-    // Check if the slot is blocked in local preference
-    const key = `${date.format("YYYY-MM-DD")}_${time}`;
-if (localPreference[key] === "blocked") {
-  return { title: "", date: date.format("YYYY-MM-DD"), time, status: "Blocked" };
-}
 
-    // Find an event that spans this slot
+    const key = `${date.format("YYYY-MM-DD")}_${time}`;
+    if (localPreference[key] === "blocked") {
+      return { title: "", date: date.format("YYYY-MM-DD"), time, status: "Blocked" };
+    }
+
     const event = events.find(e => {
       if (date.isAfter(e.end_date)||date.isBefore(e.date)) return false;
 
-      // Parse event start time
       const startTime = moment(date).set({
         hour: parseInt(e.time.split(":")[0]) + (e.time.includes("PM") && parseInt(e.time.split(":")[0]) !== 12 ? 12 : 0),
         minute: parseInt(e.time.split(":")[1] || "0"),
@@ -77,7 +76,6 @@ if (localPreference[key] === "blocked") {
         millisecond: 0,
       });
 
-      // Parse event end time (if not provided, assume 1 hour)
       const endTime = e.end_time
         ? moment(date).set({
           hour: parseInt(e.end_time.split(":")[0]) + (e.end_time.includes("PM") && parseInt(e.end_time.split(":")[0]) !== 12 ? 12 : 0),

@@ -39,7 +39,6 @@ export default function CustomCalendar({ currentMonth, setCurrentMonth, loading,
 
     const handleDayClick = (day: moment.Moment) => {
         const events = getEventsForDay(day)
-        console.log(events)
         setSelectedEvent(events)
     }
 

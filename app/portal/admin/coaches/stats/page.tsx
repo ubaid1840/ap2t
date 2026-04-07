@@ -194,7 +194,6 @@ export default function Page() {
       ]) ?? [],
   };
 
-  console.log(reports)
 
 
   if (loading) {

@@ -176,7 +176,7 @@ const EditCoachProfile = ({
             </DialogTitle>
           </DialogHeader>
           <form onSubmit={form.handleSubmit(changeCoach)} className="">
-            <ScrollArea className="h-[60vh] py-1 space-y-4 px-2 ">
+            <ScrollArea className="h-[calc(100vh-250px)] py-1 space-y-4 px-2 ">
               <div className="space-y-2 px-2 pb-2">
                 <div className="grid grid-cols-2 gap-2">
                   <div className="space-y-2">
