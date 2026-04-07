@@ -13,7 +13,7 @@ const links = [
   { name: "IN-HOUSE PROGRAMS", href: "/inhouseprograms" },
   { name: "CAMPS & CLINICS", href: "/camps&clinics" },
   { name: "GALLERY", href: "/gallery" },
-  { name: "STORE", href: "#" }
+  // { name: "STORE", href: "#" }
 ];
 
 export default function Header() {

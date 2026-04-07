@@ -132,7 +132,7 @@ export default function Page() {
                                 </GradientIcon>
                                 <h4 className="font-semibold text-white">Office Hours</h4>
                                 <p className="mt-2 text-sm text-gray-400">
-                                    Mon – Sat: 9:00 AM – 6:00 PM
+                                    Mon – Sat: 6:00 AM – 6:00 PM
                                 </p>
                                 <p className="mt-2 text-sm text-gray-400">
                                     Sunday: Closed
