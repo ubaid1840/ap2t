@@ -45,6 +45,7 @@ import {
 import { Separator } from "../ui/separator";
 import { Spinner } from "../ui/spinner";
 import { AssignCoachDialog } from "./assign-coach-dialog";
+import { useAuth } from "@/contexts/auth-context";
 
 export type SessionType = {
   name: string;
@@ -182,6 +183,8 @@ export function CreateSessionDialog({
   const [coachSchedule, setCoachSchedule] = useState<{ string: string } | {}>({})
   const [blocked, setBlocked] = useState(false)
   const [blockedHours, setBlockedHours] = useState<any[]>([])
+  const {user} = useAuth()
+  const byAdmin = user?.role === 'admin'
 
 
   function getCoachBookedSessions(coachId: number | null): BookedSession[] {
@@ -364,6 +367,7 @@ export function CreateSessionDialog({
 
       await axios.post("/admin/sessions", {
         ...values,
+        byAdmin
       });
 
       await onRefresh();

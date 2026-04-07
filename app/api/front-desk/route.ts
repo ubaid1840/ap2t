@@ -1,9 +1,11 @@
 import pool from "@/lib/db";
 import {
+  fetchAllAdmins,
   sendAdminSessionEnrollmentEmail,
   sendCoachPlayerEnrollmentEmail,
 } from "@/lib/email-templates";
 import { sendPaymentReciept } from "@/lib/notification-service";
+import { sendInAppNotificationBackend } from "@/lib/send-inapp-notification";
 import { TriggerFirebaseApprovals } from "@/lib/triggerFirebase";
 import moment from "moment";
 import { NextRequest, NextResponse } from "next/server";
@@ -79,6 +81,7 @@ export async function PUT(req: NextRequest) {
         const user_id = updatingRow?.user_id;
         const session_id = updatingRow?.session_id;
         let amount = 0;
+        let hasSiblingDiscount=false
 
         const client = await pool.connect();
 
@@ -176,7 +179,6 @@ export async function PUT(req: NextRequest) {
             );
 
             const parent_id = parent_data.rows[0]?.parent_id;
-            let hasSiblingDiscount = false;
 
             if (parent_id !== null && parent_id !== undefined) {
               const siblings_data = await client.query(
@@ -263,22 +265,25 @@ export async function PUT(req: NextRequest) {
 
           const EmailDataRaw = await pool.query(
             `SELECT 
-              u.first_name,
-              u.last_name,
-              u.email AS userEmail,
-              s.name AS sessionName,
-              coach.email AS coachEmail,
-              coach.first_name AS coach_first_name,
-              coach.last_name AS coach_last_name,
-              s.date AS session_start_date,
-              s.end_date AS session_end_date,
-              NOW() AS enrollmentDate
-              FROM session_players se
-              JOIN users u ON se.user_id = u.id
-              JOIN sessions s ON se.session_id = s.id
-              JOIN users coach ON s.coach_id = coach.id
-              WHERE se.session_id = $1
-                AND se.user_id = $2;`,
+  u.first_name,
+  u.last_name,
+  u.email AS userEmail,
+  s.name AS sessionName,
+  s.coach_id,
+  coach.email AS coachEmail,
+  coach.first_name AS coach_first_name,
+  coach.last_name AS coach_last_name,
+  s.date AS session_start_date,
+  s.end_date AS session_end_date,
+  NOW() AS enrollmentDate,
+  p.parent_id 
+FROM session_players se
+JOIN users u ON se.user_id = u.id
+JOIN sessions s ON se.session_id = s.id
+JOIN users coach ON s.coach_id = coach.id
+LEFT JOIN players p ON p.user_id = u.id 
+WHERE se.session_id = $1
+  AND se.user_id = $2;`,
             [session_id, user_id],
           );
           const EmailData = EmailDataRaw.rows[0];
@@ -309,13 +314,60 @@ export async function PUT(req: NextRequest) {
                 }`,
               playerName: `${EmailData?.first_name || ""} ${EmailData?.last_name || ""
                 }`,
-              playerEmail: EmailData.userEmail,
-              sessionName: EmailData.sessionName,
+              playerEmail: EmailData.useremail,
+              sessionName: EmailData.sessionname,
               sessionDate: `${sessionStartDate} - ${sessionEndData}`,
-              enrollmentDate: EmailData.enrollmentDate,
+              enrollmentDate: EmailData.enrollmentdate,
             };
 
             await sendCoachPlayerEnrollmentEmail(coachEmailPayload);
+            const playerName = `${EmailData?.first_name || ""} ${EmailData?.last_name || ""}`;
+            const msg = `${playerName} enrolled in "${EmailData.sessionname}".`;
+
+const admins = await fetchAllAdmins();
+const promises = admins.map(admin =>
+  sendInAppNotificationBackend(
+    admin.user_id,
+    msg,
+    `/portal/admin/sessions/${session_id}`
+  )
+);
+
+await Promise.all(promises);
+await sendInAppNotificationBackend(
+  EmailData.coach_id,
+  msg,
+  `/portal/coach/sessions/${session_id}`
+);
+if(EmailData.parent_id){
+
+  await sendInAppNotificationBackend(
+    EmailData.parent_id,
+    msg,
+    `/portal/parent/sessions/${session_id}`
+  );
+}
+
+
+            const paymentStatus = session.comped
+              ? "Comped"
+              : type === "cash"
+              ? "Paid (Cash)"
+              : "Pending";
+
+            const discountText = hasSiblingDiscount ? " (Sibling discount)" : "";
+
+            const paymentMsg = `${playerName} payment for "${EmailData.sessionname}": ${paymentStatus} - $${amount}${discountText}.`;
+
+            const promises1 = admins.map(admin =>
+  sendInAppNotificationBackend(
+    admin.user_id,
+    paymentMsg,
+    `/portal/admin/payments/`
+  )
+);
+
+await Promise.all(promises1);
           }
         } catch (error: any) {
           await client.query("ROLLBACK");
@@ -355,7 +407,6 @@ export async function PUT(req: NextRequest) {
 
       await TriggerFirebaseApprovals("user");
       await TriggerFirebaseApprovals("admin");
-
       return new Response(
         JSON.stringify({
           message: "Status updated successfully",

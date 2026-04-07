@@ -2,7 +2,8 @@ import pool from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
 import admin from "@/lib/firebase-admin";
 import { getSquareClient } from "@/lib/square";
-import { sendAdminNewSignupEmail, sendNewJoiningEmail } from "@/lib/email-templates";
+import { fetchAllAdmins, sendAdminNewSignupEmail, sendNewJoiningEmail } from "@/lib/email-templates";
+import { sendInAppNotificationBackend } from "@/lib/send-inapp-notification";
 
 export async function PUT(req: NextRequest) {
     try {
@@ -87,9 +88,6 @@ export async function POST(req: NextRequest) {
                         [player_id]
                     );
                     await pool.query("COMMIT");
-            
-            const emailDataRaw=await pool.query(`SELECT first_name last_name FROM users WHERE id=$1`,[player_id])
-            const emailData=emailDataRaw.rows[0]
            
                 } catch (error) {
                     console.log("error creating player's setting", error)
@@ -326,7 +324,52 @@ export async function createUserWithFirebase(
         values
     )
 
-    return res.rows[0].id
+   const role = insertData.role;
+    const id = res.rows[0].id;
+
+    const fullName = `${rest?.first_name || ""} ${rest?.last_name || ""}`;
+    const roleLabel = role.charAt(0).toUpperCase() + role.slice(1);
+
+    const msg = `New ${roleLabel} registered: ${fullName} (${email}).`;
+
+    if (role === "parent") {
+    const route = `/portal/parents/${id}`;
+    const admins = await fetchAllAdmins();
+const promises = admins.map(admin =>
+  sendInAppNotificationBackend(
+    admin.user_id,
+    msg,
+    route
+  )
+);
+
+await Promise.all(promises);
+    } else if (role === "player") {
+    const route = `/portal/players/${id}`;
+    const admins = await fetchAllAdmins();
+const promises = admins.map(admin =>
+  sendInAppNotificationBackend(
+    admin.user_id,
+    msg,
+    route
+  )
+);
+
+await Promise.all(promises);
+    } else if (role === "coach") {
+    const route = `/portal/coaches/${id}`;
+    const admins = await fetchAllAdmins();
+const promises = admins.map(admin =>
+  sendInAppNotificationBackend(
+    admin.user_id,
+    msg,
+    route
+  )
+);
+
+await Promise.all(promises);
+    }
+    return id
 }
 
 

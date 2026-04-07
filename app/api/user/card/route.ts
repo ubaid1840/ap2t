@@ -1,5 +1,6 @@
 import pool from "@/lib/db";
-import { sendAdminPaymentNotificationEmail, sendPaymentReceiptEmail } from "@/lib/email-templates";
+import { fetchAllAdmins, sendAdminPaymentNotificationEmail, sendPaymentReceiptEmail } from "@/lib/email-templates";
+import { sendInAppNotificationBackend } from "@/lib/send-inapp-notification";
 import { getSquareClient } from "@/lib/square";
 import moment from "moment";
 import { NextRequest, NextResponse } from "next/server";
@@ -118,6 +119,27 @@ WHERE p.user_id = $1
                         paymentMethod: "Debit / Credit Card",
                         paymentDate: new Date().toISOString(),
                     });
+
+                    const paymentMsg = `${user.fullName} payment for "${session.sessionName}": paid - $${session.amount}.`;
+                   const admins = await fetchAllAdmins();
+                   const promises = admins.map(admin =>
+                     sendInAppNotificationBackend(
+                       admin.user_id,
+                       paymentMsg,
+                       `/portal/admin/payments`
+                     )
+                   );
+                   
+                   await Promise.all(promises);
+
+                   const parentidRaw=await pool.query(`SELECT parent_id FROM players WHERE user_id=$1`,[id])
+                   const parent_id=parentidRaw.rows[0]
+                   const parentMsg=`Payment payed for session "${session.sessionName}": paid - $${session.amount}.`
+                   sendInAppNotificationBackend(
+                       parent_id,
+                       parentMsg,
+                       `/portal/parent/dashboard`
+                     )
 
             } catch (err) {
                 console.error("Payment failed for session:", session.sessionId);
@@ -243,6 +265,26 @@ WHERE p.user_id = $1
                         paymentMethod: "Debit / Credit Card",
                         paymentDate: new Date().toISOString(),
                     });
+                     const paymentMsg = `${user.fullName} payment for "${session.sessionName}": paid - $${session.amount}.`;
+                   const admins = await fetchAllAdmins();
+                   const promises = admins.map(admin =>
+                     sendInAppNotificationBackend(
+                       admin.user_id,
+                       paymentMsg,
+                       `/portal/admin/payments`
+                     )
+                   );
+                   
+                   await Promise.all(promises);
+
+                   const parentidRaw=await pool.query(`SELECT parent_id FROM players WHERE user_id=$1`,[id])
+                   const parent_id=parentidRaw.rows[0]
+                   const parentMsg=`Payment payed for session "${session.sessionName}": paid - $${session.amount}.`
+                   sendInAppNotificationBackend(
+                       parent_id,
+                       parentMsg,
+                       `/portal/parent/dashboard`
+                     )
                 }
 
             } catch (err) {

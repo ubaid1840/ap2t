@@ -67,7 +67,7 @@ export const WeeklySchedule: React.FC<WeeklyScheduleProps> = ({ events, id, pref
     }
 
     const event = events.find(e => {
-      if (e.date !== date.format("YYYY-MM-DD")) return false;
+      if (date.isAfter(e.end_date)||date.isBefore(e.date)) return false;
 
       const startTime = moment(date).set({
         hour: parseInt(e.time.split(":")[0]) + (e.time.includes("PM") && parseInt(e.time.split(":")[0]) !== 12 ? 12 : 0),
@@ -85,7 +85,7 @@ export const WeeklySchedule: React.FC<WeeklyScheduleProps> = ({ events, id, pref
         })
         : moment(startTime).add(1, "hour");
 
-      return cellTime.isSameOrAfter(startTime) && cellTime.isBefore(endTime);
+      return cellTime.isSameOrAfter(startTime) && cellTime.isBefore(endTime) && date.isBefore(e.end_date) && date.isSameOrAfter(e.date);
     });
 
     if (event) return event;
