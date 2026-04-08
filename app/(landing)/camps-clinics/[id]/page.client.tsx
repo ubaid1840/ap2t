@@ -1,19 +1,18 @@
 "use client";
 
+import AppCalendar from "@/components/app-calendar";
 import { detailIcons } from "@/components/landing/constants";
 import { CurvedImage } from "@/components/landing/curved-image";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Spinner } from "@/components/ui/spinner";
 import { useIsMobile } from "@/hooks/use-mobile";
+import axios from "@/lib/axios";
 import { CircleAlert, CircleCheckBig, DollarSign } from "lucide-react";
 import moment from "moment";
-import { CampClinicSession } from "../page.client";
 import { useState } from "react";
-import AppCalendar from "@/components/app-calendar";
-import { Label } from "@/components/ui/label";
-import axios from "@/lib/axios";
 import { toast } from "sonner";
-import { Spinner } from "@/components/ui/spinner";
+import { CampClinicSession } from "../page.client";
 
 export default function CampsAndClinicsDetail({
   data = null,
@@ -21,75 +20,75 @@ export default function CampsAndClinicsDetail({
   data: CampClinicSession | null;
 }) {
   const mobile = useIsMobile();
-    const [loading, setLoading]=useState(false)
+  const [loading, setLoading] = useState(false)
   const [formData, setFormData] = useState({
     player: {
       first_name: "",
       last_name: "",
       birth_date: null as Date | null,
-      email:"",
-      role:"player",
+      email: "",
+      role: "player",
       medical_notes: "",
     },
     parent: {
       first_name: "",
       last_name: "",
       email: "",
-      role:"parent",
+      role: "parent",
       password: "",
       phone_no: "",
-      
+
     },
   });
 
   const currentCamp = data
     ? {
-        id: data.id,
-        badge: data.session_type.toUpperCase() as "CAMP" | "CLINIC",
-        title: data.name,
-        description: data.description,
-        price: Number(data.apply_promotion ? data.promotion_price : data.price),
-        left: data.total_left,
-        details: [
-          `${moment(data.date).format("MMM DD")}–${moment(data.end_date).format("DD, YYYY")}`,
-          `${moment(data.start_time, "HH:mm").format("hh:mm A")} - ${moment(data.end_time, "HH:mm").format("hh:mm A")}`,
-          `Ages ${data.age_limit ?? "All"}`,
-          "AP2T Indoor facility",
-        ],
-        highlights: [
-          "Professional coaching staff",
-          "Daily technical & tactical sessions",
-          "Small group training for individual attention",
-          "Fitness and conditioning drills",
-          "Game-based learning activities",
-          "Indoor climate-controlled facility",
-          "Skill assessment and feedback",
-          "Fun, competitive environment",
-        ],
-      }
+      id: data.id,
+      badge: data.session_type.toUpperCase() as "CAMP" | "CLINIC",
+      title: data.name,
+      description: data.description,
+      price: Number(data.apply_promotion ? data.promotion_price : data.price),
+      left: data.total_left,
+      details: [
+        `${moment(data.date).format("MMM DD")}–${moment(data.end_date).format("DD, YYYY")}`,
+        `${moment(data.start_time, "HH:mm").format("hh:mm A")} - ${moment(data.end_time, "HH:mm").format("hh:mm A")}`,
+        `Ages ${data.age_limit ?? "All"}`,
+        "AP2T Indoor facility",
+      ],
+      highlights: [
+        "Professional coaching staff",
+        "Daily technical & tactical sessions",
+        "Small group training for individual attention",
+        "Fitness and conditioning drills",
+        "Game-based learning activities",
+        "Indoor climate-controlled facility",
+        "Skill assessment and feedback",
+        "Fun, competitive environment",
+      ],
+    }
     : null;
 
-const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-  e.preventDefault();
-  setLoading(true);
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setLoading(true);
 
-  try {
-    const res = await axios.post(`/camps-and-clinics/${data?.id}`, formData);
+    try {
+      const res = await axios.post(`/camps-and-clinics/${data?.id}`, formData);
 
-    if (res.data.success) {
-      toast.success("Registered Successfully!");
+      if (res.data.success) {
+        toast.success("Registered Successfully!");
+      }
+    } catch (err: any) {
+      const message =
+        err?.response?.data?.error ||
+        err?.message ||
+        "Something went wrong";
+
+      toast.error(message);
+    } finally {
+      setLoading(false);
     }
-  } catch (err: any) {
-    const message =
-      err?.response?.data?.error ||  
-      err?.message ||                  
-      "Something went wrong";
-
-    toast.error(message);
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
 
   return (
@@ -123,11 +122,10 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
               <div className="flex items-center gap-4">
                 <div
                   className={`text-xs font-semibold px-2.5 py-1 rounded-md
-              ${
-                currentCamp.badge === "CLINIC"
-                  ? "bg-blue-500/15 text-blue-400"
-                  : "bg-primary/15 text-primary"
-              }
+              ${currentCamp.badge === "CLINIC"
+                      ? "bg-blue-500/15 text-blue-400"
+                      : "bg-primary/15 text-primary"
+                    }
             `}
                 >
                   {currentCamp.badge}
@@ -234,88 +232,120 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
                           </div>
                         )}
                         <div className="flex flex-col gap-4">
-<div className="space-y-3">
-                          <h4 className="text-sm font-medium text-white/80">
-                            Player Information
-                          </h4>
+                          <div className="space-y-3">
+                            <h4 className="text-sm font-medium text-white/80">
+                              Player Information
+                            </h4>
 
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                            <input
-                              type="text"
-                              placeholder="First Name"
-                              required
-                              className="w-full rounded-[8px] border border-[#6D6D6D] px-3 py-2 text-sm text-white"
-                              onChange={(e) =>
-                                setFormData((prev) => ({
-                                  ...prev,
-                                  player: {
-                                    ...prev.player,
-                                    first_name: e.target.value,
-                                  },
-                                }))
-                              }
-                            />
-                            <input
-                              type="text"
-                              placeholder="Last Name"
-                              required
-                              className="w-full rounded-[8px] border border-[#6D6D6D] px-3 py-2 text-sm text-white placeholder-white/40 focus:outline-none focus:border-white/30"
-                              onChange={(e) =>
-                                setFormData((prev) => ({
-                                  ...prev,
-                                  player: {
-                                    ...prev.player,
-                                    last_name: e.target.value,
-                                  },
-                                }))
-                              }
-                            />
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                               <input
-                             type="email"
-                             placeholder="Email"
-                             required
-                             className="w-full rounded-[8px] border border-[#6D6D6D] px-3 py-2 text-sm text-white placeholder-white/40 focus:outline-none focus:border-white/30"
-                             onChange={(e) =>
-                               setFormData((prev) => ({
-                                 ...prev,
-                                 player: {
-                                   ...prev.player,
-                                   email: e.target.value.trim().toLocaleLowerCase(),
-                                 },
-                               }))
-                             }
-                           />
+                                type="text"
+                                placeholder="First Name"
+                                required
+                                className="w-full rounded-[8px] border border-[#6D6D6D] px-3 py-2 text-sm text-white"
+                                onChange={(e) =>
+                                  setFormData((prev) => ({
+                                    ...prev,
+                                    player: {
+                                      ...prev.player,
+                                      first_name: e.target.value,
+                                    },
+                                  }))
+                                }
+                              />
+                              <input
+                                type="text"
+                                placeholder="Last Name"
+                                required
+                                className="w-full rounded-[8px] border border-[#6D6D6D] px-3 py-2 text-sm text-white placeholder-white/40 focus:outline-none focus:border-white/30"
+                                onChange={(e) =>
+                                  setFormData((prev) => ({
+                                    ...prev,
+                                    player: {
+                                      ...prev.player,
+                                      last_name: e.target.value,
+                                    },
+                                  }))
+                                }
+                              />
+                              <input
+                                type="email"
+                                placeholder="Email"
+                                required
+                                className="w-full rounded-[8px] border border-[#6D6D6D] px-3 py-2 text-sm text-white placeholder-white/40 focus:outline-none focus:border-white/30"
+                                onChange={(e) =>
+                                  setFormData((prev) => ({
+                                    ...prev,
+                                    player: {
+                                      ...prev.player,
+                                      email: e.target.value.trim().toLocaleLowerCase(),
+                                    },
+                                  }))
+                                }
+                              />
+                            </div>
+                            <div className="space-y-2">
+                              <h4 className="text-xs font-medium text-white/80">
+                                Birth Date
+                              </h4>
+
+                              <AppCalendar
+                                className="w-full rounded-[8px] border dark:bg-none dark:border-[#6D6D6D] px-3 py-2 text-sm placeholder-white/40 focus:outline-none focus:border-white/30"
+                                date={formData.player.birth_date}
+                                onChange={(date: Date) =>
+                                  setFormData((prev) => ({
+                                    ...prev,
+                                    player: {
+                                      ...prev.player,
+                                      birth_date: date,
+                                    },
+                                  }))
+                                }
+                              />
+                            </div>
                           </div>
-                              <div className="space-y-2">
-                                <h4 className="text-xs font-medium text-white/80">
-                            Birth Date
-                          </h4>
-                                 
-                          <AppCalendar
-                          className="w-full rounded-[8px] border dark:bg-none dark:border-[#6D6D6D] px-3 py-2 text-sm placeholder-white/40 focus:outline-none focus:border-white/30"
-                            date={formData.player.birth_date}
-                            onChange={(date: Date) =>
-                              setFormData((prev) => ({
-                                ...prev,
-                                player: {
-                                  ...prev.player,
-                                  birth_date: date,
-                                },
-                              }))
-                            }
-                          />
-                              </div>
-                        </div>
 
-                        <div className="space-y-3">
-                          <h4 className="text-sm font-medium text-white/80">
-                            Parent / Guardian Information
-                          </h4>
+                          <div className="space-y-3">
+                            <h4 className="text-sm font-medium text-white/80">
+                              Parent / Guardian Information
+                            </h4>
 
-                          <div className="grid grid-cols-2 gap-2">
+                            <div className="grid grid-cols-2 gap-2">
+                              <input
+                                type="text"
+                                placeholder="First Name"
+                                required
+                                className="w-full rounded-[8px] border border-[#6D6D6D] px-3 py-2 text-sm text-white placeholder-white/40 focus:outline-none focus:border-white/30"
+                                onChange={(e) =>
+                                  setFormData((prev) => ({
+                                    ...prev,
+                                    parent: {
+                                      ...prev.parent,
+                                      first_name: e.target.value,
+                                    },
+                                  }))
+                                }
+                              />
+                              <input
+                                type="text"
+                                placeholder="Last Name"
+                                required
+                                className="w-full rounded-[8px] border border-[#6D6D6D] px-3 py-2 text-sm text-white placeholder-white/40 focus:outline-none focus:border-white/30"
+                                onChange={(e) =>
+                                  setFormData((prev) => ({
+                                    ...prev,
+                                    parent: {
+                                      ...prev.parent,
+                                      last_name: e.target.value,
+                                    },
+                                  }))
+                                }
+                              />
+                            </div>
+
                             <input
-                              type="text"
-                              placeholder="First Name"
+                              type="email"
+                              placeholder="Email"
                               required
                               className="w-full rounded-[8px] border border-[#6D6D6D] px-3 py-2 text-sm text-white placeholder-white/40 focus:outline-none focus:border-white/30"
                               onChange={(e) =>
@@ -323,14 +353,14 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
                                   ...prev,
                                   parent: {
                                     ...prev.parent,
-                                    first_name: e.target.value,
+                                    email: e.target.value.trim().toLocaleLowerCase(),
                                   },
                                 }))
                               }
                             />
                             <input
-                              type="text"
-                              placeholder="Last Name"
+                              type="password"
+                              placeholder="*******"
                               required
                               className="w-full rounded-[8px] border border-[#6D6D6D] px-3 py-2 text-sm text-white placeholder-white/40 focus:outline-none focus:border-white/30"
                               onChange={(e) =>
@@ -338,80 +368,48 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
                                   ...prev,
                                   parent: {
                                     ...prev.parent,
-                                    last_name: e.target.value,
+                                    password: e.target.value,
+                                  },
+                                }))
+                              }
+                            />
+
+                            <input
+                              type="tel"
+                              placeholder="Phone"
+                              required
+                              className="w-full rounded-[8px] border border-[#6D6D6D] px-3 py-2 text-sm text-white placeholder-white/40 focus:outline-none focus:border-white/30"
+                              onChange={(e) =>
+                                setFormData((prev) => ({
+                                  ...prev,
+                                  parent: {
+                                    ...prev.parent,
+                                    phone_no: e.target.value,
+                                  },
+                                }))
+                              }
+                            />
+
+                            <textarea
+                              placeholder="Medical Information (Optional)"
+                              rows={3}
+                              className="w-full rounded-[8px] border border-[#6D6D6D] px-3 py-2 text-sm text-white placeholder-white/40 focus:outline-none focus:border-white/30"
+                              onChange={(e) =>
+                                setFormData((prev) => ({
+                                  ...prev,
+                                  player: {
+                                    ...prev.player,
+                                    medical_notes: e.target.value,
                                   },
                                 }))
                               }
                             />
                           </div>
-
-                          <input
-                            type="email"
-                            placeholder="Email"
-                            required
-                            className="w-full rounded-[8px] border border-[#6D6D6D] px-3 py-2 text-sm text-white placeholder-white/40 focus:outline-none focus:border-white/30"
-                            onChange={(e) =>
-                              setFormData((prev) => ({
-                                ...prev,
-                                parent: {
-                                  ...prev.parent,
-                                  email: e.target.value.trim().toLocaleLowerCase(),
-                                },
-                              }))
-                            }
-                          />
-                          <input
-                            type="password"
-                            placeholder="*******"
-                            required
-                            className="w-full rounded-[8px] border border-[#6D6D6D] px-3 py-2 text-sm text-white placeholder-white/40 focus:outline-none focus:border-white/30"
-                            onChange={(e) =>
-                              setFormData((prev) => ({
-                                ...prev,
-                                parent: {
-                                  ...prev.parent,
-                                  password: e.target.value,
-                                },
-                              }))
-                            }
-                          />
-
-                          <input
-                            type="tel"
-                            placeholder="Phone"
-                            required
-                            className="w-full rounded-[8px] border border-[#6D6D6D] px-3 py-2 text-sm text-white placeholder-white/40 focus:outline-none focus:border-white/30"
-                            onChange={(e) =>
-                              setFormData((prev) => ({
-                                ...prev,
-                                parent: {
-                                  ...prev.parent,
-                                  phone_no: e.target.value,
-                                },
-                              }))
-                            }
-                          />
-
-                          <textarea
-                            placeholder="Medical Information (Optional)"
-                            rows={3}
-                            className="w-full rounded-[8px] border border-[#6D6D6D] px-3 py-2 text-sm text-white placeholder-white/40 focus:outline-none focus:border-white/30"
-                            onChange={(e) =>
-                              setFormData((prev) => ({
-                                ...prev,
-                                player: {
-                                  ...prev.player,
-                                  medical_notes: e.target.value,
-                                },
-                              }))
-                            }
-                          />
                         </div>
-                        </div>
-                        
+
 
                         <Button type="submit" className="w-full rounded-full" disabled={loading}>
-                            {loading&&<Spinner className=" text-black h-5 w-5"/>}
+                          {loading && <Spinner className=" text-black h-5 w-5" />}
                           Complete Registration
                         </Button>
 
