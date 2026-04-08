@@ -1,5 +1,5 @@
 import pool from "@/lib/db";
-import { fetchAllAdmins, sendAdminSessionEnrollmentEmail } from "@/lib/email-templates";
+import { fetchAllAdmins, sendAdminNewSignupEmail, sendAdminSessionEnrollmentEmail, sendNewJoiningEmail } from "@/lib/email-templates";
 import admin from "@/lib/firebase-admin";
 import { sendInAppNotificationBackend } from "@/lib/send-inapp-notification";
 import moment from "moment";
@@ -52,7 +52,7 @@ export async function POST(
 ) {
   const { id } = await params;
 
-  
+  const defaultPass=12345678
   let player: any, parent: any;
   try {
     const body = await req.json();
@@ -146,6 +146,11 @@ export async function POST(
       password: parent.password,
     });
 
+    await admin.auth().createUser({
+      email: player.email.trim().toLowerCase(),
+      password: player.password || defaultPass,
+    });
+
   } catch (err: any) {
     console.error("Firebase error:", err.message);
     return NextResponse.json(
@@ -199,7 +204,25 @@ export async function POST(
        VALUES ($1, $2, $3)`,
       [playerUserId, parentUserId, player.medical_notes ?? null]
     );
-
+    const playeremaiNotificationData = {
+            email:`${player.email}`,
+            fullName: `${player.first_name} ${player?.last_name}`,
+            password: `${defaultPass}`
+        }
+        await sendNewJoiningEmail(playeremaiNotificationData)
+        const parentemaiNotificationData = {
+            email:`${parent.email}`,
+            fullName: `${parent.first_name} ${parent?.last_name}`,
+            password: `${parent.password}`
+        }
+        await sendNewJoiningEmail(parentemaiNotificationData)
+        const adminEmailProps={
+            email:parent.email,
+            fullName:`${player?.first_name} ${player?.last_name}`,
+            role: "user"
+        }
+        
+       await sendAdminNewSignupEmail(adminEmailProps)
     
     await client.query(
       `INSERT INTO session_players (session_id, user_id)
@@ -261,6 +284,7 @@ const promises = admins.map(admin =>
     `/portal/admin/sessions/${id}`
   )
 );
+
 
 await Promise.all(promises);
 await sendInAppNotificationBackend(

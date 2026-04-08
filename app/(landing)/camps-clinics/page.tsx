@@ -12,7 +12,7 @@ export const metadata = {
 };
 export default async function Page(){
 
-    const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"}/api/camps-and-clinics`, {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"}/api/camps-clinics`, {
     cache: "no-store",
   });
 

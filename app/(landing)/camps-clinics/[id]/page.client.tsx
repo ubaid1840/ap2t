@@ -74,7 +74,7 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
   setLoading(true);
 
   try {
-    const res = await axios.post(`/camps-and-clinics/${data?.id}`, formData);
+    const res = await axios.post(`/camps-clinics/${data?.id}`, formData);
 
     if (res.data.success) {
       toast.success("Registered Successfully!");

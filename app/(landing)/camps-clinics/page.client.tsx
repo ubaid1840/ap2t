@@ -184,7 +184,7 @@ export default function CampsAndClinics({ data = [] }: any) {
                                             })}
                                         </div>
 
-                                        <Link href={`/camps&clinics/${item.id}`}>
+                                        <Link href={`/camps-clinics/${item.id}`}>
                                             <Button
                                                 className="w-full bg-primary/20 text-primary hover:bg-primary/30 flex items-center gap-2"
                                             >
