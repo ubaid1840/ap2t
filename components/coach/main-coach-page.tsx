@@ -131,8 +131,8 @@ export default function MainCoachPage({
     // },
   ];
 
-const weeklyEvents = data?.session_data
-  ? data.session_data.flatMap((session) => {
+  const weeklyEvents = data?.session_data
+    ? data.session_data.flatMap((session) => {
       const events = [];
 
       let current = moment(session.date);
@@ -152,7 +152,7 @@ const weeklyEvents = data?.session_data
 
       return events;
     })
-  : [];
+    : [];
 
   const blockedEvents: Event[] = [];
 
@@ -173,6 +173,7 @@ const weeklyEvents = data?.session_data
 
   const combinedEvents = blockedEvents ? [...weeklyEvents, ...blockedEvents] : weeklyEvents;
 
+  const baseTab = admin ? ["Details", "Availability", "Sessions", "Revenue"] : ["Details", "Availability", "Sessions"]
 
   if (loading) {
     return (
@@ -184,6 +185,8 @@ const weeklyEvents = data?.session_data
       </div>
     )
   }
+
+
 
   return (
     <div className="flex flex-col w-full gap-6">
@@ -250,7 +253,7 @@ const weeklyEvents = data?.session_data
             className={`overflow-x-auto ${isMobile && "max-w-[calc(100vw-64px)]"}`}
           >
             <TabsList className="bg-transparent relative flex gap-2 px-2">
-              {["Details", "Availability", "Sessions", "Revenue"].map((t) => (
+              {baseTab.map((t) => (
                 <TabsTrigger
                   key={t}
                   value={t}
@@ -271,7 +274,7 @@ const weeklyEvents = data?.session_data
                       <Clock /> Sessions
                     </div>
                   )}
-                  {t === "Revenue" && (
+                  {t === "Revenue" && admin && (
                     <div className="flex gap-2 items-center py-2">
                       <DollarSign /> Revenue
                     </div>
@@ -393,7 +396,7 @@ const weeklyEvents = data?.session_data
             </div>
           </TabsContent>
 
-          <TabsContent value="Revenue" className="space-y-4 p-4">
+          {admin && <TabsContent value="Revenue" className="space-y-4 p-4">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               <div className="space-y-2 p-4 flex-1 bg-[#1A1A1A] rounded-[10px] border border-border">
                 <div className="flex gap-2">
@@ -472,6 +475,7 @@ const weeklyEvents = data?.session_data
               </div>
             </div>
           </TabsContent>
+          }
         </Tabs>
       </div>
     </div>
@@ -526,7 +530,7 @@ function calculateStats(sessions: SessionDataCoach[] | undefined, payments: Paym
         completedRatings.length
         : 0
 
-   
+
   }
   if (payments) {
     const filteredPayments = payments.filter((item) => item.status === 'paid')

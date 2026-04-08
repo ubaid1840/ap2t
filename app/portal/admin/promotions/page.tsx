@@ -57,7 +57,7 @@ type PrmotionsType = {
   total_participants: number;
   total_revenue: number;
   rawData: any
-  promotion_end : string | null
+  promotion_end: string | null
 }
 
 export default function Page() {
@@ -97,10 +97,10 @@ export default function Page() {
     }
   };
 
- 
+
 
   function calculateSessionStats(sessions: any[]) {
-   const today = moment();
+    const today = moment();
 
     return sessions.reduce(
       (acc, session) => {
@@ -108,7 +108,7 @@ export default function Page() {
           session.apply_promotion &&
           session.promotion_end
         ) {
-         const promoEnd = moment(new Date(session.promotion_end));
+          const promoEnd = moment(new Date(session.promotion_end));
 
           if (today.isSameOrBefore(promoEnd, "day")) {
             acc.total_active += 1;
@@ -178,29 +178,29 @@ export default function Page() {
   ];
 
   const filteredData = data.filter((item) => {
-  const today = moment();
+    const today = moment();
 
-  if (filter === "All") return true;
+    if (filter === "All") return true;
 
-  if (filter === "Active") {
-   
-    return item.apply_promotion && today.isSameOrBefore(moment(item.promotion_end), "day");
-  }
+    if (filter === "Active") {
 
-  if (filter === "Upcoming") {
-    return item.status?.toLowerCase() === "upcoming";
-  }
+      return item.apply_promotion && today.isSameOrBefore(moment(item.promotion_end), "day");
+    }
 
-  if (filter === "Archive") {
-    return (
-      item.status?.toLowerCase() === "completed" ||
-      item.status?.toLowerCase() === "cancelled" ||
-      (item.apply_promotion && today.isAfter(moment(item.promotion_end), "day"))
-    );
-  }
+    if (filter === "Upcoming") {
+      return item.status?.toLowerCase() === "upcoming";
+    }
 
-  return true;
-});
+    if (filter === "Archive") {
+      return (
+        item.status?.toLowerCase() === "completed" ||
+        item.status?.toLowerCase() === "cancelled" ||
+        (item.apply_promotion && today.isAfter(moment(item.promotion_end), "day"))
+      );
+    }
+
+    return true;
+  });
 
 
 
@@ -398,14 +398,6 @@ export default function Page() {
                     <Users /> View Detail
                   </Button>
                 </NextLink>
-                {/* <EditSessionDialog
-                  promotion={true}
-                  coach_id={null}
-                  sessionId={item.id}
-                  sessionData={item.rawData}
-                  onSuccess={fetchData}
-                />
-                <Button variant="ghost" className="bg-warning-bg text-warning-text border border-warning-text/32"><Archive /></Button> */}
               </div>
 
 

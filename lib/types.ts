@@ -46,6 +46,7 @@ export interface SessionDataType {
   location?: string;
   promotion_price ?: string;
   comped : boolean
+  coach_id ?: string | number
 }
 
 export interface Event {

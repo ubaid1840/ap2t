@@ -1,6 +1,7 @@
 "use client"
 
 import PageTable from "@/components/app-table"
+import BulkEmail from "@/components/bulk-email"
 import ExportExcel from "@/components/export-excel"
 import InputWithIcon from "@/components/input-with-icon"
 import { PLAYERS_COLUMNS } from "@/components/players/columns"
@@ -53,6 +54,7 @@ export default function Page() {
             if (result.data) {
                 const mappedPlayers = result.data.map((p: any) => ({
                     id: p.id,
+                    email : p.email,
                     name: joinNames([p.first_name, p.last_name]),
                     coach_name: joinNames([p?.coach_first_name, p?.coach_last_name]),
                     age: getYear(p.birth_date),
@@ -62,7 +64,8 @@ export default function Page() {
                     last_session: p?.last_session || "N/A",
                     last_session_date: p?.last_session_date ? moment(new Date(p?.last_session_date)).format("YYYY-MM-DD") : "N/A",
                     attendance: String(p?.attendance_percent || 0),
-                    joining_date: p.created_at
+                    joining_date: p.created_at,
+                    parent_email : p.parent_email
                 }));
                 setPlayers(mappedPlayers)
             }
@@ -122,6 +125,8 @@ export default function Page() {
                     <CreatePlayer onRefresh={async () => {
                         await fetchData()
                     }} />
+
+                    <BulkEmail players={players}/>
                 </div>
             </Header>
 

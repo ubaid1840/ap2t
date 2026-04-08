@@ -93,8 +93,7 @@ export function EditSessionDialog({
   const [blocked, setBlocked] = useState(false)
   const [blockedHours, setBlockedHours] = useState<any[]>([])
   const router = useRouter();
-  const { user } = useAuth()
-  const byAdmin = user?.role === 'admin'
+  const { isAdmin } = useAuth()
 
 
   function to24Hour(timeStr: string): string {
@@ -267,7 +266,7 @@ export function EditSessionDialog({
       return
     }
     try {
-      await axios.put(`/admin/sessions`, { ...values, id: sessionId, byAdmin });
+      await axios.put(`/admin/sessions`, { ...values, id: sessionId, byAdmin: isAdmin });
 
       toast.success("Session updated successfully");
       setOpen(false);
@@ -289,7 +288,7 @@ export function EditSessionDialog({
     setDeleteLoading(true);
 
     try {
-      await axios.delete(`/admin/sessions/${sessionId}?byAdmin=${byAdmin}`);
+      await axios.delete(`/admin/sessions/${sessionId}?byAdmin=${isAdmin}`);
       toast.success("Session deleted successfully");
       setDeleteLoading(false);
       setSelectedSession(null);

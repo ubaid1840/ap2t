@@ -56,6 +56,7 @@ SELECT
     pl.parent_id,
     parent_user.first_name AS parent_first_name,
     parent_user.last_name AS parent_last_name,
+    parent_user.email AS parent_email,
     ls.session_name AS last_session,
     ls.session_date AS last_session_date,
     ls.session_end_date AS last_session_end_date,

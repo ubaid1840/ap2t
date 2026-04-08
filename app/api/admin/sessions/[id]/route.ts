@@ -46,7 +46,8 @@ export async function DELETE(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const { id: session_id,byAdmin } = await params;
+  const { id: session_id } = await params;
+  const {byAdmin} = await request.json()
 
   try {
     const result = await pool.query(

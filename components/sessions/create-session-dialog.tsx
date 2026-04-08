@@ -183,9 +183,8 @@ export function CreateSessionDialog({
   const [coachSchedule, setCoachSchedule] = useState<{ string: string } | {}>({})
   const [blocked, setBlocked] = useState(false)
   const [blockedHours, setBlockedHours] = useState<any[]>([])
-  const {user} = useAuth()
-  const byAdmin = user?.role === 'admin'
-
+  const {isAdmin} = useAuth()
+ 
 
   function getCoachBookedSessions(coachId: number | null): BookedSession[] {
     if (!all_sessions || all_sessions.length === 0 || !coachId) return [];
@@ -367,7 +366,7 @@ export function CreateSessionDialog({
 
       await axios.post("/admin/sessions", {
         ...values,
-        byAdmin
+        byAdmin : isAdmin
       });
 
       await onRefresh();

@@ -27,14 +27,14 @@ type AuthContextType = {
   firebaseUser: FirebaseUser | null;
   user: DBUser | null;
   loading: boolean;
-
+isAdmin : boolean
 };
 
 const AuthContext = createContext<AuthContextType>({
   firebaseUser: null,
   user: null,
   loading: true,
-
+isAdmin : false
 });
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
@@ -92,8 +92,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   }, [pathname]);
 
+  const isAdmin = user?.role === 'admin'
+
   return (
-    <AuthContext.Provider value={{ firebaseUser, user, loading }}>
+    <AuthContext.Provider value={{ firebaseUser, user, loading, isAdmin }}>
       {children}
     </AuthContext.Provider>
   );

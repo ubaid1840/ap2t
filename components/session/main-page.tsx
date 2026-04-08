@@ -71,7 +71,7 @@ export default function SessionMainPage({ id, back, back_title, admin = false }:
   const [tab, setTab] = useState("Participants");
   const isMobile = useIsMobile();
   const [loading, setLoading] = useState(false);
-  const { user } = useAuth()
+  const { user, isAdmin } = useAuth()
   const [participants, setParticipants] = useState<any[]>([]);
   const [payments, setPayments] = useState<any[]>([]);
   const [notes, setNotes] = useState([])
@@ -91,12 +91,13 @@ export default function SessionMainPage({ id, back, back_title, admin = false }:
     }
   }, [id]);
 
+  const allowed =  isAdmin ? true : user?.id === data?.coach_id ? true : false
+
   const fetchData = async () => {
     try {
       setLoading(true);
 
       const result = await axios.get(`/admin/sessions/${id}`);
-
       if (result.data) {
         const d = result.data;
         setRawSessionData(d);
@@ -114,7 +115,8 @@ export default function SessionMainPage({ id, back, back_title, admin = false }:
           max_players: d.max_players,
           location: d.location,
           comped: d.comped,
-          description: d.description
+          description: d.description,
+          coach_id : d.coach_id
         } as any);
       }
     } finally {
@@ -262,19 +264,19 @@ export default function SessionMainPage({ id, back, back_title, admin = false }:
               </div>
               <div className="flex gap-4">
 
-                {data && data?.status === "upcoming" &&
+                {data && data?.status === "upcoming" && allowed &&
                   <StartSessionNow id={id} onRefresh={async () => {
                     await fetchData()
                   }} />
                 }
 
-                <EditSessionDialog
+             {allowed &&   <EditSessionDialog
                   coach_id={admin ? null : user?.id}
                   sessionId={id}
                   sessionData={rawSessionData}
                   onSuccess={fetchData}
                   all_sessions={allSessions}
-                />
+                />}
               </div>
             </div>
             <p className="text-sm text-muted-foreground">
@@ -342,7 +344,7 @@ export default function SessionMainPage({ id, back, back_title, admin = false }:
 
           <div className="flex gap-2 flex-wrap px-6">
 
-            {data && data.status !== "completed" && data.status !== "cancelled" && (
+            {data && data.status !== "completed" && data.status !== "cancelled" && allowed && (
               <Markbuttons
                 id={id}
                 onRefresh={async () => {
@@ -352,7 +354,7 @@ export default function SessionMainPage({ id, back, back_title, admin = false }:
               />
             )}
 
-            {data && !data?.comped &&
+            {data && !data?.comped && allowed &&
               <MarkComped id={id} onRefresh={fetchData} />
             }
           </div>
@@ -399,7 +401,7 @@ export default function SessionMainPage({ id, back, back_title, admin = false }:
           <Separator />
 
           <TabsContent value="Participants" className="space-y-4 p-4">
-            {data?.status === "upcoming" && <AddParticipantDialog sessionId={Number(id)} onSuccess={async () => {
+            {data?.status === "upcoming" && allowed && <AddParticipantDialog sessionId={Number(id)} onSuccess={async () => {
               await fetchParticipants()
               await fetchPayments()
             }} />}
@@ -483,7 +485,7 @@ export default function SessionMainPage({ id, back, back_title, admin = false }:
                       </div>
                     </div>
 
-                    {!['paid', 'comped'].includes(payment?.status) &&
+                    {!['paid', 'comped'].includes(payment?.status) && isAdmin &&
 
                       <DiscountDialog onRefresh={fetchPayments} original={data?.price || "0"} data={payment} />
                     }
@@ -496,9 +498,9 @@ export default function SessionMainPage({ id, back, back_title, admin = false }:
           <TabsContent value="Notes" className="space-y-4 p-4">
             <div className="flex justify-between items-center">
               <h1 className="text-lg ">Internal Notes</h1>
-              <AddNoteDialog session_id={Number(id)} onRefresh={async () => {
+             { allowed && <AddNoteDialog session_id={Number(id)} onRefresh={async () => {
                 await fetchNotes()
-              }} />
+              }} />}
             </div>
             {notes.map((note: noteType) => {
               return (
@@ -719,7 +721,7 @@ const AttendanceMarking = ({ player_id, onRefresh, session_id }: { player_id: nu
 }
 
 const AddNoteDialog = ({ session_id, onRefresh }: { session_id: number, onRefresh: () => Promise<void> }) => {
-  const { user } = useAuth()
+  const { user, } = useAuth()
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false)
   const [data, setData] = useState({
