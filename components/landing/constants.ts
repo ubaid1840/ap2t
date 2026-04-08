@@ -25,7 +25,7 @@ export const about = [
     { title: "25+", description: "Certified Expert Trainers" },
     { title: "150+", description: "Classes" },
     { title: "5000+", description: "Members" },
-    { title: "12+", description: "Years" },
+    { title: "15+", description: "Years" },
 
 ]
 
