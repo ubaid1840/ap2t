@@ -100,7 +100,7 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
             <div className="relative space-y-8 w-full max-w-4xl">
               <div className="flex flex-col items-center gap-4 text-center">
                 <h1 className="text-4xl sm:text-5xl font-bold">
-                  Camps & Clinis
+                  Camps & Clinics
                 </h1>
                 <p className="text-sm text-muted max-w-xl">
                   Enhance your reflection time, coordination, and movement

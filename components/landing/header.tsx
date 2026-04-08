@@ -11,7 +11,7 @@ const links = [
   { name: "HOME", href: "/home" },
   { name: "ABOUT US", href: "/about" },
   { name: "IN-HOUSE PROGRAMS", href: "/inhouseprograms" },
-  { name: "CAMPS & CLINICS", href: "/camps&clinics" },
+  { name: "CAMPS & CLINICS", href: "/camps-clinics" },
   { name: "GALLERY", href: "/gallery" },
   // { name: "STORE", href: "#" }
 ];

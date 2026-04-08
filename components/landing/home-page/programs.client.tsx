@@ -58,7 +58,7 @@ const programs = [
     title: "Technical Training",
     price: "$40/Player",
     description:
-      "Join our dynamic group training sessions for collaborative skill development and team building.",
+      "Group sessions focused on improving soccer skills, technique, and on-field decision-making.",
     buttonText: "Book Online",
     icon: <Users className="text-[#CAFF33] size-8 relative z-10" />,
   },
@@ -66,7 +66,7 @@ const programs = [
     title: "Physical Training",
     price: "Custom fit",
     description:
-      "One-on-one personalized training tailored to your specific needs and goals.",
+      "Personalized workouts to improve strength, speed, agility, and overall athletic performance",
     buttonText: "Book Online",
     icon: <User className="text-[#CAFF33] size-8 relative z-10" />,
   },
@@ -74,7 +74,7 @@ const programs = [
     title: "2 Hour Training",
     price: "$40/Player",
     description:
-      "Compete at the highest level with our elite competitive team programs.",
+      "Intensive 2-hour sessions focused on improving skills, speed, and game performance.",
     buttonText: "Book Online",
     icon: <Trophy className="text-[#CAFF33] size-8 relative z-10" />,
   },
@@ -82,7 +82,7 @@ const programs = [
     title: "Semi-Private Session",
     price: "Contact Us",
     description:
-      "One-on-one personalized training tailored to your specific needs and goals.",
+      "Semi-private sessions for personalized guidance in a small-group setting.",
     buttonText: "Email to Book",
     icon: <User className="text-[#CAFF33] size-8 relative z-10" />,
   },
@@ -90,7 +90,7 @@ const programs = [
     title: "Private Session",
     price: "Contact Us",
     description:
-      "Compete at the highest level with our elite competitive team programs.",
+      "Personalized private coaching to refine skills and reach your highest potential.",
     buttonText: "Email to Book",
     icon: <Trophy className="text-[#CAFF33] size-8 relative z-10" />,
   },
