@@ -72,8 +72,8 @@ export default function CampsAndClinicsDetail({
     e.preventDefault();
     setLoading(true);
 
-    try {
-      const res = await axios.post(`/camps-and-clinics/${data?.id}`, formData);
+  try {
+    const res = await axios.post(`/camps-clinics/${data?.id}`, formData);
 
       if (res.data.success) {
         toast.success("Registered Successfully!");

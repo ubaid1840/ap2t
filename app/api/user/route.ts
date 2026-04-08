@@ -330,7 +330,7 @@ export async function createUserWithFirebase(
     const fullName = `${rest?.first_name || ""} ${rest?.last_name || ""}`;
     const roleLabel = role.charAt(0).toUpperCase() + role.slice(1);
 
-    const msg = `New ${roleLabel} registered: ${fullName} (${email}).`;
+    const msg = `New ${roleLabel} registered ${fullName} (${email}).`;
 
     if (role === "parent") {
     const route = `/portal/parents/${id}`;

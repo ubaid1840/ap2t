@@ -134,7 +134,7 @@ WHERE p.user_id = $1
 
                    const parentidRaw=await pool.query(`SELECT parent_id FROM players WHERE user_id=$1`,[id])
                    const parent_id=parentidRaw.rows[0]
-                   const parentMsg=`Payment payed for session "${session.sessionName}": paid - $${session.amount}.`
+                   const parentMsg=`Payment payed for session ${session.sessionName} paid - $${session.amount}.`
                    sendInAppNotificationBackend(
                        parent_id,
                        parentMsg,
@@ -265,7 +265,7 @@ WHERE p.user_id = $1
                         paymentMethod: "Debit / Credit Card",
                         paymentDate: new Date().toISOString(),
                     });
-                     const paymentMsg = `${user.fullName} payment for "${session.sessionName}": paid - $${session.amount}.`;
+                     const paymentMsg = `${user.fullName} payment for ${session.sessionName} paid - $${session.amount}.`;
                    const admins = await fetchAllAdmins();
                    const promises = admins.map(admin =>
                      sendInAppNotificationBackend(
@@ -279,9 +279,14 @@ WHERE p.user_id = $1
 
                    const parentidRaw=await pool.query(`SELECT parent_id FROM players WHERE user_id=$1`,[id])
                    const parent_id=parentidRaw.rows[0]
-                   const parentMsg=`Payment payed for session "${session.sessionName}": paid - $${session.amount}.`
+                   const parentMsg=`Payment payed for session ${session.sessionName} paid - $${session.amount}.`
                    sendInAppNotificationBackend(
                        parent_id,
+                       parentMsg,
+                       `/portal/parent/dashboard`
+                     )
+                     sendInAppNotificationBackend(
+                       id,
                        parentMsg,
                        `/portal/parent/dashboard`
                      )

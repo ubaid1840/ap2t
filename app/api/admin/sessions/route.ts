@@ -63,7 +63,7 @@ export async function POST(req: NextRequest) {
     const coachName =
       `${emailData?.first_name || ""} ${emailData?.last_name || ""}`.trim();
     if (byAdmin) {
-      const msg = `New session "${data?.name}" with ${coachName} scheduled on ${moment(data.date).format("YYYY-MMM-DD")} - ${moment(data.end_date).format("YYYY-MMM-DD")} at ${data?.start_time} - ${data.end_time}.`;
+      const msg = `New session ${data?.name} with ${coachName} scheduled on ${moment(data.date).format("YYYY-MMM-DD")} - ${moment(data.end_date).format("YYYY-MMM-DD")} at ${data?.start_time} - ${data.end_time}.`;
 
       await sendInAppNotificationBackend(
         data.coach_id,
@@ -71,7 +71,7 @@ export async function POST(req: NextRequest) {
         `/portal/coach/sessions/${session_id}`,
       );
     } else if (!byAdmin) {
-      const msg = `New session "${data?.name}" with ${coachName} scheduled on ${moment(data.date).format("YYYY-MMM-DD")} - ${moment(data.end_date).format("YYYY-MMM-DD")} at ${data?.start_time} - ${data.end_time}.`;
+      const msg = `New session ${data?.name} with ${coachName} scheduled on ${moment(data.date).format("YYYY-MMM-DD")} - ${moment(data.end_date).format("YYYY-MMM-DD")} at ${data?.start_time} - ${data.end_time}.`;
 
       const admins = await fetchAllAdmins();
 const promises = admins.map(admin =>
@@ -217,7 +217,7 @@ export async function PUT(req: NextRequest) {
     const coachName =
       `${emailData?.first_name || ""} ${emailData?.last_name || ""}`.trim();
     if (byAdmin) {
-      const msg = `Session "${data?.name}" with ${coachName} was updated`;
+      const msg = `Session ${data?.name} with ${coachName} was updated`;
 
       await sendInAppNotificationBackend(
         data.coach_id,
@@ -225,7 +225,7 @@ export async function PUT(req: NextRequest) {
         `/portal/admin/sessions/${id}`,
       );
     } else if (!byAdmin) {
-      const msg = `Session "${data?.name}" with ${coachName} was updated`;
+      const msg = `Session ${data?.name} with ${coachName} was updated`;
 
       const admins = await fetchAllAdmins();
 const promises = admins.map(admin =>
