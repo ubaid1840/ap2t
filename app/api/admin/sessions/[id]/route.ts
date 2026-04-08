@@ -66,13 +66,13 @@ export async function DELETE(
     const coachNames=coachNamesRaw.rows[0]
     const coachFullName=`${coachNames.first_name} ${coachNames.last_name}`
     if(byAdmin){
-
+      
+      const msg = `Session with you ${session?.name} was deleted by admin`;
     
-    const msg = `Session with you "${session?.name}" was deleted by admin`;
 
 await sendInAppNotificationBackend(session.coach_id, msg, `/portal/coach/sessions/`)
 }else if(!byAdmin){
-  const msg = `Session "${session?.name}" was deleted by ${coachFullName}`;
+  const msg = `Session ${session?.name} was deleted by ${coachFullName}`;
   const admins=await fetchAllAdmins()
   const promises = admins.map(admin =>
 
@@ -80,6 +80,12 @@ await sendInAppNotificationBackend(session.coach_id, msg, `/portal/coach/session
   )
   await Promise.all(promises)
 }
+const playerMsg=`Session ${session?.name} was deleted`
+  const res= await pool.query(`SELECT user_id from session_players WHERE session_id=$1`,[session_id])
+  const playersInSsssionId= res.rows
+  for(const playerId of playersInSsssionId){
+    sendInAppNotificationBackend(playerId, playerMsg, `/portal/admin/sessions/`)
+  }
     return NextResponse.json(
       { message: "Session deleted successfully", session: result.rows[0] },
       { status: 200 }
@@ -152,11 +158,11 @@ export async function PUT(req: NextRequest) {
     if(byAdmin){
 
     
-    const msg = `Session "${data?.name}" with ${coachName} was updated`;
+    const msg = `Session ${data?.name} with ${coachName} was updated`;
 
 await sendInAppNotificationBackend(data.coach_id, msg, `/portal/coach/sessions/${id}`)
 }else if(!byAdmin){
-  const msg = `Session "${data?.name}" with ${coachName} was updated`;
+  const msg = `Session ${data?.name} with ${coachName} was updated`;
 
 const admins=await fetchAllAdmins()
   const promises = admins.map(admin =>
@@ -166,7 +172,7 @@ const admins=await fetchAllAdmins()
   await Promise.all(promises)
 }
 if(updates.status!=="upcoming"){
-  const msg = `Session "${data?.name}" with ${coachName} is ${updates.status}`;
+  const msg = `Session ${data?.name} with ${coachName} is ${updates.status}`;
   const res= await pool.query(`SELECT user_id from session_players WHERE session_id=$1`,[id])
   const playersInSsssionId= res.rows
   for(const playerId of playersInSsssionId){
@@ -176,6 +182,7 @@ if(updates.status!=="upcoming"){
 
     sendInAppNotificationBackend(admin.id, msg, `/portal/admin/sessions/`)
   )
+  sendInAppNotificationBackend(playerId, msg, `/portal/admin/sessions/`)
   await Promise.all(promises)
   }
 }

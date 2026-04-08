@@ -251,7 +251,7 @@ WHERE se.session_id = $1
     }
     const playerName = `${emailData?.first_name || ""} ${emailData?.last_name || ""}`.trim();
 
-const msg = `${playerName} enrolled in "${emailData.sessionname}".`;
+const msg = `${playerName} enrolled in ${emailData.sessionname}.`;
 
 const admins = await fetchAllAdmins();
 const promises = admins.map(admin =>
@@ -268,7 +268,7 @@ await sendInAppNotificationBackend(
   msg,
   `/portal/coach/sessions/${id}`
 );
-const paymentMsg = `${playerName} enrolled in "${emailData.sessionname}". Payment: Pending`;
+const paymentMsg = `${playerName} enrolled in ${emailData.sessionname}. Payment: Pending`;
 
 if(emailData.parent_id){
 
@@ -278,6 +278,11 @@ if(emailData.parent_id){
     `/portal/parent/sessions/${id}`
   );
 }
+await sendInAppNotificationBackend(
+    playerUserId,
+    msg,
+    `/portal/parent/sessions/${id}`
+  );
 
 const promises1 = admins.map(admin =>
   sendInAppNotificationBackend(

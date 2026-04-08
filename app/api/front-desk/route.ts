@@ -322,7 +322,7 @@ WHERE se.session_id = $1
 
             await sendCoachPlayerEnrollmentEmail(coachEmailPayload);
             const playerName = `${EmailData?.first_name || ""} ${EmailData?.last_name || ""}`;
-            const msg = `${playerName} enrolled in "${EmailData.sessionname}".`;
+            const msg = `${playerName} enrolled in ${EmailData.sessionname}.`;
 
 const admins = await fetchAllAdmins();
 const promises = admins.map(admin =>
@@ -347,6 +347,11 @@ if(EmailData.parent_id){
     `/portal/parent/sessions/${session_id}`
   );
 }
+await sendInAppNotificationBackend(
+    user_id,
+    msg,
+    `/portal/parent/sessions/${session_id}`
+  );
 
 
             const paymentStatus = session.comped
@@ -357,7 +362,7 @@ if(EmailData.parent_id){
 
             const discountText = hasSiblingDiscount ? " (Sibling discount)" : "";
 
-            const paymentMsg = `${playerName} payment for "${EmailData.sessionname}": ${paymentStatus} - $${amount}${discountText}.`;
+            const paymentMsg = `${playerName} payment for ${EmailData.sessionname} ${paymentStatus} - $${amount}${discountText}.`;
 
             const promises1 = admins.map(admin =>
   sendInAppNotificationBackend(
@@ -366,8 +371,21 @@ if(EmailData.parent_id){
     `/portal/admin/payments/`
   )
 );
-
 await Promise.all(promises1);
+if(EmailData.parent_id){
+
+  await sendInAppNotificationBackend(
+    EmailData.parent_id,
+    paymentMsg,
+    `/portal/parent/sessions/${session_id}`
+  );
+}
+await sendInAppNotificationBackend(
+    user_id,
+    paymentMsg,
+    `/portal/parent/sessions/${session_id}`
+  );
+
           }
         } catch (error: any) {
           await client.query("ROLLBACK");

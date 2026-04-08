@@ -208,7 +208,7 @@ const paymentStatus = sessionData.comped
 
 const discountText = hasSiblingDiscount ? " (Sibling discount applied)" : "";
 
-const msg = `${playerName} enrolled in "${emailData.sessionname}".`;
+const msg = `${playerName} enrolled in ${emailData.sessionname}.`;
 const admins = await fetchAllAdmins();
 const promises = admins.map(admin =>
   sendInAppNotificationBackend(
@@ -240,6 +240,10 @@ const paymentmsg=` Payment: ${paymentStatus} - $${amount}${discountText}.`
     sendInAppNotificationBackend(admin.id, paymentmsg, `/portal/admin/sessions/`)
   )
   await Promise.all(promises1)
+  if(emailData.parent_id){
+     await sendInAppNotificationBackend(emailData.parent_id, paymentmsg, `/portal/parent/sessions/`)
+  }
+  await sendInAppNotificationBackend(player_id, paymentmsg, `/portal/player/sessions/`)
 
     return NextResponse.json(
       { message: "Done" },

@@ -50,7 +50,7 @@ export async function POST(
 
       await Promise.all(
         allAdmins.map(async (admin) => {
-          const paymentMsg = `${fullName} attendended for "${admin.sessionName}".`;
+          const paymentMsg = `${fullName} attendended for ${admin.sessionName}.`;
 
           await sendInAppNotificationBackend(
             admin.user_id,
@@ -75,7 +75,7 @@ WHERE se.session_id = $1
         [data.session_id, data.user_id],
       );
       const EmailData = EmailDataRaw.rows[0];
-      const msg = `${EmailData.playername} attended in "${EmailData.sessionname}".`;
+      const msg = `${EmailData.playername} attended in ${EmailData.sessionname}.`;
       await sendInAppNotificationBackend(
         EmailData.coach_id,
         msg,
