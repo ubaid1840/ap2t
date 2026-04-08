@@ -16,6 +16,7 @@ import { useMemo, useState } from "react";
 import { Label } from "./ui/label";
 import { ScrollArea } from "./ui/scroll-area";
 import axios from "@/lib/axios";
+import { toast } from "sonner";
 
 interface User {
     id: number;
@@ -59,6 +60,7 @@ function UserTable({ data, onClose }: UserTableProps) {
     const [msg, setMsg] = useState("");
     const [loading, setLoading] = useState(false);
     const [selectedAges, setSelectedAges] = useState<number[]>([]);
+    const [subject, setSubject] = useState("")
     const isMobile = useIsMobile()
 
     const uniqueAges = useMemo(() => {
@@ -120,8 +122,10 @@ function UserTable({ data, onClose }: UserTableProps) {
 
             await axios.post(`/admin/bulk`, {
                 emails: emailPlayers,
-                msg
+                msg,
+                subject
             })
+            toast.success("Emails sent")
             handleClose()
         } finally {
             setLoading(false);
@@ -140,16 +144,25 @@ function UserTable({ data, onClose }: UserTableProps) {
     const content = (
         <div className="flex flex-col-reverse lg:flex-row gap-4">
 
-            <div className="space-y-4 w-full sm:min-w-[280px]">
+           <div className="flex flex-col space-y-4 w-full h-full sm:min-w-[280px]">
+
+                 <div className="space-y-2">
+                    <Label>Enter Subject</Label>
+                    <Input
+                        placeholder="Search subject..."
+                        value={subject}
+                        onChange={(e) => setSubject(e.target.value)}
+                    />
+                </div>
 
 
-                <div className="space-y-2">
+             <div className="flex flex-col flex-1 gap-2">
                     <Label>Enter Message</Label>
                     <Textarea
                         placeholder="Type your message..."
                         value={msg}
                         onChange={(e) => setMsg(e.target.value)}
-                        className="h-24"
+                        className="min-h-24 h-full"
                     />
                 </div>
 
@@ -187,7 +200,7 @@ function UserTable({ data, onClose }: UserTableProps) {
 
 
                 <Button
-                    className="w-full lg:w-auto"
+                    className="w-full"
                     variant="default"
                     onClick={handleSendNotifications}
                     disabled={selectedUsers.length === 0 || loading || !msg.trim() }

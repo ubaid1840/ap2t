@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
 
-    const { emails, msg } = await req.json()
+    const { emails, msg, subject = "Notification" } = await req.json()
 
     if (!emails || !msg) return NextResponse.json({ message: "Data missing" }, { status: 400 })
 
@@ -59,7 +59,7 @@ export async function POST(req: NextRequest) {
   </body>
 </html>
 `;
-                    await sendSingleEmail(message, "Notification", eachEmail as string);
+                    await sendSingleEmail(message, subject, eachEmail as string);
                 } catch (error: any) {
                     console.log(`Failed for ${eachEmail}:`, error?.message);
                 }
