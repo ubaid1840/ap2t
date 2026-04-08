@@ -111,10 +111,17 @@ function UserTable({ data, onClose }: UserTableProps) {
     const handleSendNotifications = async () => {
         if (selectedUsers.length === 0) return;
         setLoading(true);
-        let emailPlayers: { id: number, email: string, parent_email: string }[] = []
+        let emailPlayers: { email: string, parent_email: string | null, name : string,  }[] = []
         selectedUsers.forEach((item) => {
             data.forEach((ep) => {
-                if (ep.id === item) emailPlayers.push({ id: ep.id, email: ep.email, parent_email: ep.parent_email })
+                if (ep.id === item) {
+                    emailPlayers.push(
+                        {
+                            email: ep?.email,
+                            name : ep?.name,
+                            parent_email: ep?.parent_email,
+                        })
+                }
             })
         })
 
@@ -144,9 +151,9 @@ function UserTable({ data, onClose }: UserTableProps) {
     const content = (
         <div className="flex flex-col-reverse lg:flex-row gap-4">
 
-           <div className="flex flex-col space-y-4 w-full h-full sm:min-w-[280px]">
+            <div className="flex flex-col space-y-4 w-full h-full sm:min-w-[280px]">
 
-                 <div className="space-y-2">
+                <div className="space-y-2">
                     <Label>Enter Subject</Label>
                     <Input
                         placeholder="Search subject..."
@@ -156,7 +163,7 @@ function UserTable({ data, onClose }: UserTableProps) {
                 </div>
 
 
-             <div className="flex flex-col flex-1 gap-2">
+                <div className="flex flex-col flex-1 gap-2">
                     <Label>Enter Message</Label>
                     <Textarea
                         placeholder="Type your message..."
@@ -203,7 +210,7 @@ function UserTable({ data, onClose }: UserTableProps) {
                     className="w-full"
                     variant="default"
                     onClick={handleSendNotifications}
-                    disabled={selectedUsers.length === 0 || loading || !msg.trim() }
+                    disabled={selectedUsers.length === 0 || loading || !msg.trim()}
                 >
                     {loading ? "Sending..." : "Send Notification"}
                 </Button>
