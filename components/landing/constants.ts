@@ -12,7 +12,7 @@ export const values = [
     },
     {
         title: "Goal-Oriented",
-        description: "Every training sesison is desinged with clear outcomes in mind. We set actionable targets, track performance, and help athletes stay focused on achieving real, impactful results. "
+        description: "Every training session is designed with clear outcomes in mind. We set actionable targets, track performance, and help athletes stay focused on achieving real, impactful results. "
     },
     {
         title: "Professionalism",
@@ -24,8 +24,8 @@ export const values = [
 export const about = [
     { title: "25+", description: "Certified Expert Trainers" },
     { title: "150+", description: "Classes" },
-    { title: "200+", description: "Members" },
-    { title: "10+", description: "Years" },
+    { title: "5000+", description: "Members" },
+    { title: "15+", description: "Years" },
 
 ]
 

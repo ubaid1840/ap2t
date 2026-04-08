@@ -43,7 +43,7 @@ export default function Footer() {
                             </div>
                             <div className="flex gap-2 items-start">
                                 <LetterTextIcon className="w-4 h-4 mt-0.5" />
-                                <span>info@sportshub.com</span>
+                                <span>rjallen@ap2t.net | mike@ap2t.net | matt@ap2t.net</span>
                             </div>
                             <div className="flex gap-2 items-start">
                                 <Map className="w-4 h-4 mt-0.5" />
@@ -68,7 +68,7 @@ export default function Footer() {
                 </div>
 
                 <div className="border-t border-[#282828] mt-10 pt-6 text-center text-xs text-[#A3A3A3]">
-                    © 2025 AP2T. All rights reserved.
+                    © {`${new Date().getFullYear()}`} AP2T. All rights reserved.
                 </div>
             </div>
         </div>

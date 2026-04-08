@@ -99,7 +99,7 @@ export default function Hero() {
                         </Link>
                         <Link href="/contact">
                         <Button size={"lg"} className="bg-transparent border-2 border-white rounded-full text-white w-full sm:w-auto hover:bg-white/10">
-                            CALL US 732-XXX-XXXX
+                            CALL US 732-515-9300
                         </Button>
                         </Link>
                     </div>

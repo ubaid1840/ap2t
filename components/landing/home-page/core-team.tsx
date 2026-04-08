@@ -28,7 +28,7 @@ export default function CoreTeam() {
       </div>
 
       <p className="text-[#A3A3A3] text-sm sm:text-base mb-6 sm:mb-8">
-        Meet the dedicated professionals who make Athletic exceptional
+        Meet the dedicated professionals who make AP2T exceptional
       </p>
 
       <Carousel className="w-full mt-4">

@@ -52,7 +52,6 @@ export default function CampsAndClinics({ data = [] }: any) {
     const [filter, setFilter] = useState("All")
     const mobile = useIsMobile()
     const camps = transformCampClinics(data);
-
     return (
         <div className="relative pt-16 sm:pt-20">
             <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 space-y-10">
@@ -63,10 +62,10 @@ export default function CampsAndClinics({ data = [] }: any) {
                         <div className="relative space-y-8 w-full max-w-4xl">
                             <div className="flex flex-col items-center gap-4 text-center">
                                 <h1 className="text-4xl sm:text-5xl font-bold">
-                                    Camps & Clinis
+                                    Camps & Clinics
                                 </h1>
                                 <p className="text-sm text-muted max-w-xl">
-                                    Enhance your reflection time, coordination, and movement efficiency.
+                                    Enhance your reaction time, coordination, and movement efficiency.
                                 </p>
                             </div>
                         </div>
@@ -216,7 +215,7 @@ export const transformCampClinics = (
         left: s.total_left,
         details: [
             `${moment(s.date).format("MMM DD")}–${moment(s.end_date).format("DD, YYYY")}`,
-            `${moment(s.start_time, "HH:mm").format("hh:mm A")} - ${moment(s.end_time, "HH:mm").format("hh:mm A")}`,
+            `${s.start_time} - ${s.end_time}`,
             `Ages ${s.age_limit ?? "All"}`,
             "AP2T Indoor facility",
         ],

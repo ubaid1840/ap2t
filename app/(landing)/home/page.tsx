@@ -1,5 +1,3 @@
-"use client";
-
 import Booking from "@/components/landing/home-page/book.client";
 import Facilities from "@/components/landing/home-page/facilities.client";
 import Hero from "@/components/landing/home-page/hero.client";
@@ -8,6 +6,17 @@ import Programs from "@/components/landing/home-page/programs.client";
 import Testimonials from "@/components/landing/home-page/testimonials.client";
 import JoinNow from "@/components/landing/join-now";
 import PricingSection from "@/components/landing/pricing-section";
+export const metadata = {
+  title: "Home | AP2T",
+  description: "AP2T is a modern platform for managing sports training sessions, coaches, and player development with ease.",
+  keywords: [
+    "sports training",
+    "coaching platform",
+    "player development",
+    "AP2T",
+    "training sessions",
+  ]
+};
 export default function LandingPage() {
 
     return (
