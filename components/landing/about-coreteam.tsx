@@ -2,16 +2,12 @@
 import { useIsMobile } from "@/hooks/use-mobile"
 import { useSafeBack } from "@/hooks/use-safe-back"
 import { ArrowLeft, Mail } from "lucide-react"
-import { useRouter } from "next/navigation"
 import { team } from "./constants"
 
 
-export default function CoreTeamPage(){
-     const isMobile = useIsMobile()
-    const router = useRouter()
-     const safeBack = useSafeBack("/home")
-
-    
+export default function CoreTeamPage() {
+    const isMobile = useIsMobile()
+    const safeBack = useSafeBack("/home")
 
     return (
         <div className="pt-16 sm:pt-20 relative">

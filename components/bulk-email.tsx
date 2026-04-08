@@ -37,12 +37,12 @@ const BulkEmail = ({ players }: { players: any }) => {
     const [open, setOpen] = useState(false)
     return (
         <>
-            <Button onClick={() => setOpen(!open)}><Send /> Send Bulk Notifications</Button>
+            <Button onClick={() => setOpen(!open)}><Send /> Send Bulk Emails</Button>
             <Dialog open={open} onOpenChange={setOpen}>
                 <DialogContent className="sm:max-w-[90vw]">
                     <DialogHeader>
                         <DialogTitle>
-                            Send Bulk Notifications
+                            Send Bulk Emails
                         </DialogTitle>
                     </DialogHeader>
                     <UserTable data={players} onClose={() => setOpen(false)} />

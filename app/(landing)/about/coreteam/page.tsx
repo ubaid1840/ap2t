@@ -1,4 +1,4 @@
-import CoreTeam from "@/components/landing/home-page/core-team";
+import CoreTeamPage from "@/components/landing/about-coreteam";
 
 export const metadata = {
   title: "Core Team | AP2T",
@@ -11,5 +11,5 @@ export const metadata = {
   },
 };
 export default function Page() {
-    return(<CoreTeam/>)
+  return <CoreTeamPage />
 }
