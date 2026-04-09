@@ -100,7 +100,7 @@ export const sessionSchema = z.object({
   image: z.string(),
   promotion_start: z.date().nullable(),
   promotion_end: z.date().nullable(),
-  promotion_price:  z.coerce.number<number>().min(1, "promotion price is required"),
+  promotion_price:  z.string(),
   show_storefront: z.boolean(),
 })
   .superRefine((data, ctx) => {
@@ -165,48 +165,17 @@ export function CreateSessionDialog({
   coach_id = null,
   coach_name = null,
   promotion = false,
-  all_sessions = [],
 }: {
   coach_name?: string | null;
   coach_id?: string | null;
   onRefresh: () => Promise<void>;
   promotion?: boolean;
-  all_sessions?: any[]
 }) {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const [coach_Name, setCoach_name] = useState<string | null>(null);
-  const [notAvailableSessions, setNotAvailableSessions] = useState<
-    BookedSession[]
-  >([]);
-  const [booked, setBooked] = useState(false);
-  const [coachSchedule, setCoachSchedule] = useState<{ string: string } | {}>({})
-  const [blocked, setBlocked] = useState(false)
-  const [blockedHours, setBlockedHours] = useState<any[]>([])
   const { isAdmin } = useAuth()
-
-
-  function getCoachBookedSessions(coachId: number | null): BookedSession[] {
-    if (!all_sessions || all_sessions.length === 0 || !coachId) return [];
-
-    return all_sessions
-      .filter(
-        (session) =>
-          (session.status === "upcoming" || session.status === "ongoing") &&
-          coachId === session.original.coach_id,
-      )
-      .map((session) => {
-        const [start_time, end_time] = session.time.split(" - ");
-        return {
-          name: session.original.name,
-          date: session.original.date,
-          end_date: session.original.end_date,
-          start_time,
-          end_time,
-        };
-      });
-  }
 
   const form = useForm<SessionSchemaValues>({
     resolver: zodResolver(sessionSchema),
@@ -225,7 +194,7 @@ export function CreateSessionDialog({
       show_storefront: false,
       date: null,
       end_date: null,
-      promotion_price: 0,
+      promotion_price: "",
       image: "",
       promotion_start: null,
       promotion_end: null,
@@ -246,138 +215,31 @@ export function CreateSessionDialog({
   const applyPromotion = form.watch("apply_promotion");
   const image = form.watch("image");
   const selectedCoachId = form.watch("coach_id");
-  function to24Hour(timeStr: string): string {
-    if (!timeStr) return "";
+  
 
-    if (!timeStr.includes("AM") && !timeStr.includes("PM")) return timeStr;
-
-    const [time, suffix] = timeStr.split(" ");
-    let [hours, minutes] = time.split(":").map(Number);
-    if (suffix === "PM" && hours !== 12) hours += 12;
-    if (suffix === "AM" && hours === 12) hours = 0;
-    return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}`;
-  }
-
-  const getSessionsConflicts = (
-    overrides: {
-      start_time: string;
-      end_time: string;
-      date: Date | null;
-      end_date: Date | null;
-    } = {
-        start_time: "",
-        end_time: "",
-        date: null,
-        end_date: null
-      },
-  ): BookedSession[] => {
-    const selectedDate = overrides.date ?? form.getValues("date");
-    const selectedEndDate = overrides.end_date ?? form.getValues("end_date");
-    const selectedStartTime = overrides.start_time ?? form.getValues("start_time");
-    const selectedEndTime = overrides.end_time ?? form.getValues("end_time");
-
-    if (!selectedDate || !selectedEndDate || !selectedStartTime || !selectedEndTime)
-      return [];
-
-    const coachSessions = getCoachBookedSessions(selectedCoachId);
-    const newStart = to24Hour(selectedStartTime);
-    const newEnd = to24Hour(selectedEndTime);
-
-    const toDateOnly = (d: Date | string) => {
-      if (typeof d === "string") return d.slice(0, 10);
-      const year = d.getFullYear();
-      const month = String(d.getMonth() + 1).padStart(2, "0");
-      const day = String(d.getDate()).padStart(2, "0");
-      return `${year}-${month}-${day}`;
-    };
-
-    const selStartStr = toDateOnly(selectedDate);
-    const selEndStr = toDateOnly(selectedEndDate);
-
-
-    const sessionConflicts = coachSessions.filter((session) => {
-      const sessionStartStr = toDateOnly(session.date);
-      const sessionEndStr = toDateOnly(session.end_date);
-
-      const dateOverlap =
-        sessionStartStr <= selEndStr && sessionEndStr >= selStartStr;
-
-      const sessionStart24 = to24Hour(session.start_time);
-      const sessionEnd24 = to24Hour(session.end_time);
-      const timeOverlap = sessionStart24 < newEnd && sessionEnd24 > newStart;
-
-      return dateOverlap && timeOverlap;
+const CreateSession = async (values: SessionSchemaValues) => {
+  setLoading(true);
+  try {
+    const res = await axios.post("/admin/sessions", {
+      ...values,
+      byAdmin: isAdmin
     });
-
-    setNotAvailableSessions(sessionConflicts);
-    setBooked(sessionConflicts.length > 0);
-
-    return sessionConflicts;
-  };
-  function getBlockedConflict(values: SessionSchemaValues) {
-    if (!coachSchedule) return []
-    const conflicts = Object.entries(coachSchedule).filter(
-      ([blockedDateTime, status]) => {
-        if (status !== "blocked") return false;
-
-
-        const [blockedDateStr, blockedTimePart] = blockedDateTime.split("_");
-
-        const selStartStr = moment(values.date).format("YYYY-MM-DD");
-        const selEndStr = moment(values.end_date).format("YYYY-MM-DD");
-
-        if (blockedDateStr < selStartStr || blockedDateStr > selEndStr) return false;
-
-
-        const blockedTime24 = to24Hour(blockedTimePart);
-        const newStart = to24Hour(values.start_time);
-        const newEnd = to24Hour(values.end_time);
-
-        return blockedTime24 >= newStart && blockedTime24 < newEnd;
-      }
-    );
-
-    setBlocked(conflicts.length > 0);
-    setBlockedHours(conflicts);
-    return conflicts;
-  }
-
-  const CreateSession = async (values: SessionSchemaValues) => {
-    setLoading(true);
-    try {
-      const sessionConflicts = getSessionsConflicts({
-        date: values.date,
-        end_date: values.end_date,
-        start_time: values.start_time,
-        end_time: values.end_time,
-      })
-      const hasSessionConflict = sessionConflicts.length > 0;
-      const blockedConflict = getBlockedConflict(values)
-      const hasBlockedConflict = blockedConflict.length > 0
-      if (hasSessionConflict) {
-        toast.error("Can't create session because coach is already booked at this time and date")
-        setLoading(false)
-        return
-      }
-      if (hasBlockedConflict) {
-        toast.error("Can't create session because coach has blocked his scedule.")
-        setLoading(false)
-        return
-      }
-
-      await axios.post("/admin/sessions", {
-        ...values,
-        byAdmin: isAdmin
-      });
-
-      await onRefresh();
-      form.reset();
-      setOpen(false);
-    } finally {
-      setLoading(false);
+    toast.success("Session Created!")
+    await onRefresh();
+    form.reset();
+    setOpen(false);
+  } catch (error: any) {
+    if (error.response?.status === 409) {
+      const conflicts = error.response.data.conflicts;
+      console.log(conflicts)
+      toast.error(conflicts[0].message);
+    } else {
+      toast.error("Unexpected error:", error);
     }
-  };
-
+  } finally {
+    setLoading(false);
+  }
+};
   return (
     <>
       <Button onClick={() => setOpen(!open)} className="gap-2 text-sm">
@@ -389,8 +251,6 @@ export function CreateSessionDialog({
           setOpen(val);
           if (!val) {
             form.reset();
-            setBooked(false);
-            setNotAvailableSessions([]);
             setLoading(false)
           }
         }}
@@ -560,7 +420,6 @@ export function CreateSessionDialog({
                             setCoach_name(
                               `${coach.first_name} ${coach.last_name}`,
                             );
-                            setCoachSchedule(coach.schedule)
                           }}
                         />
                       }
@@ -677,24 +536,6 @@ export function CreateSessionDialog({
                     />
                   </div>
                 </div>
-                {booked && notAvailableSessions.length > 0 && (
-                  <p className="text-sm text-red-500">
-                    Coach is booked on session {notAvailableSessions[0].name} at{" "}
-                    {moment(notAvailableSessions[0].date).format("YYYY-MM-DD")} till{" "}
-                    {moment(notAvailableSessions[0].end_date).format("YYYY-MM-DD")} at time{" "}
-                    {notAvailableSessions[0].start_time} till{" "}
-                    {notAvailableSessions[0].end_time}
-                  </p>
-                )}
-                {blocked && blockedHours.length > 0 && (
-                  <p className="text-sm text-red-500">
-                    Coach has blocked their schedule on:{" "}
-                    {blockedHours.map(([blockedDateTime]) => {
-                      const [date, time] = blockedDateTime.split("_");
-                      return `${date} at ${time}`;
-                    }).join(", ")}
-                  </p>
-                )}
                 <div className="flex gap-2 text-md ">
                   <MapPin className="text-primary w-4 w-4" />
                   <h1 className="text-[#F3F4F6]">Location & Pricing</h1>
