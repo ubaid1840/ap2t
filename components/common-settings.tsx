@@ -21,11 +21,14 @@ import { Scrollbar } from "@radix-ui/react-scroll-area";
 import { EmailAuthProvider, reauthenticateWithCredential, updatePassword } from "firebase/auth";
 import { deleteObject, ref } from "firebase/storage";
 import {
+    Link,
+    Link2,
     Loader2,
     MapPin,
     MessageSquare,
     Phone,
     Plus,
+    Star,
     User
 } from "lucide-react";
 import { ReactNode, useEffect, useRef, useState } from "react";
@@ -53,6 +56,8 @@ export default function CommonSettings() {
     });
     const { user } = useAuth();
     const [passwordLoading, setPasswordLoading] = useState(false)
+    const [link,setLink]=useState("")
+    const [linkLoading,setLinkLoading]=useState(false)
 
     const [securityInfo, setSecurityInfo] = useState({
         oldPass: "",
@@ -184,7 +189,16 @@ export default function CommonSettings() {
                 });
         }
     };
-
+    const generateLink=async () => {
+        try{
+            setLinkLoading(true)
+            const res=await axios.post("/testimonials/generate-link")
+            const link=res.data.link
+            setLink(link)
+        }finally{
+            setLinkLoading(false)
+        }
+    }
 
     return (
 
@@ -230,6 +244,15 @@ export default function CommonSettings() {
                                     <div className="flex gap-2 items-center py-2">
                                         <FaLock />
                                         Security
+                                    </div>
+                                </TabsTrigger>
+                                <TabsTrigger
+                                    value="Review"
+                                    className="dark:data-[state=active]:bg-[#CBFD0026] dark:data-[state=active]:text-primary dark:data-[state=active]:border-b-primary rounded-none h-9 px-4 text-[12px] leading-tight tracking-tight"
+                                >
+                                    <div className="flex gap-2 items-center py-2">
+                                        <Star />
+                                        Review
                                     </div>
                                 </TabsTrigger>
                             </TabsList>
@@ -463,6 +486,18 @@ export default function CommonSettings() {
                                         />
                                     </div>
                                 </div>
+                            </TabsContent>
+                            <TabsContent value="Review" className="space-y-4">
+                                    <div className="flex justify-center w-full">
+                                            <div className="flex items-center gap-2">
+                                                <Link/>
+                                   <Input
+                                   className="w-2xl h-10"
+                                   value={link}
+                                   />
+                                    <Button onClick={generateLink}>Generate Link</Button>
+                                            </div>
+                                    </div>
                             </TabsContent>
                         </CardContent>
                     </Tabs>
