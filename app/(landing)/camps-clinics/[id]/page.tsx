@@ -1,3 +1,4 @@
+import { ServerError } from "@/components/server-error";
 import CampsAndClinicsDetail from "./page.client";
 
 export const metadata = {
@@ -11,18 +12,25 @@ export const metadata = {
   },
 };
 
-export default async function Page({params} : {params : {id : string}}){
-  const {id} = await params
+export default async function Page({ params }: { params: { id: string } }) {
+
+  try {
+    const { id } = await params
     const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"}/api/camps-clinics/${id}`, {
-    cache: "no-store",
-  });
+      cache: "no-store",
+    });
 
-  if (!res.ok) {
-    throw new Error("Failed to fetch camps and clinics");
-  }
+    if (!res.ok) {
+      throw new Error("Failed to fetch camps and clinics");
+    }
 
-  const data = await res.json();
+    const data = await res.json();
     return (
-        <CampsAndClinicsDetail data={data}/>
+      <CampsAndClinicsDetail data={data} />
     )
+  } catch (error: any) {
+    return (
+      <ServerError error={error} />
+    )
+  }
 }

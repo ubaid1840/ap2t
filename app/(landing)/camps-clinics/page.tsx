@@ -1,4 +1,8 @@
+
 import CampsAndClinics from "./page.client";
+import RetryButton from "../../../components/retry-button";
+import { ServerError } from "@/components/server-error";
+
 
 export const metadata = {
   title: "Camps & Clinics | AP2T",
@@ -10,18 +14,26 @@ export const metadata = {
       "Structured camps and clinics to help athletes improve skills and performance.",
   },
 };
-export default async function Page(){
+export default async function Page() {
 
+  try {
     const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"}/api/camps-clinics`, {
-    cache: "no-store",
-  });
+      cache: "no-store",
+    });
 
-  if (!res.ok) {
-    throw new Error("Failed to fetch camps and clinics");
+    if (!res.ok) {
+      throw new Error("Failed to fetch camps and clinics");
+    }
+
+    const data = await res.json();
+    return (
+      <CampsAndClinics data={data} />
+    )
+  } catch (error: any) {
+    return (
+      <ServerError error={error}/>
+    )
   }
 
-  const data = await res.json();
-    return (
-        <CampsAndClinics data={data}/>
-    )
+
 }
