@@ -95,12 +95,12 @@ export const sessionSchema = z.object({
   end_time: z.string().min(1, "End time required"),
   price: z.coerce.number<number>().min(0, "Price is required")
     .positive("Price must be greater than 0"),
-  max_players:  z.coerce.number<number>().min(1, "Max players required"),
+  max_players: z.coerce.number<number>().min(1, "Max players required"),
   apply_promotion: z.boolean(),
   image: z.string(),
   promotion_start: z.date().nullable(),
   promotion_end: z.date().nullable(),
-  promotion_price:  z.string(),
+  promotion_price: z.coerce.number<number>(),
   show_storefront: z.boolean(),
 })
   .superRefine((data, ctx) => {
@@ -128,11 +128,11 @@ export const sessionSchema = z.object({
           message: "Promotion end date is required",
         });
       }
-      if (data.promotion_price === null || data.promotion_price === undefined) {
+      if (data.apply_promotion && (!data.promotion_price || data.promotion_price <= 0)) {
         ctx.addIssue({
           path: ["promotion_price"],
           code: z.ZodIssueCode.custom,
-          message: "Promotion price is required",
+          message: "Promotion price must be greater than 0",
         });
       }
 
@@ -194,7 +194,7 @@ export function CreateSessionDialog({
       show_storefront: false,
       date: null,
       end_date: null,
-      promotion_price: "",
+      promotion_price: 0,
       image: "",
       promotion_start: null,
       promotion_end: null,
@@ -215,31 +215,31 @@ export function CreateSessionDialog({
   const applyPromotion = form.watch("apply_promotion");
   const image = form.watch("image");
   const selectedCoachId = form.watch("coach_id");
-  
 
-const CreateSession = async (values: SessionSchemaValues) => {
-  setLoading(true);
-  try {
-    const res = await axios.post("/admin/sessions", {
-      ...values,
-      byAdmin: isAdmin
-    });
-    toast.success("Session Created!")
-    await onRefresh();
-    form.reset();
-    setOpen(false);
-  } catch (error: any) {
-    if (error.response?.status === 409) {
-      const conflicts = error.response.data.conflicts;
-      console.log(conflicts)
-      toast.error(conflicts[0].message);
-    } else {
-      toast.error("Unexpected error:", error);
+
+  const CreateSession = async (values: SessionSchemaValues) => {
+    setLoading(true);
+    try {
+      const res = await axios.post("/admin/sessions", {
+        ...values,
+        byAdmin: isAdmin
+      });
+      toast.success("Session Created!")
+      await onRefresh();
+      form.reset();
+      setOpen(false);
+    } catch (error: any) {
+      if (error.response?.status === 409) {
+        const conflicts = error.response.data.conflicts;
+        console.log(conflicts)
+        toast.error(conflicts[0].message);
+      } else {
+        toast.error("Unexpected error:", error);
+      }
+    } finally {
+      setLoading(false);
     }
-  } finally {
-    setLoading(false);
-  }
-};
+  };
   return (
     <>
       <Button onClick={() => setOpen(!open)} className="gap-2 text-sm">
@@ -575,7 +575,7 @@ const CreateSession = async (values: SessionSchemaValues) => {
                             Price <RequiredStar />
                           </Label>
                           <Input
-                           {...field}
+                            {...field}
                             id={field.name}
                             aria-invalid={fieldState.invalid}
                             placeholder=""
