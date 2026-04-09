@@ -1,4 +1,5 @@
 "use client";
+import { useAuth } from "@/contexts/auth-context";
 import axios from "@/lib/axios";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -49,7 +50,6 @@ import { Separator } from "../ui/separator";
 import { Spinner } from "../ui/spinner";
 import { AssignCoachDialog } from "./assign-coach-dialog";
 import { sessionSchema, SessionType } from "./create-session-dialog";
-import { useAuth } from "@/contexts/auth-context";
 
 type BookedSession = {
   name: string;
@@ -64,6 +64,8 @@ interface EditSessionDialogProps {
   sessionData?: SessionType & {
     coach_first_name?: string;
     coach_last_name?: string;
+    apply_promotion : boolean
+    show_storefront : boolean
   };
   onSuccess?: () => void;
   coach_id?: string | null;
@@ -202,6 +204,8 @@ export function EditSessionDialog({
     setBlockedHours(conflicts);
     return conflicts;
   }
+
+
   const form = useForm<SessionSchemaValues>({
     resolver: zodResolver(sessionSchema),
     defaultValues: {
@@ -233,39 +237,73 @@ export function EditSessionDialog({
 
   useEffect(() => {
     if (open && sessionData) {
-      form.reset();
+    form.reset({
+        name: sessionData.name,
+        description: sessionData.description,
+        type: sessionData.type as "camp" | "clinic",
+        age_limit: sessionData.age_limit,
+        session_type: sessionData.session_type,
+        coach_id: sessionData.coach_id,
+        location: sessionData.location,
+        date: sessionData?.date ? new Date(sessionData?.date) : undefined,
+        end_date: sessionData.end_date ? new Date(sessionData.end_date) : undefined,
+        start_time: sessionData.start_time,
+        end_time: sessionData.end_time,
+        price: Number(sessionData.price),
+        max_players: Number(sessionData.max_players),
+        apply_promotion: sessionData.apply_promotion,
+        image: sessionData.image,
+        promotion_price: Number(sessionData.promotion_price),
+        promotion_start: sessionData.promotion_start
+          ? new Date(sessionData.promotion_start)
+          : undefined,
+        promotion_end: sessionData.promotion_end
+          ? new Date(sessionData.promotion_end)
+          : undefined,
+        show_storefront: (sessionData.show_storefront as boolean) ?? false,
+      });
       setCoach_name(`${sessionData?.coach_first_name} ${sessionData?.coach_last_name}`)
       setCoachSchedule(sessionData?.coach_schedule_preference ?? {})
     }
   }, [open, sessionData]);
+
+  useEffect(() => {
+    if (coach_id) {
+      form.setValue("coach_id", Number(coach_id));
+    }
+    setCoach_name(`${sessionData?.coach_first_name} ${sessionData?.coach_last_name}`);
+  }, [coach_id, form]);
 
   const editSession = async (values: SessionSchemaValues) => {
     if (!sessionId) {
       toast.error("Session ID is required");
       return;
     }
-    const sessionConflicts = getSessionsConflicts({
-      date: values.date,
-      end_date: values.end_date,
-      start_time: values.start_time,
-      end_time: values.end_time,
-    });
 
-    const hasSessionConflict = sessionConflicts.length > 0;
-    setLoading(true);
-    const blockedConflict = getBlockedConflict(values)
-    const hasBlockedConflict = blockedConflict.length > 0
-    if (hasSessionConflict) {
-      toast.error("Can't update session because coach is already booked at this time and date")
-      setLoading(false)
-      return
-    }
-    if (hasBlockedConflict) {
-      toast.error("Can't update session because coach has blocked his scedule.")
-      setLoading(false)
-      return
-    }
     try {
+
+      const sessionConflicts = getSessionsConflicts({
+        date: values.date,
+        end_date: values.end_date,
+        start_time: values.start_time,
+        end_time: values.end_time,
+      });
+
+      const hasSessionConflict = sessionConflicts.length > 0;
+      setLoading(true);
+      const blockedConflict = getBlockedConflict(values)
+      const hasBlockedConflict = blockedConflict.length > 0
+      if (hasSessionConflict) {
+        toast.error("Can't update session because coach is already booked at this time and date")
+        setLoading(false)
+        return
+      }
+      if (hasBlockedConflict) {
+        toast.error("Can't update session because coach has blocked his scedule.")
+        setLoading(false)
+        return
+      }
+
       await axios.put(`/admin/sessions`, { ...values, id: sessionId, byAdmin: isAdmin });
 
       toast.success("Session updated successfully");
