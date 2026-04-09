@@ -15,6 +15,8 @@ export default function () {
     const [linkLoading, setLinkLoading] = useState(false)
     const { user } = useAuth()
 
+    
+
     const generateLink = async () => {
         if (!user?.id) return
         try {
@@ -58,6 +60,8 @@ export default function () {
                     <Button disabled={linkLoading} onClick={generateLink}>{linkLoading && <Spinner className=" text-black h-5 w-5" />}Generate Link</Button>
                 </div>
             </div>
+
+
         </TabsContent>
     )
 }
