@@ -93,16 +93,17 @@ export const sessionSchema = z.object({
   end_date: z.date({ error: "End date is required" }).nullable(),
   start_time: z.string().min(1, "Start time required"),
   end_time: z.string().min(1, "End time required"),
-  price: z.number().min(0, "Price required"),
-  max_players: z.number().min(1, "Max players required"),
+  price: z.coerce.number<number>().min(0, "Price is required")
+    .positive("Price must be greater than 0"),
+  max_players:  z.coerce.number<number>().min(1, "Max players required"),
   apply_promotion: z.boolean(),
   image: z.string(),
   promotion_start: z.date().nullable(),
   promotion_end: z.date().nullable(),
-  promotion_price: z.number(),
+  promotion_price:  z.coerce.number<number>().min(1, "promotion price is required"),
   show_storefront: z.boolean(),
 })
-.superRefine((data, ctx) => {
+  .superRefine((data, ctx) => {
     if (data.date && data.end_date && moment(data.end_date).isBefore(moment(data.date))) {
       ctx.addIssue({
         path: ["end_date"],
@@ -111,7 +112,7 @@ export const sessionSchema = z.object({
       });
     }
 
-   
+
     if (data.apply_promotion) {
       if (!data.promotion_start) {
         ctx.addIssue({
@@ -183,8 +184,8 @@ export function CreateSessionDialog({
   const [coachSchedule, setCoachSchedule] = useState<{ string: string } | {}>({})
   const [blocked, setBlocked] = useState(false)
   const [blockedHours, setBlockedHours] = useState<any[]>([])
-  const {isAdmin} = useAuth()
- 
+  const { isAdmin } = useAuth()
+
 
   function getCoachBookedSessions(coachId: number | null): BookedSession[] {
     if (!all_sessions || all_sessions.length === 0 || !coachId) return [];
@@ -228,7 +229,7 @@ export function CreateSessionDialog({
       image: "",
       promotion_start: null,
       promotion_end: null,
-      apply_promotion : promotion ?? false
+      apply_promotion: promotion ?? false
     },
   });
 
@@ -264,7 +265,7 @@ export function CreateSessionDialog({
       date: Date | null;
       end_date: Date | null;
     } = {
-      start_time: "",
+        start_time: "",
         end_time: "",
         date: null,
         end_date: null
@@ -366,7 +367,7 @@ export function CreateSessionDialog({
 
       await axios.post("/admin/sessions", {
         ...values,
-        byAdmin : isAdmin
+        byAdmin: isAdmin
       });
 
       await onRefresh();
@@ -549,7 +550,7 @@ export function CreateSessionDialog({
                           Selected Coach: {coach_Name}
                         </p>
                       )}
-                  
+
                       {
                         <AssignCoachDialog
                           onSelect={(coach) => {
@@ -733,7 +734,7 @@ export function CreateSessionDialog({
                             Price <RequiredStar />
                           </Label>
                           <Input
-                            {...field}
+                           {...field}
                             id={field.name}
                             aria-invalid={fieldState.invalid}
                             placeholder=""
@@ -939,6 +940,7 @@ export function CreateSessionDialog({
                                 aria-invalid={fieldState.invalid}
                                 placeholder=""
                                 autoComplete="off"
+
                               />
                               {fieldState.invalid && (
                                 <FieldError errors={[fieldState.error]} />
