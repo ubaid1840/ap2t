@@ -13,7 +13,7 @@ import React, {
 import { Avatar } from '../ui/avatar'
 import { Card, CardContent, CardFooter, CardHeader } from '../ui/card'
 
-export type Review = {
+export type ReviewLanding = {
   star: number;
   title: string;
   description: string;
@@ -24,7 +24,7 @@ export type Review = {
 };
 
 type PropType = {
-  slides: Review[]
+  slides: ReviewLanding[]
   options?: EmblaOptionsType
   children: ReactNode
 }
