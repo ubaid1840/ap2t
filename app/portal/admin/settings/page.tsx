@@ -1,6 +1,7 @@
 "use client";
 import NotificationPreference from "@/components/settings/notification-preference";
 import ProfileInfo from "@/components/settings/profile-info";
+import Review from "@/components/settings/review";
 import RolePersmission from "@/components/settings/role-permissions";
 import Security from "@/components/settings/security";
 import SquareIntegration from "@/components/settings/square-integration";
@@ -21,7 +22,8 @@ import {
   DollarSign,
   Info,
   MessageCircle,
-  MessageSquare
+  MessageSquare,
+  Star
 } from "lucide-react";
 import { ReactNode, useEffect, useState } from "react";
 import { FaBell, FaCreditCard, FaLock, FaUser } from "react-icons/fa";
@@ -386,6 +388,15 @@ export default function Page() {
                     Security
                   </div>
                 </TabsTrigger>
+                 <TabsTrigger
+                                    value="Review"
+                                  className="dark:data-[state=active]:bg-[#CBFD0026] dark:data-[state=active]:text-primary dark:data-[state=active]:border-b-primary rounded-none h-9 px-4 text-[12px] leading-tight tracking-tight"
+                                >
+                                    <div className="flex gap-2 items-center py-2">
+                                        <Star />
+                                        Review
+                                    </div>
+                                </TabsTrigger>
               </TabsList>
               <Scrollbar orientation="horizontal" />
             </ScrollArea>
@@ -396,6 +407,7 @@ export default function Page() {
               <RolePersmission rolePermissions={rolePermissions} />
               <SquareIntegration squareIntegration={squareIntegration} setSquareIntegration={setSquareIntegration} />
               <Security />
+              <Review />
             </CardContent>
           </Tabs>
         </Card>}
