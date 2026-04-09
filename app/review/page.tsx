@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { User } from "lucide-react";
+import { Spinner } from "@/components/ui/spinner";
 
 export default function ReviewPage() {
   const searchParams = useSearchParams();
@@ -19,9 +19,11 @@ export default function ReviewPage() {
   const [hover, setHover] = useState(0);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState("");
+  const [loading,setLoading]=useState(false)
 
   const handleSubmit = async (e: any) => {
     e.preventDefault();
+    setLoading(true)
 
     if (!token) {
       setError("Invalid or missing token");
@@ -47,6 +49,7 @@ export default function ReviewPage() {
       return;
     }
 
+    setLoading(false)
     setSubmitted(true);
   };
 
@@ -55,7 +58,7 @@ export default function ReviewPage() {
       <div className="min-h-screen flex items-center justify-center bg-[#0a0a0a] text-white">
         <div className="bg-[#454545] p-8 rounded-2xl text-center">
           <h1 className="text-2xl font-semibold mb-2">Thank you!</h1>
-          <p className="text-[#a3a3a3]">Your review has been submitted.</p>
+          <p className="text-[#a3a3a3]">Your review has been submitted. You can close this page.</p>
         </div>
       </div>
     );
@@ -113,7 +116,7 @@ export default function ReviewPage() {
     </div>
 
     <div className="flex justify-end gap-3">
-      <button onClick={handleSubmit} className="bg-[#c8f020] text-[#111] font-semibold rounded-lg px-5 py-2 text-sm">Submit Review</button>
+      <button onClick={handleSubmit} className="bg-[#c8f020] text-[#111] font-semibold rounded-lg px-5 py-2 text-sm">{loading && <Spinner className=" text-black h-5 w-5" />} Submit Review</button>
     </div>
   </div>
 </div>

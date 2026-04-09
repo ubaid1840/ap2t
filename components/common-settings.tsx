@@ -192,7 +192,9 @@ export default function CommonSettings() {
     const generateLink=async () => {
         try{
             setLinkLoading(true)
-            const res=await axios.post("/testimonials/generate-link")
+            const res=await axios.post("/testimonials/generate-link",{
+                user_id:user?.id
+            })
             const link=res.data.link
             setLink(link)
         }finally{
@@ -494,8 +496,9 @@ export default function CommonSettings() {
                                    <Input
                                    className="w-2xl h-10"
                                    value={link}
+                                   onChange={(e)=>setLink(e.target.value)}
                                    />
-                                    <Button onClick={generateLink}>Generate Link</Button>
+                                    <Button onClick={generateLink}>{linkLoading && <Spinner className=" text-black h-5 w-5" />}Generate Link</Button>
                                             </div>
                                     </div>
                             </TabsContent>

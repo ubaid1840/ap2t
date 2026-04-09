@@ -8,14 +8,15 @@ function generateToken() {
 
 export async function POST(req: NextRequest) {
   const token = generateToken();
+  const body=await req.json()
 
   const expiresAt = new Date();
   expiresAt.setHours(expiresAt.getHours() + 24); 
 
   await pool.query(
-    `INSERT INTO review_links (token, expires_at)
-     VALUES ($1, $2)`,
-    [token, expiresAt]
+    `INSERT INTO review_links (token,user_id, expires_at)
+     VALUES ($1, $2,$3)`,
+    [token,body.user_id,expiresAt]
   );
 
   const link = `${process.env.BASE_URL}/review?token=${token}`;
