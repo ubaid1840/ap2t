@@ -100,7 +100,7 @@ export const sessionSchema = z.object({
   image: z.string(),
   promotion_start: z.date().nullable(),
   promotion_end: z.date().nullable(),
-  promotion_price: z.coerce.number<number>(),
+  promotion_price: z.coerce.number().optional().default(0), // so it doesnt ask me to fill promotional price when creating simple session validation happens in supper refine.
   show_storefront: z.boolean(),
 })
   .superRefine((data, ctx) => {
@@ -231,7 +231,7 @@ export function CreateSessionDialog({
       .filter(
         (session) =>
           (session.status === "upcoming" || session.status === "ongoing") &&
-          coachId === session.original.coach_id,
+          Number(coachId) === Number(session.original.coach_id),
       )
       .map((session) => {
         const [start_time, end_time] = session.time.split(" - ");
@@ -344,7 +344,7 @@ export function CreateSessionDialog({
 
 
   const CreateSession = async (values: SessionSchemaValues) => {
-    setLoading(true);
+    // setLoading(true);
     try {
 
       const sessionConflicts = getSessionsConflicts({
@@ -368,14 +368,14 @@ export function CreateSessionDialog({
         return
       }
 
-      const res = await axios.post("/admin/sessions", {
-        ...values,
-        byAdmin: isAdmin
-      });
-      toast.success("Session Created!")
-      await onRefresh();
-      form.reset();
-      setOpen(false);
+      // const res = await axios.post("/admin/sessions", {
+      //   ...values,
+      //   byAdmin: isAdmin
+      // });
+      // toast.success("Session Created!")
+      // await onRefresh();
+      // form.reset();
+      // setOpen(false);
     } catch (error: any) {
       if (error.response?.status === 409) {
         const conflicts = error.response.data.conflicts;
@@ -568,6 +568,7 @@ export function CreateSessionDialog({
                             setCoach_name(
                               `${coach.first_name} ${coach.last_name}`,
                             );
+                            setCoachSchedule(coach.schedule)
                           }}
                         />
                       }

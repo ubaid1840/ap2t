@@ -114,8 +114,8 @@ export function EditSessionDialog({
       .filter(
         (session) =>
           (session.status === "upcoming" || session.status === "ongoing") &&
-          coachId === session.original.coach_id &&
-          session.original.id !== sessionId,
+          Number(coachId) === Number(session.original.coach_id) &&
+          Number(session.original.id) !== Number(sessionId),
       )
       .map((session) => {
         const [start_time, end_time] = session.time.split(" - ");
@@ -427,7 +427,7 @@ export function EditSessionDialog({
                             </SelectTrigger>
                             <SelectContent>
                               <SelectItem value={"camp"}>Camp</SelectItem>
-                              <SelectItem value={"comped"}>Clinic</SelectItem>
+                              <SelectItem value={"clinic"}>Clinic</SelectItem>
                             </SelectContent>
                           </Select>
                           {fieldState.invalid && (
