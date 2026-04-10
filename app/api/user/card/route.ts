@@ -130,7 +130,7 @@ WHERE p.user_id = $1
                      )
                    );
                    
-                   await Promise.all(promises);
+                   await Promise.allSettled(promises);
 
                    const parentidRaw=await pool.query(`SELECT parent_id FROM players WHERE user_id=$1`,[id])
                    const parent_id=parentidRaw.rows[0]
@@ -275,7 +275,7 @@ WHERE p.user_id = $1
                      )
                    );
                    
-                   await Promise.all(promises);
+                   await Promise.allSettled(promises);
 
                    const parentidRaw=await pool.query(`SELECT parent_id FROM players WHERE user_id=$1`,[id])
                    const parent_id=parentidRaw.rows[0]

@@ -78,7 +78,7 @@ await sendInAppNotificationBackend(session.coach_id, msg, `/portal/coach/session
 
     sendInAppNotificationBackend(admin.id, msg, `/portal/admin/sessions/`)
   )
-  await Promise.all(promises)
+  await Promise.allSettled(promises)
 }
 const playerMsg=`Session ${session?.name} was deleted`
   const res= await pool.query(`SELECT user_id from session_players WHERE session_id=$1`,[session_id])
@@ -169,7 +169,7 @@ const admins=await fetchAllAdmins()
 
     sendInAppNotificationBackend(admin.id, msg, `/portal/admin/sessions/`)
   )
-  await Promise.all(promises)
+  await Promise.allSettled(promises)
 }
 if(updates.status!=="upcoming"){
   const msg = `Session ${data?.name} with ${coachName} is ${updates.status}`;
@@ -183,7 +183,7 @@ if(updates.status!=="upcoming"){
     sendInAppNotificationBackend(admin.id, msg, `/portal/admin/sessions/`)
   )
   sendInAppNotificationBackend(playerId, msg, `/portal/admin/sessions/`)
-  await Promise.all(promises)
+  await Promise.allSettled(promises)
   }
 }
         return NextResponse.json({ message: "Updated successfully" }, { status: 200 });

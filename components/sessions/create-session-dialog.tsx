@@ -344,7 +344,7 @@ export function CreateSessionDialog({
 
 
   const CreateSession = async (values: SessionSchemaValues) => {
-    // setLoading(true);
+    setLoading(true);
     try {
 
       const sessionConflicts = getSessionsConflicts({
@@ -368,14 +368,14 @@ export function CreateSessionDialog({
         return
       }
 
-      // const res = await axios.post("/admin/sessions", {
-      //   ...values,
-      //   byAdmin: isAdmin
-      // });
-      // toast.success("Session Created!")
-      // await onRefresh();
-      // form.reset();
-      // setOpen(false);
+      const res = await axios.post("/admin/sessions", {
+        ...values,
+        byAdmin: isAdmin
+      });
+      toast.success("Session Created!")
+      await onRefresh();
+      form.reset();
+      setOpen(false);
     } catch (error: any) {
       if (error.response?.status === 409) {
         const conflicts = error.response.data.conflicts;

@@ -24,6 +24,7 @@ import { Field, FieldError } from "../ui/field";
 import { Spinner } from "../ui/spinner";
 import SelectPosition from "./select-position";
 import SelectSkill from "./select-skill";
+import { toast } from "sonner";
 
 type CreatePlayerProps = {
   parent_id?: number | null | undefined | string;
@@ -101,7 +102,7 @@ export function CreatePlayer({
         skill_level: values.skillLevel,
         medical_notes: values.medicalNotes,
       });
-
+      toast.success("Player created!")
       await onRefresh();
       form.reset();
       setOpen(false);

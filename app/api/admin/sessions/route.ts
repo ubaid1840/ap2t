@@ -82,7 +82,7 @@ export async function POST(req: NextRequest) {
         )
       );
 
-      await Promise.all(promises);
+      await Promise.allSettled(promises);;
     }
 
     return NextResponse.json({ message: "Data inserted" }, { status: 201 });
@@ -236,7 +236,7 @@ export async function PUT(req: NextRequest) {
         )
       );
 
-      await Promise.all(promises);
+      await Promise.allSettled(promises);
     }
 
     return NextResponse.json(

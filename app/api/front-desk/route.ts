@@ -82,7 +82,7 @@ export async function PUT(req: NextRequest) {
         const session_id = updatingRow?.session_id;
         let amount = 0;
         let hasSiblingDiscount=false
-
+        let clientReleased = false;
         const client = await pool.connect();
 
         try {
@@ -262,7 +262,8 @@ export async function PUT(req: NextRequest) {
           }
 
           await client.query("COMMIT");
-
+          client.release();
+          clientReleased = true;
           const EmailDataRaw = await pool.query(
             `SELECT 
   u.first_name,
@@ -333,7 +334,7 @@ const promises = admins.map(admin =>
   )
 );
 
-await Promise.all(promises);
+await Promise.allSettled(promises);
 await sendInAppNotificationBackend(
   EmailData.coach_id,
   msg,
@@ -400,8 +401,8 @@ await sendInAppNotificationBackend(
             { status: 500 },
           );
         } finally {
-          client.release();
-        }
+  if (!clientReleased) client.release(); 
+}
       }
 
       if (type === "cash") {

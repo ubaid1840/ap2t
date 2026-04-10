@@ -210,6 +210,51 @@ export async function POST(req: NextRequest) {
                 password
             }
             await sendNewJoiningEmail(emaiNotificationData)
+            const id = user.id;
+
+    const fullName = `${data?.first_name || ""} ${data?.last_name || ""}`;
+    const roleLabel = role.charAt(0).toUpperCase() + role.slice(1);
+
+    const msg = `New ${roleLabel} registered ${fullName} (${email}).`;
+
+    if (role === "parent") {
+    const route = `/portal/admin/parents/${id}`;
+    const admins = await fetchAllAdmins();
+const promises = admins.map(admin =>
+  sendInAppNotificationBackend(
+    admin.user_id,
+    msg,
+    route
+  )
+);
+
+await Promise.allSettled(promises);
+    } else if (role === "player") {
+    const route = `/portal/admin/players/${id}`;
+    const admins = await fetchAllAdmins();
+    console.log("players ",admins)
+const promises = admins.map(admin =>
+  sendInAppNotificationBackend(
+    admin.user_id,
+    msg,
+    route
+  )
+);
+
+await Promise.allSettled(promises);
+    } else if (role === "coach") {
+    const route = `/portal/admin/coaches/${id}`;
+    const admins = await fetchAllAdmins();
+const promises = admins.map(admin =>
+  sendInAppNotificationBackend(
+    admin.user_id,
+    msg,
+    route
+  )
+);
+
+await Promise.allSettled(promises);
+    }
 
             return NextResponse.json(
                 { message: "Data saved" },
@@ -333,7 +378,7 @@ export async function createUserWithFirebase(
     const msg = `New ${roleLabel} registered ${fullName} (${email}).`;
 
     if (role === "parent") {
-    const route = `/portal/parents/${id}`;
+    const route = `/portal/admin/parents/${id}`;
     const admins = await fetchAllAdmins();
 const promises = admins.map(admin =>
   sendInAppNotificationBackend(
@@ -343,10 +388,11 @@ const promises = admins.map(admin =>
   )
 );
 
-await Promise.all(promises);
+await Promise.allSettled(promises);
     } else if (role === "player") {
-    const route = `/portal/players/${id}`;
+    const route = `/portal/admin/players/${id}`;
     const admins = await fetchAllAdmins();
+    console.log("players ",admins)
 const promises = admins.map(admin =>
   sendInAppNotificationBackend(
     admin.user_id,
@@ -355,9 +401,9 @@ const promises = admins.map(admin =>
   )
 );
 
-await Promise.all(promises);
+await Promise.allSettled(promises);
     } else if (role === "coach") {
-    const route = `/portal/coaches/${id}`;
+    const route = `/portal/admin/coaches/${id}`;
     const admins = await fetchAllAdmins();
 const promises = admins.map(admin =>
   sendInAppNotificationBackend(
@@ -367,7 +413,7 @@ const promises = admins.map(admin =>
   )
 );
 
-await Promise.all(promises);
+await Promise.allSettled(promises);
     }
     return id
 }

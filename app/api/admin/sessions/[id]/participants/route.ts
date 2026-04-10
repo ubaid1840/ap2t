@@ -218,7 +218,7 @@ const promises = admins.map(admin =>
   )
 );
 
-await Promise.all(promises);
+await Promise.allSettled(promises);
 await sendInAppNotificationBackend(
   emailData.coach_id,
   msg,
