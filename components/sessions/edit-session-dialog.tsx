@@ -64,8 +64,6 @@ interface EditSessionDialogProps {
   sessionData?: SessionType & {
     coach_first_name?: string;
     coach_last_name?: string;
-    apply_promotion : boolean
-    show_storefront : boolean
   };
   onSuccess?: () => void;
   coach_id?: string | null;

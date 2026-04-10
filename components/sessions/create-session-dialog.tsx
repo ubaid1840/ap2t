@@ -62,13 +62,13 @@ export type SessionType = {
   end_time: string;
   price: number | string;
   max_players: number | string;
-  // apply_promotion: boolean;
+  apply_promotion: boolean;
   promotion_price?: number | string;
   image: string;
   end_date: null | Date;
   promotion_start: null | Date;
   promotion_end: null | Date;
-  // show_storefront: boolean | "indeterminate";
+  show_storefront: boolean;
   coach_schedule_preference?: any
 };
 type BookedSession = {
@@ -100,7 +100,7 @@ export const sessionSchema = z.object({
   image: z.string(),
   promotion_start: z.date().nullable(),
   promotion_end: z.date().nullable(),
-  promotion_price: z.coerce.number().optional().default(0), // so it doesnt ask me to fill promotional price when creating simple session validation happens in supper refine.
+  promotion_price:  z.coerce.number<number>(),
   show_storefront: z.boolean(),
 })
   .superRefine((data, ctx) => {
