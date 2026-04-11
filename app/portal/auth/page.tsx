@@ -13,6 +13,9 @@ import { useEffect } from "react";
 import { FaApple, FaFacebook, FaGoogle } from "react-icons/fa";
 import { useAuth } from "@/contexts/auth-context";
 import { Spinner } from "@/components/ui/spinner";
+import { signInWithPopup } from "firebase/auth";
+import { auth, provider } from "@/lib/firebase";
+import { toast } from "sonner";
 
 
 export default function Page() {
@@ -121,6 +124,19 @@ export default function Page() {
 }
 
 const Continue = () => {
+  const [loading, setLoading] = React.useState(false)
+
+  async function handleGoogleLogin() {
+    setLoading(true);
+    await signInWithPopup(auth, provider)
+      .catch((err: any) => {
+        toast.error(err?.message || "Error login",)
+
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }
 
   return (
     <>
@@ -132,9 +148,11 @@ const Continue = () => {
         <span className="h-px flex-1 bg-border" />
       </div>
       <div className="flex justify-center items-center gap-10 mt-2">
-        <button><GradientIcon onClick={() => console.log("google")}>
-          <FaGoogle className="text-primary" size={18} />
-        </GradientIcon></button>
+        {loading ? <div className="p-2"><Spinner /> </div> :
+          <GradientIcon onClick={() => handleGoogleLogin()}>
+            <FaGoogle className="text-primary" size={18} />
+          </GradientIcon>
+        }
         {/* <button><GradientIcon onClick={() => console.log("facebook")}>
           <FaFacebook className="text-primary" size={18} />
         </GradientIcon></button>

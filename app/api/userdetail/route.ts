@@ -29,7 +29,7 @@ WHERE u.email = $1;`, [email])
         const result = query.rows[0] ?? null
 
         if (!result) {
-            NextResponse.json({ message: "No user found in the system" }, { status: 400 })
+            NextResponse.json({ message: "We couldn't find your account. Sign up now to get started." }, { status: 400 })
         }
 
         return NextResponse.json(result, { status: 200 })

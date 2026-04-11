@@ -1,17 +1,17 @@
 "use client"
 import { auth } from "@/lib/firebase";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { Eye, EyeOff, Loader2 } from "lucide-react";
+import { Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
+import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
+import z from "zod";
 import { Button } from "../ui/button";
+import { Field, FieldError } from "../ui/field";
 import { Input } from "../ui/input";
 import { Spinner } from "../ui/spinner";
-import z from "zod";
-import { Controller, useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Field, FieldError } from "../ui/field";
 
 
 const loginSchema = z.object({
@@ -32,14 +32,8 @@ type LoginSchemaValues = z.infer<typeof loginSchema>;
 export default function LoginForm({ onClickSignup }: { onClickSignup: () => void }) {
   const [loading, setLoading] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
-  const [logindata, setLoginData] = useState(
-    {
-      email: "",
-      password: "",
-    }
-  )
-
-  const onSubmit = async (values:LoginSchemaValues) => {
+  
+  const onSubmit = async (values: LoginSchemaValues) => {
     setLoading(true)
 
     try {
@@ -56,12 +50,12 @@ export default function LoginForm({ onClickSignup }: { onClickSignup: () => void
     }
   };
 
-  const form=useForm<LoginSchemaValues>(
+  const form = useForm<LoginSchemaValues>(
     {
-      resolver:zodResolver(loginSchema),
-      defaultValues:{
-        email:"",
-        password:""
+      resolver: zodResolver(loginSchema),
+      defaultValues: {
+        email: "",
+        password: ""
       }
     }
   )
@@ -71,46 +65,46 @@ export default function LoginForm({ onClickSignup }: { onClickSignup: () => void
       <div className="flex flex-col justify-center items-center gap-5">
 
         <Controller
-                  name="email"
-                  control={form.control}
-                  render={({ field, fieldState }) => (
-                    <Field data-invalid={fieldState.invalid}>
-                      
-                      <Input
-                        {...field}
-                        id={field.name}
-                        aria-invalid={fieldState.invalid}
-                        placeholder="Email"
-                        autoComplete="off"
-                      />
-                      {fieldState.invalid && (
-                        <FieldError errors={[fieldState.error]} />
-                      )}
-                    </Field>
-                  )}
-                />
+          name="email"
+          control={form.control}
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid}>
+
+              <Input
+                {...field}
+                id={field.name}
+                aria-invalid={fieldState.invalid}
+                placeholder="Email"
+                autoComplete="off"
+              />
+              {fieldState.invalid && (
+                <FieldError errors={[fieldState.error]} />
+              )}
+            </Field>
+          )}
+        />
 
         <div className="relative w-full">
           <Controller
-                  name="password"
-                  control={form.control}
-                  render={({ field, fieldState }) => (
-                    <Field data-invalid={fieldState.invalid}>
-                      
-                      <Input
-                        {...field}
-                        id={field.name}
-                        aria-invalid={fieldState.invalid}
-                        type={showPassword? "text":"password"}
-                        placeholder="Password"
-                        autoComplete="off"
-                      />
-                      {fieldState.invalid && (
-                        <FieldError errors={[fieldState.error]} />
-                      )}
-                    </Field>
-                  )}
+            name="password"
+            control={form.control}
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+
+                <Input
+                  {...field}
+                  id={field.name}
+                  aria-invalid={fieldState.invalid}
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Password"
+                  autoComplete="off"
                 />
+                {fieldState.invalid && (
+                  <FieldError errors={[fieldState.error]} />
+                )}
+              </Field>
+            )}
+          />
 
           <button
             type="button"
@@ -130,7 +124,7 @@ export default function LoginForm({ onClickSignup }: { onClickSignup: () => void
           className="bg-primary text-secondary w-full"
           disabled={loading}
         >
-          {loading && <Spinner className="text-black"/>}
+          {loading && <Spinner className="text-black" />}
           Log In
         </Button>
 
