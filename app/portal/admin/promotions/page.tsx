@@ -20,9 +20,6 @@ import NextLink from "next/link";
 import { ReactNode, useEffect, useState } from "react";
 import { GoDotFill } from "react-icons/go";
 
-
-
-
 const allFilters = ["All", "Active", "Upcoming", "Archive"]
 
 type PrmotionsType = {

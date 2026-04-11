@@ -210,7 +210,7 @@ export default function Page() {
 
   return (
     <div className="flex flex-col w-full gap-4">
-       <BackButton title="Back to coaches" route="/portal/admin/coaches" />
+      <BackButton title="Back to coaches" route="/portal/admin/coaches" />
       <Header>
         <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
           <Button onClick={() => {
@@ -238,58 +238,58 @@ export default function Page() {
               </div>} />
         ))}
       </div>
-      
-        <Card>
-          <CardContent className="space-y-4">
 
-            <div className="text-sm flex gap-2 items-center">
-              <Filter className="text-primary" size={16} /> Filters
-            </div>
+      <Card>
+        <CardContent className="space-y-4">
 
-
+          <div className="text-sm flex gap-2 items-center">
+            <Filter className="text-primary" size={16} /> Filters
+          </div>
 
 
-            <div className="flex flex-col w-full gap-4">
 
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-
-                <div className="flex flex-1 flex-col gap-2">
-                  <Label className="text-muted-foreground font-normal text-xs">Start Date</Label>
-                  <AppCalendar date={dates.start} onChange={(d) => setDates((prevState) => ({ ...prevState, start: d }))} />
-                </div>
+          <div className="flex flex-col w-full gap-4">
 
 
-                <div className="flex flex-1 flex-col gap-2">
-                  <Label className="text-muted-foreground font-normal text-xs">End Date</Label>
-                  <AppCalendar date={dates.end} onChange={(d) => setDates((prevState) => ({ ...prevState, end: d }))} />
-                </div>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
 
-                <div className="flex flex-1 flex-col gap-2">
-                  <Label className="text-muted-foreground font-normal text-xs">Select Coach</Label>
-                  <AssignCoachDialog
-                  placeholder={coach?.name ? coach.name :"Select Coach"}
-                    onSelect={(coach) => {
-                      setCoach({
-                        name:
-                          `${coach.first_name} ${coach.last_name}`,
-                        id: coach.id
-                      });
-                    }}
-                  />
-                </div>
-
-
+              <div className="flex flex-1 flex-col gap-2">
+                <Label className="text-muted-foreground font-normal text-xs">Start Date</Label>
+                <AppCalendar date={dates.start} onChange={(d) => setDates((prevState) => ({ ...prevState, start: d }))} />
               </div>
-              <Button disabled={filterLoading || !dates.start || !dates.end || !coach?.id} onClick={() => {
-                setFilterLoading(true)
-                filterData(dates.start, dates.end)
-              }}>{filterLoading && <Spinner className="text-black" />}Apply Filter</Button>
-            </div>
 
-          </CardContent>
-        </Card>
-      
+
+              <div className="flex flex-1 flex-col gap-2">
+                <Label className="text-muted-foreground font-normal text-xs">End Date</Label>
+                <AppCalendar date={dates.end} onChange={(d) => setDates((prevState) => ({ ...prevState, end: d }))} />
+              </div>
+
+              <div className="flex flex-1 flex-col gap-2">
+                <Label className="text-muted-foreground font-normal text-xs">Select Coach</Label>
+                <AssignCoachDialog
+                  placeholder={coach?.name ? coach.name : "Select Coach"}
+                  onSelect={(coach) => {
+                    setCoach({
+                      name:
+                        `${coach?.first_name} ${coach?.last_name}`,
+                      id: coach?.id
+                    });
+                  }}
+                />
+              </div>
+
+
+            </div>
+            <Button disabled={filterLoading || !dates.start || !dates.end || !coach?.id} onClick={() => {
+              setFilterLoading(true)
+              filterData(dates.start, dates.end)
+            }}>{filterLoading && <Spinner className="text-black" />}Apply Filter</Button>
+          </div>
+
+        </CardContent>
+      </Card>
+
 
       <div className="grid sm:grid-cols-2 grid-cols-1 gap-4">
         <Card>

@@ -88,7 +88,7 @@ export async function POST(req: NextRequest) {
                         [player_id]
                     );
                     await pool.query("COMMIT");
-           
+
                 } catch (error) {
                     console.log("error creating player's setting", error)
                 }
@@ -212,49 +212,48 @@ export async function POST(req: NextRequest) {
             await sendNewJoiningEmail(emaiNotificationData)
             const id = user.id;
 
-    const fullName = `${data?.first_name || ""} ${data?.last_name || ""}`;
-    const roleLabel = role.charAt(0).toUpperCase() + role.slice(1);
+            const fullName = `${data?.first_name || ""} ${data?.last_name || ""}`;
+            const roleLabel = role.charAt(0).toUpperCase() + role.slice(1);
 
-    const msg = `New ${roleLabel} registered ${fullName} (${email}).`;
+            const msg = `New ${roleLabel} registered ${fullName} (${email}).`;
 
-    if (role === "parent") {
-    const route = `/portal/admin/parents/${id}`;
-    const admins = await fetchAllAdmins();
-const promises = admins.map(admin =>
-  sendInAppNotificationBackend(
-    admin.user_id,
-    msg,
-    route
-  )
-);
+            if (role === "parent") {
+                const route = `/portal/admin/parents/${id}`;
+                const admins = await fetchAllAdmins();
+                const promises = admins.map(admin =>
+                    sendInAppNotificationBackend(
+                        admin.user_id,
+                        msg,
+                        route
+                    )
+                );
 
-await Promise.allSettled(promises);
-    } else if (role === "player") {
-    const route = `/portal/admin/players/${id}`;
-    const admins = await fetchAllAdmins();
-    console.log("players ",admins)
-const promises = admins.map(admin =>
-  sendInAppNotificationBackend(
-    admin.user_id,
-    msg,
-    route
-  )
-);
+                await Promise.allSettled(promises);
+            } else if (role === "player") {
+                const route = `/portal/admin/players/${id}`;
+                const admins = await fetchAllAdmins();
+                const promises = admins.map(admin =>
+                    sendInAppNotificationBackend(
+                        admin.user_id,
+                        msg,
+                        route
+                    )
+                );
 
-await Promise.allSettled(promises);
-    } else if (role === "coach") {
-    const route = `/portal/admin/coaches/${id}`;
-    const admins = await fetchAllAdmins();
-const promises = admins.map(admin =>
-  sendInAppNotificationBackend(
-    admin.user_id,
-    msg,
-    route
-  )
-);
+                await Promise.allSettled(promises);
+            } else if (role === "coach") {
+                const route = `/portal/admin/coaches/${id}`;
+                const admins = await fetchAllAdmins();
+                const promises = admins.map(admin =>
+                    sendInAppNotificationBackend(
+                        admin.user_id,
+                        msg,
+                        route
+                    )
+                );
 
-await Promise.allSettled(promises);
-    }
+                await Promise.allSettled(promises);
+            }
 
             return NextResponse.json(
                 { message: "Data saved" },
@@ -308,10 +307,10 @@ export async function createUserWithFirebase(
         password
     }
     await sendNewJoiningEmail(emaiNotificationData)
-    const adminEmailProps={
-        email:email,
-        fullName:`${rest?.first_name} ${rest?.last_name}`,
-        role:data?.role ||  "user"
+    const adminEmailProps = {
+        email: email,
+        fullName: `${rest?.first_name} ${rest?.last_name}`,
+        role: data?.role || "user"
     }
     await sendAdminNewSignupEmail(adminEmailProps)
 
@@ -369,7 +368,7 @@ export async function createUserWithFirebase(
         values
     )
 
-   const role = insertData.role;
+    const role = insertData.role;
     const id = res.rows[0].id;
 
     const fullName = `${rest?.first_name || ""} ${rest?.last_name || ""}`;
@@ -378,42 +377,41 @@ export async function createUserWithFirebase(
     const msg = `New ${roleLabel} registered ${fullName} (${email}).`;
 
     if (role === "parent") {
-    const route = `/portal/admin/parents/${id}`;
-    const admins = await fetchAllAdmins();
-const promises = admins.map(admin =>
-  sendInAppNotificationBackend(
-    admin.user_id,
-    msg,
-    route
-  )
-);
+        const route = `/portal/admin/parents/${id}`;
+        const admins = await fetchAllAdmins();
+        const promises = admins.map(admin =>
+            sendInAppNotificationBackend(
+                admin.user_id,
+                msg,
+                route
+            )
+        );
 
-await Promise.allSettled(promises);
+        await Promise.allSettled(promises);
     } else if (role === "player") {
-    const route = `/portal/admin/players/${id}`;
-    const admins = await fetchAllAdmins();
-    console.log("players ",admins)
-const promises = admins.map(admin =>
-  sendInAppNotificationBackend(
-    admin.user_id,
-    msg,
-    route
-  )
-);
+        const route = `/portal/admin/players/${id}`;
+        const admins = await fetchAllAdmins();
+        const promises = admins.map(admin =>
+            sendInAppNotificationBackend(
+                admin.user_id,
+                msg,
+                route
+            )
+        );
 
-await Promise.allSettled(promises);
+        await Promise.allSettled(promises);
     } else if (role === "coach") {
-    const route = `/portal/admin/coaches/${id}`;
-    const admins = await fetchAllAdmins();
-const promises = admins.map(admin =>
-  sendInAppNotificationBackend(
-    admin.user_id,
-    msg,
-    route
-  )
-);
+        const route = `/portal/admin/coaches/${id}`;
+        const admins = await fetchAllAdmins();
+        const promises = admins.map(admin =>
+            sendInAppNotificationBackend(
+                admin.user_id,
+                msg,
+                route
+            )
+        );
 
-await Promise.allSettled(promises);
+        await Promise.allSettled(promises);
     }
     return id
 }

@@ -120,8 +120,7 @@ export default function Page() {
             </div>
             <CreateSessionDialog onRefresh={async () => {
               await fetchData()
-            }}
-              all_sessions={sessions} />
+            }}/>
           </div>
         </div>
       </Header>

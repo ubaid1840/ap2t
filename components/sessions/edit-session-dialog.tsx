@@ -49,7 +49,7 @@ import {
 import { Separator } from "../ui/separator";
 import { Spinner } from "../ui/spinner";
 import { AssignCoachDialog } from "./assign-coach-dialog";
-import { sessionSchema, SessionType } from "./create-session-dialog";
+import { SessionCoach, sessionSchema, SessionType } from "./create-session-dialog";
 
 type BookedSession = {
   name: string;
@@ -68,7 +68,6 @@ interface EditSessionDialogProps {
   onSuccess?: () => void;
   coach_id?: string | null;
   promotion?: boolean;
-  all_sessions?: any[];
 }
 
 
@@ -80,7 +79,6 @@ export function EditSessionDialog({
   onSuccess,
   coach_id = null,
   promotion = false,
-  all_sessions = [],
 }: EditSessionDialogProps) {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -94,7 +92,8 @@ export function EditSessionDialog({
   const [blockedHours, setBlockedHours] = useState<any[]>([])
   const router = useRouter();
   const { isAdmin } = useAuth()
-
+  const [all_sessions, setAllSessions] = useState<SessionCoach[]>([])
+  const [sessionLoading, setSessionLoading] = useState(false)
 
   function to24Hour(timeStr: string): string {
     if (!timeStr) return "";
@@ -112,22 +111,22 @@ export function EditSessionDialog({
       .filter(
         (session) =>
           (session.status === "upcoming" || session.status === "ongoing") &&
-          Number(coachId) === Number(session.original.coach_id) &&
-          Number(session.original.id) !== Number(sessionId),
+          Number(coachId) === Number(session.coach_id) &&
+          Number(session.id) !== Number(sessionId),
       )
       .map((session) => {
-        const [start_time, end_time] = session.time.split(" - ");
+        const { start_time, end_time } = session;
         return {
-          name: session.original.name,
-          date: session.original.date,
-          end_date: session.original.end_date,
+          name: session.name,
+          date: session.date,
+          end_date: session.end_date,
           start_time,
           end_time,
         };
       });
   }
 
-  const getSessionsConflicts = (
+  function getSessionsConflicts(
     overrides: {
       start_time: string;
       end_time: string;
@@ -139,7 +138,7 @@ export function EditSessionDialog({
         date: null,
         end_date: null
       },
-  ): BookedSession[] => {
+  ): BookedSession[] {
     const selectedDate = overrides.date ?? form.getValues("date");
     const selectedEndDate = overrides.end_date ?? form.getValues("end_date");
     const selectedStartTime = overrides.start_time ?? form.getValues("start_time");
@@ -235,7 +234,7 @@ export function EditSessionDialog({
 
   useEffect(() => {
     if (open && sessionData) {
-    form.reset({
+      form.reset({
         name: sessionData.name,
         description: sessionData.description,
         type: sessionData.type as "camp" | "clinic",
@@ -272,7 +271,7 @@ export function EditSessionDialog({
     setCoach_name(`${sessionData?.coach_first_name} ${sessionData?.coach_last_name}`);
   }, [coach_id, form]);
 
-  const editSession = async (values: SessionSchemaValues) => {
+  async function editSession(values: SessionSchemaValues) {
     if (!sessionId) {
       toast.error("Session ID is required");
       return;
@@ -315,7 +314,7 @@ export function EditSessionDialog({
     }
   };
 
-  const deleteSession = async () => {
+  async function deleteSession() {
     if (!sessionId) {
       toast.error("Session ID is required");
       return;
@@ -328,7 +327,7 @@ export function EditSessionDialog({
       toast.success("Session deleted successfully");
       setDeleteLoading(false);
       setSelectedSession(null);
-      setOpen(false);
+      handleClose();
       if (promotion) {
         router.replace("/portal/admin/promotions");
       } else {
@@ -339,13 +338,43 @@ export function EditSessionDialog({
     }
   };
 
+  async function handleGetSessions(coachID: number) {
+    if (!coachID) return
+    setSessionLoading(true)
+
+    try {
+      const result = await axios.get(`/coach/${coachID}/sessions`);
+      setAllSessions(result.data)
+
+    } finally {
+      setSessionLoading(false)
+    }
+  }
+
+  function handleClose() {
+
+    setOpen(false)
+
+    setLoading(false);
+    setDeleteLoading(false);
+    setSelectedSession(null);
+    setCoach_name(null);
+    setNotAvailableSessions([]);
+    setBooked(false);
+    setCoachSchedule({})
+    setBlocked(false)
+    setBlockedHours([])
+    setAllSessions([])
+    setSessionLoading(false)
+  }
+
   return (
     <>
       <Button onClick={() => setOpen(!open)} variant={"outline"}>
         <SquarePen className="w-5 h-5" />
         {!promotion && "Edit"}
       </Button>
-      <Dialog open={open} onOpenChange={setOpen}>
+      <Dialog open={open} onOpenChange={handleClose}>
         <DialogContent className="bg-[#252525] border border-[#3A3A3A] sm:max-w-4xl p-0 gap-0">
           <DialogHeader className="border-b border-[#3A3A3A] p-4">
             <DialogTitle className="text-[#F3F4F6] font-semibold text-lg">
@@ -488,26 +517,32 @@ export function EditSessionDialog({
                       Assigned Coach *
                     </Label>
 
-                    <div className="flex gap-4 items-center">
-                      {selectedCoachId && coach_Name && (
-                        <p className="mt-1 text-sm text-ghost-text">
-                          Selected Coach: {coach_Name}
-                        </p>
-                      )}
-                      {(
-                        <AssignCoachDialog
-                          onSelect={(coach) => {
-                            form.setValue("coach_id", coach.id, {
-                              shouldValidate: true,
-                            });
-                            setCoach_name(
-                              `${coach.first_name} ${coach.last_name}`,
-                            );
-                            setCoachSchedule(coach.schedule)
-                          }}
-                        />
-                      )}
-                    </div>
+                    {sessionLoading ? <Spinner /> :
+
+                      <div className="flex gap-4 items-center">
+                        {selectedCoachId && coach_Name && (
+                          <p className="mt-1 text-sm text-ghost-text">
+                            Selected Coach: {coach_Name}
+                          </p>
+                        )}
+                        {(
+                          <AssignCoachDialog
+                            placeholder={coach_Name ? "Change Coach" : "Select Coach"}
+                            onSelect={(coach) => {
+                              form.setValue("coach_id", coach?.id, {
+                                shouldValidate: true,
+                              });
+                              setCoach_name(
+                                `${coach?.first_name} ${coach?.last_name}`,
+                              );
+                              setCoachSchedule(coach?.schedule)
+                              handleGetSessions(coach?.id)
+                            }}
+
+                          />
+                        )}
+                      </div>
+                    }
                   </div>
                 </div>
 

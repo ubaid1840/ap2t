@@ -1,15 +1,14 @@
-import { Copy, Link, LinkIcon, RefreshCcw, RotateCcw } from "lucide-react";
-import { TabsContent } from "../ui/tabs";
-import { Input } from "../ui/input";
-import { Button } from "../ui/button";
-import { Spinner } from "../ui/spinner";
-import { useEffect, useState } from "react";
-import axios from "@/lib/axios";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useAuth } from "@/contexts/auth-context";
+import axios from "@/lib/axios";
+import { Copy, RefreshCcw } from "lucide-react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import { Button } from "../ui/button";
 import { Checkbox } from "../ui/checkbox";
-import { Label } from "../ui/label";
+import { Input } from "../ui/input";
+import { Spinner } from "../ui/spinner";
+import { TabsContent } from "../ui/tabs";
 
 
 export type Review = {
@@ -29,9 +28,6 @@ export default function ReviewSection() {
     const [linkLoading, setLinkLoading] = useState(false);
     const [reviews, setReviews] = useState<Review[]>([]);
     const [loading, setLoading] = useState(false);
-    const [dialogOpen, setDialogOpen] = useState(false);
-    const [currentReview, setCurrentReview] = useState<Review | null>(null);
-
     const { user } = useAuth();
 
     useEffect(() => {
@@ -50,7 +46,7 @@ export default function ReviewSection() {
         }
     }
 
-    const generateLink = async () => {
+    async function generateLink() {
         if (!user?.id) return;
         try {
             setLinkLoading(true);
@@ -87,7 +83,7 @@ export default function ReviewSection() {
                         Generate Link
                     </Button>
 
-                    <Button  disabled={loading} size={"icon-sm"} onClick={async () => {
+                    <Button disabled={loading} size={"icon-sm"} onClick={async () => {
                         await fetchData()
 
                     }}>
@@ -95,17 +91,17 @@ export default function ReviewSection() {
                     </Button>
                 </div>
             </div>
-                <div className="space-y-4 mt-4">
-                    {reviews.map((r, i) => (
-                        <EachReview sr={i + 1} r={r} key={r.id}
-                            onUpdateCheckBox={(item) => {
-                                setReviews(prev => prev.map(r => (r.id === item.id ? { ...r, show: item.show } : r)));
-                            }}
-                            onUpdateReview={(item) => {
-                                setReviews(prev => prev.map(r => (r.id === item.id ? item : r)));
-                            }} />
-                    ))}
-                </div>
+            <div className="space-y-4 mt-4">
+                {reviews.map((r, i) => (
+                    <EachReview sr={i + 1} r={r} key={r.id}
+                        onUpdateCheckBox={(item) => {
+                            setReviews(prev => prev.map(r => (r.id === item.id ? { ...r, show: item.show } : r)));
+                        }}
+                        onUpdateReview={(item) => {
+                            setReviews(prev => prev.map(r => (r.id === item.id ? item : r)));
+                        }} />
+                ))}
+            </div>
         </TabsContent>
     );
 
@@ -118,7 +114,7 @@ const EachReview = ({ sr, r, onUpdateCheckBox, onUpdateReview }: { sr: number, r
     const [selectedReview, setSelectedReview] = useState<Review | null>(null)
     const [updateLoading, setUpdateLoading] = useState(false)
 
-    const saveAdminEdit = async () => {
+    async function saveAdminEdit() {
         if (!selectedReview) return;
         setUpdateLoading(true)
         try {

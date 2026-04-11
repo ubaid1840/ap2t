@@ -22,19 +22,21 @@ type Coach = {
   id: number;
   first_name: string;
   last_name: string;
-  email:string;
-  picture:string;
-  schedule : any
+  email: string;
+  picture: string;
+  schedule: any
 };
 interface AssignCoachDialogProps {
-  onSelect: (coach: { id: number; first_name: string; last_name: string; schedule : any 
+  onSelect: (coach: {
+    id: number; first_name: string; last_name: string; schedule: any
   }) => void;
-  already?: boolean
-  placeholder ?: string
+  placeholder?: string
 }
 
 
-export function AssignCoachDialog({ onSelect, already = false, placeholder = "Select Coach"  }: AssignCoachDialogProps) {
+
+
+export function AssignCoachDialog({ onSelect, placeholder = "Select Coach" }: AssignCoachDialogProps) {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [results, setResults] = useState<Coach[]>([]);
@@ -58,6 +60,11 @@ export function AssignCoachDialog({ onSelect, already = false, placeholder = "Se
     }
   };
 
+  async function handleSelect(coachInformation: { id: number, first_name: string, last_name: string, schedule: any }) {
+    if (!coachInformation?.id) return
+    onSelect(coachInformation)
+    setOpen(false);
+  }
   const filteredData = results.filter((item) => `${item.first_name} ${item.last_name}`?.toLocaleLowerCase()?.includes(debouncedSeach?.toLocaleLowerCase()))
 
   return (
@@ -73,9 +80,8 @@ export function AssignCoachDialog({ onSelect, already = false, placeholder = "Se
     >
       <DialogTrigger asChild>
         <Button>
-          <Plus  />
-          {already ? "Change Coach" :
-            placeholder}
+          <Plus />
+          {placeholder}
         </Button>
       </DialogTrigger>
       <DialogContent className="bg-[#252525] border-[#3A3A3A] max-w-5xl p-0 gap-0">
@@ -110,13 +116,15 @@ export function AssignCoachDialog({ onSelect, already = false, placeholder = "Se
                     key={coach.id}
                     className="flex items-center justify-between p-3 rounded-lg bg-[#1A1A1A] border border-[#3A3A3A] cursor-pointer hover:bg-[#2A2A2A]"
                     onClick={() => {
-                      onSelect({
+
+                      handleSelect({
                         id: coach.id,
                         first_name: coach.first_name,
                         last_name: coach.last_name,
-                        schedule : coach?.schedule
-                      });
-                      setOpen(false); 
+                        schedule: coach?.schedule
+                      })
+
+
                     }}
                   >
                     <div className="flex items-center gap-3">

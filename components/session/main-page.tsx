@@ -270,12 +270,11 @@ export default function SessionMainPage({ id, back, back_title, admin = false }:
                   }} />
                 }
 
-             {allowed &&   <EditSessionDialog
+             {allowed && data &&   <EditSessionDialog
                   coach_id={admin ? null : user?.id}
                   sessionId={id}
                   sessionData={rawSessionData}
                   onSuccess={fetchData}
-                  all_sessions={allSessions}
                 />}
               </div>
             </div>

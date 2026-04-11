@@ -145,7 +145,6 @@ export default function Page() {
             <CreateSessionDialog
               coach_id={user?.id}
               coach_name={joinNames([user?.first_name, user?.last_name])}
-              all_sessions={sessions}
               onRefresh={async () => {
                 await fetchData();
               }}

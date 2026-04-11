@@ -47,6 +47,34 @@ import { Separator } from "../ui/separator";
 import { Spinner } from "../ui/spinner";
 import { AssignCoachDialog } from "./assign-coach-dialog";
 
+export interface SessionCoach {
+  id: number;
+  name: string;
+  description: string;
+  status: string;
+  session_type: string;
+  coach_id: number;
+  location: string;
+  start_time: string;
+  end_time: string;
+  date: string;
+  end_date: string;
+  price: string;
+  max_players: number;
+  apply_promotion: boolean;
+  created_at: string;
+  promotion_price: string;
+  image: string;
+  show_storefront: boolean;
+  comped: boolean;
+  promotion_start: string | null;
+  promotion_end: string | null;
+  type: "camp" | "clinic" | string;
+  age_limit: string;
+  coach_first_name: string;
+  coach_last_name: string;
+}
+
 export type SessionType = {
   name: string;
   description: string;
@@ -100,7 +128,7 @@ export const sessionSchema = z.object({
   image: z.string(),
   promotion_start: z.date().nullable(),
   promotion_end: z.date().nullable(),
-  promotion_price:  z.coerce.number<number>(),
+  promotion_price: z.coerce.number<number>(),
   show_storefront: z.boolean(),
 })
   .superRefine((data, ctx) => {
@@ -164,16 +192,17 @@ export function CreateSessionDialog({
   coach_id = null,
   coach_name = null,
   promotion = false,
-  all_sessions = [],
+
 }: {
   coach_name?: string | null;
   coach_id?: string | null;
   onRefresh: () => Promise<void>;
   promotion?: boolean;
-  all_sessions?: any[]
+
 }) {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [all_sessions, setAllSessions] = useState<SessionCoach[]>([])
   const [notAvailableSessions, setNotAvailableSessions] = useState<
     BookedSession[]
   >([]);
@@ -183,6 +212,7 @@ export function CreateSessionDialog({
   const [blockedHours, setBlockedHours] = useState<any[]>([])
   const [coach_Name, setCoach_name] = useState<string | null>(null);
   const { isAdmin } = useAuth()
+  const [sessionLoading, setSessionLoading] = useState(false)
 
   const form = useForm<SessionSchemaValues>({
     resolver: zodResolver(sessionSchema),
@@ -231,14 +261,14 @@ export function CreateSessionDialog({
       .filter(
         (session) =>
           (session.status === "upcoming" || session.status === "ongoing") &&
-          Number(coachId) === Number(session.original.coach_id),
+          Number(coachId) === Number(session.coach_id),
       )
       .map((session) => {
-        const [start_time, end_time] = session.time.split(" - ");
+        const { start_time, end_time } = session;
         return {
-          name: session.original.name,
-          date: session.original.date,
-          end_date: session.original.end_date,
+          name: session.name,
+          date: session.date,
+          end_date: session.end_date,
           start_time,
           end_time,
         };
@@ -258,7 +288,7 @@ export function CreateSessionDialog({
     return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}`;
   }
 
-  const getSessionsConflicts = (
+  function getSessionsConflicts (
     overrides: {
       start_time: string;
       end_time: string;
@@ -270,7 +300,7 @@ export function CreateSessionDialog({
         date: null,
         end_date: null
       },
-  ): BookedSession[] => {
+  ): BookedSession[]  {
     const selectedDate = overrides.date ?? form.getValues("date");
     const selectedEndDate = overrides.end_date ?? form.getValues("end_date");
     const selectedStartTime = overrides.start_time ?? form.getValues("start_time");
@@ -343,7 +373,7 @@ export function CreateSessionDialog({
   }
 
 
-  const CreateSession = async (values: SessionSchemaValues) => {
+  async function CreateSession (values: SessionSchemaValues) {
     setLoading(true);
     try {
 
@@ -376,18 +406,39 @@ export function CreateSessionDialog({
       await onRefresh();
       form.reset();
       setOpen(false);
-    } catch (error: any) {
-      if (error.response?.status === 409) {
-        const conflicts = error.response.data.conflicts;
-        console.log(conflicts)
-        toast.error(conflicts[0].message);
-      } else {
-        toast.error("Unexpected error:", error);
-      }
     } finally {
       setLoading(false);
     }
   };
+
+  async function handleGetSessions(coachID: number) {
+    if (!coachID) return
+    setSessionLoading(true)
+
+    try {
+      const result = await axios.get(`/coach/${coachID}/sessions`);
+      setAllSessions(result.data)
+
+    } finally {
+      setSessionLoading(false)
+    }
+  }
+
+  function handleClose() {
+
+    setOpen(false)
+    setLoading(false);
+    setCoach_name(null);
+    setNotAvailableSessions([]);
+    setBooked(false);
+    setCoachSchedule({})
+    setBlocked(false)
+    setBlockedHours([])
+    setAllSessions([])
+    setSessionLoading(false)
+    form.reset()
+  }
+
   return (
     <>
       <Button onClick={() => setOpen(!open)} className="gap-2 text-sm">
@@ -395,13 +446,7 @@ export function CreateSessionDialog({
       </Button>
       <Dialog
         open={open}
-        onOpenChange={(val) => {
-          setOpen(val);
-          if (!val) {
-            form.reset();
-            setLoading(false)
-          }
-        }}
+        onOpenChange={handleClose}
       >
         <DialogContent className="bg-[#252525] border border-[#3A3A3A] sm:max-w-4xl p-0">
           <DialogHeader className="border-b border-[#3A3A3A] p-4">
@@ -552,27 +597,33 @@ export function CreateSessionDialog({
                       Assigned Coach *
                     </Label>
 
-                    <div className="flex gap-4 items-center">
-                      {selectedCoachId && coach_Name && (
-                        <p className="mt-1 text-sm text-ghost-text">
-                          Selected Coach: {coach_Name}
-                        </p>
-                      )}
+                    {sessionLoading ? <Spinner /> :
 
-                      { !coach_id &&
-                        <AssignCoachDialog
-                          onSelect={(coach) => {
-                            form.setValue("coach_id", coach.id, {
-                              shouldValidate: true,
-                            });
-                            setCoach_name(
-                              `${coach.first_name} ${coach.last_name}`,
-                            );
-                            setCoachSchedule(coach.schedule)
-                          }}
-                        />
-                      }
-                    </div>
+                      <div className="flex gap-4 items-center">
+                        {selectedCoachId && coach_Name && (
+                          <p className="mt-1 text-sm text-ghost-text">
+                            Selected Coach: {coach_Name}
+                          </p>
+                        )}
+
+                        {!coach_id &&
+                          <AssignCoachDialog
+                            placeholder={coach_Name ? "Change Coach" : "Select Coach"}
+                            onSelect={(coach) => {
+                              form.setValue("coach_id", coach?.id, {
+                                shouldValidate: true,
+                              });
+                              setCoach_name(
+                                `${coach?.first_name} ${coach?.last_name}`,
+                              );
+                              setCoachSchedule(coach?.schedule)
+                              handleGetSessions(coach?.id)
+                            }}
+
+                          />
+                        }
+                      </div>
+                    }
                   </div>
                 </div>
 
