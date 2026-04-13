@@ -1,16 +1,13 @@
 import AppSidebar from "@/components/app-sidebar";
 import KBar from "@/components/kbar";
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
-import NotificationContextProvider from "@/store/context/NotificationContext";
-import UserContextProvider from "@/store/context/UserContext";
 import { ReactNode } from "react";
 import DashboardHeader from "./dashboard-header";
 
 export default async function CommonLayout({ children }: { children: ReactNode }) {
   return (
-    <UserContextProvider>
-      <KBar>
-        <NotificationContextProvider>
+    
+      <KBar>    
           <SidebarProvider>
             <AppSidebar />
             <SidebarInset>
@@ -21,9 +18,8 @@ export default async function CommonLayout({ children }: { children: ReactNode }
                 <div className="flex flex-1">{children}</div>
               </div>
             </SidebarInset>
-          </SidebarProvider>
-        </NotificationContextProvider>
+          </SidebarProvider>    
       </KBar>
-    </UserContextProvider>
+    
   );
 }

@@ -81,12 +81,12 @@ export async function PUT(req: NextRequest) {
         const user_id = updatingRow?.user_id;
         const session_id = updatingRow?.session_id;
         let amount = 0;
-        let hasSiblingDiscount=false
+        let hasSiblingDiscount = false
         let clientReleased = false;
         const client = await pool.connect();
 
         try {
-          await client.query("BEGIN");
+          await pool.query("BEGIN");
 
           /* ---------------- SESSION ---------------- */
 
@@ -325,67 +325,67 @@ WHERE se.session_id = $1
             const playerName = `${EmailData?.first_name || ""} ${EmailData?.last_name || ""}`;
             const msg = `${playerName} enrolled in ${EmailData.sessionname}.`;
 
-const admins = await fetchAllAdmins();
-const promises = admins.map(admin =>
-  sendInAppNotificationBackend(
-    admin.user_id,
-    msg,
-    `/portal/admin/sessions/${session_id}`
-  )
-);
+            const admins = await fetchAllAdmins();
+            const promises = admins.map(admin =>
+              sendInAppNotificationBackend(
+                admin.user_id,
+                msg,
+                `/portal/admin/sessions/${session_id}`
+              )
+            );
 
-await Promise.allSettled(promises);
-await sendInAppNotificationBackend(
-  EmailData.coach_id,
-  msg,
-  `/portal/coach/sessions/${session_id}`
-);
-if(EmailData.parent_id){
+            await Promise.allSettled(promises);
+            await sendInAppNotificationBackend(
+              EmailData.coach_id,
+              msg,
+              `/portal/coach/sessions/${session_id}`
+            );
+            if (EmailData.parent_id) {
 
-  await sendInAppNotificationBackend(
-    EmailData.parent_id,
-    msg,
-    `/portal/parent/sessions/${session_id}`
-  );
-}
-await sendInAppNotificationBackend(
-    user_id,
-    msg,
-    `/portal/parent/sessions/${session_id}`
-  );
+              await sendInAppNotificationBackend(
+                EmailData.parent_id,
+                msg,
+                `/portal/parent/sessions/${session_id}`
+              );
+            }
+            await sendInAppNotificationBackend(
+              user_id,
+              msg,
+              `/portal/parent/sessions/${session_id}`
+            );
 
 
             const paymentStatus = session.comped
               ? "Comped"
               : type === "cash"
-              ? "Paid (Cash)"
-              : "Pending";
+                ? "Paid (Cash)"
+                : "Pending";
 
             const discountText = hasSiblingDiscount ? " (Sibling discount)" : "";
 
             const paymentMsg = `${playerName} payment for ${EmailData.sessionname} ${paymentStatus} - $${amount}${discountText}.`;
 
             const promises1 = admins.map(admin =>
-  sendInAppNotificationBackend(
-    admin.user_id,
-    paymentMsg,
-    `/portal/admin/payments/`
-  )
-);
-await Promise.all(promises1);
-if(EmailData.parent_id){
+              sendInAppNotificationBackend(
+                admin.user_id,
+                paymentMsg,
+                `/portal/admin/payments/`
+              )
+            );
+            await Promise.all(promises1);
+            if (EmailData.parent_id) {
 
-  await sendInAppNotificationBackend(
-    EmailData.parent_id,
-    paymentMsg,
-    `/portal/parent/sessions/${session_id}`
-  );
-}
-await sendInAppNotificationBackend(
-    user_id,
-    paymentMsg,
-    `/portal/parent/sessions/${session_id}`
-  );
+              await sendInAppNotificationBackend(
+                EmailData.parent_id,
+                paymentMsg,
+                `/portal/parent/sessions/${session_id}`
+              );
+            }
+            await sendInAppNotificationBackend(
+              user_id,
+              paymentMsg,
+              `/portal/parent/sessions/${session_id}`
+            );
 
           }
         } catch (error: any) {
@@ -401,8 +401,8 @@ await sendInAppNotificationBackend(
             { status: 500 },
           );
         } finally {
-  if (!clientReleased) client.release(); 
-}
+          if (!clientReleased) client.release();
+        }
       }
 
       if (type === "cash") {
