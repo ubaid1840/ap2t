@@ -7,24 +7,23 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/contexts/auth-context";
+import { useDebounce } from "@/hooks/use-debounce";
 import { useIsMobile } from "@/hooks/use-mobile";
+import axios from "@/lib/axios";
 import { auth } from "@/lib/firebase";
+import { joinNames } from "@/lib/functions";
 import { signOut } from "firebase/auth";
 import { ChevronDown } from "lucide-react";
+import { usePathname } from "next/navigation";
+import { useRouter } from "nextjs-toploader/app";
 import { ReactNode, useEffect, useState } from "react";
 import InputWithIcon from "./input-with-icon";
 import NotificationSheet from "./notification-sheet";
-import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
-import { Button } from "./ui/button";
-import { Separator } from "./ui/separator";
-import axios from "@/lib/axios";
-import { useRouter } from "nextjs-toploader/app";
-import { ScrollArea } from "./ui/scroll-area";
-import { useDebounce } from "@/hooks/use-debounce";
-import { Spinner } from "./ui/spinner";
-import { usePathname } from "next/navigation";
 import RenderAvatar from "./render-avatar";
-import { joinNames } from "@/lib/functions";
+import { Button } from "./ui/button";
+import { ScrollArea } from "./ui/scroll-area";
+import { Separator } from "./ui/separator";
+import { Spinner } from "./ui/spinner";
 
 interface PopupItem {
   id: string | number;
@@ -65,7 +64,7 @@ export default function DashboardHeader({ trigger }: { trigger?: ReactNode }) {
               {user?.email}
             </p>
           </div>
-           <RenderAvatar fallback={joinNames([user?.first_name, user?.last_name])} img={user?.picture}/>
+          <RenderAvatar fallback={joinNames([user?.first_name, user?.last_name])} img={user?.picture} />
 
           <DropdownMenu>
             <DropdownMenuTrigger>

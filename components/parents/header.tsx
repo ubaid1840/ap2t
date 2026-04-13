@@ -1,4 +1,3 @@
-import { Dot } from "lucide-react"
 import { ReactNode } from "react"
 
 const Header = ({ children, totalParents }: { children: ReactNode, totalParents : number }) => {

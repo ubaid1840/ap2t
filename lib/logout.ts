@@ -1,6 +1,6 @@
 import { signOut } from "firebase/auth";
-import { auth } from "./firebase";
 import { toast } from "sonner";
+import { auth } from "./firebase";
 
 
 export async function handleLogout() {

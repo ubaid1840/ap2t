@@ -1,11 +1,13 @@
 import { BarChart } from "@/components/charts/bar-chart";
 import { Card, CardContent, CardHeader } from "../ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
-import { AttendanceRecord } from "@/app/portal/admin/dashboard/page";
+import { AttendanceRecord } from "@/lib/types";
 
 
 
-export function DailyCheckins({ data }: { data: AttendanceRecord[] }) {
+export function DailyCheckins({ data }: {
+  data: AttendanceRecord[]
+}) {
 
 
   function getHourLabel(date: Date) {
@@ -15,7 +17,6 @@ export function DailyCheckins({ data }: { data: AttendanceRecord[] }) {
     if (hour === 12) return "12 PM";
     return `${hour - 12} PM`;
   }
-
   function getDayLabel(date: Date) {
     return date.toLocaleDateString("en-US", { weekday: "short", timeZone: "UTC" });
   }
@@ -29,9 +30,6 @@ export function DailyCheckins({ data }: { data: AttendanceRecord[] }) {
 
   function generateCheckinsChartData(data: any[]) {
     const today = new Date();
-
-
-
     const hours = [
       "12 AM", "1 AM", "2 AM", "3 AM", "4 AM", "5 AM", "6 AM", "7 AM", "8 AM", "9 AM", "10 AM", "11 AM",
       "12 PM", "1 PM", "2 PM", "3 PM", "4 PM", "5 PM", "6 PM", "7 PM", "8 PM", "9 PM", "10 PM", "11 PM"

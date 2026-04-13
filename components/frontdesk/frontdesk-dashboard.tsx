@@ -3,30 +3,16 @@
 import PageTable from "@/components/app-table";
 import { useApproval } from "@/components/frontdesk/use-approval";
 import { Button } from "@/components/ui/button";
+import { useDebounce } from "@/hooks/use-debounce";
 import axios from "@/lib/axios";
+import { FrontDeskActionData } from "@/lib/types";
 import { ColumnDef } from "@tanstack/react-table";
-import { ArrowUpDown, CircleCheck, Filter, Loader2 } from "lucide-react";
+import { ArrowUpDown, CircleCheck, Loader2 } from "lucide-react";
 import moment from "moment";
 import { useState } from "react";
 import { RxCrossCircled } from "react-icons/rx";
 import InputWithIcon from "../input-with-icon";
-import { useDebounce } from "@/hooks/use-debounce";
-import { SendInAppNotification } from "@/lib/send-inapp-notification";
 
-
-export type FrontDeskActionData = {
-  id: number;
-  session_name: string;
-  player_name: string;
-  date: string;
-  end_date: string;
-  start_time: string;
-  end_time: string;
-  referal_code: string | null;
-  price: number;
-  action: "cash" | "approval";
-  status: "waiting" | "accepted" | "rejected";
-};
 
 export default function FrontdeskDashboard() {
 
@@ -318,7 +304,7 @@ export default function FrontdeskDashboard() {
           </div>
         </div>
       </div>
-      
+
       <PageTable
         loading={loading}
         columns={FRONT_DESK_SESSION_COLUMNS}

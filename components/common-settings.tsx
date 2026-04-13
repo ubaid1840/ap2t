@@ -21,14 +21,11 @@ import { Scrollbar } from "@radix-ui/react-scroll-area";
 import { EmailAuthProvider, reauthenticateWithCredential, updatePassword } from "firebase/auth";
 import { deleteObject, ref } from "firebase/storage";
 import {
-    Link,
-    Link2,
     Loader2,
     MapPin,
     MessageSquare,
     Phone,
     Plus,
-    Star,
     User
 } from "lucide-react";
 import { ReactNode, useEffect, useRef, useState } from "react";
@@ -56,7 +53,7 @@ export default function CommonSettings() {
     });
     const { user } = useAuth();
     const [passwordLoading, setPasswordLoading] = useState(false)
-   
+
 
     const [securityInfo, setSecurityInfo] = useState({
         oldPass: "",
@@ -235,7 +232,7 @@ export default function CommonSettings() {
                                         Security
                                     </div>
                                 </TabsTrigger>
-                               
+
                             </TabsList>
                             <Scrollbar orientation="horizontal" />
                         </ScrollArea>
@@ -352,7 +349,7 @@ export default function CommonSettings() {
                                         onChange={(e) =>
                                             setProfileInfo((prev) => ({
                                                 ...prev,
-                                               phone_no : e,
+                                                phone_no: e,
                                             }))
                                         }
                                     />
@@ -468,7 +465,7 @@ export default function CommonSettings() {
                                     </div>
                                 </div>
                             </TabsContent>
-                           
+
                         </CardContent>
                     </Tabs>
                 </Card>}

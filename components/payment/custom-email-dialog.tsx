@@ -1,6 +1,10 @@
 "use client";
 
+import axios from "@/lib/axios";
+import { PaymentItem } from "@/lib/types";
 import { useState } from "react";
+import { toast } from "sonner";
+import { Button } from "../ui/button";
 import {
     Dialog,
     DialogContent,
@@ -10,10 +14,6 @@ import {
 } from "../ui/dialog";
 import { Input } from "../ui/input";
 import { Textarea } from "../ui/textarea";
-import { Button } from "../ui/button";
-import axios from "@/lib/axios";
-import { PaymentItem } from "@/app/portal/admin/payments/page";
-import { toast } from "sonner";
 
 type EmailDialogProps = {
     data: PaymentItem;

@@ -1,13 +1,11 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { ColumnDef } from "@tanstack/react-table";
-import { ArrowUpDown, Eye, Info, Mail, Phone, TrendingDown, TrendingUp, Users } from "lucide-react";
+import { ArrowUpDown, Eye } from "lucide-react";
 import Link from "next/link";
-import { IoIosPin } from "react-icons/io";
-import getInitials from "../parents/get-initials";
-import CardStatus, { typeClasses } from "../card-status";
-import { DashIcon } from "@radix-ui/react-icons";
+import CardStatus from "../card-status";
 import DummyButton from "../dummy-button";
+import getInitials from "../parents/get-initials";
 
 
 
@@ -18,10 +16,10 @@ export type PlayersData = {
     position: string;
     parent: string;
     last_session: string;
-    last_session_date: string; // ISO format "YYYY-MM-DD"
-    attendance: number; // e.g., 94, 89, 100
-    id : number;
-    joining_date ?: string
+    last_session_date: string;
+    attendance: number;
+    id: number;
+    joining_date?: string
 
 };
 
@@ -49,7 +47,7 @@ export const PLAYERS_COLUMNS: ColumnDef<PlayersData>[] = [
                 <div>
                     <div className="text-[#D1D5DC]">{row.getValue("name")}</div>
                     <div className="text-xs text-muted-foreground">
-                      {row.original.coach_name ? `Coach ${row.original.coach_name}` : "N/A"}  
+                        {row.original.coach_name ? `Coach ${row.original.coach_name}` : "N/A"}
                     </div>
                 </div>
             </div>
@@ -140,18 +138,18 @@ export const PLAYERS_COLUMNS: ColumnDef<PlayersData>[] = [
                 <ArrowUpDown />
             </Button>
         ),
-        cell: ({ row }) =>  (
-                <div className="w-20">
-                <CardStatus value={row.getValue("attendance")} icon={true}/>
-                    </div>
-            )
+        cell: ({ row }) => (
+            <div className="w-20">
+                <CardStatus value={row.getValue("attendance")} icon={true} />
+            </div>
+        )
     },
     {
         id: "actions",
         header: () => <div className="text-[#99A1AF] text-[12px] tracking-wider dark:hover:bg-transparent dark:hover:text-white/50">ACTIONS</div>,
         cell: ({ row }) => (
             <Link href={`/portal/admin/players/${row.original.id}`}>
-               <DummyButton>
+                <DummyButton>
                     <Eye /> View
                 </DummyButton>
             </Link>

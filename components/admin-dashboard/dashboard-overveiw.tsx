@@ -1,6 +1,7 @@
-import { DashboardStats } from "@/app/portal/admin/dashboard/page"
+
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent } from "@/components/ui/card"
+import { DashboardStats } from "@/lib/types"
 import { Calendar, DollarSign, Info, User } from "lucide-react"
 
 

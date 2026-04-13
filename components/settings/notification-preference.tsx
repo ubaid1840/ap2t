@@ -1,6 +1,7 @@
-import { NotificationSetting } from "@/app/portal/admin/settings/page";
-import { TabsContent } from "../ui/tabs";
+
+import { NotificationSetting } from "@/lib/types";
 import { Switch } from "../ui/switch";
+import { TabsContent } from "../ui/tabs";
 
 
 const NotificationPreference = ({ notificationInfo, setNotificationInfo }: { notificationInfo: NotificationSetting[], setNotificationInfo: (val: any) => void }) => {

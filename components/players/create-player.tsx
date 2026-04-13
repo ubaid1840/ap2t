@@ -17,6 +17,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Plus } from "lucide-react";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
+import { toast } from "sonner";
 import { z } from "zod";
 import AppCalendar from "../app-calendar";
 import { RequiredStar } from "../required-star";
@@ -24,12 +25,11 @@ import { Field, FieldError } from "../ui/field";
 import { Spinner } from "../ui/spinner";
 import SelectPosition from "./select-position";
 import SelectSkill from "./select-skill";
-import { toast } from "sonner";
 
 type CreatePlayerProps = {
   parent_id?: number | null | undefined | string;
   onRefresh?: () => Promise<void>;
-  placeholder ?: string
+  placeholder?: string
 };
 
 const playerSchema = z.object({
@@ -62,10 +62,10 @@ type PlayerFormValues = z.infer<typeof playerSchema>;
 
 export function CreatePlayer({
   parent_id = null,
-  onRefresh = async () => {},
+  onRefresh = async () => { },
   placeholder = "Add Player"
 }: CreatePlayerProps) {
-  
+
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const form = useForm<PlayerFormValues>({

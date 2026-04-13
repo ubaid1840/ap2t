@@ -22,38 +22,24 @@ import AppCalendar from "../app-calendar";
 import { RequiredStar } from "../required-star";
 import { Field, FieldError } from "../ui/field";
 import { Spinner } from "../ui/spinner";
-import { PlayerResponse } from "./main-player-page";
 import SelectPosition from "./select-position";
 import SelectSkill from "./select-skill";
-type DataProps = {
-  first_name: string;
-  last_name: string;
-  phone_no: string;
-  position: string;
-  skillLevel: string;
-  medicalNotes: string;
-  birth_date: null | Date;
-  zip_code: string;
-};
+import { PlayerResponse } from "@/lib/types";
+
 
 const playerSchema = z.object({
   first_name: z.string().min(2, "First name is required"),
   last_name: z.string().min(2, "Last name is required"),
-
   phone_no: z.string().min(6, "Phone is required"),
-
   zip_code: z.string().min(3, "Zip code required"),
-
   dob: z.date({
     error: "Date of birth is required",
   }),
-
   position: z.string().min(1, "Select a position"),
-
   skillLevel: z.string().min(1, "Select skill level"),
-
   medicalNotes: z.string().optional(),
 });
+
 type PlayerFormValues = z.infer<typeof playerSchema>;
 
 export function EditInfo({
@@ -205,7 +191,7 @@ export function EditInfo({
                         </Label>
 
                         <AppCalendar
-                          date={field.value? new Date(field.value):undefined}
+                          date={field.value ? new Date(field.value) : undefined}
                           onChange={field.onChange}
                         />
                         {fieldState.invalid && (

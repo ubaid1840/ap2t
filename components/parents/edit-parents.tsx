@@ -11,32 +11,30 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import axios from "@/lib/axios";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { SquarePen } from "lucide-react";
 import { useEffect, useState } from "react";
-import axios from "@/lib/axios";
-import { useParams } from "next/navigation";
-import { Spinner } from "../ui/spinner";
+import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import z from "zod";
-import { Controller, useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Field, FieldError } from "../ui/field";
 import { RequiredStar } from "../required-star";
+import { Field, FieldError } from "../ui/field";
+import { Spinner } from "../ui/spinner";
 import { Textarea } from "../ui/textarea";
 
 type EditParentsProps = {
   parent_id: number | null;
-  data: DataProp;
+  data: {
+    first_name: string;
+    last_name: string;
+    phone_no: string | null;
+    location: string | null;
+    zip_code: string | null;
+  };
   onRefresh: () => Promise<void>;
 };
 
-type DataProp = {
-  first_name: string;
-  last_name: string;
-  phone_no: string | null;
-  location: string | null;
-  zip_code: string | null;
-};
 
 const parentSchema = z.object({
   first_name: z.string().min(2, "First name is required"),

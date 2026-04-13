@@ -1,20 +1,20 @@
 "use client";
 
-import GradientIcon from "@/components/landing/icon-container";
 import LoginForm from "@/components/auth/loginForm";
 import SignUpForm from "@/components/auth/signupform";
+import GradientIcon from "@/components/landing/icon-container";
+import { Spinner } from "@/components/ui/spinner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useAuth } from "@/contexts/auth-context";
+import { auth, provider } from "@/lib/firebase";
 import { cn } from "@/lib/utils";
+import { signInWithPopup } from "firebase/auth";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import * as React from "react";
 import { useEffect } from "react";
-import { FaApple, FaFacebook, FaGoogle } from "react-icons/fa";
-import { useAuth } from "@/contexts/auth-context";
-import { Spinner } from "@/components/ui/spinner";
-import { signInWithPopup } from "firebase/auth";
-import { auth, provider } from "@/lib/firebase";
+import { FaGoogle } from "react-icons/fa";
 import { toast } from "sonner";
 
 

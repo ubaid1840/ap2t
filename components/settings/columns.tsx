@@ -1,16 +1,24 @@
-import { ArrowUpDown, MapPin } from "lucide-react";
-import { Progress } from "../ui/progress";
-import { Button } from "../ui/button";
 import { ColumnDef } from "@tanstack/react-table";
+import { ArrowUpDown, MapPin } from "lucide-react";
+import { Button } from "../ui/button";
+import { Progress } from "../ui/progress";
 
 
-export type AttendanceData = {
+type AttendanceData = {
   name: string
   sessions: number
   attended: number
   missed: number
   attendance_rate: number
 };
+
+type ZipRevenueData = {
+  zip: string
+  players: number
+  revenue: number
+  avg_revenue: number
+}
+
 
 export const PLAYER_ATTENDANCE_DATA_COLUMNS: ColumnDef<AttendanceData>[] = [
   {
@@ -109,12 +117,6 @@ export const PLAYER_ATTENDANCE_DATA_COLUMNS: ColumnDef<AttendanceData>[] = [
 
 ];
 
-export type ZipRevenueData = {
-  zip: string
-  players: number
-  revenue: number
-  avg_revenue: number
-}
 
 export const ZIP_REVENUE_DATA_COLUMNS: ColumnDef<ZipRevenueData>[] = [
   {
@@ -150,7 +152,7 @@ export const ZIP_REVENUE_DATA_COLUMNS: ColumnDef<ZipRevenueData>[] = [
     ),
     cell: ({ row }) => (
       <div className="text-[#D1D5DC] flex items-center gap-2">
-        {Number(row.getValue("total_users")|| 0).toFixed(0)}
+        {Number(row.getValue("total_users") || 0).toFixed(0)}
       </div>
     ),
   },

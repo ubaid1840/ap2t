@@ -2,11 +2,10 @@
 import PageTable from "@/components/app-table";
 import InputWithIcon from "@/components/input-with-icon";
 import { CreateSessionDialog } from "@/components/sessions/create-session-dialog";
-import SessionCalendar from "@/components/calendar/session-calendar";
 import {
-  SESSION_COLUMNS,
-  SESSION_COLUMNS_COACH,
+  SESSION_COLUMNS_COACH
 } from "@/components/sessions/session-column";
+import SessionSheetCalendar from "@/components/sessions/session-sheet-calender";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -14,23 +13,12 @@ import { Separator } from "@/components/ui/separator";
 import { useAuth } from "@/contexts/auth-context";
 import axios from "@/lib/axios";
 import { joinNames } from "@/lib/functions";
+import { SessionProps } from "@/lib/types";
 import { Calendar, Filter, List } from "lucide-react";
 import moment, { Moment } from "moment";
 import { ReactNode, useEffect, useState } from "react";
-import SessionSheetCalendar from "@/components/sessions/session-sheet-calender";
 
-export type SessionProps = {
-  id: number;
-  sessionName: string;
-  type: string;
-  date: string;
-  time: string;
-  coachName: string;
-  price: string | number;
-  status: string;
-  original : any
-  end_date : string
-};
+
 
 export default function Page() {
   const [filter, setFilter] = useState(false);
@@ -101,23 +89,23 @@ export default function Page() {
     setSearch((prev) => ({ ...prev, [key]: val }));
   }
 
- const filteredData = sessions.filter((item) => {
-  const sessionText = item?.sessionName?.toLowerCase() ?? "";
-  const coachText = item?.coachName?.toLowerCase() ?? "";
-  const typeText = item?.type?.toLowerCase() ?? "";
+  const filteredData = sessions.filter((item) => {
+    const sessionText = item?.sessionName?.toLowerCase() ?? "";
+    const coachText = item?.coachName?.toLowerCase() ?? "";
+    const typeText = item?.type?.toLowerCase() ?? "";
 
- 
-  const sessionWords = search.main?.toLowerCase().trim().split(/\s+/).filter(Boolean) || [];
-  const coachWords = search.coach?.toLowerCase().trim().split(/\s+/).filter(Boolean) || [];
-  const typeWords = search.type?.toLowerCase().trim().split(/\s+/).filter(Boolean) || [];
 
-  
-  const matchesSession = !sessionWords.length || sessionWords.every((word) => sessionText.includes(word));
-  const matchesCoach = !coachWords.length || coachWords.every((word) => coachText.includes(word));
-  const matchesType = !typeWords.length || typeWords.every((word) => typeText.includes(word));
+    const sessionWords = search.main?.toLowerCase().trim().split(/\s+/).filter(Boolean) || [];
+    const coachWords = search.coach?.toLowerCase().trim().split(/\s+/).filter(Boolean) || [];
+    const typeWords = search.type?.toLowerCase().trim().split(/\s+/).filter(Boolean) || [];
 
-  return matchesSession && matchesCoach && matchesType;
-});
+
+    const matchesSession = !sessionWords.length || sessionWords.every((word) => sessionText.includes(word));
+    const matchesCoach = !coachWords.length || coachWords.every((word) => coachText.includes(word));
+    const matchesType = !typeWords.length || typeWords.every((word) => typeText.includes(word));
+
+    return matchesSession && matchesCoach && matchesType;
+  });
 
   return (
     <div className="flex flex-col w-full gap-4">
@@ -210,7 +198,7 @@ export default function Page() {
           headerClassName={"rounded-4xl"}
           columns={SESSION_COLUMNS_COACH}
           data={filteredData || []}
-          onRowClick={() => {}}
+          onRowClick={() => { }}
         />
       )}
       {tab === "calendar" && (

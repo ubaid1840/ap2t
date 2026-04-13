@@ -1,24 +1,20 @@
 "use client";
 import AppCalendar from "@/components/app-calendar";
-import PageTable from "@/components/app-table";
 import BackButton from "@/components/back-button";
 import { BarChart } from "@/components/charts/bar-chart";
-import LineChart from "@/components/charts/line-chart-dots";
 import PieChart from "@/components/charts/pie-chart";
 import { AssignCoachDialog } from "@/components/sessions/assign-coach-dialog";
-import { PLAYER_ATTENDANCE_DATA_COLUMNS, ZIP_REVENUE_DATA_COLUMNS } from "@/components/settings/columns";
-import { MONTHLY_SESSIONS_CONFIG, SESSION_TYPE_CHART_CONFIG } from "@/components/settings/constants";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
+import { Card, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { useSidebar } from "@/components/ui/sidebar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Spinner } from "@/components/ui/spinner";
-import { useAuth } from "@/contexts/auth-context";
 import { useIsMobile } from "@/hooks/use-mobile";
 import axios from "@/lib/axios";
+import { SESSION_TYPE_CHART_CONFIG } from "@/lib/constants";
 import { exportDashboardToExcel, exportToExcel } from "@/lib/functions";
+import { DashboardDataResponse } from "@/lib/types";
 
 import {
   ChartColumn,
@@ -26,85 +22,13 @@ import {
   Download,
   FileText,
   Filter,
-  LucideProps,
-  MapPin,
-  TrendingUp
+  LucideProps
 } from "lucide-react";
 import moment from "moment";
-import { ReactNode, useEffect, useState } from "react";
-
-
-// ----------------------------
-// Totals Section
-// ----------------------------
-export type Totals = {
-  totalRevenue: number;      // sum of all paid payments
-  totalSessions: number;     // total sessions
-  totalPending: number;      // total payments with status 'pending'
-  totalComped: number;       // total payments with status 'comped'
-};
-
-// ----------------------------
-// Revenue By Coach
-// ----------------------------
-export type RevenueBySessionItem = {
-  session_name: string;  // e.g., "Coach Ali"
-  value: number;  // revenue sum
-};
-
-// ----------------------------
-// Sessions by Type
-// ----------------------------
-export type SessionTypeItem = {
-  name: string;   // e.g., "Private Session"
-  value: number;  // count of sessions of this type
-  fill: string;   // chart color variable
-};
-
-// ----------------------------
-// Monthly Revenue Trend
-// ----------------------------
-export type MonthlyRevenueItem = {
-  month: string;  // e.g., "July"
-  value: number;  // revenue sum for the month
-};
-
-// ----------------------------
-// Player Attendance Data
-// ----------------------------
-export type PlayerAttendanceItem = {
-  id: number;           // unique ID assigned in the response
-  name: string;         // player's full name
-  sessions: number;     // total sessions enrolled
-  attended: number;     // sessions attended
-  missed: number;       // sessions missed
-  attendance_rate: number; // attendance percentage
-};
-
-export type ZipcodeItem = {
-  avg_revenue: string
-  total_revenue: string
-  total_users: string
-  zip_code: string
-}
-
-// ----------------------------
-// Full Response Type
-// ----------------------------
-export type DashboardDataResponse = {
-  totals: Totals;
-  revenueBySession: RevenueBySessionItem[];
-  sessionTypeData: SessionTypeItem[];
-  monthlyRevenueTrend: MonthlyRevenueItem[];
-  playerAttendanceData: PlayerAttendanceItem[];
-  zipcodeData: ZipcodeItem[]
-};
-
+import { ReactNode, useState } from "react";
 
 export default function Page() {
 
-  const { open } = useSidebar()
-  const isMobile = useIsMobile()
   const [loading, setLoading] = useState(false)
   const [reports, setReports] = useState<DashboardDataResponse | undefined>()
   const [filterLoading, setFilterLoading] = useState(false)

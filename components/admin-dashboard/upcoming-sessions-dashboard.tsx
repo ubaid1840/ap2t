@@ -1,4 +1,5 @@
 import { useIsMobile } from "@/hooks/use-mobile"
+import { SessionRecord } from "@/lib/types"
 import { Calendar } from "lucide-react"
 import Link from "next/link"
 import PageTable from "../app-table"
@@ -6,16 +7,15 @@ import { Button } from "../ui/button"
 import { Card, CardContent, CardHeader } from "../ui/card"
 import { useSidebar } from "../ui/sidebar"
 import { DASHBOARD_SESSIONS_COLUMNS } from "./columns"
-import { SessionRecord } from "@/app/portal/admin/dashboard/page"
-export function UpcomingSessions({sessions} : {sessions : SessionRecord[]}) {
-  const {open} = useSidebar()
+export function UpcomingSessions({ sessions }: { sessions: SessionRecord[] }) {
+  const { open } = useSidebar()
   const isMobile = useIsMobile()
 
   return (
     <Card className="bg-[#252525] flex flex-col h-full p-0 border border-[#3A3A3A] overflow-hidden">
 
       <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-6 pb-0 gap-4 sm:gap-0">
-     
+
         <div className="flex flex-col gap-1">
           <h1 className="font-medium text-lg">Upcoming Sessions</h1>
           <p className="text-sm text-muted-foreground">
@@ -43,11 +43,11 @@ export function UpcomingSessions({sessions} : {sessions : SessionRecord[]}) {
 
         />
         <div className="flex justify-end py-4 px-2 bg-[#1A1A1A]">
-            <Link href="/portal/admin/sessions">
-                <Button className="bg-[#252525] border border-[#3A3A3A] text-[#D1D5DC]">
-                    View All Sessions
-                </Button>
-            </Link>
+          <Link href="/portal/admin/sessions">
+            <Button className="bg-[#252525] border border-[#3A3A3A] text-[#D1D5DC]">
+              View All Sessions
+            </Button>
+          </Link>
         </div>
       </CardContent>
 

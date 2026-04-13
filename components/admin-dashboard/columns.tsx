@@ -4,7 +4,7 @@ import { ArrowUpDown } from "lucide-react";
 import Link from "next/link";
 import CardStatus from "../card-status";
 
-export type SessionData = {
+type SessionData = {
   name: string;
   session_type: string;
   coach_name: string;

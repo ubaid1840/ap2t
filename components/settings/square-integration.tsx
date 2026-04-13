@@ -1,5 +1,6 @@
-import { SquareFieldKey, SquareIntegrationState, SquareMode } from "@/app/portal/admin/settings/page";
+
 import useSquareConnection from "@/hooks/use-square-connection";
+import { SquareFieldKey, SquareIntegrationState, SquareMode } from "@/lib/types";
 import { CircleCheckBig } from "lucide-react";
 import { memo } from "react";
 import CardStatus from "../card-status";

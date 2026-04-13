@@ -1,7 +1,6 @@
-import { Dot } from "lucide-react"
 import { ReactNode } from "react"
 
-const Header = ({ children, length }: { children: ReactNode, length : number }) => {
+const Header = ({ children, length }: { children: ReactNode, length: number }) => {
     return (
         <div className="flex w-full gap-4 justify-between flex-wrap items-center">
             <div className="space-y-2">

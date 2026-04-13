@@ -1,6 +1,7 @@
 "use client";
 import { useAuth } from "@/contexts/auth-context";
 import axios from "@/lib/axios";
+import { BookedSession, SessionCoach } from "@/lib/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Calendar,
@@ -47,65 +48,7 @@ import { Separator } from "../ui/separator";
 import { Spinner } from "../ui/spinner";
 import { AssignCoachDialog } from "./assign-coach-dialog";
 
-export interface SessionCoach {
-  id: number;
-  name: string;
-  description: string;
-  status: string;
-  session_type: string;
-  coach_id: number;
-  location: string;
-  start_time: string;
-  end_time: string;
-  date: string;
-  end_date: string;
-  price: string;
-  max_players: number;
-  apply_promotion: boolean;
-  created_at: string;
-  promotion_price: string;
-  image: string;
-  show_storefront: boolean;
-  comped: boolean;
-  promotion_start: string | null;
-  promotion_end: string | null;
-  type: "camp" | "clinic" | string;
-  age_limit: string;
-  coach_first_name: string;
-  coach_last_name: string;
-}
 
-export type SessionType = {
-  name: string;
-  description: string;
-  type: string;
-  age_limit: string;
-  session_type: string;
-  coach_id: number | null;
-  coach_name: string;
-  location: string;
-  date: null | Date;
-  start_time: string;
-  status: string;
-  end_time: string;
-  price: number | string;
-  max_players: number | string;
-  apply_promotion: boolean;
-  promotion_price?: number | string;
-  image: string;
-  end_date: null | Date;
-  promotion_start: null | Date;
-  promotion_end: null | Date;
-  show_storefront: boolean;
-  coach_schedule_preference?: any
-};
-type BookedSession = {
-  name: string;
-  date: string;
-  end_date: string;
-  start_time: string;
-  end_time: string;
-};
 
 export const sessionSchema = z.object({
   name: z.string().min(2, "Session name is required"),
@@ -288,7 +231,7 @@ export function CreateSessionDialog({
     return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}`;
   }
 
-  function getSessionsConflicts (
+  function getSessionsConflicts(
     overrides: {
       start_time: string;
       end_time: string;
@@ -300,7 +243,7 @@ export function CreateSessionDialog({
         date: null,
         end_date: null
       },
-  ): BookedSession[]  {
+  ): BookedSession[] {
     const selectedDate = overrides.date ?? form.getValues("date");
     const selectedEndDate = overrides.end_date ?? form.getValues("end_date");
     const selectedStartTime = overrides.start_time ?? form.getValues("start_time");
@@ -373,7 +316,7 @@ export function CreateSessionDialog({
   }
 
 
-  async function CreateSession (values: SessionSchemaValues) {
+  async function CreateSession(values: SessionSchemaValues) {
     setLoading(true);
     try {
 

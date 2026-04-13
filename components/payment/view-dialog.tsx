@@ -1,4 +1,3 @@
-import { PaymentItem } from "@/app/portal/admin/payments/page";
 import {
   Calendar,
   Clock,
@@ -13,8 +12,9 @@ import { GoDotFill } from "react-icons/go";
 import CardStatus from "../card-status";
 import { DialogClose, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
 import { ScrollArea } from "../ui/scroll-area";
+import { PaymentItem } from "@/lib/types";
 
-export function ViewDialog({ data } : {data : PaymentItem}) {
+export function ViewDialog({ data }: { data: PaymentItem }) {
   return (
     <DialogContent className="bg-[#252525] border border-border p-0 sm:max-w-4xl">
       <DialogHeader className="border-b border-border p-4">
@@ -40,7 +40,7 @@ export function ViewDialog({ data } : {data : PaymentItem}) {
                 <p className="text-sm text-ghost-text">Status</p>
               </div>
               <CardStatus
-              
+
                 value={data.status}
                 className="w-20"
               />
@@ -100,11 +100,11 @@ export function ViewDialog({ data } : {data : PaymentItem}) {
                 </div>
               </div>
               {data?.method !== 'Cash' &&
-              <div className="space-y-0">
-                <p className="text-xs text-ghost-text">Processed via</p>
-                <h1 className="text-[#E5E7EB]">Square</h1>
-              </div>
-}
+                <div className="space-y-0">
+                  <p className="text-xs text-ghost-text">Processed via</p>
+                  <h1 className="text-[#E5E7EB]">Square</h1>
+                </div>
+              }
             </div>
           </div>
           <div className="space-y-2">
@@ -133,7 +133,7 @@ export function ViewDialog({ data } : {data : PaymentItem}) {
       </ScrollArea>
       <div className="p-4 border-t border-[#3A3A3A]">
         <div className="flex justify-end gap-4  ">
-         <DialogClose className="text-[12px] font-medium tracking-wider leading-none h-10 px-4 py-2 bg-primary text-black rounded-md hover:opacity-70 cursor-pointer flex  items-center justify-center">
+          <DialogClose className="text-[12px] font-medium tracking-wider leading-none h-10 px-4 py-2 bg-primary text-black rounded-md hover:opacity-70 cursor-pointer flex  items-center justify-center">
             Close
           </DialogClose>
         </div>

@@ -1,22 +1,11 @@
 "use client";
 import SessionCalendar from "@/components/calendar/session-calendar";
-import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/contexts/auth-context";
 import axios from "@/lib/axios";
 import { joinNames } from "@/lib/functions";
+import { SessionProps } from "@/lib/types";
 import moment, { Moment } from "moment";
 import { ReactNode, useEffect, useState } from "react";
-
-export type SessionProps = {
-  id: number,
-  sessionName: string,
-  type: string,
-  date: string,
-  time: string,
-  coachName: string,
-  price: string | number,
-  status: string
-}
 
 export default function Page() {
   const [sessions, setSessions] = useState<SessionProps[]>([]);
@@ -32,43 +21,44 @@ export default function Page() {
   const fetchData = async () => {
     try {
       setLoading(true)
-       const month = currentMonth
-  ? currentMonth.format("YYYY-MM")
-  : null;
-      const result = await axios.get(`/parent/${user?.id}/sessions`, 
-         {
-    params: { month }
-  }
+      const month = currentMonth
+        ? currentMonth.format("YYYY-MM")
+        : null;
+      const result = await axios.get(`/parent/${user?.id}/sessions`,
+        {
+          params: { month }
+        }
       );
       if (result.data) {
         const mappedSessions = result.data.map((s: any) => {
-          let finalPrice=s.price
-          let promotion=false
+          let finalPrice = s.price
+          let promotion = false
           if (
-          s.apply_promotion &&
-          s.promotion_price &&
-          s.promotion_start &&
-          s.promotion_end &&
-          moment(s.promotion_start).isBefore(moment()) &&
-          moment(s.promotion_end).isAfter(moment())
-        ) {
-          finalPrice = s.promotion_price;
-          promotion=true
-        }
-          return({
-          id: s.id,
-          sessionName: s.name,
-          type: s.session_type,
-          date: moment(new Date(s.date)).format("YYYY-MM-DD"),
-          time: `${s.start_time} - ${s.end_time}`,
-          coachName: joinNames([s.coach_first_name, s.coach_last_name]),
-          price: finalPrice,
-          original_price:s.price,
-          promotion:promotion,
-          status: s?.status || 'upcoming',
-          children: s?.children || [],
-          end_date : s?.end_date ? moment(new Date(s.end_date)).format("YYYY-MM-DD") : null
-        })});
+            s.apply_promotion &&
+            s.promotion_price &&
+            s.promotion_start &&
+            s.promotion_end &&
+            moment(s.promotion_start).isBefore(moment()) &&
+            moment(s.promotion_end).isAfter(moment())
+          ) {
+            finalPrice = s.promotion_price;
+            promotion = true
+          }
+          return ({
+            id: s.id,
+            sessionName: s.name,
+            type: s.session_type,
+            date: moment(new Date(s.date)).format("YYYY-MM-DD"),
+            time: `${s.start_time} - ${s.end_time}`,
+            coachName: joinNames([s.coach_first_name, s.coach_last_name]),
+            price: finalPrice,
+            original_price: s.price,
+            promotion: promotion,
+            status: s?.status || 'upcoming',
+            children: s?.children || [],
+            end_date: s?.end_date ? moment(new Date(s.end_date)).format("YYYY-MM-DD") : null
+          })
+        });
 
         setSessions(mappedSessions);
       }

@@ -1,6 +1,7 @@
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useAuth } from "@/contexts/auth-context";
 import axios from "@/lib/axios";
+import { ReviewType } from "@/lib/types";
 import { Copy, RefreshCcw } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -10,23 +11,10 @@ import { Input } from "../ui/input";
 import { Spinner } from "../ui/spinner";
 import { TabsContent } from "../ui/tabs";
 
-
-export type Review = {
-    id: number;
-    title: string;
-    description: string;
-    name: string;
-    designation: string;
-    rating: number;
-    admin: boolean;
-    show: boolean;
-    showChanged?: boolean
-};
-
 export default function ReviewSection() {
     const [link, setLink] = useState("");
     const [linkLoading, setLinkLoading] = useState(false);
-    const [reviews, setReviews] = useState<Review[]>([]);
+    const [reviews, setReviews] = useState<ReviewType[]>([]);
     const [loading, setLoading] = useState(false);
     const { user } = useAuth();
 
@@ -38,7 +26,7 @@ export default function ReviewSection() {
     async function fetchData() {
         setLoading(true);
         try {
-            const { data }: { data: Review[] } = await axios.get("/testimonials");
+            const { data }: { data: ReviewType[] } = await axios.get("/testimonials");
             const sorted = data.sort((a, b) => (b.admin ? 1 : 0) - (a.admin ? 1 : 0));
             setReviews(sorted);
         } finally {
@@ -107,11 +95,11 @@ export default function ReviewSection() {
 
 }
 
-const EachReview = ({ sr, r, onUpdateCheckBox, onUpdateReview }: { sr: number, r: Review, onUpdateCheckBox: ({ id, show }: { id: number, show: boolean }) => void, onUpdateReview: (item: Review) => void }) => {
+const EachReview = ({ sr, r, onUpdateCheckBox, onUpdateReview }: { sr: number, r: ReviewType, onUpdateCheckBox: ({ id, show }: { id: number, show: boolean }) => void, onUpdateReview: (item: ReviewType) => void }) => {
 
     const [hover, setHover] = useState(0);
     const [loading, setLoading] = useState(false)
-    const [selectedReview, setSelectedReview] = useState<Review | null>(null)
+    const [selectedReview, setSelectedReview] = useState<ReviewType | null>(null)
     const [updateLoading, setUpdateLoading] = useState(false)
 
     async function saveAdminEdit() {

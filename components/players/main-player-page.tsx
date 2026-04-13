@@ -14,6 +14,7 @@ import { useAuth } from "@/contexts/auth-context";
 import { useIsMobile } from "@/hooks/use-mobile";
 import axios from "@/lib/axios";
 import { getYear, joinNames } from "@/lib/functions";
+import { PlayerResponse, SessionData, SquareSavedCard } from "@/lib/types";
 import { Scrollbar } from "@radix-ui/react-scroll-area";
 import {
   Bookmark,
@@ -38,136 +39,13 @@ import Link from "next/link";
 import { ReactNode, useEffect, useState } from "react";
 import { IoIosStar, IoIosStarOutline } from "react-icons/io";
 import getInitials from "../parents/get-initials";
-import { Skeleton } from "../ui/skeleton";
-import { AddParentDialog } from "./add-parents";
-import PaymentMethodSteps from "../square/payment-method-steps";
-import { SquareSavedCard } from "@/lib/types";
 import { DiscountDialog } from "../payment/apply-discount";
+import PaymentMethodSteps from "../square/payment-method-steps";
 import { Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogOverlay, DialogTitle } from "../ui/dialog";
+import { Skeleton } from "../ui/skeleton";
 import { Spinner } from "../ui/spinner";
 
-export interface PlayerResponse {
-  id: number;
-  first_name: string;
-  last_name: string;
-  email: string;
-  role: string;
-  status: string;
-  zip_code: string
-  picture: string | null;
-  location: string | null;
-  phone_no: string;
-  joining_date: string | null;
-  birth_date: Date | null;
-  created_at: string;
 
-  profile: PlayerProfile;
-
-  parent_id: number | null;
-  attach_parent: Parent | null;
-
-  sessions_data: SessionData[];
-
-  payment_data: Payment[];
-
-  all_notes: NoteWithCoach[];
-}
-
-export interface PlayerProfile {
-  id: number;
-  user_id: number;
-  parent_id: number | null;
-  position: string;
-  skill_level: string;
-  medical_notes: string | null;
-  created_at: string;
-}
-
-export interface Parent {
-  id: number;
-  first_name: string;
-  last_name: string;
-  email: string;
-  phone_no: string;
-  picture: string;
-  location: string;
-  profile?: any;
-}
-
-export interface SessionData {
-  id: number;
-  name: string;
-  description: string;
-  status: string;
-  session_type: string;
-  coach_id: number;
-  location: string;
-
-  start_time: string;
-  end_time: string;
-  date: string;
-  end_date: string;
-
-  price: string;
-  promotion_price: string | null;
-  apply_promotion: boolean;
-
-  max_players: number;
-  created_at: string;
-
-  image: string;
-  show_storefront: boolean;
-
-  coach_first_name: string | null;
-  coach_last_name: string | null;
-
-  payment_detail: Payment | null;
-
-  note_detail: SessionNote[];
-  session_rating: number
-  attendance_detail: Attendance[];
-}
-
-export interface Payment {
-  id: number;
-  session_id: number;
-  user_id: number;
-  status: string;
-  amount?: string | number;
-  created_at?: string;
-  original_price?: string | number;
-}
-
-export interface SessionNote {
-  id: number;
-  user_id: number;
-  session_id: number;
-  note_type: string;
-  note: string;
-  important: boolean;
-  created_at: string;
-}
-export interface Attendance {
-  id: number;
-  user_id: number;
-  session_id: number;
-  status: "present" | "absent" | "pending" | string;
-  created_at: string;
-}
-
-export interface NoteWithCoach {
-  id: number;
-  user_id: number;
-  session_id: number;
-  note_type: string;
-  note: string;
-  important: boolean;
-  created_at: string;
-  rating?: number;
-  coach_first_name: string | null;
-  coach_last_name: string | null;
-  session_name: string;
-}
 
 export default function MainPlayerPage({
   id,
@@ -700,8 +578,8 @@ export default function MainPlayerPage({
                       </div>
                     </div>
 
-                    {item?.payment_detail?.status &&  !['paid', 'comped'].includes(item?.payment_detail?.status) &&
-                     <DiscountDialog data={item?.payment_detail} onRefresh={fetchData} original={item?.price} />}
+                    {item?.payment_detail?.status && !['paid', 'comped'].includes(item?.payment_detail?.status) &&
+                      <DiscountDialog data={item?.payment_detail} onRefresh={fetchData} original={item?.price} />}
                   </CardContent>
                 </Card>
               ))}

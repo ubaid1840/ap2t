@@ -12,37 +12,11 @@ import { useAuth } from "@/contexts/auth-context";
 import { useDebounce } from "@/hooks/use-debounce";
 import axios from "@/lib/axios";
 import { joinNames } from "@/lib/functions";
+import { CoachCardNamesType, coachinfoType } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { Calendar, CheckCircle, Eye, Target, TrendingUp, User } from "lucide-react";
 import Link from "next/link";
 import { ReactNode, useEffect, useState } from "react";
-
-
-
-export type coachinfoType = {
-  id: number
-  name: string;
-  email: string;
-  phoneNo: string;
-  status: string;
-  bio: string;
-  notification: string;
-  specialities: string[];
-  certifications: string[];
-  preferedSchedule: string;
-  totalSessions: string;
-  completed: string;
-  upComing: string;
-  players: string;
-  avgRating: string;
-};
-
-type CoachCardNamesType = {
-  totalSessions: string;
-  completed: string
-  upComing: string
-  players: string
-}
 
 const CoachCardNames: CoachCardNamesType = { totalSessions: "Total Sessions", completed: "Completed", upComing: "Upcoming", players: "Players" }
 

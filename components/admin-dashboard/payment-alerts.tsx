@@ -1,13 +1,13 @@
-import { Bell, CircleCheck, CircleCheckBig, CircleX } from "lucide-react";
-import { Card, CardContent, CardHeader } from "../ui/card";
-import { Button } from "../ui/button";
-import { ScrollArea } from "../ui/scroll-area";
 import { Badge } from '@/components/ui/badge';
-import { PaymentRecord } from "@/app/portal/admin/dashboard/page";
-import { joinNames } from "@/lib/functions";
-import { useState } from "react";
-import { Spinner } from "../ui/spinner";
 import axios from "@/lib/axios";
+import { joinNames } from "@/lib/functions";
+import { PaymentRecord } from "@/lib/types";
+import { Bell, CircleCheckBig, CircleX } from "lucide-react";
+import { useState } from "react";
+import { Button } from "../ui/button";
+import { Card, CardContent, CardHeader } from "../ui/card";
+import { ScrollArea } from "../ui/scroll-area";
+import { Spinner } from "../ui/spinner";
 
 type PaymentAlertsProps = {
   data: PaymentRecord[] | []
@@ -16,9 +16,6 @@ type PaymentAlertsProps = {
   onRefresh?: (val: PaymentRecord) => Promise<void>
 }
 export function PaymentAlerts({ data, onClickPaid, onClickOverride, onRefresh }: PaymentAlertsProps) {
-
-
-
 
   return (
     <Card className="bg-[#252525] flex-1 border border-[#3A3A3A]">
@@ -91,7 +88,7 @@ const Reminder = ({ alert, onRefresh }: { alert: PaymentRecord, onRefresh?: (val
   return (
     <Button disabled={loading} onClick={handleReminderEmail}>
       {loading ? <Spinner className="text-black" /> : "Remind"}
-      </Button>
+    </Button>
   )
 }
 

@@ -1,6 +1,5 @@
 "use client";
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -8,11 +7,11 @@ import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useDebounce } from "@/hooks/use-debounce";
 import axios from "@/lib/axios";
+import { joinNames } from "@/lib/functions";
 import { Plus, Search } from "lucide-react";
 import { useEffect, useState } from "react";
-import { Spinner } from "../ui/spinner";
 import RenderAvatar from "../render-avatar";
-import { joinNames } from "@/lib/functions";
+import { Spinner } from "../ui/spinner";
 
 interface AddParticipantDialogProps {
   sessionId: number;

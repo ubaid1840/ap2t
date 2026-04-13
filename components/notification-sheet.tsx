@@ -5,17 +5,17 @@ import {
     SheetContent,
     SheetDescription,
     SheetHeader,
-    SheetTitle,
-    SheetTrigger
+    SheetTitle
 } from "@/components/ui/sheet"
-import { NotificationType, useNotifications } from "@/hooks/use-notifications"
+import { useAuth } from "@/contexts/auth-context"
+import { useNotifications } from "@/hooks/use-notifications"
+import axios from "@/lib/axios"
+import { NotificationType } from "@/lib/types"
 import { Bell, Dot } from "lucide-react"
 import moment from "moment"
 import { useRouter } from "nextjs-toploader/app"
-import { ScrollArea } from "./ui/scroll-area"
-import axios from "@/lib/axios"
-import { useAuth } from "@/contexts/auth-context"
 import { useState } from "react"
+import { ScrollArea } from "./ui/scroll-area"
 import { Spinner } from "./ui/spinner"
 
 export default function NotificationSheet() {

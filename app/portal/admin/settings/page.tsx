@@ -15,6 +15,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "@/contexts/auth-context";
 import { useIsMobile } from "@/hooks/use-mobile";
 import axios from "@/lib/axios";
+import { NotificationSetting, ProfileInfoProps, SquareIntegrationState } from "@/lib/types";
 import { Scrollbar } from "@radix-ui/react-scroll-area";
 import {
   Calendar,
@@ -32,39 +33,7 @@ import { RiShieldKeyholeLine } from "react-icons/ri";
 import { toast } from "sonner";
 
 
-export type SquareMode = "test" | "live";
 
-export type SquareCredentials = {
-  merchantId: string;
-  locationId: string;
-  apiKey: string;
-};
-
-export type SquareIntegrationState = {
-  mode: SquareMode;
-  credentials: {
-    test: SquareCredentials;
-    live: SquareCredentials;
-  };
-};
-
-export type SquareFieldKey = keyof SquareCredentials;
-
-export type ProfileInfoProps = {
-  first_name: string,
-  last_name: string,
-  email: string,
-  phone_no: string,
-  location: string,
-  birth_date: Date | undefined,
-}
-
-export type NotificationSetting = {
-  title: string;
-  description: string;
-  value: boolean;
-  icon: ReactNode;
-};
 
 export default function Page() {
 
@@ -171,7 +140,7 @@ export default function Page() {
 
     const res = await axios.get(`/square`);
     const settings = res.data;
-   
+
     setSquareIntegration(
       {
         mode: settings.mode ? "test" : "live",
@@ -388,15 +357,15 @@ export default function Page() {
                     Security
                   </div>
                 </TabsTrigger>
-                 <TabsTrigger
-                                    value="Review"
-                                  className="dark:data-[state=active]:bg-[#CBFD0026] dark:data-[state=active]:text-primary dark:data-[state=active]:border-b-primary rounded-none h-9 px-4 text-[12px] leading-tight tracking-tight"
-                                >
-                                    <div className="flex gap-2 items-center py-2">
-                                        <Star />
-                                        Review
-                                    </div>
-                                </TabsTrigger>
+                <TabsTrigger
+                  value="Review"
+                  className="dark:data-[state=active]:bg-[#CBFD0026] dark:data-[state=active]:text-primary dark:data-[state=active]:border-b-primary rounded-none h-9 px-4 text-[12px] leading-tight tracking-tight"
+                >
+                  <div className="flex gap-2 items-center py-2">
+                    <Star />
+                    Review
+                  </div>
+                </TabsTrigger>
               </TabsList>
               <Scrollbar orientation="horizontal" />
             </ScrollArea>

@@ -11,12 +11,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Textarea } from "@/components/ui/textarea";
 import { useIsMobile } from "@/hooks/use-mobile";
+import axios from "@/lib/axios";
 import { Check, Send } from "lucide-react";
 import { useMemo, useState } from "react";
+import { toast } from "sonner";
 import { Label } from "./ui/label";
 import { ScrollArea } from "./ui/scroll-area";
-import axios from "@/lib/axios";
-import { toast } from "sonner";
 
 interface User {
     id: number;
@@ -111,14 +111,14 @@ function UserTable({ data, onClose }: UserTableProps) {
     const handleSendNotifications = async () => {
         if (selectedUsers.length === 0) return;
         setLoading(true);
-        let emailPlayers: { email: string, parent_email: string | null, name : string,  }[] = []
+        let emailPlayers: { email: string, parent_email: string | null, name: string, }[] = []
         selectedUsers.forEach((item) => {
             data.forEach((ep) => {
                 if (ep.id === item) {
                     emailPlayers.push(
                         {
                             email: ep?.email,
-                            name : ep?.name,
+                            name: ep?.name,
                             parent_email: ep?.parent_email,
                         })
                 }

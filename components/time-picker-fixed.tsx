@@ -1,6 +1,5 @@
 "use client";
 
-import * as React from "react";
 import { Button } from "@/components/ui/button";
 import {
   Popover,
@@ -10,12 +9,9 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 import { Clock } from "lucide-react";
+import * as React from "react";
 
-type TimePickerProps = {
-  value?: string; // "HH:mm AM/PM"
-  onChange: (value: string) => void;
-  className?: string;
-};
+
 function format12Hour(hour: number) {
   const suffix = hour >= 12 ? "PM" : "AM";
   const h = hour % 12 || 12;
@@ -26,7 +22,7 @@ function pad(n: number) {
   return String(n).padStart(2, "0");
 }
 
-// --- new helper to parse hour from "hh:mm AM/PM" ---
+
 function parseHour12(time?: string) {
   if (!time) return null;
   const [hhmm, suffix] = time.split(" ");
@@ -40,10 +36,12 @@ export function TimePickerFixed({
   value,
   onChange,
   className,
-}: TimePickerProps) {
+}: {
+  value?: string;
+  onChange: (value: string) => void;
+  className?: string;
+}) {
   const [open, setOpen] = React.useState(false);
-
-  // --- fixed: parse hour correctly including AM/PM ---
   const selectedHour = parseHour12(value);
 
   const updateTime = (hour: number) => {
@@ -52,7 +50,7 @@ export function TimePickerFixed({
   };
 
   function formatDisplay(time: string) {
-    return time; // already in "hh:mm AM/PM"
+    return time;
   }
 
   return (

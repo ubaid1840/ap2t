@@ -1,25 +1,14 @@
 "use client";
 import SessionCalendar from "@/components/calendar/session-calendar";
-import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/contexts/auth-context";
 import axios from "@/lib/axios";
 import { joinNames } from "@/lib/functions";
+import { SessionProps } from "@/lib/types";
 import moment, { Moment } from "moment";
 import { ReactNode, useEffect, useState } from "react";
 
-export type SessionProps = {
-  id: number,
-  sessionName: string,
-  type: string,
-  date: string,
-  time: string,
-  coachName: string,
-  price: string | number,
-  status: string
-}
-
 export default function Page() {
- 
+
   const [sessions, setSessions] = useState<SessionProps[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentMonth, setCurrentMonth] = useState<Moment>(moment())
@@ -33,13 +22,13 @@ export default function Page() {
   const fetchData = async () => {
     setLoading(true)
     const month = currentMonth
-  ? currentMonth.format("YYYY-MM")
-  : null;
+      ? currentMonth.format("YYYY-MM")
+      : null;
     try {
-      const result = await axios.get(`/player/${user?.id}/sessions`, 
-         {
-    params: { month }
-  }
+      const result = await axios.get(`/player/${user?.id}/sessions`,
+        {
+          params: { month }
+        }
       );
       if (result.data) {
         const mappedSessions = result.data.map((s: any) => ({
@@ -51,8 +40,8 @@ export default function Page() {
           coachName: joinNames([s.coach_first_name, s.coach_last_name]),
           price: s.price,
           status: s?.status || 'upcoming',
-          enrolled : s?.enrolled,
-          end_date : s?.end_date ? moment(new Date(s.end_date)).format("YYYY-MM-DD") : null
+          enrolled: s?.enrolled,
+          end_date: s?.end_date ? moment(new Date(s.end_date)).format("YYYY-MM-DD") : null
         }));
         setSessions(mappedSessions);
       }
@@ -70,7 +59,7 @@ export default function Page() {
       <Header session_length={sessions.length}>
         {null}
       </Header>
-        <SessionCalendar currentMonth={currentMonth} setCurrentMonth={setCurrentMonth} player_id={user?.id} sessions={sessions} onSuccess={fetchData} loading={loading}/>
+      <SessionCalendar currentMonth={currentMonth} setCurrentMonth={setCurrentMonth} player_id={user?.id} sessions={sessions} onSuccess={fetchData} loading={loading} />
     </div>
   );
 }

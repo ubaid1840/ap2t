@@ -1,5 +1,5 @@
-import { PaymentItem } from "@/app/portal/admin/payments/page";
 import axios from "@/lib/axios";
+import { PaymentItem } from "@/lib/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { DialogClose } from "@radix-ui/react-dialog";
 import moment from "moment";
@@ -125,8 +125,8 @@ export function OverrideDialog({
                               "transaction_id",
                               moment().valueOf().toString(),
                             );
-                          }else{
-                            form.setValue("transaction_id","")
+                          } else {
+                            form.setValue("transaction_id", "")
                           }
                         }}
                       >

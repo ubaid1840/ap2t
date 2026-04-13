@@ -6,45 +6,16 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { CampClinicCard, CampClinicSession } from "@/lib/types";
 import { ArrowRight, Search } from "lucide-react";
 import moment from "moment";
 import Link from "next/link";
 import { useState } from "react";
 
-export interface CampClinicSession {
-    id: number;
-    session_type: string;
-    type: string;
-    name: string;
-    description: string;
-    date: string;
-    end_date: string;
-    start_time: string;
-    end_time: string;
-    age_limit: string;
-    apply_promotion: boolean;
-    promotion_price: string;
-    price: string;
-    max_players: number;
-    total_enrolled_players: number;
-    total_left: number;
-}
 
 
-export interface CampClinicCard {
-    id: string | number,
-    badge: "CAMP" | "CLINIC";
-    title: string;
-    description: string;
-    price: number;
-    left: number
-    details: [
-        string,
-        string,
-        string,
-        string
-    ];
-}
+
+
 
 export default function CampsAndClinics({ data = [] }: any) {
 

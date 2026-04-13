@@ -1,23 +1,20 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { ColumnDef } from "@tanstack/react-table";
-import { ArrowUpDown, Eye } from "lucide-react";
-import Link from "next/link";
-import CardStatus from "../card-status";
-import DummyButton from "../dummy-button";
+import { ArrowUpDown } from "lucide-react";
 import getInitials from "../parents/get-initials";
 
 
 
-export type PlayersData = {
+type PlayersData = {
     name: string;
     coach_name: string;
     age: number;
     position: string;
     parent: string;
     last_session: string;
-    last_session_date: string; // ISO format "YYYY-MM-DD"
-    attendance: number; // e.g., 94, 89, 100
+    last_session_date: string; 
+    attendance: number; 
     id : number;
     joining_date ?: string
 

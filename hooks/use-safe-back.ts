@@ -8,7 +8,7 @@ export const useSafeBack = (fallback: string = "/home") => {
   const [hasHistory, setHasHistory] = useState(false)
 
   useEffect(() => {
-    // Mark that user has navigated inside the app
+  
     if (typeof window !== "undefined") {
       setHasHistory(sessionStorage.getItem("hasHistory") === "true")
       sessionStorage.setItem("hasHistory", "true")

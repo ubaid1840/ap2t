@@ -1,6 +1,5 @@
 "use client";
 import CardStatus from "@/components/card-status";
-import { PAYMENT_HISTORY } from "@/components/parents/constatns";
 import { EditParents } from "@/components/parents/edit-parents";
 import { LinkChildrenDialog } from "@/components/parents/link-children";
 import { CreatePlayer } from "@/components/players/create-player";
@@ -14,7 +13,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "@/contexts/auth-context";
 import { useIsMobile } from "@/hooks/use-mobile";
 import axios from "@/lib/axios";
-import { calcualteRevenu, exportToExcel, getYear, joinNames } from "@/lib/functions";
+import { exportToExcel, getYear, joinNames } from "@/lib/functions";
+import { ParentDetailResponse, PaymentItemParent, SquareSavedCard } from "@/lib/types";
 import { Scrollbar } from "@radix-ui/react-scroll-area";
 import {
   Banknote,
@@ -27,113 +27,19 @@ import {
   Mail,
   MapPin,
   Phone,
-  Send,
   User,
   Users,
   UserX
 } from "lucide-react";
 import moment from "moment";
-import { ReactNode, useEffect, useRef, useState } from "react";
+import Link from "next/link";
+import { ReactNode, useEffect, useState } from "react";
 import { IoIosPin } from "react-icons/io";
 import { IoCalendarClear } from "react-icons/io5";
-import { Spinner } from "../ui/spinner";
-import Link from "next/link";
-import { toast } from "sonner";
-import { DARKMODECARDSTYLE } from "@/lib/constants";
-import SquareCard, { SquareCardRef } from "../square/square-card";
 import PaymentMethodSteps from "../square/payment-method-steps";
-import { SquareSavedCard } from "@/lib/types";
-
-export interface ParentDetailResponse {
-  parent: Parent;
-  stats: ParentStats;
-  linked_childrens: LinkedChildren[];
-  sessions: ParentSession[];
-  payments: PaymentItemParent[]
-}
-
-export type PaymentItemParent = {
-  id: number;
-  session_name: string
-  transaction_id: string;
-  user_id: number;
-  session_id: number;
-  amount: string; // or number if you prefer to convert
-  method: string;
-  status: "paid" | "pending" | "failed" | "comped" | "refunded";
-  paid_at: string; // ISO date string
-  created_at: string; // ISO date string
-  comped_category: string | null;
-  comped_reason: string | null;
-};
+import { Spinner } from "../ui/spinner";
 
 
-export interface Parent {
-  id: number;
-  first_name: string;
-  last_name: string;
-  email: string;
-  role: string;
-  status: string;
-  zip_code: string
-  picture: string | null;
-  location: string | null;
-  phone_no: string | null;
-  joining_date: string | null;
-  birth_date: string | null;
-  created_at: string;
-  profile: ParentProfile;
-  square_card_id ?: string | null
-}
-
-export interface ParentProfile {
-  id: number;
-  user_id: number;
-  created_at: string;
-}
-
-export interface ParentStats {
-  total_linked_children: number;
-  total_spent: number;
-  upcoming_sessions: number;
-}
-
-export interface LinkedChildren {
-  player_id: number;
-  user_id: number;
-  first_name: string;
-  last_name: string;
-  birth_date: string;
-  picture: string | null;
-  total_sessions: number;
-  skill_level: string
-  next_session: ChildNextSession | null;
-}
-
-export interface ChildNextSession {
-  date: string;
-  start_time: string;
-}
-
-export interface ParentSession {
-  session_id: number;
-  name: string;
-  comped: boolean;
-  status: string;
-  date: string;
-  start_time: string;
-  end_time: string;
-  coach_first_name: string;
-  coach_last_name: string;
-  price: string;
-  apply_promotion: boolean
-  promotion_price: string
-  players: SessionPlayer[];
-}
-export interface SessionPlayer {
-  first_name: string;
-  last_name: string;
-}
 
 
 
@@ -163,7 +69,7 @@ export default function MainParentPage({
     }
   }, [id, user]);
 
-  async function fetchCardInformation(){
+  async function fetchCardInformation() {
     const result = await axios.get(`/user/card?id=${id}`);
     setCardInformation(result.data)
   }
@@ -424,7 +330,7 @@ export default function MainParentPage({
           <TabsContent value="linked">
             <div className="flex gap-4 p-4 justify-end">
               <LinkChildrenDialog parent_id={id as string} onSuccess={fetchData} />
-              <CreatePlayer parent_id={id as string} onRefresh={fetchData} placeholder="Add Child"/>
+              <CreatePlayer parent_id={id as string} onRefresh={fetchData} placeholder="Add Child" />
             </div>
 
             <div className="flex w-full justify-between gap-4 p-2 flex-wrap">
@@ -552,7 +458,7 @@ export default function MainParentPage({
 
           <TabsContent value="method" className="space-y-4 p-2">
 
-        <PaymentMethodSteps  id={data?.parent?.id} data={cardInformation} onRefresh={fetchCardInformation}/>
+            <PaymentMethodSteps id={data?.parent?.id} data={cardInformation} onRefresh={fetchCardInformation} />
 
           </TabsContent>
         </Tabs>
@@ -565,7 +471,7 @@ export default function MainParentPage({
 
 const RenderCardDetail = ({ data }: { data: SquareSavedCard | undefined }) => {
 
- 
+
   return (
     <Card className="rounded-[10px] bg-[#1A1A1A] border-[#3A3A3A] sm:w-[250px] w-full">
       <CardContent>

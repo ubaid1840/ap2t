@@ -14,61 +14,26 @@ import {
   Filter,
   OctagonAlert
 } from "lucide-react";
-import { ReactNode, useCallback, useEffect, useMemo, useState } from "react";
+import { ReactNode, useEffect, useMemo, useState } from "react";
 import { GoDotFill } from "react-icons/go";
 
 import CardStatus, { typeClasses } from "@/components/card-status";
 import getInitials from "@/components/parents/get-initials";
 import { CompedDialog } from "@/components/payment/comped-dialog";
+import { CustomEmailDialog } from "@/components/payment/custom-email-dialog";
+import { OverrideDialog } from "@/components/payment/override-dialog";
 import { ViewDialog } from "@/components/payment/view-dialog";
 import RenderAvatar from "@/components/render-avatar";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
+import { useDebounce } from "@/hooks/use-debounce";
+import useSquareConnection from "@/hooks/use-square-connection";
+import { PaymentItem, PaymentsSummaryResponse } from "@/lib/types";
 import { ColumnDef } from "@tanstack/react-table";
 import { ArrowUpDown, CheckCircle, Eye, Send } from "lucide-react";
 import moment from "moment";
-import { OverrideDialog } from "@/components/payment/override-dialog";
-import { useDebounce } from "@/hooks/use-debounce";
-import useSquareConnection from "@/hooks/use-square-connection";
-import { CustomEmailDialog } from "@/components/payment/custom-email-dialog";
 
 
 
-export interface PaymentsSummaryResponse {
-  totalRevenue: number;
-  totalPending: number;
-  totalFailed: number;
-  totalComped: number;
-  paymentsData: PaymentItem[];
-}
-
-
-export interface PaymentItem {
-  id: number;
-  transaction_id: string | null;
-  user_id: number;
-  session_id: number;
-  amount: string;
-  method: string | null;
-  status: "pending" | "paid" | "failed" | "comped" | "completed";
-  paid_at: string | null;
-  created_at: string;
-
-
-  session_name: string | null;
-
-
-  player_user_id: number | null;
-  player_first_name: string | null;
-  player_last_name: string | null;
-  player_picture: string | null;
-  player_name: string;
-
-
-  parent_id: number | null;
-  parent_first_name: string | null;
-  parent_last_name: string | null;
-  parent_name: string;
-}
 
 
 
@@ -137,26 +102,26 @@ export default function Page() {
 
 
   const filteredData = useMemo(() => {
-  if (!payments?.paymentsData) return [];
+    if (!payments?.paymentsData) return [];
 
-  const searchWords = debouncedSearch
-    .toLowerCase()
-    .trim()
-    .split(/\s+/);
+    const searchWords = debouncedSearch
+      .toLowerCase()
+      .trim()
+      .split(/\s+/);
 
-  return payments.paymentsData.filter((item) => {
-    const statusMatch =
-      filter === "All" ||
-      item?.status?.toLowerCase() === filter.toLowerCase();
+    return payments.paymentsData.filter((item) => {
+      const statusMatch =
+        filter === "All" ||
+        item?.status?.toLowerCase() === filter.toLowerCase();
 
-    const toSearch = `${item.player_name} ${item.parent_name} ${item.session_name}`.toLowerCase();
-    const searchMatch =
-      !searchWords.length ||
-      searchWords.every((word : string) => toSearch.includes(word));
+      const toSearch = `${item.player_name} ${item.parent_name} ${item.session_name}`.toLowerCase();
+      const searchMatch =
+        !searchWords.length ||
+        searchWords.every((word: string) => toSearch.includes(word));
 
-    return statusMatch && searchMatch;
-  });
-}, [payments?.paymentsData, filter, debouncedSearch]);
+      return statusMatch && searchMatch;
+    });
+  }, [payments?.paymentsData, filter, debouncedSearch]);
 
 
 
@@ -499,9 +464,9 @@ export default function Page() {
         setVisible((prevState) => ({ ...prevState, show: "" }))
       }} onRefresh={fetchData} />
 
-       <CustomEmailDialog data={visible?.data} open={visible.show === 'email'} onOpenChange={() => {
+      <CustomEmailDialog data={visible?.data} open={visible.show === 'email'} onOpenChange={() => {
         setVisible((prevState) => ({ ...prevState, show: "" }))
-      }}  />
+      }} />
     </div>
   );
 }

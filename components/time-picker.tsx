@@ -1,6 +1,5 @@
 "use client"
 
-import * as React from "react"
 import { Button } from "@/components/ui/button"
 import {
   Popover,
@@ -10,12 +9,7 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { cn } from "@/lib/utils"
 import { Clock } from "lucide-react"
-
-type TimePickerProps = {
-  value?: string // "HH:mm"
-  onChange: (value: string) => void
-  className?: string
-}
+import * as React from "react"
 
 function pad(n: number) {
   return String(n).padStart(2, "0")
@@ -30,7 +24,11 @@ function to24Hour(hour: number, period: "AM" | "PM") {
   return hour === 12 ? 12 : hour + 12
 }
 
-export function TimePicker({ value, onChange, className }: TimePickerProps) {
+export function TimePicker({ value, onChange, className }: {
+  value?: string
+  onChange: (value: string) => void
+  className?: string
+}) {
   const [open, setOpen] = React.useState(false)
 
   const date = value

@@ -145,6 +145,7 @@ export default function MainCoachPage({
           time: session.start_time,
           end_time: session.end_time,
           status: "Booked",
+          end_data : end.format("YYYY-MM-DD")
         });
 
         current = current.clone().add(1, "day");
@@ -166,6 +167,7 @@ export default function MainCoachPage({
           time: m.format("HH:mm"),
           end_time: "",
           status: "Blocked",
+          end_date : undefined
         });
       }
     });

@@ -1,38 +1,22 @@
 "use client";
 
-import { useAuth } from "@/contexts/auth-context";
 import PageTable from "@/components/app-table";
+import ExportExcel from "@/components/export-excel";
 import InputWithIcon from "@/components/input-with-icon";
 import { PARENT_COLUMNS } from "@/components/parents/columns";
-import { PARENT_DATA } from "@/components/parents/constatns";
 import { CreateParent } from "@/components/parents/create-parent";
 import Header from "@/components/parents/header";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import axios from "@/lib/axios";
-import { Download, Filter, Plus } from "lucide-react";
-import { useEffect, useState } from "react";
-import moment from "moment";
-import ExportExcel from "@/components/export-excel";
-import { joinNames } from "@/lib/functions";
+import { useAuth } from "@/contexts/auth-context";
 import { useDebounce } from "@/hooks/use-debounce";
+import axios from "@/lib/axios";
+import { ParentData } from "@/lib/types";
+import { Filter } from "lucide-react";
+import moment from "moment";
+import { useEffect, useState } from "react";
 
-export interface ParentData {
-  id: number | string;
-  name: string;
-  joining_date: string; 
-  email: string;
-  number: string | null;
-  location: string;
-  children: string;
-  card_status: string;
-  total_spent: string;
-  last_spent: string;
-  last_transaction_date: string; 
-  zip_code:string;
-}
 
 export default function Page() {
   const [filter, setFilter] = useState(false);
@@ -40,10 +24,10 @@ export default function Page() {
   const [loading, setLoading] = useState(false)
   const [search, setSearch] = useState("")
   // const [paymentStatusSearch,setPaymentStatusSearch]=useState("")
-  const [zipCodeSearch,setZipCodeSearch] =useState("")
+  const [zipCodeSearch, setZipCodeSearch] = useState("")
   const debouncedSearch = useDebounce(search, 300);
-// const debouncedPayment = useDebounce(paymentStatusSearch, 300);
-const debouncedZip = useDebounce(zipCodeSearch, 300);
+  // const debouncedPayment = useDebounce(paymentStatusSearch, 300);
+  const debouncedZip = useDebounce(zipCodeSearch, 300);
   const { user } = useAuth();
 
   useEffect(() => {
@@ -72,37 +56,37 @@ const debouncedZip = useDebounce(zipCodeSearch, 300);
       last_transaction_date: p.last_transaction_date
         ? moment(new Date(p.last_transaction_date)).format("YYYY-MM-DD")
         : "N/A",
-        zip_code:p.zip_code
+      zip_code: p.zip_code
     }));
     setParents(parentsmapped);
     setLoading(false)
   };
 
- const filteredData = parents.filter((item) => {
-  const text = `${item.name} ${item.email} ${item.number}`.toLowerCase();
-  const zip = `${item.zip_code ?? ""}`.toLowerCase();
+  const filteredData = parents.filter((item) => {
+    const text = `${item.name} ${item.email} ${item.number}`.toLowerCase();
+    const zip = `${item.zip_code ?? ""}`.toLowerCase();
 
-  const searchWords = debouncedSearch
-    ?.toLowerCase()
-    .trim()
-    .split(/\s+/)
-    .filter(Boolean); // remove empty strings
+    const searchWords = debouncedSearch
+      ?.toLowerCase()
+      .trim()
+      .split(/\s+/)
+      .filter(Boolean); // remove empty strings
 
-  const matchesSearch =
-    !searchWords?.length ||
-    searchWords.every((word : string) => text.includes(word));
+    const matchesSearch =
+      !searchWords?.length ||
+      searchWords.every((word: string) => text.includes(word));
 
-  const matchesZip =
-    !debouncedZip || zip.includes(debouncedZip.toLowerCase());
+    const matchesZip =
+      !debouncedZip || zip.includes(debouncedZip.toLowerCase());
 
-  return matchesSearch && matchesZip;
-});
+    return matchesSearch && matchesZip;
+  });
 
   return (
     <div className="flex flex-col w-full gap-6">
       <Header totalParents={parents.length}>
         <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
-          <ExportExcel header={["Parent", "Joining Date", "Email", "Contact", "Location", "children", "Card Status", "Total Spent", "Last Spent", "Last Transaction Date"]} fileName="parents_data.xlsx" data={parents.map((item)=>[
+          <ExportExcel header={["Parent", "Joining Date", "Email", "Contact", "Location", "children", "Card Status", "Total Spent", "Last Spent", "Last Transaction Date"]} fileName="parents_data.xlsx" data={parents.map((item) => [
             item?.name || "",
             item?.joining_date || "",
             item?.email || "",
@@ -113,7 +97,7 @@ const debouncedZip = useDebounce(zipCodeSearch, 300);
             item?.total_spent || "",
             item?.last_spent || "",
             item?.last_transaction_date || ""
-          ])}/>
+          ])} />
 
           <CreateParent onRefresh={async () => {
             await fetchData()
@@ -124,7 +108,7 @@ const debouncedZip = useDebounce(zipCodeSearch, 300);
       <div className="flex flex-col gap-4 rounded-[14px] bg-#252525 border border-[#3A3A3A] p-4 bg-[#252525]">
         <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
           <div className="w-full">
-            <InputWithIcon value={search} onChange={(e)=> setSearch(e.target.value)} placeholder="Search by name, email, or phone..." />
+            <InputWithIcon value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search by name, email, or phone..." />
           </div>
 
           <Button onClick={() => setFilter(!filter)}>
@@ -144,7 +128,7 @@ const debouncedZip = useDebounce(zipCodeSearch, 300);
 
               <div className="flex flex-1 flex-col gap-2">
                 <Label className="text-muted-foreground">Zip Code</Label>
-                <InputWithIcon value={zipCodeSearch} onChange={(e)=> setZipCodeSearch(e.target.value)} placeholder="Search By Zip Code..." />
+                <InputWithIcon value={zipCodeSearch} onChange={(e) => setZipCodeSearch(e.target.value)} placeholder="Search By Zip Code..." />
 
               </div>
             </div>

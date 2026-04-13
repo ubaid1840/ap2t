@@ -17,9 +17,9 @@ import axios from "@/lib/axios"
 import { SquarePen } from "lucide-react"
 import { useEffect, useState } from "react"
 import { IoIosStar, IoIosStarOutline } from "react-icons/io"
-import SelectSession from "./select-session"
-import { Spinner } from "../ui/spinner"
 import { ScrollArea } from "../ui/scroll-area"
+import { Spinner } from "../ui/spinner"
+import SelectSession from "./select-session"
 
 export function AddCoachNotes({ player_id, onRefresh }: { player_id: number | undefined, onRefresh: () => Promise<void> }) {
   const [open, setOpen] = useState(false)

@@ -14,23 +14,12 @@ import { Separator } from "@/components/ui/separator"
 import { useAuth } from "@/contexts/auth-context"
 import axios from "@/lib/axios"
 import { getYear, joinNames } from "@/lib/functions"
+import { PlayerData } from "@/lib/types"
 import { Filter } from "lucide-react"
 import moment from "moment"
 import { useEffect, useState } from "react"
 
-export interface PlayerData {
-    id: number | string;
-    name: string;
-    coach_name: string;
-    age: string;
-    position: string;
-    phone: string | null;
-    parent: string;
-    last_session: string;
-    last_session_date: string;
-    attendance: string;
-    joining_date: string | Date | null;
-}
+
 
 export default function Page() {
 

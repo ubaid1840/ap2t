@@ -7,6 +7,7 @@ import { Separator } from "@/components/ui/separator";
 import { useAuth } from "@/contexts/auth-context";
 import axios from "@/lib/axios";
 import { calcualteRevenu, joinNames } from "@/lib/functions";
+import { PrmotionsType } from "@/lib/types";
 import {
   Calendar,
   DollarSign,
@@ -22,40 +23,7 @@ import { GoDotFill } from "react-icons/go";
 
 const allFilters = ["All", "Active", "Upcoming", "Archive"]
 
-type PrmotionsType = {
-  id: number;
-  name: string;
-  description: string;
-  status: "all" | "completed" | "upcoming" | "cancelled" | "ongoing" | string;
-  session_type: string;
-  coach_id: number;
-  location: string;
-  start_time: string;
-  end_time: string;
-  time: string;
-  date: string;
-  end_date: string | null;
-  price: string;
-  promotion_price: string | null;
-  save: number;
-  max_players: number;
-  apply_promotion: boolean;
-  show_storefront: boolean;
-  image: string;
-  created_at: string;
-  coach_first_name: string;
-  coach_last_name: string;
-  coachName: string;
-  payment_statuses: string[];
-  store_front: boolean
-  participants: {
-    user_id: number;
-  }[];
-  total_participants: number;
-  total_revenue: number;
-  rawData: any
-  promotion_end: string | null
-}
+
 
 export default function Page() {
   const [filter, setFilter] = useState<

@@ -1,12 +1,12 @@
-import { useState } from "react";
-import { Button } from "../ui/button"
-import { TabsContent } from "../ui/tabs"
-import { LocalInput } from "./button-and-switch"
-import { toast } from "sonner";
-import { auth } from "@/lib/firebase";
 import { useAuth } from "@/contexts/auth-context";
+import { auth } from "@/lib/firebase";
 import { EmailAuthProvider, reauthenticateWithCredential, updatePassword } from "firebase/auth";
+import { useState } from "react";
+import { toast } from "sonner";
+import { Button } from "../ui/button";
 import { Spinner } from "../ui/spinner";
+import { TabsContent } from "../ui/tabs";
+import { LocalInput } from "./button-and-switch";
 
 
 const Security = () => {

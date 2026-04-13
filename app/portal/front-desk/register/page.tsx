@@ -25,36 +25,22 @@ import { File, FileWarning, Plus, User, Wallet } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
-import PageTable from "@/components/app-table"
-import ExportExcel from "@/components/export-excel"
-import InputWithIcon from "@/components/input-with-icon"
-import { PLAYERS_COLUMNS } from "@/components/players/columns"
-import { CreatePlayer } from "@/components/players/create-player"
-import Header from "@/components/players/header"
+import PageTable from "@/components/app-table";
+import InputWithIcon from "@/components/input-with-icon";
+import Header from "@/components/players/header";
 
-import { useAuth } from "@/contexts/auth-context"
+import { useAuth } from "@/contexts/auth-context";
 
-import { getYear, joinNames } from "@/lib/functions"
-import { Filter } from "lucide-react"
-import moment from "moment"
 import { PLAYERS_COLUMNS_FD } from "@/components/frontdesk/columns";
 import { Dialog, DialogContent, DialogHeader, DialogOverlay, DialogTitle } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { getYear, joinNames } from "@/lib/functions";
+import { PlayerData } from "@/lib/types";
+import { Filter } from "lucide-react";
+import moment from "moment";
 
 
-export interface PlayerData {
-    id: number | string;
-    name: string;
-    coach_name: string;
-    age: string;
-    position: string;
-    phone: string | null;
-    parent: string;
-    last_session: string;
-    last_session_date: string;
-    attendance: string;
-    joining_date: string | Date | null;
-}
+
 
 export default function Page() {
 
@@ -509,9 +495,9 @@ export function RegistrationDialog({ onRefresh }: { onRefresh: () => Promise<voi
                                     }
                                 />
                             </div>
-                       
 
-                        
+
+
                             <div className="flex-1">
                                 <Label className="text-sm">Birth Date <RequiredStar /></Label>
                                 <AppCalendar
@@ -534,7 +520,7 @@ export function RegistrationDialog({ onRefresh }: { onRefresh: () => Promise<voi
                                     }
                                 />
                             </div>
-                       
+
                             <div className="flex-1">
                                 <Label className="text-sm">Zip Code <RequiredStar /></Label>
                                 <Input
@@ -562,7 +548,7 @@ export function RegistrationDialog({ onRefresh }: { onRefresh: () => Promise<voi
                                     }
                                 />
                             </div>
-                       
+
                             <div className="flex-1">
                                 <Label className="text-sm">Password <RequiredStar /></Label>
                                 <Input
@@ -631,7 +617,7 @@ export function RegistrationDialog({ onRefresh }: { onRefresh: () => Promise<voi
                                             }
                                         />
                                     </div>
-                                
+
                                     <div className="flex-1">
                                         <Label className="text-sm">Birth Date <RequiredStar /></Label>
                                         <AppCalendar
@@ -654,7 +640,7 @@ export function RegistrationDialog({ onRefresh }: { onRefresh: () => Promise<voi
                                             }
                                         />
                                     </div>
-                               
+
                                     <div className="space-y-2">
                                         <Label className="text-sm">Zip Code <RequiredStar /></Label>
                                         <Input
@@ -682,7 +668,7 @@ export function RegistrationDialog({ onRefresh }: { onRefresh: () => Promise<voi
                                             }
                                         />
                                     </div>
-                               
+
                                     <div className="flex-1">
                                         <Label className="text-sm">Password <RequiredStar /></Label>
                                         <Input

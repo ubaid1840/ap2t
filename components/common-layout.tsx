@@ -16,7 +16,7 @@ export default async function CommonLayout({ children }: { children: ReactNode }
             <SidebarInset>
               <div className="flex flex-1 flex-col">
                 <div className="w-full bg-[#252525] h-[61.5px]">
-                <DashboardHeader trigger={<SidebarTrigger />}/>
+                  <DashboardHeader trigger={<SidebarTrigger />} />
                 </div>
                 <div className="flex flex-1">{children}</div>
               </div>

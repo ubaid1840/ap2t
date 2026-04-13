@@ -1,7 +1,7 @@
 import { ReactNode } from "react";
-import { Switch } from "../ui/switch";
-import { Label } from "../ui/label";
 import { Input } from "../ui/input";
+import { Label } from "../ui/label";
+import { Switch } from "../ui/switch";
 
 
 export const LocalSwitch = ({

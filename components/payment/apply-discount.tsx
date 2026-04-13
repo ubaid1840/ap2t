@@ -1,8 +1,8 @@
 import axios from "@/lib/axios";
+import { Payment } from "@/lib/types";
 import { DialogClose } from "@radix-ui/react-dialog";
 import { useState } from "react";
 import { toast } from "sonner";
-import { Payment } from "../players/main-player-page";
 import { Button } from "../ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
 import { Input } from "../ui/input";

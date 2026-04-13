@@ -6,12 +6,12 @@ import CardStatus from "../card-status";
 import DummyButton from "../dummy-button";
 
 
-export type SessionData = {
+type SessionData = {
   id: number;
   sessionName: string;
   type: string;
   date: string;
-  end_date:string;
+  end_date: string;
   time: string;
   coachName: string;
   playerName: string;
@@ -19,32 +19,6 @@ export type SessionData = {
   payment: "paid" | "pending" | "comped" | "failed";
   status: "upcoming" | "completed" | "cancelled" | "comped";
 };
-
-
-type CardStatusType =
-  | "success"
-  | "warning"
-  | "danger"
-  | "info"
-  | "active"
-  | "ghost"
-  | "alternative";
-
-const paymentStatusMap: Record<SessionData["payment"], CardStatusType> = {
-  paid: "active",
-  pending: "warning",
-  comped: "alternative",
-  failed: "danger"
-};
-
-const sessionStatusMap: Record<SessionData["status"], CardStatusType> = {
-  completed: "active",
-  upcoming: "info",
-  cancelled: "danger",
-  comped: "alternative"
-};
-
-
 
 
 export const SESSION_COLUMNS: ColumnDef<SessionData>[] = [
@@ -96,14 +70,14 @@ export const SESSION_COLUMNS: ColumnDef<SessionData>[] = [
         <ArrowUpDown />
       </Button>
     ),
-    cell: ({ row }) =>{
-       return(
-      <div className="leading-tight">
-        <div className="text-[#D1D5DC]">{row.original.date}-{row.original.end_date}</div>
-        <div className="text-xs text-[#9CA3AF]">{row.original.time}</div>
-      </div>
-    )
-  }
+    cell: ({ row }) => {
+      return (
+        <div className="leading-tight">
+          <div className="text-[#D1D5DC]">{row.original.date}-{row.original.end_date}</div>
+          <div className="text-xs text-[#9CA3AF]">{row.original.time}</div>
+        </div>
+      )
+    }
 
   },
 

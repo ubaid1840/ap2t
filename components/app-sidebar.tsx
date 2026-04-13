@@ -13,19 +13,17 @@ import {
 } from "@/components/ui/sidebar";
 
 import { Icons } from "@/components/icons";
+import { useAuth } from "@/contexts/auth-context";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { admin_nav_items, coach_nav_items, front_desk_items, parent_nav_items, player_nav_items } from "@/lib/constants";
+import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Button } from "./ui/button";
-import { ScrollArea, ScrollBar } from "./ui/scroll-area";
-import { cn } from "@/lib/utils";
-import { useAuth } from "@/contexts/auth-context";
 import { useEffect, useState } from "react";
-import { Dialog, DialogTrigger } from "./ui/dialog";
-import GetSupportDialog from "./get-sport-dialog/getsupportddialog";
-import { useApproval } from "./frontdesk/use-approval";
 import CountBadge from "./count-badge";
+import { useApproval } from "./frontdesk/use-approval";
+import GetSupportDialog from "./get-support-dialog/getsupportddialog";
+import { ScrollArea, ScrollBar } from "./ui/scroll-area";
 
 
 export const company = {
@@ -115,7 +113,7 @@ export default function AppSidebar() {
                         >
                           <Icon />
                           <span className="text-[14px]">{item.title}  </span>
-                          {item?.title === 'Front Desk' && <CountBadge count={approvalCount}/>}
+                          {item?.title === 'Front Desk' && <CountBadge count={approvalCount} />}
                         </Link>
                       </SidebarMenuButton>
                     </SidebarMenuItem>

@@ -1,21 +1,20 @@
-import { PaymentItem } from "@/app/portal/admin/payments/page";
 import axios from "@/lib/axios";
+import { PaymentItem } from "@/lib/types";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { DialogClose } from "@radix-ui/react-dialog";
 import { OctagonAlert } from "lucide-react";
 import { useState } from "react";
+import { Controller, useForm } from "react-hook-form";
+import z from "zod";
+import { RequiredStar } from "../required-star";
 import { Button } from "../ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
+import { Field, FieldError } from "../ui/field";
 import { Label } from "../ui/label";
 import { ScrollArea } from "../ui/scroll-area";
 import { Spinner } from "../ui/spinner";
 import { Textarea } from "../ui/textarea";
 import SelectCompCategory from "./select-comp-cateegory";
-import { toast } from "sonner";
-import z from "zod";
-import { Controller, useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { RequiredStar } from "../required-star";
-import { Field, FieldError } from "../ui/field";
 
 type CompedDialogProps = {
   data: PaymentItem;
@@ -116,7 +115,7 @@ export function CompedDialog({
                 </div>
               </div>
               <div className="space-y-2">
-                
+
 
                 <Controller
                   name="comped_category"
@@ -146,7 +145,7 @@ export function CompedDialog({
                       <Label className="text-sm text-[#99A1AF]">
                         Comp Reason <RequiredStar />
                       </Label>
-                      
+
                       <Textarea
                         value={field.value}
                         onChange={field.onChange}

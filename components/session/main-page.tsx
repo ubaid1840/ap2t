@@ -15,7 +15,7 @@ import {
   DialogTitle
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Select,
   SelectContent,
@@ -91,7 +91,7 @@ export default function SessionMainPage({ id, back, back_title, admin = false }:
     }
   }, [id]);
 
-  const allowed =  isAdmin ? true : user?.id === data?.coach_id ? true : false
+  const allowed = isAdmin ? true : user?.id === data?.coach_id ? true : false
 
   const fetchData = async () => {
     try {
@@ -116,7 +116,7 @@ export default function SessionMainPage({ id, back, back_title, admin = false }:
           location: d.location,
           comped: d.comped,
           description: d.description,
-          coach_id : d.coach_id
+          coach_id: d.coach_id
         } as any);
       }
     } finally {
@@ -270,7 +270,7 @@ export default function SessionMainPage({ id, back, back_title, admin = false }:
                   }} />
                 }
 
-             {allowed && data &&   <EditSessionDialog
+                {allowed && data && <EditSessionDialog
                   coach_id={admin ? null : user?.id}
                   sessionId={id}
                   sessionData={rawSessionData}
@@ -497,7 +497,7 @@ export default function SessionMainPage({ id, back, back_title, admin = false }:
           <TabsContent value="Notes" className="space-y-4 p-4">
             <div className="flex justify-between items-center">
               <h1 className="text-lg ">Internal Notes</h1>
-             { allowed && <AddNoteDialog session_id={Number(id)} onRefresh={async () => {
+              {allowed && <AddNoteDialog session_id={Number(id)} onRefresh={async () => {
                 await fetchNotes()
               }} />}
             </div>

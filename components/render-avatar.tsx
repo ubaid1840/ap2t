@@ -1,7 +1,7 @@
+import { GetProfileImage } from "@/lib/functions";
 import { memo, useEffect, useState } from "react";
 import getInitials from "./parents/get-initials";
-import { Avatar, AvatarImage, AvatarFallback } from "./ui/avatar";
-import { GetProfileImage } from "@/lib/functions";
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Spinner } from "./ui/spinner";
 
 

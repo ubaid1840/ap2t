@@ -1,22 +1,22 @@
 import { useAuth } from "@/contexts/auth-context"
-import RenderAvatar from "../render-avatar"
-import { TabsContent } from "../ui/tabs"
-import { Loader2, MapPin, MessageSquare, Phone, Plus, User } from "lucide-react"
-import { Button } from "../ui/button"
-import { LocalInput } from "./button-and-switch"
-import { FaUser } from "react-icons/fa6"
-import { Label } from "../ui/label"
-import AppCalendar from "../app-calendar"
-import { memo, useRef, useState } from "react"
+import axios from "@/lib/axios"
+import { storage } from "@/lib/firebase"
 import { joinNames } from "@/lib/functions"
 import { uploadProfileImage } from "@/lib/upload-profile-image"
-import axios from "@/lib/axios"
 import { deleteObject, ref } from "firebase/storage"
-import { storage } from "@/lib/firebase"
-import { ProfileInfoProps } from "@/app/portal/admin/settings/page"
+import { Loader2, MapPin, MessageSquare, Phone, Plus, User } from "lucide-react"
+import { memo, useRef, useState } from "react"
+import { FaUser } from "react-icons/fa6"
+import AppCalendar from "../app-calendar"
+import RenderAvatar from "../render-avatar"
+import { Button } from "../ui/button"
+import { Label } from "../ui/label"
+import { TabsContent } from "../ui/tabs"
+import { LocalInput } from "./button-and-switch"
+import { ProfileInfoProps } from "@/lib/types"
 
 
-const ProfileInfo = ({ profileInfo, setProfileInfo, profileImage, setProfileImage }: { profileInfo: ProfileInfoProps, setProfileInfo: (val: any) => void, profileImage: string | null |undefined, setProfileImage: (val: string | null | undefined) => void }) => {
+const ProfileInfo = ({ profileInfo, setProfileInfo, profileImage, setProfileImage }: { profileInfo: ProfileInfoProps, setProfileInfo: (val: any) => void, profileImage: string | null | undefined, setProfileImage: (val: string | null | undefined) => void }) => {
     const { user } = useAuth()
     const fileInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -64,7 +64,7 @@ const ProfileInfo = ({ profileInfo, setProfileInfo, profileImage, setProfileImag
     };
 
     return (
-        <TabsContent value="Profile info"  className="space-y-4">
+        <TabsContent value="Profile info" className="space-y-4">
             <div className="space-y-1">
                 <h1 className="text-[18px] font normal">Profile Information</h1>
                 <p className="text-xs text-muted-foreground">

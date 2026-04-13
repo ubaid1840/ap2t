@@ -42,8 +42,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { Spinner } from "./ui/spinner";
 import { useSidebar } from "./ui/sidebar";
+import { Spinner } from "./ui/spinner";
 
 const PageTable = ({
   columns,
@@ -53,7 +53,7 @@ const PageTable = ({
   onRowClick = (a: any, b: any) => { },
   loading = false,
   headerClassName = "",
-  scrollAreaWidth=""
+  scrollAreaWidth = ""
 }: any) => {
   // const [sorting, setSorting] = useState([]);
   // const [columnFilters, setColumnFilters] = useState([]);
@@ -65,7 +65,7 @@ const PageTable = ({
     pageIndex: currentPage - 1,
     pageSize: pageSize,
   };
-  const {open} = useSidebar()
+  const { open } = useSidebar()
 
 
   const pageCount = Math.ceil(data.length / pageSize);
@@ -195,7 +195,7 @@ const PageTable = ({
                         <SelectValue placeholder={paginationState.pageSize} />
                       </SelectTrigger>
                       <SelectContent side="top">
-                        {pageSizeOptions.map((pageSize : number) => (
+                        {pageSizeOptions.map((pageSize: number) => (
                           <SelectItem key={pageSize} value={`${pageSize}`}>
                             {pageSize}
                           </SelectItem>
@@ -265,4 +265,4 @@ const PageTable = ({
     </div>
   );
 };
-export default memo(PageTable) ;
+export default memo(PageTable);

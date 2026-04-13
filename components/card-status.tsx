@@ -20,10 +20,10 @@ export const typeClasses = {
     upcoming: "bg-info-bg text-info-text border-info-text/32",
     pending: "bg-warning-bg text-warning-text border-warning-text/32",
     inactive: "bg-ghost-bg text-ghost-text border-ghost-text/32",
-    enabled:"bg-success-bg text-success-text border-success-text/32",
-    disabled:"bg-warning-bg text-warning-text border-warning-text/32",
-    connected : "bg-alternative-bg text-alternative-text border-alternative-text/32",
-    disconnected : "bg-warning-bg text-warning-text border-warning-text/32"
+    enabled: "bg-success-bg text-success-text border-success-text/32",
+    disabled: "bg-warning-bg text-warning-text border-warning-text/32",
+    connected: "bg-alternative-bg text-alternative-text border-alternative-text/32",
+    disconnected: "bg-warning-bg text-warning-text border-warning-text/32"
 }
 
 export const IconType = {
@@ -36,8 +36,8 @@ export const IconType = {
     attended: <CircleCheckBig size={14} />,
     connected: <GoDotFill size={14} />,
     completed: <CircleCheckBig size={14} />,
-    disconnected : <CircleX size={14} />,
-    comped : <CircleCheckBig size={14}/>
+    disconnected: <CircleX size={14} />,
+    comped: <CircleCheckBig size={14} />
 }
 
 interface CardStatusProps {
@@ -48,43 +48,43 @@ interface CardStatusProps {
 
 const CardStatus = ({ value, icon = false, className = "" }: CardStatusProps) => {
 
-   
 
-   if (value === undefined || value === null) return null
+
+    if (value === undefined || value === null) return null
 
     let str: string = ""
     let localIcon: null | ReactNode = null
     let localType = typeClasses.other
 
-    
+
     const numericValue =
-  typeof value === "string" && !isNaN(Number(value))
-    ? Number(value)
-    : value
+        typeof value === "string" && !isNaN(Number(value))
+            ? Number(value)
+            : value
 
-if (typeof numericValue === "number") {
-  str = String(numericValue)
+    if (typeof numericValue === "number") {
+        str = String(numericValue)
 
-  localIcon =
-    numericValue > 90
-      ? <TrendingUp size={14} />
-      : numericValue >= 80
-      ? <DashIcon />
-      : <TrendingDown size={14} />
+        localIcon =
+            numericValue > 90
+                ? <TrendingUp size={14} />
+                : numericValue >= 80
+                    ? <DashIcon />
+                    : <TrendingDown size={14} />
 
-  localType =
-    numericValue > 90
-      ? typeClasses.success
-      : numericValue >= 80
-      ? typeClasses.warning
-      : typeClasses.danger
-}
-else if (typeof value === "string") {
-  str = value.charAt(0).toUpperCase() + value.slice(1)
+        localType =
+            numericValue > 90
+                ? typeClasses.success
+                : numericValue >= 80
+                    ? typeClasses.warning
+                    : typeClasses.danger
+    }
+    else if (typeof value === "string") {
+        str = value.charAt(0).toUpperCase() + value.slice(1)
 
-  localIcon = IconType[value as keyof typeof IconType] ?? null
-  localType = typeClasses[value as keyof typeof typeClasses] ?? typeClasses.other
-}
+        localIcon = IconType[value as keyof typeof IconType] ?? null
+        localType = typeClasses[value as keyof typeof typeClasses] ?? typeClasses.other
+    }
 
     return (
         <div

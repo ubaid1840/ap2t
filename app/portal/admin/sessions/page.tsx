@@ -11,22 +11,12 @@ import { Separator } from "@/components/ui/separator";
 import { useAuth } from "@/contexts/auth-context";
 import axios from "@/lib/axios";
 import { joinNames } from "@/lib/functions";
+import { SessionProps } from "@/lib/types";
 import { Calendar, Filter, List } from "lucide-react";
 import moment, { Moment } from "moment";
 import { ReactNode, useEffect, useState } from "react";
 
-export type SessionProps = {
-  id: number,
-  sessionName: string,
-  type: string,
-  date: string,
-  time: string,
-  end_date: string,
-  coachName: string,
-  price: string | number,
-  status: string
-  original: any
-}
+
 
 export default function Page() {
   const [filter, setFilter] = useState(false);

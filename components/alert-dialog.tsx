@@ -8,19 +8,10 @@ import {
   AlertDialogHeader,
   AlertDialogTitle
 } from "@/components/ui/alert-dialog";
+import { ConfirmationProps } from "@/lib/types";
 import { Spinner } from "./ui/spinner";
-import { ReactNode } from "react";
 
-type ConfirmationProps = {
-  title: string
-  description: string
-  onPressYes: () => Promise<void>
-  onPressCancel: () => void
-  open: boolean
-  loading: boolean
-  children?: null | ReactNode
-  valid?: boolean
-}
+
 const ConfirmationDialog = ({ title, description, onPressYes, onPressCancel, open, loading, children = null, valid = true }: ConfirmationProps) => {
   return (
     <AlertDialog open={open}>

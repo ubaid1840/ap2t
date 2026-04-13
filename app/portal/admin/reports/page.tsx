@@ -5,10 +5,8 @@ import { BarChart } from "@/components/charts/bar-chart";
 import LineChart from "@/components/charts/line-chart-dots";
 import PieChart from "@/components/charts/pie-chart";
 import { PLAYER_ATTENDANCE_DATA_COLUMNS, ZIP_REVENUE_DATA_COLUMNS } from "@/components/settings/columns";
-import { MONTHLY_SESSIONS_CONFIG, SESSION_TYPE_CHART_CONFIG } from "@/components/settings/constants";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useSidebar } from "@/components/ui/sidebar";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -16,7 +14,9 @@ import { Spinner } from "@/components/ui/spinner";
 import { useAuth } from "@/contexts/auth-context";
 import { useIsMobile } from "@/hooks/use-mobile";
 import axios from "@/lib/axios";
+import { MONTHLY_SESSIONS_CONFIG, SESSION_TYPE_CHART_CONFIG } from "@/lib/constants";
 import { exportDashboardToExcel, exportToExcel } from "@/lib/functions";
+import { DashboardDataResponse } from "@/lib/types";
 
 import {
   ChartColumn,
@@ -32,72 +32,7 @@ import moment from "moment";
 import { ReactNode, useEffect, useState } from "react";
 
 
-// ----------------------------
-// Totals Section
-// ----------------------------
-export type Totals = {
-  totalRevenue: number;      // sum of all paid payments
-  totalSessions: number;     // total sessions
-  totalPending: number;      // total payments with status 'pending'
-  totalComped: number;       // total payments with status 'comped'
-  averageAttendance: number; // average attendance percentage across all sessions
-};
 
-// ----------------------------
-// Revenue By Coach
-// ----------------------------
-export type RevenueByCoachItem = {
-  coach: string;  // e.g., "Coach Ali"
-  value: number;  // revenue sum
-};
-
-// ----------------------------
-// Sessions by Type
-// ----------------------------
-export type SessionTypeItem = {
-  name: string;   // e.g., "Private Session"
-  value: number;  // count of sessions of this type
-  fill: string;   // chart color variable
-};
-
-// ----------------------------
-// Monthly Revenue Trend
-// ----------------------------
-export type MonthlyRevenueItem = {
-  month: string;  // e.g., "July"
-  value: number;  // revenue sum for the month
-};
-
-// ----------------------------
-// Player Attendance Data
-// ----------------------------
-export type PlayerAttendanceItem = {
-  id: number;           // unique ID assigned in the response
-  name: string;         // player's full name
-  sessions: number;     // total sessions enrolled
-  attended: number;     // sessions attended
-  missed: number;       // sessions missed
-  attendance_rate: number; // attendance percentage
-};
-
-export type ZipcodeItem = {
-  avg_revenue: string
-  total_revenue: string
-  total_users: string
-  zip_code: string
-}
-
-// ----------------------------
-// Full Response Type
-// ----------------------------
-export type DashboardDataResponse = {
-  totals: Totals;
-  revenueByCoach: RevenueByCoachItem[];
-  sessionTypeData: SessionTypeItem[];
-  monthlyRevenueTrend: MonthlyRevenueItem[];
-  playerAttendanceData: PlayerAttendanceItem[];
-  zipcodeData: ZipcodeItem[]
-};
 
 
 export default function Page() {
@@ -134,8 +69,8 @@ export default function Page() {
     const startDate = start ? moment(start).format("YYYY-MM-DD") : null
     const endDate = end ? moment(end).format("YYYY-MM-DD") : null
 
-    if(!startDate || !endDate) return
-    
+    if (!startDate || !endDate) return
+
     setFilterLoading(true)
     try {
       const response = await axios.get(`/admin/report?filter=true&start=${startDate}&end=${endDate}`)
@@ -200,7 +135,7 @@ export default function Page() {
     sheetName: "Revenue by Coach",
     headers: ["Coach", "Revenue"],
     rows:
-      reports?.revenueByCoach.map((r) => [
+      reports?.revenueByCoach?.map((r) => [
         r.coach,
         String(r.value),
       ]) ?? [],

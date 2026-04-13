@@ -1,11 +1,11 @@
 "use client"
 
 import axios from "@/lib/axios"
+import { SquareSavedCard } from "@/lib/types"
 import { useRef, useState } from "react"
 import { Button } from "../ui/button"
 import { Spinner } from "../ui/spinner"
 import SquareCard, { SquareCardRef } from "./square-card"
-import { SquareSavedCard } from "@/lib/types"
 
 export default function PaymentMethodSteps({ id, data, onRefresh }: { id: string | number | undefined, data?: SquareSavedCard, onRefresh: () => Promise<void> }) {
 
@@ -36,14 +36,14 @@ export default function PaymentMethodSteps({ id, data, onRefresh }: { id: string
 
     }
 
-    async function handleDeleteCard(){
+    async function handleDeleteCard() {
         try {
             setDeleteLoading(true)
             await axios.put(`/user`, {
-                id : id,
-                cardholder_name : "",
-                square_card_id : "",
-                card_active : false
+                id: id,
+                cardholder_name: "",
+                square_card_id: "",
+                card_active: false
             })
             await onRefresh()
         } finally {
@@ -73,14 +73,14 @@ export default function PaymentMethodSteps({ id, data, onRefresh }: { id: string
 
                 <div className="flex gap-2 flex-wrap">
 
-                {data?.id &&
-                    <Button disabled={deleteLoading} onClick={() => handleDeleteCard()} variant="destructive" size="sm">
-                     {deleteLoading && <Spinner className="text-white"/>}   Delete
+                    {data?.id &&
+                        <Button disabled={deleteLoading} onClick={() => handleDeleteCard()} variant="destructive" size="sm">
+                            {deleteLoading && <Spinner className="text-white" />}   Delete
+                        </Button>
+                    }
+                    <Button onClick={() => setOpen(!open)} variant="outline" size="sm">
+                        {data?.id ? "Update" : "Add"}
                     </Button>
-                }
-                <Button onClick={() => setOpen(!open)} variant="outline" size="sm">
-                    {data?.id ? "Update" : "Add"}
-                </Button>
                 </div>
             </div>
 

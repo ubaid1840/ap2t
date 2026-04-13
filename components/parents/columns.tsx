@@ -1,28 +1,13 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { ParentData } from "@/lib/types";
 import { ColumnDef } from "@tanstack/react-table";
-import { ArrowUpDown, CircleCheckBig, CircleX, Eye, Hash, Info, Mail, MapPin, Phone, Users } from "lucide-react";
+import { ArrowUpDown, Eye, Mail, MapPin, Phone, Users } from "lucide-react";
 import Link from "next/link";
 import { IoIosPin } from "react-icons/io";
-import getInitials from "./get-initials";
 import CardStatus from "../card-status";
 import DummyButton from "../dummy-button";
-
-
-export interface ParentData {
-    id: number
-    name: string;
-    joining_date: string;
-    email: string;
-    number: string;
-    location: string;
-    children: number;
-    card_status: string;
-    total_spent: number;
-    last_spent: number;
-    last_transaction_date: string;
-    zip_code:string
-}
+import getInitials from "./get-initials";
 
 export const PARENT_COLUMNS: ColumnDef<ParentData>[] = [
     {
@@ -152,8 +137,8 @@ export const PARENT_COLUMNS: ColumnDef<ParentData>[] = [
         ),
         cell: ({ row }) => {
             return (
-                 <div className="w-25">
-                <CardStatus value={row.original.card_status} icon={true} />
+                <div className="w-25">
+                    <CardStatus value={row.original.card_status} icon={true} />
                 </div>
             )
         },
@@ -189,7 +174,7 @@ export const PARENT_COLUMNS: ColumnDef<ParentData>[] = [
         >ACTIONS</div>,
         cell: ({ row }) => (
             <Link href={`/portal/admin/parents/${row.original.id}`}>
-               <DummyButton>
+                <DummyButton>
                     <Eye /> View
                 </DummyButton>
             </Link>

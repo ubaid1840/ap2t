@@ -1,6 +1,7 @@
 "use client";
 import { useAuth } from "@/contexts/auth-context";
 import axios from "@/lib/axios";
+import { BookedSession, SessionCoach, SessionType } from "@/lib/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Calendar,
@@ -49,15 +50,8 @@ import {
 import { Separator } from "../ui/separator";
 import { Spinner } from "../ui/spinner";
 import { AssignCoachDialog } from "./assign-coach-dialog";
-import { SessionCoach, sessionSchema, SessionType } from "./create-session-dialog";
+import { sessionSchema, } from "./create-session-dialog";
 
-type BookedSession = {
-  name: string;
-  date: string;
-  end_date: string;
-  start_time: string;
-  end_time: string;
-};
 
 interface EditSessionDialogProps {
   sessionId?: number;

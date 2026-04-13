@@ -1,16 +1,16 @@
-import { useEffect, useState } from "react";
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "../ui/select";
 import axios from "@/lib/axios";
+import { useEffect, useState } from "react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { Spinner } from "../ui/spinner";
 
 type SelectProps = {
     value: string
     onChange: (val: string) => void
-    placeholder ?: string
-  required ?: boolean
+    placeholder?: string
+    required?: boolean
 }
 
-export default function SelectPosition({ value, onChange, placeholder = "Select" , required = false}: SelectProps) {
+export default function SelectPosition({ value, onChange, placeholder = "Select", required = false }: SelectProps) {
 
     const [data, setData] = useState([])
     const [loading, setLoading] = useState(false)

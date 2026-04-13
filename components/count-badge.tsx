@@ -1,11 +1,8 @@
 
 
-
-type CountBadgeProps = {
+const CountBadge = ({ count }: {
   count?: number | null;
-};
-
-const CountBadge = ({ count }: CountBadgeProps) => {
+}) => {
   const safeCount = count ?? 0;
 
   if (safeCount <= 0) return null;
