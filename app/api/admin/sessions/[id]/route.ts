@@ -43,11 +43,12 @@ WHERE s.id = $1
 }
 
 export async function DELETE(
-  request: Request,
+  request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id: session_id } = await params;
-  const {byAdmin} = await request.json()
+  const searchParams = request.nextUrl.searchParams
+  const byAdmin  = searchParams.get("byAdmin") === "true"
 
   try {
     const result = await pool.query(
@@ -62,134 +63,135 @@ export async function DELETE(
       );
     }
     const session = result.rows[0];
-    const coachNamesRaw=await pool.query(`SELECT first_name,last_name FROM users WHERE id=$1`,[session.coach_id])
-    const coachNames=coachNamesRaw.rows[0]
-    const coachFullName=`${coachNames.first_name} ${coachNames.last_name}`
-    if(byAdmin){
-      
+    const coachNamesRaw = await pool.query(`SELECT first_name,last_name FROM users WHERE id=$1`, [session.coach_id])
+    const coachNames = coachNamesRaw.rows[0]
+    const coachFullName = `${coachNames.first_name} ${coachNames.last_name}`
+
+    if (byAdmin) {
+
       const msg = `Session with you ${session?.name} was deleted by admin`;
-    
 
-await sendInAppNotificationBackend(session.coach_id, msg, `/portal/coach/sessions/`)
-}else if(!byAdmin){
-  const msg = `Session ${session?.name} was deleted by ${coachFullName}`;
-  const admins=await fetchAllAdmins()
-  const promises = admins.map(admin =>
 
-    sendInAppNotificationBackend(admin.id, msg, `/portal/admin/sessions/`)
-  )
-  await Promise.allSettled(promises)
-}
-const playerMsg=`Session ${session?.name} was deleted`
-  const res= await pool.query(`SELECT user_id from session_players WHERE session_id=$1`,[session_id])
-  const playersInSsssionId= res.rows
-  for(const playerId of playersInSsssionId){
-    sendInAppNotificationBackend(playerId, playerMsg, `/portal/admin/sessions/`)
-  }
+      await sendInAppNotificationBackend(session.coach_id, msg, `/portal/coach/sessions/`)
+    } else if (!byAdmin) {
+      const msg = `Session ${session?.name} was deleted by ${coachFullName}`;
+      const admins = await fetchAllAdmins()
+      const promises = admins.map(admin =>
+
+        sendInAppNotificationBackend(admin.id, msg, `/portal/admin/sessions/`)
+      )
+      await Promise.allSettled(promises)
+    }
+    const playerMsg = `Session ${session?.name} was deleted`
+    const res = await pool.query(`SELECT user_id from session_players WHERE session_id=$1`, [session_id])
+    const playersInSsssionId = res.rows
+    for (const playerId of playersInSsssionId) {
+      sendInAppNotificationBackend(playerId, playerMsg, `/portal/admin/sessions/`)
+    }
     return NextResponse.json(
       { message: "Session deleted successfully", session: result.rows[0] },
       { status: 200 }
     );
-  } catch (error) {
+  } catch (error: any) {
     console.error("DELETE /api/admin/sessions/[id] error:", error);
 
     return NextResponse.json(
-      { message: "Internal Server Error" },
+      { message: error?.essage || "Internal Server Error" },
       { status: 500 }
     );
   }
 }
 
 export async function PUT(req: NextRequest) {
-    try {
-        const data = await req.json();
-        const { id,byAdmin, ...updates } = data;
+  try {
+    const data = await req.json();
+    const { id, byAdmin, ...updates } = data;
 
-        if (!id) {
-            return NextResponse.json({ message: "ID is required" }, { status: 400 });
-        }
+    if (!id) {
+      return NextResponse.json({ message: "ID is required" }, { status: 400 });
+    }
 
-        const fields: any[] = [];
-        const values: any[] = [];
+    const fields: any[] = [];
+    const values: any[] = [];
 
-        Object.entries(updates).forEach(([key, value], index) => {
-            if (value !== undefined) {
-                fields.push(`${key} = $${index + 1}`);
-                values.push(value);
-            }
-        });
+    Object.entries(updates).forEach(([key, value], index) => {
+      if (value !== undefined) {
+        fields.push(`${key} = $${index + 1}`);
+        values.push(value);
+      }
+    });
 
-        if (fields.length === 0) {
-            return NextResponse.json({ message: "No valid data provided for update" }, { status: 400 });
-        }
+    if (fields.length === 0) {
+      return NextResponse.json({ message: "No valid data provided for update" }, { status: 400 });
+    }
 
-        values.push(id);
-        const query = `
+    values.push(id);
+    const query = `
           UPDATE sessions 
           SET ${fields.join(", ")}
           WHERE id = $${values.length}
       `;
 
-        await pool.query(query, values);
+    await pool.query(query, values);
 
-        const emailDataRaw = await pool.query(`SELCET
+    const emailDataRaw = await pool.query(`SELCET
                email,
                first_name || ' ' || last_name AS "fullName"
                FROM users
                WHERE id=$1
                `, [data.coach_id])
-        
-            const emailData = emailDataRaw.rows[0]
-        
-            const coachEmailPayload = {
-              coachEmail: `${emailData.email}`,
-              coachName: `${emailData.fullName}`,
-              sessionName: `${data.name}`,
-              sessionDate: `${data.date} - ${data.end_date}`,
-              sessionTime: data.time,
-              location: `${data.location}`,
-              createdBy: "admin",
-              createdDate: `${new Date()}`,
-            }
-            await sendCoachNewSessionEmail(coachEmailPayload)
 
-        
-             const coachName = `${emailData?.first_name || ""} ${emailData?.last_name || ""}`.trim();
-    if(byAdmin){
+    const emailData = emailDataRaw.rows[0]
 
-    
-    const msg = `Session ${data?.name} with ${coachName} was updated`;
-
-await sendInAppNotificationBackend(data.coach_id, msg, `/portal/coach/sessions/${id}`)
-}else if(!byAdmin){
-  const msg = `Session ${data?.name} with ${coachName} was updated`;
-
-const admins=await fetchAllAdmins()
-  const promises = admins.map(admin =>
-
-    sendInAppNotificationBackend(admin.id, msg, `/portal/admin/sessions/`)
-  )
-  await Promise.allSettled(promises)
-}
-if(updates.status!=="upcoming"){
-  const msg = `Session ${data?.name} with ${coachName} is ${updates.status}`;
-  const res= await pool.query(`SELECT user_id from session_players WHERE session_id=$1`,[id])
-  const playersInSsssionId= res.rows
-  for(const playerId of playersInSsssionId){
-
-    const admins=await fetchAllAdmins()
-  const promises = admins.map(admin =>
-
-    sendInAppNotificationBackend(admin.id, msg, `/portal/admin/sessions/`)
-  )
-  sendInAppNotificationBackend(playerId, msg, `/portal/admin/sessions/`)
-  await Promise.allSettled(promises)
-  }
-}
-        return NextResponse.json({ message: "Updated successfully" }, { status: 200 });
-    } catch (error : any) {
-        console.log("Error updating data:", error?.message);
-        return NextResponse.json({ message:  error?.message || "Internal Server Error" }, { status: 500 });
+    const coachEmailPayload = {
+      coachEmail: `${emailData.email}`,
+      coachName: `${emailData.fullName}`,
+      sessionName: `${data.name}`,
+      sessionDate: `${data.date} - ${data.end_date}`,
+      sessionTime: data.time,
+      location: `${data.location}`,
+      createdBy: "admin",
+      createdDate: `${new Date()}`,
     }
+    await sendCoachNewSessionEmail(coachEmailPayload)
+
+
+    const coachName = `${emailData?.first_name || ""} ${emailData?.last_name || ""}`.trim();
+    if (byAdmin) {
+
+
+      const msg = `Session ${data?.name} with ${coachName} was updated`;
+
+      await sendInAppNotificationBackend(data.coach_id, msg, `/portal/coach/sessions/${id}`)
+    } else if (!byAdmin) {
+      const msg = `Session ${data?.name} with ${coachName} was updated`;
+
+      const admins = await fetchAllAdmins()
+      const promises = admins.map(admin =>
+
+        sendInAppNotificationBackend(admin.id, msg, `/portal/admin/sessions/`)
+      )
+      await Promise.allSettled(promises)
+    }
+    if (updates.status !== "upcoming") {
+      const msg = `Session ${data?.name} with ${coachName} is ${updates.status}`;
+      const res = await pool.query(`SELECT user_id from session_players WHERE session_id=$1`, [id])
+      const playersInSsssionId = res.rows
+      for (const playerId of playersInSsssionId) {
+
+        const admins = await fetchAllAdmins()
+        const promises = admins.map(admin =>
+
+          sendInAppNotificationBackend(admin.id, msg, `/portal/admin/sessions/`)
+        )
+        sendInAppNotificationBackend(playerId, msg, `/portal/admin/sessions/`)
+        await Promise.allSettled(promises)
+      }
+    }
+    return NextResponse.json({ message: "Updated successfully" }, { status: 200 });
+  } catch (error: any) {
+    console.log("Error updating data:", error?.message);
+    return NextResponse.json({ message: error?.message || "Internal Server Error" }, { status: 500 });
+  }
 }
 export const revalidate = 0

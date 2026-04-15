@@ -64,7 +64,7 @@ type noteType = {
   important: boolean;
 }
 
-export default function SessionMainPage({ id, back, back_title, admin = false }: { id: number, back: string, back_title: string, admin?: boolean }) {
+export default function SessionMainPage({ id, back, back_title, admin = false, promotion = false }: { id: number, back: string, back_title: string, admin?: boolean, promotion?: boolean }) {
   const [data, setData] = useState<SessionDataType>();
   const [rawSessionData, setRawSessionData] = useState<any>(null);
   const [allSessions, setAllSessions] = useState<any[]>([]);
@@ -275,6 +275,7 @@ export default function SessionMainPage({ id, back, back_title, admin = false }:
                   sessionId={id}
                   sessionData={rawSessionData}
                   onSuccess={fetchData}
+                  promotion={promotion}
                 />}
               </div>
             </div>

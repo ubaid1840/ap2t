@@ -63,7 +63,6 @@ export default function Page() {
   };
 
 
-
   function calculateSessionStats(sessions: any[]) {
     const today = moment();
 
