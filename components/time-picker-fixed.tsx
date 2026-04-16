@@ -79,7 +79,7 @@ export function TimePickerFixed({
       >
         <ScrollArea className="max-h-32 w-20">
           <div className=" max-h-32 py-1 flex flex-col gap-1">
-            {Array.from({ length: 9 }, (_, i) => i + 9).map((h) => (
+            {Array.from({ length: 14 }, (_, i) => i + 8).map((h) => (
               <Button
                 key={h}
                 size="sm"

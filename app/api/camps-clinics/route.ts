@@ -17,6 +17,7 @@ export async function GET() {
     s.start_time,
     s.end_time,
     s.age_limit,
+    s.location,
     s.apply_promotion,
     s.promotion_price,
     s.price,

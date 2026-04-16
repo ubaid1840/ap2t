@@ -25,6 +25,8 @@ export default async function Page({ params }: { params: { id: string } }) {
     }
 
     const data = await res.json();
+
+    console.log(data)
     return (
       <CampsAndClinicsDetail data={data} />
     )

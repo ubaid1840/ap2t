@@ -561,6 +561,7 @@ export type CampClinicSession = {
   max_players: number;
   total_enrolled_players: number;
   total_left: number;
+  location : string
 }
 
 export type CampClinicCard = {

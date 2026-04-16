@@ -247,7 +247,7 @@ export default function Page() {
             <div className="relative">
               <img
                 src={item.image}
-                alt="Basketball Training"
+                alt={item.name}
 
                 className="w-full object-cover"
               />

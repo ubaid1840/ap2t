@@ -8,11 +8,11 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Spinner } from "@/components/ui/spinner";
 import { useIsMobile } from "@/hooks/use-mobile";
 import axios from "@/lib/axios";
+import { CampClinicSession } from "@/lib/types";
 import { CircleAlert, CircleCheckBig, DollarSign } from "lucide-react";
 import moment from "moment";
 import { useState } from "react";
 import { toast } from "sonner";
-import { CampClinicSession } from "../page.client";
 
 export default function CampsAndClinicsDetail({
   data = null,
@@ -53,7 +53,7 @@ export default function CampsAndClinicsDetail({
         `${moment(data.date).format("MMM DD")}–${moment(data.end_date).format("DD, YYYY")}`,
         `${moment(data.start_time, "HH:mm").format("hh:mm A")} - ${moment(data.end_time, "HH:mm").format("hh:mm A")}`,
         `Ages ${data.age_limit ?? "All"}`,
-        "AP2T Indoor facility",
+        data?.location || "",
       ],
       highlights: [
         "Professional coaching staff",

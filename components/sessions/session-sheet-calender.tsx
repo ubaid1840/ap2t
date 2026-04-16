@@ -47,7 +47,7 @@ export default function SessionSheetCalendar({
   const coaches = [...new Set(sessions.map((s) => s.coachName))];
 
   const timeSlots: { label: string; start_hour: number; end_hour: number }[] = [];
-  for (let i = 8; i <= 19; i++) {
+  for (let i = 8; i <= 20; i++) {
     timeSlots.push({
       label: `${moment({ hour: i }).format("hA")}-${moment({ hour: i + 1 }).format("hA")}`,
       start_hour: i,

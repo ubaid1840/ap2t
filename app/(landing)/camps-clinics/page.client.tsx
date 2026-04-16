@@ -188,7 +188,7 @@ export const transformCampClinics = (
             `${moment(s.date).format("MMM DD")}–${moment(s.end_date).format("DD, YYYY")}`,
             `${s.start_time} - ${s.end_time}`,
             `Ages ${s.age_limit ?? "All"}`,
-            "AP2T Indoor facility",
+            s?.location || "",
         ],
     }));
 };
