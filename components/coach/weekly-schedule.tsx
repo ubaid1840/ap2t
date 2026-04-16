@@ -90,7 +90,7 @@ export const WeeklySchedule: React.FC<WeeklyScheduleProps> = ({ events, id, pref
         })
         : moment(startTime).add(1, "hour");
 
-      return cellTime.isSameOrAfter(startTime) && cellTime.isBefore(endTime) && date.isBefore(e.end_date) && date.isSameOrAfter(e.date);
+      return cellTime.isSameOrAfter(startTime) && cellTime.isSameOrBefore(endTime) && date.isSameOrBefore(e.end_date) && date.isSameOrAfter(e.date);
     });
 
     if (event) return event;
