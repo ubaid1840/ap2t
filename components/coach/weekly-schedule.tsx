@@ -35,8 +35,7 @@ const timeSlots = [
 ];
 
 export const WeeklySchedule: React.FC<WeeklyScheduleProps> = ({ events, id, preference }) => {
-
-
+  console.log(events)
   const [currentWeekStart, setCurrentWeekStart] = useState(moment().startOf("week").add(1, "days"));
   const isMobile = useIsMobile();
   const [contextMenu, setContextMenu] = useState<{
@@ -72,7 +71,17 @@ export const WeeklySchedule: React.FC<WeeklyScheduleProps> = ({ events, id, pref
     }
 
     const event = events.find(e => {
-      if (date.isAfter(e.end_date)||date.isBefore(e.date)) return false;
+      const eventStart = moment(e.date).startOf("day");
+      const eventEnd = moment(e.end_date).startOf("day");
+      const cellDate = moment(date).startOf("day");
+  //       console.log({
+  //   raw_date: e.date,
+  //   raw_end_date: e.end_date,
+  //   eventStart: eventStart.format("YYYY-MM-DD"),
+  //   eventEnd: eventEnd.format("YYYY-MM-DD"),
+  //   cellDate: cellDate.format("YYYY-MM-DD"),
+  // });
+      if (cellDate.isAfter(eventEnd) || cellDate.isBefore(eventStart)) return false;
 
       const startTime = moment(date).set({
         hour: parseInt(e.time.split(":")[0]) + (e.time.includes("PM") && parseInt(e.time.split(":")[0]) !== 12 ? 12 : 0),
@@ -90,7 +99,12 @@ export const WeeklySchedule: React.FC<WeeklyScheduleProps> = ({ events, id, pref
         })
         : moment(startTime).add(1, "hour");
 
-      return cellTime.isSameOrAfter(startTime) && cellTime.isSameOrBefore(endTime) && date.isSameOrBefore(e.end_date) && date.isSameOrAfter(e.date);
+      return (
+  cellTime.isSameOrAfter(startTime) &&
+  cellTime.isSameOrBefore(endTime) &&
+  cellDate.isSameOrAfter(eventStart) &&
+  cellDate.isSameOrBefore(eventEnd)
+);
     });
 
     if (event) return event;

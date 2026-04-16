@@ -145,7 +145,7 @@ export default function MainCoachPage({
           time: session.start_time,
           end_time: session.end_time,
           status: "Booked",
-          end_data : end.format("YYYY-MM-DD")
+          end_date : end.format("YYYY-MM-DD")
         });
 
         current = current.clone().add(1, "day");
