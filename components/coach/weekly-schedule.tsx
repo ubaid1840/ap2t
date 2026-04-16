@@ -35,7 +35,7 @@ const timeSlots = [
 ];
 
 export const WeeklySchedule: React.FC<WeeklyScheduleProps> = ({ events, id, preference }) => {
-  console.log(events)
+
   const [currentWeekStart, setCurrentWeekStart] = useState(moment().startOf("week").add(1, "days"));
   const isMobile = useIsMobile();
   const [contextMenu, setContextMenu] = useState<{
