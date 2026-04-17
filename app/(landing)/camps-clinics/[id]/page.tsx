@@ -23,10 +23,7 @@ export default async function Page({ params }: { params: { id: string } }) {
     if (!res.ok) {
       throw new Error("Failed to fetch camps and clinics");
     }
-
     const data = await res.json();
-
-    console.log(data)
     return (
       <CampsAndClinicsDetail data={data} />
     )
