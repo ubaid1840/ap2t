@@ -1,0 +1,90 @@
+import pool from "@/lib/db";
+import { TriggerFirebaseApprovals } from "@/lib/trigger-firebase";
+import { NextRequest, NextResponse } from "next/server";
+
+
+export async function POST(req: NextRequest) {
+
+
+    try {
+        const data = await req.json();
+        if (!data || Object.keys(data).length === 0) {
+            return NextResponse.json({ message: "Required parameters missing" }, { status: 400 });
+        }
+
+        const { session_id, user_id } = data
+
+        const checkExisting = await pool.query(`SELECT id FROM front_desk_actions WHERE session_id = $1 AND user_id = $2`, [session_id, user_id])
+        if (checkExisting.rows.length === 0) {
+            console.log(1)
+            const fields = Object.keys(data);
+            const values = Object.values(data);
+            const placeholders = fields.map((_, i) => `$${i + 1}`).join(", ");
+
+
+            await pool.query(
+                `INSERT INTO front_desk_actions (${fields.join(",")})
+       VALUES (${placeholders})
+       `,
+                values
+            );
+        } else {
+          console.log(2)
+            const id = checkExisting.rows[0]?.id ?? null
+            const { ...updates } = data;
+
+            if (!id) {
+                return NextResponse.json({ message: "ID is required" }, { status: 400 });
+            }
+
+            const fields: any[] = [];
+            const values: any[] = [];
+
+            Object.entries(updates).forEach(([key, value], index) => {
+                if (value !== undefined) {
+                    fields.push(`${key} = $${index + 1}`);
+                    values.push(value);
+                }
+            });
+            values.push(id);
+            const query = `
+          UPDATE front_desk_actions 
+          SET ${fields.join(", ")}
+          WHERE id = $${values.length}
+      `;
+
+            await pool.query(query, values);
+        }
+        
+        await TriggerFirebaseApprovals()
+
+        return NextResponse.json({ message: "Done" }, { status: 200 })
+    } catch (error: any) {
+        console.log(error)
+        return NextResponse.json(
+            { message: error?.message || "Internal Server Error" },
+            { status: 500 }
+        );
+    }
+}
+
+export async function GET(req: NextRequest) {
+
+    try {
+        const searchParams = req.nextUrl.searchParams
+        const user_id = searchParams.get(`user_id`)
+        const session_id = searchParams.get(`session_id`)
+
+        const query = await pool.query(`SELECT status FROM front_desk_actions WHERE user_id = $1 AND session_id = $2 ORDER BY id DESC LIMIT 1`, [user_id, session_id])
+
+        const res = query.rows?.[0] ?? null
+
+        return NextResponse.json(res, { status: 200 })
+    } catch (error: any) {
+        return NextResponse.json({ message: error?.message || "Server error" }, { status: 500 })
+    }
+
+
+}
+
+export const revalidate = 0
