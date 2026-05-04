@@ -1,5 +1,7 @@
 "use client";
 import SessionCalendar from "@/components/calendar/session-calendar";
+import PrivateSessionInquiryDialog from "@/components/players/privateSessionInquiry";
+import ReserveDialog from "@/components/players/reserveDialog";
 import { useAuth } from "@/contexts/auth-context";
 import axios from "@/lib/axios";
 import { joinNames } from "@/lib/functions";
@@ -57,7 +59,10 @@ export default function Page() {
   return (
     <div className="flex flex-col w-full gap-4">
       <Header session_length={sessions.length}>
-        {null}
+        <div className="flex gap-2 items-center flex-wrap">
+        <ReserveDialog/>
+        <PrivateSessionInquiryDialog email={user?.email} firstName={user?.first_name} lastName={user?.last_name}/>
+        </div>
       </Header>
       <SessionCalendar currentMonth={currentMonth} setCurrentMonth={setCurrentMonth} player_id={user?.id} sessions={sessions} onSuccess={fetchData} loading={loading} />
     </div>

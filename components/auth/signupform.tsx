@@ -202,14 +202,17 @@ export default function SignUpForm({
   const signUp = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!playerData.email || !playerData.password) return;
+    const playerEmail = playerData?.email?.trim()?.toLocaleLowerCase()
+    const parentEmail = parentData?.email?.trim()?.toLocaleLowerCase()
+
+    if (!playerEmail || !playerData.password) return;
     if (playerData.password !== playerData.confirm_password) return;
     if (!playerData.birth_date) {
       toast.error("Birth date is required");
       return;
     }
     if (underAged && !selfPaid) {
-      if (!parentData.email || !parentData.password) {
+      if (!parentEmail || !parentData.password) {
         toast.error("under aged players required parents information")
         return
       }
@@ -230,11 +233,13 @@ export default function SignUpForm({
       return;
     }
 
+   
+
     const payload: any = {
       player: {
         first_name: playerData.first_name,
         last_name: playerData.last_name,
-        email: playerData.email,
+        email: playerEmail,
         zip_code: playerData.zip_code,
         password: playerData.password,
         birth_date: playerData.birth_date,
@@ -252,7 +257,7 @@ export default function SignUpForm({
         first_name: parentData.first_name,
         last_name: parentData.last_name,
         zip_code: parentData.zip_code,
-        email: parentData.email,
+        email: parentEmail,
         password: parentData.password,
         birth_date: parentData.birth_date,
         location: parentData.location,

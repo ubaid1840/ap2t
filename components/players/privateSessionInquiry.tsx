@@ -1,5 +1,7 @@
 "use client";
 
+import axios from "@/lib/axios";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "../ui/button";
 import {
@@ -7,19 +9,20 @@ import {
   DialogContent,
   DialogTitle
 } from "../ui/dialog";
-import { useEffect, useState } from "react";
 import { Spinner } from "../ui/spinner";
-import axios from "@/lib/axios";
 
-export default function GetSupportDialog({ email }: { email: string | undefined }) {
+export default function PrivateSessionInquiryDialog({ email, firstName, lastName }: { email: string | undefined, firstName: string | undefined, lastName: string | undefined }) {
   const [localEmail, setLocalEmail] = useState("")
-
+  const [localFirstName, setLocalFirstName] = useState("")
+  const [localLastName, setLocalLastName] = useState("")
   const [loading, setLoading] = useState(false)
   const [open, setOpen] = useState(false)
 
   useEffect(() => {
     if (email) setLocalEmail(email)
-  }, [email])
+    if (firstName) setLocalFirstName(firstName)
+    if (lastName) setLocalLastName(lastName)
+  }, [email, firstName, lastName])
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -38,32 +41,32 @@ export default function GetSupportDialog({ email }: { email: string | undefined 
 
     try {
       await axios.post(`/support`, data)
-      toast.success("Message sent to support team..");
+      toast.success("Inquiry successfully sent..");
       setOpen(false)
     } finally {
       setLoading(false)
     }
-
 
   };
 
 
   return (
     <>
-      <div className="flex flex-col gap-1 w-full bg-primary rounded-xl p-4">
-        <p className="text-xs text-[#282828]">Need Help?</p>
-        <p className="text-md text-[#282828]">Contact Support</p>
-        <Button className="bg-black text-primary rounded-xl" onClick={()=> setOpen(true)}>
-          Get Support
-        </Button>
-      </div>
+
+      <Button onClick={() => setOpen(true)}>
+        Private Session Inquiry
+      </Button>
+
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent>
-          <DialogTitle>Get Support</DialogTitle>
+          <DialogTitle>Private Session Inquiry</DialogTitle>
 
           <form className="mt-8 space-y-5" onSubmit={handleSubmit}>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <input
+
+                value={localFirstName}
+                onChange={(e) => setLocalFirstName(e.target.value)}
                 name="firstName"
                 required
                 type="text"
@@ -71,6 +74,9 @@ export default function GetSupportDialog({ email }: { email: string | undefined 
                 className="w-full rounded bg-neutral-900 border border-neutral-800 px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-primary"
               />
               <input
+
+                value={localLastName}
+                onChange={(e) => setLocalLastName(e.target.value)}
                 name="lastName"
                 required
                 type="text"
@@ -79,13 +85,7 @@ export default function GetSupportDialog({ email }: { email: string | undefined 
               />
             </div>
 
-            <input
-              name="phone"
-              required
-              type="tel"
-              placeholder="Phone Number"
-              className="w-full rounded bg-neutral-900 border border-neutral-800 px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-primary"
-            />
+
 
             <input
               name="email"
@@ -101,12 +101,12 @@ export default function GetSupportDialog({ email }: { email: string | undefined 
               name="message"
               required
               rows={5}
-              placeholder="Your Message"
+              placeholder="Your Inquiry"
               className="w-full rounded bg-neutral-900 border border-neutral-800 px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-primary"
             />
 
             <Button type="submit" className="w-full" disabled={loading}>
-              {loading && <Spinner className="text-black" />}  Send Message
+              {loading && <Spinner className="text-white" />}  Send Message
             </Button>
           </form>
         </DialogContent>

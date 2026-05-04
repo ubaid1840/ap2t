@@ -3,17 +3,19 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
   const month  = req.nextUrl.searchParams.get("month")
-
+const queryParams : (string | number | null)[] = [id]
   try {
-    const query = `
+    
+    let query = `
        SELECT
       s.*,
       u.first_name AS coach_first_name,
       u.last_name  AS coach_last_name,
+      u.picture AS coach_picture,
       CASE 
         WHEN sp.user_id IS NOT NULL THEN true
         ELSE false
@@ -24,7 +26,12 @@ export async function GET(
     LEFT JOIN session_players sp
       ON sp.session_id = s.id
       AND sp.user_id = $1
-      WHERE
+  `;
+
+  if(month){
+     queryParams.push(month ? `${month}-01T00:00:00Z` : null)
+    query += ` 
+    WHERE
     (
       s.date >= DATE_TRUNC('month', COALESCE($2::timestamptz, NOW()))
       AND s.date < DATE_TRUNC('month', COALESCE($2::timestamptz, NOW())) + INTERVAL '1 month'
@@ -35,10 +42,13 @@ export async function GET(
       AND s.end_date >= DATE_TRUNC('month', COALESCE($2::timestamptz, NOW()))
       AND s.end_date < DATE_TRUNC('month', COALESCE($2::timestamptz, NOW())) + INTERVAL '1 month'
     )
-  ORDER BY s.date ASC
-  `;
+    `
+   
+  }
 
-    const result = await pool.query(query, [id, month ? `${month}-01T00:00:00Z` : null]);
+  query += ` ORDER BY s.date ASC`
+
+    const result = await pool.query(query, queryParams);
     return NextResponse.json(result.rows);
   } catch (error) {
     console.error("GET /api/admin/sessions error:", error);

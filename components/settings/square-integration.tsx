@@ -2,7 +2,7 @@
 import useSquareConnection from "@/hooks/use-square-connection";
 import { SquareFieldKey, SquareIntegrationState, SquareMode } from "@/lib/types";
 import { CircleCheckBig } from "lucide-react";
-import { memo } from "react";
+import { memo, useEffect, useMemo, useState } from "react";
 import CardStatus from "../card-status";
 import { Button } from "../ui/button";
 import { TabsContent } from "../ui/tabs";
@@ -10,6 +10,8 @@ import { LocalInput, LocalSwitch } from "./button-and-switch";
 
 
 const SquareIntegration = ({ squareIntegration, setSquareIntegration }: { squareIntegration: SquareIntegrationState, setSquareIntegration: (val: any) => void }) => {
+
+    
 
 
     const activeMode: SquareMode = squareIntegration.mode;
@@ -35,7 +37,17 @@ const SquareIntegration = ({ squareIntegration, setSquareIntegration }: { square
             },
         ];
 
-    const { loading, connected, checkConnection } = useSquareConnection(squareIntegration.mode)
+    const { loading, connected, checkConnection } = useSquareConnection(squareIntegration.mode, squareIntegration)
+
+    const validateConnection = useMemo(() => {
+    const credentials = squareIntegration.credentials[activeMode];
+
+    return squareFields.every((field) => {
+        const value = credentials?.[field.key];
+
+        return typeof value === "string" && value.trim() !== "";
+    });
+}, [squareIntegration, activeMode]);
 
 
     return (
@@ -93,12 +105,11 @@ const SquareIntegration = ({ squareIntegration, setSquareIntegration }: { square
                 />
             </div>
             <div className="space-x-4 mt-8">
-                <Button onClick={async () => {
-                    await checkConnection()
+                <Button disabled={!validateConnection} onClick={() => {
+                    checkConnection()
                 }} variant={"outline"} className="leading-none" >
                     <CircleCheckBig />   {loading ? "Testing..." : "Test Connection"}
                 </Button >
-
             </div>
         </TabsContent>
     )

@@ -68,9 +68,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         }
 
         if (!role) {
-          await handleLogout()
+          await handleLogout(false)
           setUser(null)
-          toast.error("There is no user role...")
+          toast.error("User with role not found")
           return
         }
         const correctedRoute = `/portal/${role}`

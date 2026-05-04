@@ -12,22 +12,22 @@ export async function GET(req: NextRequest) {
     try {
         if (position_list) {
             const result = await pool.query(`SELECT position_list FROM configurations`)
-            return NextResponse.json(result.rows?.[0]?.position_list, { status: 200 })
+            return NextResponse.json(result.rows?.[0]?.position_list ?? [], { status: 200 })
         }
 
         if (skill_level_list) {
             const result = await pool.query(`SELECT skill_level_list FROM configurations`)
-            return NextResponse.json(result.rows?.[0]?.skill_level_list, { status: 200 })
+            return NextResponse.json(result.rows?.[0]?.skill_level_list ?? [], { status: 200 })
         }
 
         if (session_types) {
             const result = await pool.query(`SELECT session_types FROM configurations`)
-            return NextResponse.json(result.rows?.[0]?.session_types, { status: 200 })
+            return NextResponse.json(result.rows?.[0]?.session_types ?? [], { status: 200 })
         }
 
          if (comped_category_list) {
             const result = await pool.query(`SELECT comped_category_list FROM configurations`)
-            return NextResponse.json(result.rows?.[0]?.comped_category_list, { status: 200 })
+            return NextResponse.json(result.rows?.[0]?.comped_category_list ?? [], { status: 200 })
         }
         const result = await pool.query(`SELECT * FROM configurations`)
         return NextResponse.json(result.rows, { status: 200 })

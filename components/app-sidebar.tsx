@@ -125,7 +125,8 @@ export default function AppSidebar() {
         </ScrollArea>
       </SidebarContent>
 
-      {state === "expanded" && showSupport &&
+      {state === "expanded" && 
+      // showSupport &&
 
         <SidebarFooter className="border-t py-5">
           <SidebarMenu>

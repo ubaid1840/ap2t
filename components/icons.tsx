@@ -1,5 +1,6 @@
 import {
   Check,
+  Crown,
   Loader2,
   LogIn,
   Settings2,
@@ -34,6 +35,7 @@ settings2 : Settings2,
   close: X,
   spinner: Loader2,
   register : LogIn,
+  camps : Crown,
   gitHub: ({ ...props }) => (
     <svg
       aria-hidden='true'

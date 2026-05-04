@@ -49,6 +49,7 @@ export default function Page() {
     location: "",
     birth_date: undefined,
   });
+
   const { user } = useAuth();
   const [profileImage, setProfileImage] = useState<string | null>();
   const [squareIntegration, setSquareIntegration] = useState<SquareIntegrationState>({
@@ -172,24 +173,24 @@ export default function Page() {
 
       setProfileInfo({
         first_name: result.user?.first_name || "",
-        last_name: result?.last_name || "",
+        last_name: result.user?.last_name || "",
         email: result.user?.email || "",
         phone_no: result.user?.phone_no || "",
-        location: result.user?.location,
+        location: result.user?.location || "",
         birth_date: result.user?.birth_date || undefined,
       });
       setProfileImage(result.user?.picture || null);
-      const settings = result.settings;
+      const settings = result?.settings ?? null;
 
       setRolePermissions({
-        manage_users: settings.manage_users,
-        manage_coaches: settings.manage_coaches,
-        manage_players: settings.manage_players,
-        manage_payments: settings.manage_payments,
-        manage_promotions: settings.manage_promotions,
-        manage_sessions: settings.manage_sessions,
-        system_settings: settings.system_settings,
-        view_reports: settings.view_report
+        manage_users: settings.manage_users ?? false,
+        manage_coaches: settings.manage_coaches ?? false,
+        manage_players: settings.manage_players ?? false,
+        manage_payments: settings.manage_payments ?? false,
+        manage_promotions: settings.manage_promotions ?? false,
+        manage_sessions: settings.manage_sessions ?? false,
+        system_settings: settings.system_settings ?? false,
+        view_reports: settings.view_report ?? false
       })
 
       setNotificationInfo([

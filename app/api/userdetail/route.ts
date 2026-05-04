@@ -26,10 +26,11 @@ LEFT JOIN coaches c ON c.user_id = u.id
 LEFT JOIN parents pr ON pr.user_id = u.id
 WHERE u.email = $1;`, [email])
 
-        const result = query.rows[0] ?? null
+
+        const result = query.rows?.[0] ?? null
 
         if (!result) {
-            NextResponse.json({ message: "We couldn't find your account. Sign up now to get started." }, { status: 400 })
+            return NextResponse.json({ message: "We couldn't find your account. Sign up now to get started." }, { status: 400 })
         }
 
         return NextResponse.json(result, { status: 200 })

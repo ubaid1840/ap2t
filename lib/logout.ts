@@ -3,7 +3,7 @@ import { toast } from "sonner";
 import { auth } from "./firebase";
 
 
-export async function handleLogout() {
+export async function handleLogout(cond = true) {
     await signOut(auth)
-    toast.success("Logout successfull")
+    if (cond) toast.success("Logout successfull")
 }

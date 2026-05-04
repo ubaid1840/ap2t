@@ -32,7 +32,7 @@ export async function POST(
     if (check.rows.length > 0) {
       await client.query("ROLLBACK");
       return NextResponse.json(
-        { message: "Player already in session" },
+        { message: "Player already enrolled" },
         { status: 409 }
       );
     }

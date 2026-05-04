@@ -11,7 +11,7 @@ const transporter = nodemailer.createTransport({
   port: process.env.BULK_EMAIL_PORT,
   secure: false,
   auth: {
-    user: process.env.BULK_EMAIL_USER,
+    user: process.env.BULK_EMAIL_LOGIN,
     pass: process.env.BULK_EMAIL_PASSWORD,
   },
 } as SMTPConnection.Options);
@@ -36,6 +36,7 @@ export const sendSingleEmail = async (message: string, subject: string, email: s
     }
 
   } catch (error: any) {
+    console.log(error)
     throw new Error(error?.message || "Error sending email");
   }
 };

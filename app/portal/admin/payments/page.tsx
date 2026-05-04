@@ -14,9 +14,9 @@ import {
   Filter,
   OctagonAlert
 } from "lucide-react";
-import { ReactNode, useEffect, useMemo, useState } from "react";
-import { GoDotFill } from "react-icons/go";
+import { ReactNode, Suspense, useEffect, useMemo, useState } from "react";
 
+import SquareConnection from "@/components/admin-dashboard/square-connection";
 import CardStatus, { typeClasses } from "@/components/card-status";
 import getInitials from "@/components/parents/get-initials";
 import { CompedDialog } from "@/components/payment/comped-dialog";
@@ -26,7 +26,6 @@ import { ViewDialog } from "@/components/payment/view-dialog";
 import RenderAvatar from "@/components/render-avatar";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { useDebounce } from "@/hooks/use-debounce";
-import useSquareConnection from "@/hooks/use-square-connection";
 import { PaymentItem, PaymentsSummaryResponse } from "@/lib/types";
 import { ColumnDef } from "@tanstack/react-table";
 import { ArrowUpDown, CheckCircle, Eye, Send } from "lucide-react";
@@ -50,8 +49,6 @@ export default function Page() {
   const [payments, setPayments] = useState<PaymentsSummaryResponse | undefined>()
   const [visible, setVisible] = useState<{ show: string, data: any }>({ show: "", data: null })
   const debouncedSearch = useDebounce(search, 300);
-  const { connected } = useSquareConnection()
-
 
   useEffect(() => {
     if (user?.id)
@@ -363,13 +360,9 @@ export default function Page() {
               >
                 <CreditCard size={20} />
               </div>
-              <div className="space-y-1 ">
-                <h1 className="text-[#99A1AF] text-xs">Square Integration</h1>
-                <div className="flex items-center gap-2 text-sm">
-                  <GoDotFill className={connected ? "text-active-text" : "text-warning-text"} />
-                  <h1 className={connected ? "text-active-text" : "text-warning-text"}>{connected ? "Connected" : "Disconnected"}</h1>
-                </div>
-              </div>
+            
+                <SquareConnection />
+            
             </CardContent>
           </Card>
 

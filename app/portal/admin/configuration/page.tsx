@@ -16,7 +16,7 @@ interface Configuration {
   session_types: string[]
   position_list: string[]
   skill_level_list: string[]
-  comped_category_list : string[]
+  comped_category_list: string[]
 }
 
 export default function Page() {
@@ -43,15 +43,15 @@ export default function Page() {
     if (!config) return
     setSaveLoading(true)
     try {
-        
-        await axios.put("/admin/configuration", config)
-        toast.success("Configuration updated")
+
+      await axios.put("/admin/configuration", config)
+      toast.success("Configuration updated")
     } finally {
-        setSaveLoading(false)
+      setSaveLoading(false)
     }
   }
 
-  if (loading) return (<div className="w-full flex justify-center pt-10"><Spinner /></div>) 
+  if (loading) return (<div className="w-full flex justify-center pt-10"><Spinner /></div>)
 
   return (
     <div className="flex flex-col w-full gap-6">
@@ -61,44 +61,44 @@ export default function Page() {
 
       {config &&
 
-      <>
-      
-
-      <ArrayEditor
-        title="Session Types"
-        values={config.session_types}
-        onChange={(arr) =>
-          setConfig({ ...config, session_types: arr })
-        }
-      />
+        <>
 
 
+          <ArrayEditor
+            title="Session Types"
+            values={config.session_types}
+            onChange={(arr) =>
+              setConfig({ ...config, session_types: arr })
+            }
+          />
 
-      <ArrayEditor
-        title="Position List"
-        values={config.position_list}
-        onChange={(arr) =>
-          setConfig({ ...config, position_list: arr })
-        }
-      />
 
-      <ArrayEditor
-        title="Skill Levels"
-        values={config.skill_level_list}
-        onChange={(arr) =>
-          setConfig({ ...config, skill_level_list: arr })
-        }
-      />
 
-      <ArrayEditor
-        title="Comped Categories"
-        values={config.comped_category_list}
-        onChange={(arr) =>
-          setConfig({ ...config, comped_category_list: arr })
-        }
-      />
+          <ArrayEditor
+            title="Position List"
+            values={config.position_list}
+            onChange={(arr) =>
+              setConfig({ ...config, position_list: arr })
+            }
+          />
 
-      </>}
+          <ArrayEditor
+            title="Skill Levels"
+            values={config.skill_level_list}
+            onChange={(arr) =>
+              setConfig({ ...config, skill_level_list: arr })
+            }
+          />
+
+          <ArrayEditor
+            title="Comped Categories"
+            values={config.comped_category_list}
+            onChange={(arr) =>
+              setConfig({ ...config, comped_category_list: arr })
+            }
+          />
+
+        </>}
     </div>
   )
 }
@@ -141,7 +141,7 @@ export function ArrayEditor({ title, values, onChange }: ArrayEditorProps) {
 
   return (
     <div className="bg-[#252525] border border-[#3A3A3A] rounded-xl">
-      
+
       {/* Header */}
       <div
         className="flex justify-between items-center p-4 cursor-pointer"
