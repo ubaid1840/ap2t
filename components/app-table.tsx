@@ -119,11 +119,7 @@ const PageTable = ({
     <div className="flex flex-1 flex-col space-y-4">
       <div className={`relative flex flex-1 flex-col ${open ? "w-[calc(100dvw-304px)]" : "w-[calc(100dvw-96px)]"} ${isMobile && "w-[calc(100vw-44px)]"} ${scrollAreaWidth}`}>
         <div className={`flex rounded-md border md:overflow-auto ${headerClassName}`}>
-<<<<<<< HEAD
-          <ScrollArea className="overflow-x-auto flex flex-1">
-=======
           <ScrollArea className="overflow-x-auto flex flex-1 h-[500px]">
->>>>>>> 79ec77f3b71bf4a427b2192d2dc8fa21e68efdad
             <Table className="relative w-full">
               <TableHeader className="">
                 {table.getHeaderGroups().map((headerGroup) => (
@@ -264,11 +260,6 @@ const PageTable = ({
           </ScrollArea>
         </div>
       </div>
-<<<<<<< HEAD
-
-
-=======
->>>>>>> 79ec77f3b71bf4a427b2192d2dc8fa21e68efdad
     </div>
   );
 };
