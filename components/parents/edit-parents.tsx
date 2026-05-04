@@ -167,7 +167,7 @@ export function EditParents({ parent_id, data, onRefresh }: EditParentsProps) {
                         // {...field}
                         id={field.name}
                         aria-invalid={fieldState.invalid}
-                        placeholder="+1 XXX XXX XXXX"
+                        placeholder="+1XXXXXXX"
                         autoComplete="off"
                       />
                       {fieldState.invalid && (

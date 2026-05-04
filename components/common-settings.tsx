@@ -345,7 +345,7 @@ export default function CommonSettings() {
                                         title="Phone Number"
                                         Icon={<Phone className="h-5 w-5 text-gray-400" />}
                                         value={profileInfo.phone_no}
-                                        placeholder="+1 XXX XXX XXXX"
+                                        placeholder="+1XXXXXXX"
                                         onChange={(e) =>
                                             setProfileInfo((prev) => ({
                                                 ...prev,

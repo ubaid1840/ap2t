@@ -217,7 +217,7 @@ export function EditInfo({
                           {...field}
                           id={field.name}
                           aria-invalid={fieldState.invalid}
-                          placeholder="+1 XXX XXX XXXX"
+                          placeholder="+1XXXXXXXX"
                           autoComplete="off"
                         />
                         {fieldState.invalid && (
