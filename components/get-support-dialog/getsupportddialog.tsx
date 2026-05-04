@@ -37,7 +37,7 @@ export default function GetSupportDialog({ email }: { email: string | undefined 
     };
 
     try {
-      await axios.post(`/support`, data)
+      await axios.post(`/support?type=support`, data)
       toast.success("Message sent to support team..");
       setOpen(false)
     } finally {

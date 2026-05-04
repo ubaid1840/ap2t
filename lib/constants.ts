@@ -128,6 +128,22 @@ export const player_nav_items = [
 
     shortcut: ['d', 'a', 's', 'h'],
   },
+  
+    {
+      title: 'camps',
+      url: '/portal/player/camps',
+      icon: 'camps',
+  
+      shortcut: ['d', 'a', 's', 'h'],
+    },
+  
+    {
+      title: 'Promotions',
+      url: '/portal/player/promotions',
+      icon: 'promotions',
+  
+      shortcut: ['d', 'a', 's', 'h'],
+    },
 ];
 
 export const coach_nav_items = [

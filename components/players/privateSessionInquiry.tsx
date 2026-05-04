@@ -40,7 +40,7 @@ export default function PrivateSessionInquiryDialog({ email, firstName, lastName
     };
 
     try {
-      await axios.post(`/support`, data)
+      await axios.post(`/support?type=inquiry`, data)
       toast.success("Inquiry successfully sent..");
       setOpen(false)
     } finally {
