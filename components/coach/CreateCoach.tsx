@@ -210,7 +210,7 @@ const CreateCoach = ({ onRefresh }: { onRefresh: () => Promise<void> }) => {
                             {...field}
                             id={field.name}
                             aria-invalid={fieldState.invalid}
-                            placeholder="+1XXXXXX"
+                            placeholder="+1 XXX XXX XXXX"
                             autoComplete="off"
                           />
                           {fieldState.invalid && (
