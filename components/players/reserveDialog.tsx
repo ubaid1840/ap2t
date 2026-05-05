@@ -3,19 +3,18 @@
 import { useAuth } from "@/contexts/auth-context";
 import { useIsMobile } from "@/hooks/use-mobile";
 import axios from "@/lib/axios";
-import { joinNames } from "@/lib/functions";
-import { ReserveProps, SessionProps } from "@/lib/types";
+import { SessionProps } from "@/lib/types";
 import { Scrollbar } from "@radix-ui/react-scroll-area";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import moment from "moment";
 import { useMemo, useState } from "react";
+import { GoDotFill } from "react-icons/go";
+import CardStatus from "../card-status";
 import RenderAvatar from "../render-avatar";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
 import { ScrollArea } from "../ui/scroll-area";
 import { Spinner } from "../ui/spinner";
-import CardStatus from "../card-status";
-import { GoDotFill } from "react-icons/go";
 
 type ReserveComponentProps = {
     player_id?: string | null | undefined,

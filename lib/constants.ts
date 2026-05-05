@@ -122,14 +122,6 @@ export const player_nav_items = [
     shortcut: ['d', 'a', 's', 'h'],
   },
   {
-    title: 'Settings',
-    url: '/portal/player/settings',
-    icon: 'settings',
-
-    shortcut: ['d', 'a', 's', 'h'],
-  },
-
-  {
     title: 'Camps',
     url: '/portal/player/camps',
     icon: 'camps',
@@ -144,6 +136,15 @@ export const player_nav_items = [
 
     shortcut: ['d', 'a', 's', 'h'],
   },
+  {
+    title: 'Settings',
+    url: '/portal/player/settings',
+    icon: 'settings',
+
+    shortcut: ['d', 'a', 's', 'h'],
+  },
+
+  
 ];
 
 export const coach_nav_items = [
