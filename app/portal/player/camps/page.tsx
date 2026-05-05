@@ -21,6 +21,7 @@ export default function Page() {
 
     const { user } = useAuth()
     const [data, setData] = useState<PrmotionsType[] | []>([])
+    const [loading, setLoading] = useState(false)
 
 
     useEffect(() => {
@@ -29,8 +30,9 @@ export default function Page() {
     }, [user]);
 
     const fetchData = async () => {
+        setLoading(true)
         try {
-            const result = await axios.get(`/player/${user?.id}/promotions?promotion=true&type=camp`);
+            const result = await axios.get(`/player/${user?.id}/promotions?type=camp`);
             setData(result.data)
             if (result.data) {
                 const mappedSessions = result.data.map((s: any) => ({
@@ -46,11 +48,10 @@ export default function Page() {
             }
         } catch (error) {
             console.error("Error fetching sessions", error);
+        } finally {
+            setLoading(false)
         }
     };
-
-
-
 
 
 
@@ -58,11 +59,16 @@ export default function Page() {
         <div className="flex flex-col w-full gap-4">
             <Header />
 
-            <div className="flex flex-wrap gap-4">
-                {data.map((item, i) => (
-                    <RenderEachItem key={i} item={item} fetchData={fetchData} />
-                ))}
-            </div>
+            {loading ?
+                <div className="flex flex-1 items-center justify-center mt-10">
+                    <Spinner />
+                </div> :
+                <div className="flex flex-wrap gap-4">
+                    {data.map((item) => (
+                        <RenderEachItem key={item.id} item={item} fetchData={fetchData} />
+                    ))}
+                </div>
+            }
         </div>
     );
 }
@@ -75,8 +81,8 @@ const RenderEachItem = ({ item, fetchData }: { item: PrmotionsType, fetchData: (
 
         if (!user?.id || !item?.id) return
 
+        setLoading(true)
         try {
-            setLoading(true)
             await axios.post(`/admin/sessions/${item.id}/participants`, {
                 player_id: user?.id,
             });
@@ -151,9 +157,11 @@ const RenderEachItem = ({ item, fetchData }: { item: PrmotionsType, fetchData: (
 
 
                 <div className="flex gap-2 mb-4 w-full">
-                    <Button disabled={loading} onClick={() => handleEnroll(item)} variant="outline" className="w-full">
-                        {loading && <Spinner />} <Users /> Participate
-                    </Button>
+                    {item?.enrolled ? <Badge className="bg-green-500/10 text-green-400 w-full">Enrolled</Badge> :
+                        <Button disabled={loading} onClick={() => handleEnroll(item)} variant="outline" className="w-full">
+                            {loading && <Spinner />} <Users /> Participate
+                        </Button>
+                    }
                 </div>
 
             </CardContent>

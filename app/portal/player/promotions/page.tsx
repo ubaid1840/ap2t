@@ -18,7 +18,7 @@ import { useEffect, useState } from "react";
 
 
 export default function Page() {
-  
+
     const { user } = useAuth()
     const [data, setData] = useState<PrmotionsType[] | []>([])
     const [loading, setLoading] = useState(false)
@@ -29,8 +29,9 @@ export default function Page() {
     }, [user]);
 
     const fetchData = async () => {
+        setLoading(true)
         try {
-            const result = await axios.get(`/player/${user?.id}/promotions?promotion=true`);
+            const result = await axios.get(`/player/${user?.id}/promotions`);
             setData(result.data)
             if (result.data) {
                 const mappedSessions = result.data.map((s: any) => ({
@@ -46,17 +47,44 @@ export default function Page() {
             }
         } catch (error) {
             console.error("Error fetching sessions", error);
+        } finally {
+            setLoading(false)
         }
     };
 
 
 
+
+    return (
+        <div className="flex flex-col w-full gap-4">
+            <Header />
+
+            {loading ?
+                <div className="flex flex-1 items-center justify-center mt-10">
+                    <Spinner />
+                </div> :
+
+                <div className="flex flex-wrap gap-4">
+                    {data.map((item) => (
+                        <RenderEachItem key={item.id} item={item} fetchData={fetchData} />
+                    ))}
+                </div>
+            }
+        </div>
+    );
+}
+
+const RenderEachItem = ({ item, fetchData }: { item: PrmotionsType, fetchData: () => Promise<void> }) => {
+
+    const [loading, setLoading] = useState(false)
+    const { user } = useAuth()
+
     async function handleEnroll(item: PrmotionsType) {
 
         if (!user?.id || !item?.id) return
 
+        setLoading(true)
         try {
-            setLoading(true)
             await axios.post(`/admin/sessions/${item.id}/participants`, {
                 player_id: user?.id,
             });
@@ -68,89 +96,82 @@ export default function Page() {
     }
 
 
-
     return (
-        <div className="flex flex-col w-full gap-4">
-            <Header />
+        <Card className="w-full sm:w-[380px] p-0 overflow-hidden">
+            <div className="relative">
+                <img
+                    src={item.image}
+                    alt={item.name}
 
-            <div className="flex flex-wrap gap-4">
-                {data.map((item, i) => (
-                    <Card key={i} className="w-full sm:w-[380px] p-0 overflow-hidden">
-                        <div className="relative">
-                            <img
-                                src={item.image}
-                                alt={item.name}
-
-                                className="w-full object-cover"
-                            />
+                    className="w-full object-cover"
+                />
 
 
-                            <Badge className="absolute top-3 left-3 bg-active-text text-white font-normal">
-                                {item?.status?.charAt(0)?.toUpperCase() + item?.status?.slice(1)}
-                            </Badge>
+                <Badge className="absolute top-3 left-3 bg-active-text text-white font-normal">
+                    {item?.status?.charAt(0)?.toUpperCase() + item?.status?.slice(1)}
+                </Badge>
+
+            </div>
+            <CardContent className="px-4 space-y-4">
+
+                <div className="space-y-1">
+                    <h3 className="text-lg font-semibold text-white">
+                        {item.name}
+                    </h3>
+                    <p className="text-sm text-muted-foreground">
+                        {item.description}
+                    </p>
+                </div>
+
+                <div className="flex items-center gap-2">
+                    <DollarSign size={16} className="text-success-text" />
+                    <span className="text-xl font-semibold">{item.promotion_price}</span>
+                    <span className="text-sm line-through text-muted-foreground">{item.price}</span>
+                    <Badge className="bg-active-bg text-active-text rounded-md">Save ${item.save}</Badge>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2">
+                    <div className="space-y-1 bg-[#1A1A1A] border border-border rounded-xl p-3">
+
+                        <div className="flex gap-2 items-center">
+                            <Calendar size={12} className="text-muted-foreground" />
+                            <div className="text-xs text-muted-foreground">Start Date</div>
 
                         </div>
-                        <CardContent className="px-4 space-y-4">
-
-                            <div className="space-y-1">
-                                <h3 className="text-lg font-semibold text-white">
-                                    {item.name}
-                                </h3>
-                                <p className="text-sm text-muted-foreground">
-                                    {item.description}
-                                </p>
-                            </div>
-
-                            <div className="flex items-center gap-2">
-                                <DollarSign size={16} className="text-success-text" />
-                                <span className="text-xl font-semibold">{item.promotion_price}</span>
-                                <span className="text-sm line-through text-muted-foreground">{item.price}</span>
-                                <Badge className="bg-active-bg text-active-text rounded-md">Save ${item.save}</Badge>
-                            </div>
-
-                            <div className="grid grid-cols-2 gap-2">
-                                <div className="space-y-1 bg-[#1A1A1A] border border-border rounded-xl p-3">
-
-                                    <div className="flex gap-2 items-center">
-                                        <Calendar size={12} className="text-muted-foreground" />
-                                        <div className="text-xs text-muted-foreground">Start Date</div>
-
-                                    </div>
-                                    <div className="text-sm text-white">{item.date}</div>
-                                </div>
+                        <div className="text-sm text-white">{item.date}</div>
+                    </div>
 
 
 
-                                <div className="space-y-1 bg-[#1A1A1A] border border-border rounded-xl p-3">
+                    <div className="space-y-1 bg-[#1A1A1A] border border-border rounded-xl p-3">
 
-                                    <div className="flex gap-2 items-center">
-                                        <Calendar size={12} className="text-muted-foreground" />
-                                        <div className="text-xs text-muted-foreground">End Date</div>
+                        <div className="flex gap-2 items-center">
+                            <Calendar size={12} className="text-muted-foreground" />
+                            <div className="text-xs text-muted-foreground">End Date</div>
 
-                                    </div>
-                                    <div className="text-sm text-white">{item.end_date}</div>
-                                </div>
+                        </div>
+                        <div className="text-sm text-white">{item.end_date}</div>
+                    </div>
 
-                            </div>
-
-
-                            <Separator />
+                </div>
 
 
+                <Separator />
 
-                            <div className="flex gap-2 mb-4 w-full">
-                                <Button disabled={loading} onClick={() => handleEnroll(item)} variant="outline" className="w-full">
-                                    {loading && <Spinner />} <Users /> Participate
-                                </Button>
-                            </div>
 
-                        </CardContent>
 
-                    </Card>
-                ))}
-            </div>
-        </div>
-    );
+                <div className="flex gap-2 mb-4 w-full">
+                    {item?.enrolled ? <Badge className="bg-green-500/10 text-green-400 w-full">Enrolled</Badge> :
+                        <Button disabled={loading} onClick={() => handleEnroll(item)} variant="outline" className="w-full">
+                            {loading && <Spinner />} <Users /> Participate
+                        </Button>
+                    }
+                </div>
+
+            </CardContent>
+
+        </Card>
+    )
 }
 
 

@@ -810,6 +810,7 @@ export type PrmotionsType = {
   total_revenue: number;
   rawData: any
   promotion_end: string | null
+  enrolled ?: boolean
 }
 
 export type ConfirmationProps = {
