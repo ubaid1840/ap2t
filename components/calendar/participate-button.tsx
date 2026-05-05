@@ -3,7 +3,7 @@ import axios from "@/lib/axios";
 import { Button } from "../ui/button";
 import { Spinner } from "../ui/spinner";
 
-const ParticipateButton = ({ player_id, session_id, onSuccess }: { player_id: string | null | undefined, session_id: string, onSuccess: () => Promise<void> }) => {
+const ParticipateButton = ({ player_id, session_id, onSuccess }: { player_id?: string | null, session_id: string | number, onSuccess: () => Promise<void> }) => {
     const [loading, setLoading] = useState(false)
 
     async function handleEnroll() {

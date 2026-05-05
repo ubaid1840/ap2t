@@ -1,56 +1,45 @@
 "use client";
 
 import { useAuth } from "@/contexts/auth-context";
+import { useIsMobile } from "@/hooks/use-mobile";
 import axios from "@/lib/axios";
-import { ReserveProps } from "@/lib/types";
+import { joinNames } from "@/lib/functions";
+import { ReserveProps, SessionProps } from "@/lib/types";
+import { Scrollbar } from "@radix-ui/react-scroll-area";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import moment from "moment";
 import { useMemo, useState } from "react";
-import { useIsMobile } from "@/hooks/use-mobile";
-import { joinNames } from "@/lib/functions";
-import { Scrollbar } from "@radix-ui/react-scroll-area";
 import RenderAvatar from "../render-avatar";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
-import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-} from "../ui/dialog";
 import { ScrollArea } from "../ui/scroll-area";
 import { Spinner } from "../ui/spinner";
+import CardStatus from "../card-status";
+import { GoDotFill } from "react-icons/go";
 
-export default function ReserveDialog() {
-    const [loading, setLoading] = useState(false);
-    const [sessions, setSessions] = useState<ReserveProps[]>([]);
-    const [open, setOpen] = useState(false);
+type ReserveComponentProps = {
+    player_id?: string | null | undefined,
+    onSuccess: () => Promise<void>,
+    loading?: boolean,
+    sessions: SessionProps[]
+}
+
+export default function ReserveComponent({ sessions, onSuccess, loading, player_id }: ReserveComponentProps) {
     const isMobile = useIsMobile()
 
     const [selectedDate, setSelectedDate] = useState(
         moment().format("YYYY-MM-DD")
     );
 
-    const { user } = useAuth();
-
-    const fetchData = async () => {
-        if (!user?.id) return;
-
-        setOpen(true);
-        setLoading(true);
-
-        try {
-            const result = await axios.get(`/player/${user?.id}/sessions`);
-            setSessions(result.data);
-        } finally {
-            setLoading(false);
-        }
-    };
+    const [startDate, setStartDate] = useState(() =>
+        moment().subtract(3, "days").format("YYYY-MM-DD")
+    );
 
     const weekDates = useMemo(() => {
         return Array.from({ length: 7 }, (_, i) =>
-            moment(selectedDate).add(i - 3, "days").format("YYYY-MM-DD")
+            moment(startDate).add(i, "days").format("YYYY-MM-DD")
         );
-    }, [selectedDate]);
+    }, [startDate]);
 
     const selectedSessions = useMemo(() => {
         return sessions.filter((s) => {
@@ -68,95 +57,105 @@ export default function ReserveDialog() {
         });
     }, [sessions, selectedDate]);
 
+    const handlePrev = () => {
+        setStartDate((prev) =>
+            moment(prev).subtract(1, "day").format("YYYY-MM-DD")
+        );
+    };
+
+    const handleNext = () => {
+        setStartDate((prev) =>
+            moment(prev).add(1, "day").format("YYYY-MM-DD")
+        );
+    };
+
     return (
-        <>
-            <Button disabled={!user?.id} onClick={fetchData} variant="outline">
-                Reserve
-            </Button>
+        loading ? <div className="w-full mt-10 flex items-center justify-center"><Spinner /></div>
+            :
+            <div className="space-y-6">
 
-            <Dialog open={open} onOpenChange={setOpen}>
-                <DialogContent className="max-w-3xl rounded-2xl">
-                    <DialogHeader>
-                        <DialogTitle>Reserve your spot</DialogTitle>
-                    </DialogHeader>
+                <div className="flex gap-2 justify-center">
+                    <Button
+                        disabled={loading}
+                        size="icon"
+                        variant="outline"
+                        onClick={handlePrev}
+                    >
+                        <ChevronLeft />
+                    </Button>
 
-                    <ScrollArea className="min-h-[100px] max-h-[70vh]">
+                    <ScrollArea className={`overflow-x-auto ${isMobile && "max-w-[calc(100vw-150px)]"}`}>
 
-                        {loading ? (
-                            <div className="flex flex-1 h-[100px] items-center justify-center">
-                                <Spinner />
-                            </div>
-                        ) : (
-                            <div className="space-y-6">
-                                {/* DATE STRIP */}
-                                <ScrollArea className={`overflow-x-auto ${isMobile && "max-w-[calc(100vw-50px)]"}`}>
+                        <div className="flex justify-center gap-3 transition-all duration-300 ease-out">
+                            {weekDates.map((date) => {
+                                const isSelected = date === selectedDate;
 
-                                    <div className="flex justify-center gap-3 transition-all duration-300 ease-out">
-                                        {weekDates.map((date) => {
-                                            const isSelected = date === selectedDate;
-
-                                            return (
-                                                <button
-                                                    key={date}
-                                                    onClick={() => setSelectedDate(date)}
-                                                    className={`
+                                return (
+                                    <button
+                                        key={date}
+                                        onClick={() => setSelectedDate(date)}
+                                        className={`
                           flex flex-col items-center justify-center
                           h-13 w-13 rounded-full
                           transition-all duration-300
                           transform
                           ${isSelected
-                                                            ? "bg-white text-black shadow-lg"
-                                                            : undefined
-                                                        }
+                                                ? "bg-white text-black shadow-lg"
+                                                : undefined
+                                            }
                         `}
-                                                >
-                                                    <span className="text-xl font-semibold leading-none">
-                                                        {moment(date).format("DD")}
-                                                    </span>
-                                                    <span className="text-xs opacity-70">
-                                                        {moment(date).format("ddd")}
-                                                    </span>
-                                                </button>
-                                            );
-                                        })}
-                                    </div>
-                                    <Scrollbar orientation="horizontal" />
-                                </ScrollArea>
-
-                                {/* DATE TITLE */}
-                                <div >
-                                    <h2 className="text-lg font-semibold transition-all duration-300">
-                                        {moment(selectedDate).format("dddd, MMMM DD, YYYY")}
-                                    </h2>
-                                </div>
-
-                                {/* SESSIONS */}
-                                <div className="space-y-2 transition-all duration-300">
-                                    {selectedSessions.length === 0 ? (
-                                        <div className="text-sm text-muted-foreground text-center">
-                                            No sessions found
-                                        </div>
-                                    ) : (
-                                        selectedSessions.map((session) => (
-                                            <RenderEachSession key={session.id} session={session} fetchData={fetchData} />
-                                        ))
-                                    )}
-                                </div>
-
-                            </div>
-                        )}
+                                    >
+                                        <span className="text-xl font-semibold leading-none">
+                                            {moment(date).format("DD")}
+                                        </span>
+                                        <span className="text-xs opacity-70">
+                                            {moment(date).format("ddd")}
+                                        </span>
+                                    </button>
+                                );
+                            })}
+                        </div>
+                        <Scrollbar orientation="horizontal" />
                     </ScrollArea>
-                </DialogContent>
-            </Dialog>
-        </>
+
+                    <Button
+                        disabled={loading}
+                        size="icon"
+                        variant="outline"
+                        onClick={handleNext}
+
+                    >
+                        <ChevronRight />
+                    </Button>
+                </div>
+
+                <div >
+                    <h2 className="text-lg font-semibold transition-all duration-300">
+                        {moment(selectedDate).format("dddd, MMMM DD, YYYY")}
+                    </h2>
+                </div>
+
+                <div className="space-y-2 transition-all duration-300">
+                    {selectedSessions.length === 0 ? (
+                        <div className="text-sm text-muted-foreground text-center">
+                            No sessions found
+                        </div>
+                    ) : (
+                        selectedSessions.map((session) => (
+                            <RenderEachSession key={session.id} session={session} fetchData={onSuccess} />
+                        ))
+                    )}
+                </div>
+
+            </div>
     );
 }
 
-const RenderEachSession = ({ session, fetchData }: { session: ReserveProps, fetchData: () => Promise<void> }) => {
+const RenderEachSession = ({ session, fetchData }: { session: SessionProps, fetchData: () => Promise<void> }) => {
     const [loading, setLoading] = useState(false)
     const { user } = useAuth()
 
-    async function handleEnroll(item: ReserveProps) {
+    async function handleEnroll(item: SessionProps) {
         if (!user?.id || !item.id) return
         try {
             setLoading(true)
@@ -178,42 +177,50 @@ const RenderEachSession = ({ session, fetchData }: { session: ReserveProps, fetc
 
             <div className="flex flex-col items-center gap-2 min-w-[70px]">
                 <span className="text-xs font-medium text-muted-foreground">
-                    {session.start_time}
+                    {session.time}
                 </span>
 
                 <RenderAvatar
-                    className="h-9 w-9"
-                    img={session.coach_picture}
-                    fallback={joinNames([
-                        session.coach_first_name,
-                        session.coach_last_name,
-                    ])}
+                    className="h-11 w-11"
+                    img={session.coachPicture}
+                    fallback={session.coachName}
                 />
             </div>
 
-           
+
             <div className="flex flex-col flex-1 px-2 justify-between">
                 <div>
                     <div className="text-sm font-semibold text-foreground">
-                        {session.name}
+                        {session.sessionName}
                     </div>
 
                     <div className="text-xs text-muted-foreground mt-1">
                         Coach:{" "}
-                        {joinNames([
-                            session.coach_first_name,
-                            session.coach_last_name,
-                        ])}
+                        {session.coachName}
                     </div>
                 </div>
 
-                <div className="mt-3 text-xs text-muted-foreground">
-                    {session.session_type} • {session.location}
+                <div className="mt-3 text-xs text-muted-foreground flex flex-wrap gap-2 items-center">
+
+                    <span className="text-xs px-2 py-1 rounded-full font-medium capitalize bg-alternative-bg text-alternative-text">
+                        {session.type}
+                    </span>
+                    <CardStatus value={session?.status} />
+                    <GoDotFill className="text-white" />
+                    <div className="leading-none">{session.location}</div>
+
                 </div>
             </div>
 
-          
-            <div className="flex flex-col justify-end">
+
+            <div className="flex flex-col justify-end gap-2">
+                <div className="flex flex-col items-start sm:items-end gap-2">
+                    {session?.promotion && <span className="text-sm line-through text-muted-foreground">${session?.original_price}</span>}
+                    <div className="p-2 bg-active-bg text-active-text border border-active-text/32 rounded-md">
+                        <p className="text-md font-medium leading-none">${Number(session?.price || 0).toFixed(0)}</p>
+                    </div>
+
+                </div>
                 {session?.enrolled ? <Badge className="bg-green-500/10 text-green-400">Enrolled</Badge> :
                     <Button
                         disabled={loading}

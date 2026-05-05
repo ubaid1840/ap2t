@@ -10,6 +10,7 @@ import {
   DialogTitle
 } from "../ui/dialog";
 import { Spinner } from "../ui/spinner";
+import { MessageSquareDot, Send } from "lucide-react";
 
 export default function PrivateSessionInquiryDialog({ email, firstName, lastName }: { email: string | undefined, firstName: string | undefined, lastName: string | undefined }) {
   const [localEmail, setLocalEmail] = useState("")
@@ -54,12 +55,12 @@ export default function PrivateSessionInquiryDialog({ email, firstName, lastName
     <>
 
       <Button onClick={() => setOpen(true)}>
-        Private Session Inquiry
+      <Send/>  Private Training Inquiry
       </Button>
 
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent>
-          <DialogTitle>Private Session Inquiry</DialogTitle>
+          <DialogTitle>Private Training Inquiry</DialogTitle>
 
           <form className="mt-8 space-y-5" onSubmit={handleSubmit}>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

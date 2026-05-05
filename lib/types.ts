@@ -14,7 +14,7 @@ export type CalendarEvent = {
   start_date: string | null
   end_date: string | null
   end_time: string
-  originalId: string
+  originalId: string | number
   price: string | number
   original_price: string | number
   promotion: boolean
@@ -262,12 +262,19 @@ export type SessionProps = {
   sessionName: string,
   type: string,
   date: string,
+  rawDate : string
   time: string,
   end_date: string,
   coachName: string,
+  coachPicture ?:string
   price: string | number,
   status: string
   original: any
+  promotion ?:boolean
+  original_price ?: string
+  enrolled :boolean
+  children: { user_id: number, last_name: string, first_name: string }[]
+  location ?:string
 }
 
 
@@ -814,4 +821,34 @@ export type ConfirmationProps = {
   loading: boolean
   children?: null | ReactNode
   valid?: boolean
+}
+
+export type ReserveProps = {
+   id: number;
+  name: string;
+  description: string;
+  status: string;
+  session_type: string;
+  coach_id: number;
+  location: string;
+  start_time: string;
+  end_time: string;
+  date: string;
+  end_date: string;
+  price: string;
+  promotion_price: string;
+  max_players: number;
+  apply_promotion: boolean;
+  show_storefront: boolean;
+  comped: boolean;
+  enrolled: boolean;
+  created_at: string;
+  promotion_start: string | null;
+  promotion_end: string | null;
+  image: string;
+  type: string;
+  age_limit: string;
+  coach_first_name: string;
+  coach_last_name: string;
+  coach_picture: string | null;
 }

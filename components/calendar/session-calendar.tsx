@@ -3,9 +3,10 @@
 import { Moment } from "moment";
 import CustomCalendar from "./custom-calendar";
 import "./calenderstyle.css";
+import { SessionProps } from "@/lib/types";
 
 type SessionCalendarProps = { 
-  sessions?: any[], 
+  sessions?: SessionProps[], 
   player_id?: string | null | undefined, 
   onSuccess?: () => Promise<void>, 
   parent_id?: string | null | undefined | number, 
@@ -68,8 +69,8 @@ export default function SessionCalendar({ currentMonth, setCurrentMonth, session
     end_date : endDate,
     start_date : startDate,
     price : session?.price,
-    promotion:session?.promotion,
-    original_price:session?.original_price
+    promotion:session?.promotion ?? false,
+    original_price:session?.original_price ?? 0
   }))
 })
 

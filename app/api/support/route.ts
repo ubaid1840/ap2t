@@ -6,7 +6,7 @@ export async function POST(req: NextRequest) {
     const searchParams = req.nextUrl.searchParams
     const type = searchParams.get("type")
 
-    let typeMessage = type === "inquiry" ? "New Private Session Inquiry" : "New Support Request"
+    let typeMessage = type === "inquiry" ? "New Private Training Inquiry" : "New Support Request"
 
     try {
 

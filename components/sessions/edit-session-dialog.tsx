@@ -213,12 +213,12 @@ export function EditSessionDialog({
       max_players: 0,
       apply_promotion: promotion,
       show_storefront: false,
-      date: undefined,
-      end_date: undefined,
+      date: null,
+      end_date: null,
       promotion_price: 0,
       image: "",
-      promotion_start: undefined,
-      promotion_end: undefined,
+      promotion_start: null,
+      promotion_end: null,
     },
   });
 
@@ -228,6 +228,7 @@ export function EditSessionDialog({
 
   useEffect(() => {
     if (open && sessionData) {
+      console.log(sessionData)
       form.reset({
         name: sessionData.name,
         description: sessionData.description,
@@ -236,8 +237,8 @@ export function EditSessionDialog({
         session_type: sessionData.session_type,
         coach_id: sessionData.coach_id,
         location: sessionData.location,
-        date: sessionData?.date ? new Date(sessionData?.date) : undefined,
-        end_date: sessionData.end_date ? new Date(sessionData.end_date) : undefined,
+        date: sessionData?.date ? new Date(sessionData?.date) : null,
+        end_date: sessionData.end_date ? new Date(sessionData.end_date) : null,
         start_time: sessionData.start_time,
         end_time: sessionData.end_time,
         price: Number(sessionData.price),
@@ -247,10 +248,10 @@ export function EditSessionDialog({
         promotion_price: Number(sessionData.promotion_price),
         promotion_start: sessionData.promotion_start
           ? new Date(sessionData.promotion_start)
-          : undefined,
+          : null,
         promotion_end: sessionData.promotion_end
           ? new Date(sessionData.promotion_end)
-          : undefined,
+          : null,
         show_storefront: (sessionData.show_storefront as boolean) ?? false,
       });
       setCoach_name(`${sessionData?.coach_first_name} ${sessionData?.coach_last_name}`)
@@ -375,7 +376,9 @@ export function EditSessionDialog({
               Edit {promotion ? "Promotion" : "Session"}
             </DialogTitle>
           </DialogHeader>
-          <form onSubmit={form.handleSubmit(editSession)}>
+          <form onSubmit={form.handleSubmit(editSession, (e)=>{
+            console.log(e)
+          })}>
             <ScrollArea className=" py-1 space-y-4 px-2 h-[calc(100vh-250px)]">
               <div className="space-y-2 px-2 pb-2">
                 <div className="flex gap-2 text-md ">
