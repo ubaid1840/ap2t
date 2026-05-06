@@ -8,7 +8,7 @@ export async function GET(req: NextRequest) {
     const role = searchParams.get("role")
 
     if (!role) {
-        return NextResponse.json({ message: "Role is missiong" }, { status: 400 })
+        return NextResponse.json({ message: "Role is missing" }, { status: 400 })
     }
 
     let query = ""
