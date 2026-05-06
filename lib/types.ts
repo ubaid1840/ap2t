@@ -249,6 +249,7 @@ export type DashboardDataResponse = {
     total_revenue: string
     total_users: string
     zip_code: string
+    id : number
   }[];
   revenueByCoach?: {
     coach: string;
@@ -652,7 +653,7 @@ export type PlayerData = {
   last_session_date: string;
   attendance: string;
   joining_date: string | Date | null;
-}
+} 
 
 
 

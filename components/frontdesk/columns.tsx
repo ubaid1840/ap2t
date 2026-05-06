@@ -3,24 +3,9 @@ import { Button } from "@/components/ui/button";
 import { ColumnDef } from "@tanstack/react-table";
 import { ArrowUpDown } from "lucide-react";
 import getInitials from "../parents/get-initials";
+import { PlayerData } from "@/lib/types";
 
-
-
-type PlayersData = {
-    name: string;
-    coach_name: string;
-    age: number;
-    position: string;
-    parent: string;
-    last_session: string;
-    last_session_date: string; 
-    attendance: number; 
-    id : number;
-    joining_date ?: string
-
-};
-
-export const PLAYERS_COLUMNS_FD: ColumnDef<PlayersData>[] = [
+export const PLAYERS_COLUMNS_FD: ColumnDef<PlayerData>[] = [
     {
         accessorKey: "name",
         header: ({ column }) => (

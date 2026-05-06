@@ -4,24 +4,9 @@ import { ArrowUpDown, Eye } from "lucide-react";
 import Link from "next/link";
 import CardStatus from "../card-status";
 import DummyButton from "../dummy-button";
+import { SessionProps } from "@/lib/types";
 
-
-type SessionData = {
-  id: number;
-  sessionName: string;
-  type: string;
-  date: string;
-  end_date: string;
-  time: string;
-  coachName: string;
-  playerName: string;
-  price: number;
-  payment: "paid" | "pending" | "comped" | "failed";
-  status: "upcoming" | "completed" | "cancelled" | "comped";
-};
-
-
-export const SESSION_COLUMNS: ColumnDef<SessionData>[] = [
+export const SESSION_COLUMNS: ColumnDef<SessionProps>[] = [
   {
     accessorKey: "sessionName",
     header: ({ column }) => (
@@ -154,7 +139,7 @@ export const SESSION_COLUMNS: ColumnDef<SessionData>[] = [
   },
 ];
 
-export const SESSION_COLUMNS_COACH: ColumnDef<SessionData>[] = [
+export const SESSION_COLUMNS_COACH: ColumnDef<SessionProps>[] = [
   {
     accessorKey: "sessionName",
     header: ({ column }) => (

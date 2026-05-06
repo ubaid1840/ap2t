@@ -1,18 +1,11 @@
 "use client";
 
-import axios from "@/lib/axios";
-import { auth } from "@/lib/firebase";
-import { handleLogout } from "@/lib/logout";
-import {
-  User as FirebaseUser,
-  onAuthStateChanged,
-  signOut,
-} from "firebase/auth";
 import { usePathname } from "next/navigation";
 import { useRouter } from 'nextjs-toploader/app';
 import { createContext, useContext, useEffect, useState } from "react";
-import { toast } from "sonner";
-import { useAuthFirebase } from "./auth-firebase-context";
+import { onAuthStateChanged, signOut } from "firebase/auth";
+import { auth } from "@/lib/firebase";
+import axios from "@/lib/axios";
 
 type DBUser = {
   id: string;
@@ -25,43 +18,82 @@ type DBUser = {
 };
 
 type AuthContextType = {
- 
+
   user: DBUser | null;
   loading: boolean;
-isAdmin : boolean
+  isAdmin: boolean
 };
 
 const AuthContext = createContext<AuthContextType>({
- 
+
   user: null,
   loading: true,
-isAdmin : false
+  isAdmin: false
 });
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
- 
-  const [user, setUser] = useState<DBUser | null>(null);
-const {authData, loading, isAdmin} = useAuthFirebase()
-  const router = useRouter();
 
+  const [user, setUser] = useState<DBUser | null>(null);
+  const [loading, setLoading] = useState(true);
+  const router = useRouter();
+  const [authData, setAuthData] = useState<DBUser | null>(null);
   const pathname = usePathname();
 
+
   useEffect(() => {
-    
-    if(authData?.id){
-       const correctedRoute = `/portal/${authData?.role}`
-        if (!pathname.startsWith(correctedRoute)) {
-          router.replace(correctedRoute);
-          return
+    const unsub = onAuthStateChanged(auth, async (fbUser) => {
+      setLoading(true);
+      try {
+        if (!fbUser?.email) {
+          setAuthData(null);
+          return;
         }
-        setUser(authData)
-    } 
-  }, [authData, pathname]);
+
+        const res = await axios.get(`/userdetail?email=${fbUser.email}`);
+
+        if (res?.data?.status === "inactive") {
+          setAuthData({ ...res.data, status: "inactive" });
+          return;
+        }
+
+        setAuthData(res.data);
+      } catch {
+        setAuthData(null);
+        signOut(auth);
+      } finally {
+        setLoading(false);
+      }
+    });
+
+    return () => unsub();
+  }, []);
+
+  useEffect(() => {
+    if (loading) return;
+    if (!authData) {
+      if (!pathname.startsWith("/portal/auth")) {
+        router.replace("/portal/auth");
+      }
+      return;
+    }
+
+    if (authData.status === "inactive") {
+      router.replace("/portal/restrict");
+      return;
+    }
+    const correctRoute = `/portal/${authData.role}`;
+    if (!pathname.startsWith(correctRoute)) {
+      router.replace(correctRoute);
+      return
+    }
+    setUser(authData)
+  }, [authData, pathname, loading]);
 
 
+  const isAdmin = authData?.role === 'admin'
 
   return (
-    <AuthContext.Provider value={{  user, loading, isAdmin }}>
+    <AuthContext.Provider value={{ user, loading, isAdmin }}>
       {children}
     </AuthContext.Provider>
   );

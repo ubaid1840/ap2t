@@ -13,10 +13,11 @@ type AttendanceData = {
 };
 
 type ZipRevenueData = {
-  zip: string
-  players: number
-  revenue: number
-  avg_revenue: number
+  avg_revenue: string
+    total_revenue: string
+    total_users: string
+    zip_code: string
+    id : number
 }
 
 

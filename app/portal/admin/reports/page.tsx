@@ -404,7 +404,7 @@ export default function Page() {
             onRowClick={() => {
 
             }}
-            scrollAreaWidth={`${open ? "w-[calc(100dvw-306px)]" : "w-[calc(100dvw-96px)]"} ${isMobile && "w-[calc(100vw-44px)]"}`}
+            scrollAreaWidth={`${open ? "w-[calc(100dvw-306px)]" : "w-[calc(100dvw-104px)]"} ${isMobile && "w-[calc(100vw-44px)]"}`}
           />
 
         </CardContent>
@@ -442,9 +442,8 @@ export default function Page() {
             onRowClick={() => {
 
             }}
-            scrollAreaWidth={`${open ? "w-[calc(100dvw-306px)]" : "w-[calc(100dvw-96px)]"} ${isMobile && "w-[calc(100vw-44px)]"}`}
+            scrollAreaWidth={`${open ? "w-[calc(100dvw-306px)]" : "w-[calc(100dvw-104px)]"} ${isMobile && "w-[calc(100vw-44px)]"}`}
           />
-
         </CardContent>
 
 

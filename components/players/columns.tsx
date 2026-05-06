@@ -6,24 +6,12 @@ import Link from "next/link";
 import CardStatus from "../card-status";
 import DummyButton from "../dummy-button";
 import getInitials from "../parents/get-initials";
+import { PlayerData } from "@/lib/types";
 
 
 
-export type PlayersData = {
-    name: string;
-    coach_name: string;
-    age: number;
-    position: string;
-    parent: string;
-    last_session: string;
-    last_session_date: string;
-    attendance: number;
-    id: number;
-    joining_date?: string
 
-};
-
-export const PLAYERS_COLUMNS: ColumnDef<PlayersData>[] = [
+export const PLAYERS_COLUMNS: ColumnDef<PlayerData>[] = [
     {
         accessorKey: "name",
         header: ({ column }) => (

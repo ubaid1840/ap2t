@@ -3,18 +3,9 @@ import { ColumnDef } from "@tanstack/react-table";
 import { ArrowUpDown } from "lucide-react";
 import Link from "next/link";
 import CardStatus from "../card-status";
+import { SessionRecord } from "@/lib/types";
 
-type SessionData = {
-  name: string;
-  session_type: string;
-  coach_name: string;
-  start_time: string;
-  end_time : string
-  status: string;
-  id : number;
-};
-
-export const DASHBOARD_SESSIONS_COLUMNS: ColumnDef<SessionData>[] = [
+export const DASHBOARD_SESSIONS_COLUMNS: ColumnDef<SessionRecord>[] = [
     {
         accessorKey: "name",
         header: ({ column }) => (

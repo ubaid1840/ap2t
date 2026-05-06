@@ -21,8 +21,9 @@ import { useEffect, useState } from "react"
 
 
 
-export default function Page() {
 
+export default function Page() {
+    
     const [filter, setFilter] = useState(false)
     const [players, setPlayers] = useState<PlayerData[] | []>([])
     const [loading, setLoading] = useState(true)
@@ -43,7 +44,7 @@ export default function Page() {
             if (result.data) {
                 const mappedPlayers = result.data.map((p: any) => ({
                     id: p.id,
-                    email : p.email,
+                    email: p.email,
                     name: joinNames([p.first_name, p.last_name]),
                     coach_name: joinNames([p?.coach_first_name, p?.coach_last_name]),
                     age: getYear(p.birth_date),
@@ -54,7 +55,7 @@ export default function Page() {
                     last_session_date: p?.last_session_date ? moment(new Date(p?.last_session_date)).format("YYYY-MM-DD") : "N/A",
                     attendance: String(p?.attendance_percent || 0),
                     joining_date: p.created_at,
-                    parent_email : p.parent_email
+                    parent_email: p.parent_email
                 }));
                 setPlayers(mappedPlayers)
             }
@@ -65,34 +66,33 @@ export default function Page() {
         }
     }
 
-  const filteredData = players.filter((item) => {
-  const playerSearchText = `${item?.name} ${item?.parent} ${item?.position}`.toLowerCase();
-  const coachSearchText = `${item?.coach_name ?? ""}`.toLowerCase();
-  const typeSearchText = `${item?.last_session ?? ""}`.toLowerCase();
-  const playerAge = Number(item?.age ?? 0);
+    const filteredData = players.filter((item) => {
+        const playerSearchText = `${item?.name} ${item?.parent} ${item?.position}`.toLowerCase();
+        const coachSearchText = `${item?.coach_name ?? ""}`.toLowerCase();
+        const typeSearchText = `${item?.last_session ?? ""}`.toLowerCase();
+        const playerAge = Number(item?.age ?? 0);
 
-  // Split search into words for more flexible matching
-  const playerSearchWords = search?.toLowerCase().trim().split(/\s+/).filter(Boolean) || [];
-  const coachSearchWords = coachSearch?.toLowerCase().trim().split(/\s+/).filter(Boolean) || [];
-  const typeSearchWords = typeSearch?.toLowerCase().trim().split(/\s+/).filter(Boolean) || [];
+        const playerSearchWords = search?.toLowerCase().trim().split(/\s+/).filter(Boolean) || [];
+        const coachSearchWords = coachSearch?.toLowerCase().trim().split(/\s+/).filter(Boolean) || [];
+        const typeSearchWords = typeSearch?.toLowerCase().trim().split(/\s+/).filter(Boolean) || [];
 
-  const matchesPlayer =
-    !playerSearchWords.length ||
-    playerSearchWords.every((word) => playerSearchText.includes(word));
+        const matchesPlayer =
+            !playerSearchWords.length ||
+            playerSearchWords.every((word) => playerSearchText.includes(word));
 
-  const matchesCoach =
-    !coachSearchWords.length ||
-    coachSearchWords.every((word) => coachSearchText.includes(word));
+        const matchesCoach =
+            !coachSearchWords.length ||
+            coachSearchWords.every((word) => coachSearchText.includes(word));
 
-  const matchesType =
-    !typeSearchWords.length ||
-    typeSearchWords.every((word) => typeSearchText.includes(word));
+        const matchesType =
+            !typeSearchWords.length ||
+            typeSearchWords.every((word) => typeSearchText.includes(word));
 
-  const matchesAge =
-    !ageSearch || playerAge <= Number(ageSearch); 
+        const matchesAge =
+            !ageSearch || playerAge <= Number(ageSearch);
 
-  return matchesPlayer && matchesCoach && matchesType && matchesAge;
-});
+        return matchesPlayer && matchesCoach && matchesType && matchesAge;
+    });
 
 
     return (
@@ -115,7 +115,7 @@ export default function Page() {
                         await fetchData()
                     }} />
 
-                    <BulkEmail players={players}/>
+                    <BulkEmail players={players} />
                 </div>
             </Header>
 

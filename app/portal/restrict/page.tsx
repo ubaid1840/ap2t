@@ -1,10 +1,15 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
+import { useAuth } from "@/contexts/auth-context"
 import { handleLogout } from "@/lib/logout"
 import { AlertCircle } from "lucide-react"
 
 export default function AccountInactivePage() {
+
+  const {user} = useAuth()
+
+  if(!user) return null
 
   return (
     <div className="flex h-screen w-screen items-center justify-center px-4">
